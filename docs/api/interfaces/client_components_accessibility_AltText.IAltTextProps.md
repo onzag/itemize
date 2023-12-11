@@ -27,6 +27,7 @@
 - [label](client_components_accessibility_AltText.IAltTextProps.md#label)
 - [labelledBy](client_components_accessibility_AltText.IAltTextProps.md#labelledby)
 - [lang](client_components_accessibility_AltText.IAltTextProps.md#lang)
+- [onActionTriggered](client_components_accessibility_AltText.IAltTextProps.md#onactiontriggered)
 - [onTabOutTrigger](client_components_accessibility_AltText.IAltTextProps.md#ontabouttrigger)
 - [priority](client_components_accessibility_AltText.IAltTextProps.md#priority)
 - [tabAnchor](client_components_accessibility_AltText.IAltTextProps.md#tabanchor)
@@ -36,10 +37,6 @@
 - [uncontrolled](client_components_accessibility_AltText.IAltTextProps.md#uncontrolled)
 - [uncontrolledSelector](client_components_accessibility_AltText.IAltTextProps.md#uncontrolledselector)
 - [useInFlow](client_components_accessibility_AltText.IAltTextProps.md#useinflow)
-
-### Methods
-
-- [onActionTriggered](client_components_accessibility_AltText.IAltTextProps.md#onactiontriggered)
 
 ## Properties
 
@@ -60,7 +57,7 @@ this is basically the default for input fields and textareas
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:88](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L88)
+[client/components/accessibility/AltReactioner.tsx:88](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L88)
 
 ___
 
@@ -72,7 +69,7 @@ The children that should be read
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:13](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L13)
+[client/components/accessibility/AltText.tsx:13](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L13)
 
 ___
 
@@ -88,7 +85,7 @@ A class name to use in such component
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:31](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L31)
+[client/components/accessibility/AltReactioner.tsx:31](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L31)
 
 ___
 
@@ -104,7 +101,7 @@ The wrapping component to use, by default it will use a div
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:18](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L18)
+[client/components/accessibility/AltReactioner.tsx:18](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L18)
 
 ___
 
@@ -121,7 +118,7 @@ use this as a string
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:27](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L27)
+[client/components/accessibility/AltReactioner.tsx:27](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L27)
 
 ___
 
@@ -137,7 +134,7 @@ Props to pass to the component
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L22)
+[client/components/accessibility/AltReactioner.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L22)
 
 ___
 
@@ -149,7 +146,7 @@ An aria-describedby by value
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L33)
+[client/components/accessibility/AltText.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L33)
 
 ___
 
@@ -161,7 +158,7 @@ aria-description
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:23](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L23)
+[client/components/accessibility/AltText.tsx:23](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L23)
 
 ___
 
@@ -177,7 +174,7 @@ whether it is currently disabled
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:35](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L35)
+[client/components/accessibility/AltReactioner.tsx:35](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L35)
 
 ___
 
@@ -197,7 +194,7 @@ very useful for dialogs for example that may get closed by outside actions
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:75](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L75)
+[client/components/accessibility/AltReactioner.tsx:75](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L75)
 
 ___
 
@@ -209,7 +206,7 @@ aria-label
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:18](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L18)
+[client/components/accessibility/AltText.tsx:18](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L18)
 
 ___
 
@@ -221,7 +218,7 @@ aria-labelledby
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L28)
+[client/components/accessibility/AltText.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L28)
 
 ___
 
@@ -237,7 +234,38 @@ Language override
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L38)
+[client/components/accessibility/AltText.tsx:38](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L38)
+
+___
+
+### onActionTriggered
+
+• `Optional` **onActionTriggered**: (`tabNavigating`: `boolean`, `action`: ``"click"`` \| ``"blur"`` \| ``"focus"``) => `void`
+
+#### Type declaration
+
+▸ (`tabNavigating`, `action`): `void`
+
+Triggers when the action triggers
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tabNavigating` | `boolean` |
+| `action` | ``"click"`` \| ``"blur"`` \| ``"focus"`` |
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[IAltBaseProps](client_components_accessibility_AltReactioner.IAltBaseProps.md).[onActionTriggered](client_components_accessibility_AltReactioner.IAltBaseProps.md#onactiontriggered)
+
+#### Defined in
+
+[client/components/accessibility/AltReactioner.tsx:56](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L56)
 
 ___
 
@@ -254,7 +282,7 @@ layer, use this to select which reaction key would you like to trigger from the 
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:44](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L44)
+[client/components/accessibility/AltText.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L44)
 
 ___
 
@@ -279,7 +307,7 @@ but for elements that are as useInFlow pressing tab on it will figure the next a
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:48](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L48)
+[client/components/accessibility/AltReactioner.tsx:48](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L48)
 
 ___
 
@@ -296,7 +324,7 @@ anchors
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:67](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L67)
+[client/components/accessibility/AltReactioner.tsx:67](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L67)
 
 ___
 
@@ -314,7 +342,7 @@ and can be focused via the tab key
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:62](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L62)
+[client/components/accessibility/AltReactioner.tsx:62](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L62)
 
 ___
 
@@ -330,7 +358,7 @@ will trigger a new input reaction after it has been completed
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:52](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L52)
+[client/components/accessibility/AltReactioner.tsx:52](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L52)
 
 ___
 
@@ -346,7 +374,7 @@ plays with hideAllIfUnmount to trigger an action whenever it's unmounted
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:79](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L79)
+[client/components/accessibility/AltReactioner.tsx:79](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L79)
 
 ___
 
@@ -367,7 +395,7 @@ is focused, the alt is set in an uncontrolled state, and it will stop deciding w
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:103](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L103)
+[client/components/accessibility/AltReactioner.tsx:103](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L103)
 
 ___
 
@@ -385,7 +413,7 @@ depending on selection style
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:110](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L110)
+[client/components/accessibility/AltReactioner.tsx:110](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L110)
 
 ___
 
@@ -401,31 +429,4 @@ whether it is used in flow, for text the default is true
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:9](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L9)
-
-## Methods
-
-### onActionTriggered
-
-▸ `Optional` **onActionTriggered**(`tabNavigating`, `action`): `void`
-
-Triggers when the action triggers
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `tabNavigating` | `boolean` |
-| `action` | ``"click"`` \| ``"focus"`` \| ``"blur"`` |
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[IAltBaseProps](client_components_accessibility_AltReactioner.IAltBaseProps.md).[onActionTriggered](client_components_accessibility_AltReactioner.IAltBaseProps.md#onactiontriggered)
-
-#### Defined in
-
-[client/components/accessibility/AltReactioner.tsx:56](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L56)
+[client/components/accessibility/AltText.tsx:9](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltText.tsx#L9)

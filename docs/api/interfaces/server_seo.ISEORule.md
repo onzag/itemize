@@ -12,9 +12,6 @@ Represents a rule for building the SEO sitemaps
 
 - [collect](server_seo.ISEORule.md#collect)
 - [crawable](server_seo.ISEORule.md#crawable)
-
-### Methods
-
 - [parametrize](server_seo.ISEORule.md#parametrize)
 
 ## Properties
@@ -72,7 +69,7 @@ it can be async
 
 #### Defined in
 
-[server/seo/index.ts:94](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L94)
+[server/seo/index.ts:94](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L94)
 
 ___
 
@@ -85,20 +82,24 @@ false, depending on you
 
 #### Defined in
 
-[server/seo/index.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L44)
+[server/seo/index.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L44)
 
-## Methods
+___
 
 ### parametrize
 
-▸ `Optional` **parametrize**(`arg`): [`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[] \| `Promise`<[`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[]\>
+• `Optional` **parametrize**: (`arg`: \{ `collectedResults`: [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md)[] ; `rawDB`: [`ItemizeRawDB`](../classes/server_raw_db.ItemizeRawDB.md) ; `root`: [`default`](../classes/base_Root.default.md)  }) => [`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[] \| `Promise`\<[`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[]\>
+
+#### Type declaration
+
+▸ (`arg`): [`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[] \| `Promise`\<[`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[]\>
 
 This is the parametrize function, only makes sense to use when you specify the collect attribute as this needs
 to make use of collected results, however you might specify parametrize without using collect at all, but bear in mind that
 you will have somehow to keep track of what you are searching for yourself, parametrize is only really intended to run with
 collect
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
@@ -107,10 +108,10 @@ collect
 | `arg.rawDB` | [`ItemizeRawDB`](../classes/server_raw_db.ItemizeRawDB.md) |
 | `arg.root` | [`default`](../classes/base_Root.default.md) |
 
-#### Returns
+##### Returns
 
-[`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[] \| `Promise`<[`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[]\>
+[`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[] \| `Promise`\<[`ISEOParametrizer`](server_seo.ISEOParametrizer.md)[]\>
 
 #### Defined in
 
-[server/seo/index.ts:101](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L101)
+[server/seo/index.ts:101](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L101)

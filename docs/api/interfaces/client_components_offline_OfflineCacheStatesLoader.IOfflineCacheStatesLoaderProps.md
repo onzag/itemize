@@ -14,15 +14,36 @@
 
 ### Properties
 
+- [children](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderProps.md#children)
 - [disabled](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderProps.md#disabled)
 - [id](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderProps.md#id)
 - [itemOrModule](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderProps.md#itemormodule)
 
-### Methods
-
-- [children](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderProps.md#children)
-
 ## Properties
+
+### children
+
+• **children**: (`arg`: [`IOfflineCacheStatesLoaderArg`](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderArg.md)) => `ReactNode`
+
+#### Type declaration
+
+▸ (`arg`): `ReactNode`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IOfflineCacheStatesLoaderArg`](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderArg.md) |
+
+##### Returns
+
+`ReactNode`
+
+#### Defined in
+
+[client/components/offline/OfflineCacheStatesLoader.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/components/offline/OfflineCacheStatesLoader.tsx#L22)
+
+___
 
 ### disabled
 
@@ -34,7 +55,7 @@
 
 #### Defined in
 
-[client/components/offline/OfflineCacheStatesLoader.tsx:10](https://github.com/onzag/itemize/blob/a24376ed/client/components/offline/OfflineCacheStatesLoader.tsx#L10)
+[client/components/offline/OfflineCacheStatesLoader.tsx:10](https://github.com/onzag/itemize/blob/59702dd5/client/components/offline/OfflineCacheStatesLoader.tsx#L10)
 
 ___
 
@@ -48,7 +69,7 @@ ___
 
 #### Defined in
 
-[client/components/offline/OfflineCacheStatesLoader.tsx:9](https://github.com/onzag/itemize/blob/a24376ed/client/components/offline/OfflineCacheStatesLoader.tsx#L9)
+[client/components/offline/OfflineCacheStatesLoader.tsx:9](https://github.com/onzag/itemize/blob/59702dd5/client/components/offline/OfflineCacheStatesLoader.tsx#L9)
 
 ___
 
@@ -62,24 +83,4 @@ ___
 
 #### Defined in
 
-[client/components/offline/OfflineCacheStatesLoader.tsx:8](https://github.com/onzag/itemize/blob/a24376ed/client/components/offline/OfflineCacheStatesLoader.tsx#L8)
-
-## Methods
-
-### children
-
-▸ **children**(`arg`): `ReactNode`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `arg` | [`IOfflineCacheStatesLoaderArg`](client_components_offline_OfflineCacheStatesLoader.IOfflineCacheStatesLoaderArg.md) |
-
-#### Returns
-
-`ReactNode`
-
-#### Defined in
-
-[client/components/offline/OfflineCacheStatesLoader.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/components/offline/OfflineCacheStatesLoader.tsx#L22)
+[client/components/offline/OfflineCacheStatesLoader.tsx:8](https://github.com/onzag/itemize/blob/59702dd5/client/components/offline/OfflineCacheStatesLoader.tsx#L8)

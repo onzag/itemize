@@ -7,22 +7,34 @@ application and doing redirects
 
 ## Table of contents
 
-### Variables
+### Namespaces
+
+- [default](client_components_navigation_Link.default.md)
+
+### Functions
 
 - [default](client_components_navigation_Link.md#default)
 
-## Variables
+## Functions
 
 ### default
 
-• **default**: `ForwardRefExoticComponent`<`ICustomLinkProps` & `RefAttributes`<`HTMLAnchorElement`\>\>
+▸ **default**(`props`): `ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\>
 
 Same as the router link but actually takes
 care of the current language set and uses such
 language if the location is absolute
 
-**`param`** the LinkProps
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `ICustomLinkProps` & `RefAttributes`\<`HTMLAnchorElement`\> | the LinkProps |
+
+#### Returns
+
+`ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\>
 
 #### Defined in
 
-[client/components/navigation/Link.tsx:100](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/Link.tsx#L100)
+node_modules/@types/react/index.d.ts:354

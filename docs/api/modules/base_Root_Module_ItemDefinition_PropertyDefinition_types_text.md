@@ -18,10 +18,10 @@ Contains the text type description
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>
 
 The type describes how the text type behaves in the app, this includes rich text
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:49](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L49)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L48)

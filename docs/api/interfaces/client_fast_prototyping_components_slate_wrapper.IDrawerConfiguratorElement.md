@@ -17,11 +17,11 @@ Specifies a configurator to be added to the drawer
 
 ### Component
 
-• **Component**: `ComponentType`<[`IDrawerContainerProps`](client_fast_prototyping_components_slate_wrapper.IDrawerContainerProps.md)\>
+• **Component**: `ComponentType`\<[`IDrawerContainerProps`](client_fast_prototyping_components_slate_wrapper.IDrawerContainerProps.md)\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:384](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L384)
+[client/fast-prototyping/components/slate/wrapper.tsx:384](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L384)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:383](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L383)
+[client/fast-prototyping/components/slate/wrapper.tsx:383](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L383)

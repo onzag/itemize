@@ -6,7 +6,7 @@ Contains the password type description
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedPasswordType](base_Root_Module_ItemDefinition_PropertyDefinition_types_password.md#propertydefinitionsupportedpasswordtype)
 
@@ -14,7 +14,7 @@ Contains the password type description
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_password.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedPasswordType
 
@@ -24,16 +24,16 @@ A password type is described by a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:17](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L17)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:16](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L16)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedPasswordType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_password.md#propertydefinitionsupportedpasswordtype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedPasswordType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_password.md#propertydefinitionsupportedpasswordtype)\>
 
 The behaviour of passwords is specified by this type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:22](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:21](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L21)

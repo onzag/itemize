@@ -35,4 +35,4 @@ an react component that wraps this html content
 
 #### Defined in
 
-[client/components/resources/HTMLResourceLoader.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/HTMLResourceLoader.tsx#L41)
+[client/components/resources/HTMLResourceLoader.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/HTMLResourceLoader.tsx#L41)

@@ -27,7 +27,7 @@ A value to make it be default to for this column
 
 #### Defined in
 
-[base/Root/sql.ts:49](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L49)
+[base/Root/sql.ts:49](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L49)
 
 ___
 
@@ -40,7 +40,7 @@ type in order to function properly
 
 #### Defined in
 
-[base/Root/sql.ts:88](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L88)
+[base/Root/sql.ts:88](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L88)
 
 ___
 
@@ -63,7 +63,7 @@ A foreign key
 
 #### Defined in
 
-[base/Root/sql.ts:53](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L53)
+[base/Root/sql.ts:53](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L53)
 
 ___
 
@@ -75,7 +75,7 @@ An index definition
 
 #### Defined in
 
-[base/Root/sql.ts:83](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L83)
+[base/Root/sql.ts:83](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L83)
 
 ___
 
@@ -88,7 +88,7 @@ this very often
 
 #### Defined in
 
-[base/Root/sql.ts:45](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L45)
+[base/Root/sql.ts:45](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L45)
 
 ___
 
@@ -100,4 +100,4 @@ Postgresql type
 
 #### Defined in
 
-[base/Root/sql.ts:40](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L40)
+[base/Root/sql.ts:40](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L40)

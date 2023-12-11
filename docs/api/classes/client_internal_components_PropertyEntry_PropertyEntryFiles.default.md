@@ -8,7 +8,7 @@ This is the property entry file class
 
 ## Hierarchy
 
-- `Component`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>, `IPropertyEntryFilesState`\>
+- `Component`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>, `IPropertyEntryFilesState`\>
 
   ↳ **`default`**
 
@@ -63,24 +63,28 @@ This is the property entry file class
 
 ### constructor
 
-• **new default**(`props`)
+• **new default**(`props`): [`default`](client_internal_components_PropertyEntry_PropertyEntryFiles.default.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\> |
+| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\> |
+
+#### Returns
+
+[`default`](client_internal_components_PropertyEntry_PropertyEntryFiles.default.md)
 
 #### Overrides
 
-React.Component&lt;
-    IPropertyEntryHandlerProps&lt;PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps\&gt;,
+React.Component\&lt;
+    IPropertyEntryHandlerProps\&lt;PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps\&gt;,
     IPropertyEntryFilesState
   \&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:173](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L173)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:173](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L173)
 
 ## Properties
 
@@ -100,7 +104,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -108,7 +114,7 @@ React.Component.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
@@ -134,13 +140,13 @@ points to a file
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:171](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L171)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:171](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L171)
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -148,7 +154,7 @@ React.Component.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -156,8 +162,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -169,13 +176,13 @@ React.Component.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### state
 
-• **state**: `Readonly`<`IPropertyEntryFilesState`\>
+• **state**: `Readonly`\<`IPropertyEntryFilesState`\>
 
 #### Inherited from
 
@@ -183,13 +190,13 @@ React.Component.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -208,7 +215,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -216,13 +225,13 @@ React.Component.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -232,15 +241,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -248,13 +260,13 @@ React.Component.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -267,22 +279,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -290,13 +305,13 @@ React.Component.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -307,23 +322,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
-| `nextState` | `Readonly`<`IPropertyEntryFilesState`\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
+| `nextState` | `Readonly`\<`IPropertyEntryFilesState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -331,7 +349,7 @@ React.Component.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
@@ -345,7 +363,7 @@ ___
 | :------ | :------ |
 | `isExpectingImages` | `boolean` |
 | `acceptOverride` | `string` |
-| `value` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) |
+| `value` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) |
 | `avoidChanges` | `boolean` |
 
 #### Returns
@@ -354,13 +372,13 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:418](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L418)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:418](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L418)
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -382,13 +400,13 @@ React.Component.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
 ### componentDidMount
 
-▸ `Optional` **componentDidMount**(): `void`
+▸ **componentDidMount**(): `void`
 
 Called immediately after a component is mounted. Setting state here will trigger re-rendering.
 
@@ -402,13 +420,13 @@ React.Component.componentDidMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:625
+node_modules/@types/react/index.d.ts:619
 
 ___
 
 ### componentDidUpdate
 
-▸ `Optional` **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
+▸ **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
 
 Called immediately after updating occurs. Not called for the initial render.
 
@@ -418,8 +436,8 @@ The snapshot is only present if getSnapshotBeforeUpdate is present and returns n
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
-| `prevState` | `Readonly`<`IPropertyEntryFilesState`\> |
+| `prevProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
+| `prevState` | `Readonly`\<`IPropertyEntryFilesState`\> |
 | `snapshot?` | `any` |
 
 #### Returns
@@ -432,13 +450,13 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:688
+node_modules/@types/react/index.d.ts:682
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -446,15 +464,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -462,13 +483,13 @@ React.Component.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -479,22 +500,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -502,7 +526,7 @@ React.Component.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
@@ -520,13 +544,13 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:222](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L222)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:222](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L222)
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -535,23 +559,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
-| `nextState` | `Readonly`<`IPropertyEntryFilesState`\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
+| `nextState` | `Readonly`\<`IPropertyEntryFilesState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -559,7 +586,7 @@ React.Component.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
@@ -573,7 +600,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:604](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L604)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:604](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L604)
 
 ___
 
@@ -597,13 +624,13 @@ React.Component.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
 ### getCurrentValue
 
-▸ `Private` **getCurrentValue**(`doNotAbsolute`): [`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)
+▸ **getCurrentValue**(`doNotAbsolute`): [`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)
 
 Provides the current value, either the actual value
 or the rejected value
@@ -622,13 +649,13 @@ a PropertyDefinitionSupportedFileType
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:246](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L246)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:246](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L246)
 
 ___
 
 ### getCurrentValueWithInfo
 
-▸ `Private` **getCurrentValueWithInfo**(): `PropertyDefinitionSupportedFileTypeWithInfo`[]
+▸ **getCurrentValueWithInfo**(): `PropertyDefinitionSupportedFileTypeWithInfo`[]
 
 #### Returns
 
@@ -636,13 +663,13 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:320](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L320)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:320](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L320)
 
 ___
 
 ### getIdOfLastValue
 
-▸ `Private` **getIdOfLastValue**(): `string`
+▸ **getIdOfLastValue**(): `string`
 
 #### Returns
 
@@ -650,13 +677,13 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:229](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L229)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:229](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L229)
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -669,8 +696,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
-| `prevState` | `Readonly`<`IPropertyEntryFilesState`\> |
+| `prevProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\> |
+| `prevState` | `Readonly`\<`IPropertyEntryFilesState`\> |
 
 #### Returns
 
@@ -682,19 +709,19 @@ React.Component.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
 ### getValueWithInfoFromSpecific
 
-▸ `Private` **getValueWithInfoFromSpecific**(`v`, `data`): `PropertyDefinitionSupportedFileTypeWithInfo`
+▸ **getValueWithInfoFromSpecific**(`v`, `data`): `PropertyDefinitionSupportedFileTypeWithInfo`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `v` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) |
+| `v` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) |
 | `data` | `Object` |
 | `data.givenIndex` | `number` |
 | `data.isReject?` | `boolean` |
@@ -706,13 +733,13 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:283](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L283)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:283](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L283)
 
 ___
 
 ### onPushFile
 
-▸ **onPushFile**(`file`, `info?`): `Promise`<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>
+▸ **onPushFile**(`file`, `info?`): `Promise`\<[`IRQFile`](../interfaces/rq_querier.IRQFile.md)\>
 
 #### Parameters
 
@@ -723,17 +750,17 @@ ___
 
 #### Returns
 
-`Promise`<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>
+`Promise`\<[`IRQFile`](../interfaces/rq_querier.IRQFile.md)\>
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:415](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L415)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:415](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L415)
 
 ___
 
 ### onPushFileInternal
 
-▸ **onPushFileInternal**(`file`, `info?`, `avoidChanges?`): `Promise`<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>
+▸ **onPushFileInternal**(`file`, `info?`, `avoidChanges?`): `Promise`\<[`IRQFile`](../interfaces/rq_querier.IRQFile.md)\>
 
 #### Parameters
 
@@ -745,17 +772,17 @@ ___
 
 #### Returns
 
-`Promise`<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>
+`Promise`\<[`IRQFile`](../interfaces/rq_querier.IRQFile.md)\>
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:465](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L465)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:465](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L465)
 
 ___
 
 ### onPushFiles
 
-▸ **onPushFiles**(`files`, `info?`): `Promise`<`void`\>
+▸ **onPushFiles**(`files`, `info?`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -766,11 +793,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:399](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L399)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:399](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L399)
 
 ___
 
@@ -790,7 +817,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:582](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L582)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:582](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L582)
 
 ___
 
@@ -810,7 +837,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:597](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L597)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:597](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L597)
 
 ___
 
@@ -831,7 +858,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:371](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L371)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:371](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L371)
 
 ___
 
@@ -845,7 +872,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:396](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L396)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:396](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L396)
 
 ___
 
@@ -857,7 +884,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `v` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) |
+| `v` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) |
 
 #### Returns
 
@@ -865,7 +892,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:367](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L367)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:367](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L367)
 
 ___
 
@@ -883,13 +910,13 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:609](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L609)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:609](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L609)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -901,7 +928,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `IPropertyEntryFilesState` \| (`prevState`: `Readonly`<`IPropertyEntryFilesState`\>, `props`: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\>) => `IPropertyEntryFilesState` \| `Pick`<`IPropertyEntryFilesState`, `K`\> \| `Pick`<`IPropertyEntryFilesState`, `K`\> |
+| `state` | `IPropertyEntryFilesState` \| (`prevState`: `Readonly`\<`IPropertyEntryFilesState`\>, `props`: `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\>\>) => `IPropertyEntryFilesState` \| `Pick`\<`IPropertyEntryFilesState`, `K`\> \| `Pick`\<`IPropertyEntryFilesState`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -914,7 +941,7 @@ React.Component.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
@@ -926,7 +953,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\> |
+| `nextProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<[`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyEntryFilesRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryFiles.IPropertyEntryFilesRendererProps.md)\> |
 | `nextState` | `IPropertyEntryFilesState` |
 
 #### Returns
@@ -939,4 +966,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:195](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L195)
+[client/internal/components/PropertyEntry/PropertyEntryFiles.tsx:195](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryFiles.tsx#L195)

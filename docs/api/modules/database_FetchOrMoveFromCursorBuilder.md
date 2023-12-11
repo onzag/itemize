@@ -10,11 +10,11 @@ Contains the select query builder that allows to create SELECT queries
 
 - [FetchOrMoveFromCursorBuilder](../classes/database_FetchOrMoveFromCursorBuilder.FetchOrMoveFromCursorBuilder.md)
 
-### Type aliases
+### Type Aliases
 
 - [FetchCursorDirection](database_FetchOrMoveFromCursorBuilder.md#fetchcursordirection)
 
-## Type aliases
+## Type Aliases
 
 ### FetchCursorDirection
 
@@ -22,4 +22,4 @@ Contains the select query builder that allows to create SELECT queries
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:8](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L8)
+[database/FetchOrMoveFromCursorBuilder.ts:8](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L8)

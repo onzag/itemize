@@ -17,12 +17,9 @@
 - [availableLanguages](client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md#availablelanguages)
 - [changeLanguageTo](client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md#changelanguageto)
 - [currentLanguage](client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md#currentlanguage)
+- [dismissError](client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md#dismisserror)
 - [error](client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md#error)
 - [rtl](client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md#rtl)
-
-### Methods
-
-- [dismissError](client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md#dismisserror)
 
 ## Properties
 
@@ -36,7 +33,7 @@ IActualAppLanguageRetrieverProps.availableLanguages
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:21](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L21)
+[client/components/localization/AppLanguageRetriever.tsx:21](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L21)
 
 ___
 
@@ -50,7 +47,7 @@ IActualAppLanguageRetrieverProps.changeLanguageTo
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:23](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L23)
+[client/components/localization/AppLanguageRetriever.tsx:23](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L23)
 
 ___
 
@@ -64,7 +61,25 @@ IActualAppLanguageRetrieverProps.currentLanguage
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L20)
+[client/components/localization/AppLanguageRetriever.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L20)
+
+___
+
+### dismissError
+
+• `Optional` **dismissError**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/localization/AppLanguageRetriever.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L32)
 
 ___
 
@@ -74,7 +89,7 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:31](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L31)
+[client/components/localization/AppLanguageRetriever.tsx:31](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L31)
 
 ___
 
@@ -88,18 +103,4 @@ IActualAppLanguageRetrieverProps.rtl
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L22)
-
-## Methods
-
-### dismissError
-
-▸ `Optional` **dismissError**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/components/localization/AppLanguageRetriever.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L32)
+[client/components/localization/AppLanguageRetriever.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L22)

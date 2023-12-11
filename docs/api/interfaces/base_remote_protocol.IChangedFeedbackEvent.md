@@ -32,7 +32,7 @@ The slot id of that item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:79](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L79)
+[base/remote-protocol.ts:79](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L79)
 
 ___
 
@@ -44,7 +44,7 @@ The item definition as a qualified name
 
 #### Defined in
 
-[base/remote-protocol.ts:75](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L75)
+[base/remote-protocol.ts:75](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L75)
 
 ___
 
@@ -56,7 +56,7 @@ A timestamp that comes when type=last_modified
 
 #### Defined in
 
-[base/remote-protocol.ts:97](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L97)
+[base/remote-protocol.ts:97](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L97)
 
 ___
 
@@ -74,7 +74,7 @@ the case, check the lastModified property
 
 #### Defined in
 
-[base/remote-protocol.ts:93](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L93)
+[base/remote-protocol.ts:93](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L93)
 
 ___
 
@@ -86,4 +86,4 @@ The version of that item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:83](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L83)
+[base/remote-protocol.ts:83](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L83)

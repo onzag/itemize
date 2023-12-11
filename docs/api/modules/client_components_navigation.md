@@ -29,7 +29,7 @@ Simply go back
 
 #### Defined in
 
-[client/components/navigation/index.tsx:226](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/index.tsx#L226)
+[client/components/navigation/index.tsx:226](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/index.tsx#L226)
 
 ___
 
@@ -53,7 +53,7 @@ is respected in the url
 
 #### Defined in
 
-[client/components/navigation/index.tsx:197](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/index.tsx#L197)
+[client/components/navigation/index.tsx:197](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/index.tsx#L197)
 
 ___
 
@@ -76,13 +76,13 @@ A very simple redirect that runs a history push or replace
 
 #### Defined in
 
-[client/components/navigation/index.tsx:129](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/index.tsx#L129)
+[client/components/navigation/index.tsx:129](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/index.tsx#L129)
 
 ___
 
 ### setHistoryQSState
 
-▸ **setHistoryQSState**<`S`\>(`location`, `state`, `replace?`): `void`
+▸ **setHistoryQSState**\<`S`\>(`location`, `state`, `replace?`): `void`
 
 Sets the history state to a new state, but uses the query string
 instead rather than the internal history state
@@ -97,8 +97,8 @@ instead rather than the internal history state
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `location` | `Location`<`unknown`\> | the location object |
-| `state` | `Partial`<`S`\> | the state to use, partial |
+| `location` | `Location`\<`unknown`\> | the location object |
+| `state` | `Partial`\<`S`\> | the state to use, partial |
 | `replace?` | `boolean` | whether to replace rather than push |
 
 #### Returns
@@ -107,13 +107,13 @@ instead rather than the internal history state
 
 #### Defined in
 
-[client/components/navigation/index.tsx:59](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/index.tsx#L59)
+[client/components/navigation/index.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/index.tsx#L59)
 
 ___
 
 ### setHistoryState
 
-▸ **setHistoryState**<`S`\>(`location`, `state`, `replace?`): `void`
+▸ **setHistoryState**\<`S`\>(`location`, `state`, `replace?`): `void`
 
 Allows to set the history state to a new state
 
@@ -127,8 +127,8 @@ Allows to set the history state to a new state
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `location` | `Location`<`unknown`\> | the location object |
-| `state` | `Partial`<`S`\> | the new state, partial |
+| `location` | `Location`\<`unknown`\> | the location object |
+| `state` | `Partial`\<`S`\> | the new state, partial |
 | `replace?` | `boolean` | and whether it's a replace action rather than a push |
 
 #### Returns
@@ -137,4 +137,4 @@ Allows to set the history state to a new state
 
 #### Defined in
 
-[client/components/navigation/index.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/index.tsx#L26)
+[client/components/navigation/index.tsx:26](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/index.tsx#L26)

@@ -12,9 +12,9 @@ to be used in the item definition for properties in common
 
 - [buildElasticQueryForModule](base_Root_Module_sql.md#buildelasticqueryformodule)
 - [buildSQLQueryForModule](base_Root_Module_sql.md#buildsqlqueryformodule)
-- [convertGQLValueToSQLValueForModule](base_Root_Module_sql.md#convertgqlvaluetosqlvalueformodule)
+- [convertRQValueToSQLValueForModule](base_Root_Module_sql.md#convertrqvaluetosqlvalueformodule)
 - [convertSQLValueToElasticSQLValueForModule](base_Root_Module_sql.md#convertsqlvaluetoelasticsqlvalueformodule)
-- [convertSQLValueToGQLValueForModule](base_Root_Module_sql.md#convertsqlvaluetogqlvalueformodule)
+- [convertSQLValueToRQValueForModule](base_Root_Module_sql.md#convertsqlvaluetorqvalueformodule)
 - [getElasticSchemaForModule](base_Root_Module_sql.md#getelasticschemaformodule)
 - [getSQLTableDefinitionForModule](base_Root_Module_sql.md#getsqltabledefinitionformodule)
 - [getSQLTablesSchemaForModule](base_Root_Module_sql.md#getsqltablesschemaformodule)
@@ -35,7 +35,7 @@ within itself in the database
 | `serverData` | `any` | the server data |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) | the module in question |
-| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args for the query from graphql |
+| `args` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) | the args for the query from rq |
 | `elasticQueryBuilder` | [`ElasticQueryBuilder`](../classes/server_elastic.ElasticQueryBuilder.md) | the where builder |
 | `language` | `string` | - |
 | `dictionary` | `string` | the dictionary used |
@@ -48,7 +48,7 @@ within itself in the database
 
 #### Defined in
 
-[base/Root/Module/sql.ts:499](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L499)
+[base/Root/Module/sql.ts:499](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L499)
 
 ___
 
@@ -66,7 +66,7 @@ within itself in the database
 | `serverData` | `any` | the server data |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) | the module in question |
-| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args for the query from graphql |
+| `args` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) | the args for the query from rq |
 | `whereBuilder` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) | the where builder |
 | `orderByBuilder` | [`OrderByBuilder`](../classes/database_OrderByBuilder.OrderByBuilder.md) | the order by builder |
 | `language` | `string` | - |
@@ -80,15 +80,15 @@ within itself in the database
 
 #### Defined in
 
-[base/Root/Module/sql.ts:389](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L389)
+[base/Root/Module/sql.ts:389](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L389)
 
 ___
 
-### convertGQLValueToSQLValueForModule
+### convertRQValueToSQLValueForModule
 
-▸ **convertGQLValueToSQLValueForModule**(`serverData`, `appData`, `mod`, `data`, `oldData`, `uploadsClient`, `domain`, `language`, `dictionary`, `partialFields?`): [`ISQLStreamComposedTableRowValue`](../interfaces/base_Root_sql.ISQLStreamComposedTableRowValue.md)
+▸ **convertRQValueToSQLValueForModule**(`serverData`, `appData`, `mod`, `data`, `oldData`, `uploadsClient`, `domain`, `language`, `dictionary`, `partialFields?`): [`ISQLStreamComposedTableRowValue`](../interfaces/base_Root_sql.ISQLStreamComposedTableRowValue.md)
 
-Converts a graphql value, with all its items and everything it
+Converts a rq value, with all its items and everything it
 has into a SQL row data value for this specific module
 
 #### Parameters
@@ -98,13 +98,13 @@ has into a SQL row data value for this specific module
 | `serverData` | `any` | - |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) | the module in question |
-| `data` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the graphql data |
-| `oldData` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) | the old stored value for this module |
-| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\> | the uploads client |
+| `data` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) | the rq data |
+| `oldData` | [`IRQValue`](../interfaces/rq_querier.IRQValue.md) | the old stored value for this module |
+| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\> | the uploads client |
 | `domain` | `string` | - |
 | `language` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
 | `dictionary` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the postgresql dictionary |
-| `partialFields?` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | fields to make a partial value rather than a total value, note that we don't recommend using partial fields in order to create because some properties might treat nulls in a fancy way, when creating all the table rows should be set, only when updating you should use partial fields; for example, if you have a field that has a property that is nullable but it's forced into some value it will be ignored in a partial field value, don't use partial fields to create |
+| `partialFields?` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) \| [`IRQValue`](../interfaces/rq_querier.IRQValue.md) \| [`IRQRequestFields`](../interfaces/rq_querier.IRQRequestFields.md) | fields to make a partial value rather than a total value, note that we don't recommend using partial fields in order to create because some properties might treat nulls in a fancy way, when creating all the table rows should be set, only when updating you should use partial fields; for example, if you have a field that has a property that is nullable but it's forced into some value it will be ignored in a partial field value, don't use partial fields to create |
 
 #### Returns
 
@@ -114,7 +114,7 @@ the composed row value with the consume streams function
 
 #### Defined in
 
-[base/Root/Module/sql.ts:247](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L247)
+[base/Root/Module/sql.ts:247](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L247)
 
 ___
 
@@ -137,16 +137,16 @@ ___
 
 #### Defined in
 
-[base/Root/Module/sql.ts:347](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L347)
+[base/Root/Module/sql.ts:347](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L347)
 
 ___
 
-### convertSQLValueToGQLValueForModule
+### convertSQLValueToRQValueForModule
 
-▸ **convertSQLValueToGQLValueForModule**(`serverData`, `appData`, `mod`, `row`, `graphqlFields`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+▸ **convertSQLValueToRQValueForModule**(`serverData`, `appData`, `mod`, `row`, `rqFields`): [`IRQValue`](../interfaces/rq_querier.IRQValue.md)
 
 Converts a SQL value directly coming from the database as it is
-to a graphql value for this specific module, this
+to a rq value for this specific module, this
 only includes prop extensions and standard properties
 and excludes everything else
 
@@ -158,17 +158,17 @@ and excludes everything else
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) | the module in question |
 | `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the row value, with all the columns it has; the row can be overblown with other field data, this will extract only the data required for this module |
-| `graphqlFields` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | contains the only properties that are required in the request provided by grapql fields, eg {id: {}, name: {}} |
+| `rqFields` | [`IRQRequestFields`](../interfaces/rq_querier.IRQRequestFields.md) | contains the only properties that are required in the request provided by grapql fields, eg {id: {}, name: {}} |
 
 #### Returns
 
-[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+[`IRQValue`](../interfaces/rq_querier.IRQValue.md)
 
-a graphql value
+a rq value
 
 #### Defined in
 
-[base/Root/Module/sql.ts:315](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L315)
+[base/Root/Module/sql.ts:315](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L315)
 
 ___
 
@@ -190,7 +190,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/sql.ts:36](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L36)
+[base/Root/Module/sql.ts:36](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L36)
 
 ___
 
@@ -215,7 +215,7 @@ a whole table schema for the module table
 
 #### Defined in
 
-[base/Root/Module/sql.ts:84](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L84)
+[base/Root/Module/sql.ts:84](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L84)
 
 ___
 
@@ -241,4 +241,4 @@ a partial database schema for the module itself, all the child modules, and the 
 
 #### Defined in
 
-[base/Root/Module/sql.ts:208](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/sql.ts#L208)
+[base/Root/Module/sql.ts:208](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L208)

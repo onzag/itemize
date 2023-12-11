@@ -22,7 +22,7 @@ of the trigger is to add data into this error before is sent
 
 #### Defined in
 
-[server/resolvers/triggers.ts:196](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L196)
+[server/resolvers/triggers.ts:196](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L196)
 
 ___
 
@@ -35,4 +35,4 @@ have no row data
 
 #### Defined in
 
-[server/resolvers/triggers.ts:201](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L201)
+[server/resolvers/triggers.ts:201](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L201)

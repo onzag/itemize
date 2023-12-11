@@ -22,11 +22,11 @@ Contains the data provider that provides application specific information
 
 ### DataContext
 
-• **DataContext**: `Context`<[`IDataContextType`](../interfaces/client_internal_providers_appdata_provider.IDataContextType.md)\>
+• `Const` **DataContext**: `Context`\<[`IDataContextType`](../interfaces/client_internal_providers_appdata_provider.IDataContextType.md)\>
 
 The data context provides the root as well as remote listener and whether
 the update is blocked to any component that demands it under the tree
 
 #### Defined in
 
-[client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/appdata-provider.tsx#L35)
+[client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/appdata-provider.tsx#L35)

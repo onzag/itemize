@@ -9,9 +9,6 @@
 ### Properties
 
 - [location](client_fast_prototyping_components_email_email_client.ISwitcherComponentProps.md#location)
-
-### Methods
-
 - [onLocationChange](client_fast_prototyping_components_email_email_client.ISwitcherComponentProps.md#onlocationchange)
 
 ## Properties
@@ -22,25 +19,29 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:152](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L152)
+[client/fast-prototyping/components/email/email-client.tsx:152](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L152)
 
-## Methods
+___
 
 ### onLocationChange
 
-▸ **onLocationChange**(`e`, `value`): `void`
+• **onLocationChange**: (`e`: `SyntheticEvent`\<`Element`, `Event`\>, `value`: `LocationType`) => `void`
 
-#### Parameters
+#### Type declaration
+
+▸ (`e`, `value`): `void`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `e` | `SyntheticEvent`<`Element`, `Event`\> |
+| `e` | `SyntheticEvent`\<`Element`, `Event`\> |
 | `value` | `LocationType` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:153](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L153)
+[client/fast-prototyping/components/email/email-client.tsx:153](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L153)

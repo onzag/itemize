@@ -23,13 +23,13 @@
 - [ITemplateArgsProperties](../interfaces/client_internal_text_serializer_template_args.ITemplateArgsProperties.md)
 - [ITemplateProperties](../interfaces/client_internal_text_serializer_template_args.ITemplateProperties.md)
 
-### Type aliases
+### Type Aliases
 
 - [TemplateArgFunctionalWrapperFn](client_internal_text_serializer_template_args.md#templateargfunctionalwrapperfn)
 - [TemplateArgMutatingWrapperFn](client_internal_text_serializer_template_args.md#templateargmutatingwrapperfn)
 - [TemplateProperty](client_internal_text_serializer_template_args.md#templateproperty)
 
-## Type aliases
+## Type Aliases
 
 ### TemplateArgFunctionalWrapperFn
 
@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:170](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L170)
+[client/internal/text/serializer/template-args.ts:170](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L170)
 
 ___
 
@@ -170,7 +170,7 @@ new TemplateArgs({
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:129](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L129)
+[client/internal/text/serializer/template-args.ts:129](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L129)
 
 ___
 
@@ -180,4 +180,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:289](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L289)
+[client/internal/text/serializer/template-args.ts:289](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L289)

@@ -29,7 +29,7 @@ as matched on the cache itself
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:163](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L163)
+[client/internal/workers/cache/cache.worker.class.ts:163](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L163)
 
 ___
 
@@ -42,20 +42,20 @@ it's tried to be kept in sync
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:172](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L172)
+[client/internal/workers/cache/cache.worker.class.ts:172](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L172)
 
 ___
 
 ### fields
 
-• **fields**: [`IGQLRequestFields`](gql_querier.IGQLRequestFields.md)
+• **fields**: [`IRQRequestFields`](rq_querier.IRQRequestFields.md)
 
 The fields that were requested and should be contained
 in each one of these search matches
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:154](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L154)
+[client/internal/workers/cache/cache.worker.class.ts:154](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L154)
 
 ___
 
@@ -67,16 +67,16 @@ The last record date of that records list
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:167](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L167)
+[client/internal/workers/cache/cache.worker.class.ts:167](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L167)
 
 ___
 
 ### value
 
-• **value**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **value**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 The value as a list of search records
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:158](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L158)
+[client/internal/workers/cache/cache.worker.class.ts:158](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L158)

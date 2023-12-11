@@ -44,7 +44,7 @@ a react component
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:169](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L169)
+[client/components/item/SubmitActioner.tsx:169](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/SubmitActioner.tsx#L169)
 
 ___
 
@@ -62,4 +62,4 @@ the submit actioner information
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:183](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L183)
+[client/components/item/SubmitActioner.tsx:183](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/SubmitActioner.tsx#L183)

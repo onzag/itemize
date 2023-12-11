@@ -41,11 +41,11 @@ Contains the sql and server side specific functions for the payment type
 
 | Name | Type |
 | :------ | :------ |
-| `properties` | `Object` |
+| `properties` | {} |
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:42](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L42)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:42](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L42)
 
 ___
 
@@ -69,7 +69,7 @@ a boolean on whether it's searched by it or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:320](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L320)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:320](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L320)
 
 ___
 
@@ -93,7 +93,7 @@ a partial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:30](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L30)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:30](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L30)
 
 ___
 
@@ -117,7 +117,7 @@ the columns to index
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:474](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L474)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:474](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L474)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:236](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L236)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:236](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L236)
 
 ___
 
@@ -159,7 +159,7 @@ How to consider equality with a value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:483](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L483)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:483](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L483)
 
 ___
 
@@ -183,7 +183,7 @@ by the provider
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:97](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L97)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:97](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L97)
 
 ___
 
@@ -207,7 +207,7 @@ a partial row
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:106](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L106)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:106](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L106)
 
 ___
 
@@ -231,7 +231,7 @@ a property definition supported payment type (or null)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:195](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L195)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:195](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L195)
 
 ___
 
@@ -241,13 +241,13 @@ ___
 
 Provides a side effect that triggers once a payment status changes, it's created, destroyed
 or comes into existance, this is the standard type server side effect that occurs when
-graphql does things to it, and this will trigger what is necessary to  it
+rq does things to it, and this will trigger what is necessary to  it
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `arg` | [`ISQLSideEffectType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSideEffectType.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\> |
+| `arg` | [`ISQLSideEffectType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSideEffectType.md)\<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\> |
 
 #### Returns
 
@@ -255,7 +255,7 @@ graphql does things to it, and this will trigger what is necessary to  it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:600](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L600)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:600](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L600)
 
 ___
 
@@ -279,7 +279,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:498](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L498)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:498](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L498)
 
 ___
 
@@ -303,7 +303,7 @@ a boolean on whether it's searched by it or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:252](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L252)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:252](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L252)
 
 ___
 
@@ -325,7 +325,7 @@ The selection for the payment in searches
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:80](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L80)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:80](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L80)
 
 ___
 
@@ -335,13 +335,13 @@ ___
 
 Provides a side effect that triggers once a payment status changes, it's created, destroyed
 or comes into existance, this is the standard type server side effect that occurs when
-graphql does things to it, and this will trigger what is necessary to  it
+rq does things to it, and this will trigger what is necessary to  it
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `arg` | [`ISQLSideEffectType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSideEffectType.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\> |
+| `arg` | [`ISQLSideEffectType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSideEffectType.md)\<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\> |
 
 #### Returns
 
@@ -349,4 +349,4 @@ graphql does things to it, and this will trigger what is necessary to  it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:511](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L511)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:511](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L511)

@@ -27,7 +27,7 @@ they are also used for optimization and matenience operations
 
 #### Defined in
 
-[base/Root/index.ts:57](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L57)
+[base/Root/index.ts:58](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L58)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 #### Defined in
 
-[base/Root/index.ts:59](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L59)
+[base/Root/index.ts:60](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L60)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 #### Defined in
 
-[base/Root/index.ts:60](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L60)
+[base/Root/index.ts:61](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L61)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[base/Root/index.ts:61](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L61)
+[base/Root/index.ts:62](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L62)
 
 ___
 
@@ -67,4 +67,4 @@ ___
 
 #### Defined in
 
-[base/Root/index.ts:58](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L58)
+[base/Root/index.ts:59](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L59)

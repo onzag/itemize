@@ -40,4 +40,4 @@ a react component
 
 #### Defined in
 
-[client/components/outdated/AppIsBlockedFromUpdate.tsx:48](https://github.com/onzag/itemize/blob/a24376ed/client/components/outdated/AppIsBlockedFromUpdate.tsx#L48)
+[client/components/outdated/AppIsBlockedFromUpdate.tsx:48](https://github.com/onzag/itemize/blob/59702dd5/client/components/outdated/AppIsBlockedFromUpdate.tsx#L48)

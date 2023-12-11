@@ -9,26 +9,30 @@ for custom role management
 
 ## Table of contents
 
-### Methods
+### Properties
 
 - [checkRoleAccessFor](base_Root.ICustomRoleManager.md#checkroleaccessfor)
 
-## Methods
+## Properties
 
 ### checkRoleAccessFor
 
-▸ **checkRoleAccessFor**(`roles`): `Promise`<[`ICustomRoleManagerRoleStatus`](base_Root.ICustomRoleManagerRoleStatus.md)\>
+• **checkRoleAccessFor**: (`roles`: `string`[]) => `Promise`\<[`ICustomRoleManagerRoleStatus`](base_Root.ICustomRoleManagerRoleStatus.md)\>
 
-#### Parameters
+#### Type declaration
+
+▸ (`roles`): `Promise`\<[`ICustomRoleManagerRoleStatus`](base_Root.ICustomRoleManagerRoleStatus.md)\>
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `roles` | `string`[] |
 
-#### Returns
+##### Returns
 
-`Promise`<[`ICustomRoleManagerRoleStatus`](base_Root.ICustomRoleManagerRoleStatus.md)\>
+`Promise`\<[`ICustomRoleManagerRoleStatus`](base_Root.ICustomRoleManagerRoleStatus.md)\>
 
 #### Defined in
 
-[base/Root/index.ts:75](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L75)
+[base/Root/index.ts:76](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L76)

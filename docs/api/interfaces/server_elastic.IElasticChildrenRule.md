@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[server/elastic.ts:2898](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2898)
+[server/elastic.ts:2898](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2898)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2901](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2901)
+[server/elastic.ts:2901](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2901)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2897](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2897)
+[server/elastic.ts:2897](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2897)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2892](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2892)
+[server/elastic.ts:2892](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2892)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2894](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2894)
+[server/elastic.ts:2894](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2894)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2895](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2895)
+[server/elastic.ts:2895](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2895)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2893](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2893)
+[server/elastic.ts:2893](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2893)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2891](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2891)
+[server/elastic.ts:2891](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2891)
 
 ___
 
@@ -110,4 +110,4 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2896](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2896)
+[server/elastic.ts:2896](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2896)

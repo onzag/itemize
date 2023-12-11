@@ -17,11 +17,11 @@ modules are containers that offer properties in common for item definitions
 - [IRawJSONI18NDataType](../interfaces/base_Root_Module.IRawJSONI18NDataType.md)
 - [IRawJsonI18NSpecificLocaleDataType](../interfaces/base_Root_Module.IRawJsonI18NSpecificLocaleDataType.md)
 
-### Type aliases
+### Type Aliases
 
 - [ListenerType](base_Root_Module.md#listenertype)
 
-## Type aliases
+## Type Aliases
 
 ### ListenerType
 
@@ -40,4 +40,4 @@ and item definitions
 
 #### Defined in
 
-[base/Root/Module/index.ts:108](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/index.ts#L108)
+[base/Root/Module/index.ts:107](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L107)

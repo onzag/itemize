@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[client/internal/testing.ts:115](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L115)
+[client/internal/testing.ts:115](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L115)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:116](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L116)
+[client/internal/testing.ts:116](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L116)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:117](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L117)
+[client/internal/testing.ts:117](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L117)

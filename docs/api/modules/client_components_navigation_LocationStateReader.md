@@ -21,7 +21,7 @@ obtained via the browser history api or the query string
 
 ### default
 
-▸ **default**<`S`\>(`props`): `any`
+▸ **default**\<`S`\>(`props`): `any`
 
 The location state reader component
 
@@ -35,7 +35,7 @@ The location state reader component
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`ILocationStateReaderProps`](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderProps.md)<`S`\> | the props |
+| `props` | [`ILocationStateReaderProps`](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderProps.md)\<`S`\> | the props |
 
 #### Returns
 
@@ -45,13 +45,13 @@ a react component
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:171](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L171)
+[client/components/navigation/LocationStateReader.tsx:171](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L171)
 
 ___
 
 ### useLocationStateReader
 
-▸ **useLocationStateReader**<`S`\>(`options`): [`S`, (`state`: `Partial`<`S`\>, `replace?`: `boolean`) => `void`, `boolean`, (`fn`: () => `void`) => `void`]
+▸ **useLocationStateReader**\<`S`\>(`options`): [`S`, (`state`: `Partial`\<`S`\>, `replace?`: `boolean`) => `void`, `boolean`, (`fn`: () => `void`) => `void`]
 
 #### Type parameters
 
@@ -63,12 +63,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `options` | [`ILocationStateReaderOptions`](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderOptions.md)<`S`\> |
+| `options` | [`ILocationStateReaderOptions`](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderOptions.md)\<`S`\> |
 
 #### Returns
 
-[`S`, (`state`: `Partial`<`S`\>, `replace?`: `boolean`) => `void`, `boolean`, (`fn`: () => `void`) => `void`]
+[`S`, (`state`: `Partial`\<`S`\>, `replace?`: `boolean`) => `void`, `boolean`, (`fn`: () => `void`) => `void`]
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:49](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L49)
+[client/components/navigation/LocationStateReader.tsx:49](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L49)

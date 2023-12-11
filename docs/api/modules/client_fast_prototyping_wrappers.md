@@ -21,11 +21,11 @@ with the itemize application in the fast prototyping mode
 
 ### ReuseCacheContextEmotionIsAMess
 
-• **ReuseCacheContextEmotionIsAMess**: `Context`<`boolean`\>
+• `Const` **ReuseCacheContextEmotionIsAMess**: `Context`\<`boolean`\>
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/wrappers.tsx#L22)
+[client/fast-prototyping/wrappers.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/wrappers.tsx#L22)
 
 ## Functions
 
@@ -42,7 +42,7 @@ For fast prototyping we use material ui, and as such we pass those providers her
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `app` | `ReactElement`<`any`, `string` \| `JSXElementConstructor`<`any`\>\> | the application that react is asking to render |
+| `app` | `ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\> | the application that react is asking to render |
 | `config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) | the configuration that is being used, this is the same as the config.json |
 
 #### Returns
@@ -51,7 +51,7 @@ For fast prototyping we use material ui, and as such we pass those providers her
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:81](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/wrappers.tsx#L81)
+[client/fast-prototyping/wrappers.tsx:81](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/wrappers.tsx#L81)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:45](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/wrappers.tsx#L45)
+[client/fast-prototyping/wrappers.tsx:45](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/wrappers.tsx#L45)
 
 ___
 
@@ -90,7 +90,7 @@ need to change according to locale
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `mainComponent` | `ReactElement`<`any`, `string` \| `JSXElementConstructor`<`any`\>\> | the main component that is under the app |
+| `mainComponent` | `ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\> | the main component that is under the app |
 | `config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) | the config of the app |
 | `localeContext` | [`ILocaleContextType`](../interfaces/client_internal_providers_locale_provider.ILocaleContextType.md) | the locale that we are using |
 
@@ -100,4 +100,4 @@ need to change according to locale
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:110](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/wrappers.tsx#L110)
+[client/fast-prototyping/wrappers.tsx:110](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/wrappers.tsx#L110)

@@ -22,4 +22,4 @@ a value to a property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:379](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L379)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:380](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L380)

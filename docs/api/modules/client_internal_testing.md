@@ -48,4 +48,4 @@ This data is serializable on purpose
 
 #### Defined in
 
-[client/internal/testing.ts:147](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L147)
+[client/internal/testing.ts:147](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L147)

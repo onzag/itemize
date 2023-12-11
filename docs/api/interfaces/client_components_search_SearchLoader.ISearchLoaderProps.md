@@ -11,18 +11,15 @@ The loader props themselves
 ### Properties
 
 - [avoidLoadingSearchResults](client_components_search_SearchLoader.ISearchLoaderProps.md#avoidloadingsearchresults)
+- [children](client_components_search_SearchLoader.ISearchLoaderProps.md#children)
 - [cleanOnDismount](client_components_search_SearchLoader.ISearchLoaderProps.md#cleanondismount)
 - [currentPage](client_components_search_SearchLoader.ISearchLoaderProps.md#currentpage)
 - [enableExternalChecks](client_components_search_SearchLoader.ISearchLoaderProps.md#enableexternalchecks)
 - [includePolicies](client_components_search_SearchLoader.ISearchLoaderProps.md#includepolicies)
+- [onSearchDataChange](client_components_search_SearchLoader.ISearchLoaderProps.md#onsearchdatachange)
 - [pageSize](client_components_search_SearchLoader.ISearchLoaderProps.md#pagesize)
 - [startInSearchingState](client_components_search_SearchLoader.ISearchLoaderProps.md#startinsearchingstate)
 - [static](client_components_search_SearchLoader.ISearchLoaderProps.md#static)
-
-### Methods
-
-- [children](client_components_search_SearchLoader.ISearchLoaderProps.md#children)
-- [onSearchDataChange](client_components_search_SearchLoader.ISearchLoaderProps.md#onsearchdatachange)
 
 ## Properties
 
@@ -36,7 +33,33 @@ off a search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:192](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L192)
+[client/components/search/SearchLoader.tsx:192](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L192)
+
+___
+
+### children
+
+• `Optional` **children**: (`arg`: [`ISearchLoaderArg`](client_components_search_SearchLoader.ISearchLoaderArg.md)) => `any`
+
+#### Type declaration
+
+▸ (`arg`): `any`
+
+The children function which specifies how to retrieve these results
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISearchLoaderArg`](client_components_search_SearchLoader.ISearchLoaderArg.md) |
+
+##### Returns
+
+`any`
+
+#### Defined in
+
+[client/components/search/SearchLoader.tsx:172](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L172)
 
 ___
 
@@ -48,7 +71,7 @@ Whether the resulting search results should clean on dismount
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:181](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L181)
+[client/components/search/SearchLoader.tsx:181](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L181)
 
 ___
 
@@ -62,7 +85,7 @@ otherwise this will cause an error
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:168](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L168)
+[client/components/search/SearchLoader.tsx:168](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L168)
 
 ___
 
@@ -75,7 +98,7 @@ results provider props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:186](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L186)
+[client/components/search/SearchLoader.tsx:186](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L186)
 
 ___
 
@@ -88,7 +111,34 @@ item definition loader props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:177](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L177)
+[client/components/search/SearchLoader.tsx:177](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L177)
+
+___
+
+### onSearchDataChange
+
+• `Optional` **onSearchDataChange**: (`searchId`: `string`, `wasRestored`: ``"NO"`` \| ``"FROM_LOCATION"`` \| ``"FROM_STATE"``) => `void`
+
+#### Type declaration
+
+▸ (`searchId`, `wasRestored`): `void`
+
+Triggers when the search data changes, as in a new search id
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `searchId` | `string` |
+| `wasRestored` | ``"NO"`` \| ``"FROM_LOCATION"`` \| ``"FROM_STATE"`` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/search/SearchLoader.tsx:216](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L216)
 
 ___
 
@@ -102,7 +152,7 @@ at once
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L162)
+[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L162)
 
 ___
 
@@ -118,7 +168,7 @@ starts at true
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:200](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L200)
+[client/components/search/SearchLoader.tsx:200](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L200)
 
 ___
 
@@ -138,49 +188,4 @@ this is why total is the better option
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:212](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L212)
-
-## Methods
-
-### children
-
-▸ `Optional` **children**(`arg`): `any`
-
-The children function which specifies how to retrieve these results
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `arg` | [`ISearchLoaderArg`](client_components_search_SearchLoader.ISearchLoaderArg.md) |
-
-#### Returns
-
-`any`
-
-#### Defined in
-
-[client/components/search/SearchLoader.tsx:172](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L172)
-
-___
-
-### onSearchDataChange
-
-▸ `Optional` **onSearchDataChange**(`searchId`, `wasRestored`): `void`
-
-Triggers when the search data changes, as in a new search id
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `searchId` | `string` |
-| `wasRestored` | ``"NO"`` \| ``"FROM_LOCATION"`` \| ``"FROM_STATE"`` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/components/search/SearchLoader.tsx:216](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L216)
+[client/components/search/SearchLoader.tsx:212](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L212)

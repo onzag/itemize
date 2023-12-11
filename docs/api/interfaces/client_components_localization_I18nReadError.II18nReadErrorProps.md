@@ -17,11 +17,8 @@ the error props that the error displayer needs to take
 ### Properties
 
 - [capitalize](client_components_localization_I18nReadError.II18nReadErrorProps.md#capitalize)
-- [error](client_components_localization_I18nReadError.II18nReadErrorProps.md#error)
-
-### Methods
-
 - [children](client_components_localization_I18nReadError.II18nReadErrorProps.md#children)
+- [error](client_components_localization_I18nReadError.II18nReadErrorProps.md#error)
 
 ## Properties
 
@@ -37,7 +34,33 @@ Whether the error message should be capitalized
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L36)
+[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nReadError.tsx#L36)
+
+___
+
+### children
+
+• `Optional` **children**: (`value`: `string`) => `ReactNode`
+
+#### Type declaration
+
+▸ (`value`): `ReactNode`
+
+the children that passes the value to the consumer
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `string` |
+
+##### Returns
+
+`ReactNode`
+
+#### Defined in
+
+[client/components/localization/I18nReadError.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nReadError.tsx#L47)
 
 ___
 
@@ -54,26 +77,4 @@ so they can be displayed by passing it here
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L32)
-
-## Methods
-
-### children
-
-▸ `Optional` **children**(`value`): `ReactNode`
-
-the children that passes the value to the consumer
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `value` | `string` |
-
-#### Returns
-
-`ReactNode`
-
-#### Defined in
-
-[client/components/localization/I18nReadError.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L47)
+[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nReadError.tsx#L32)

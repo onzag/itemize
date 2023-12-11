@@ -8,19 +8,19 @@
 
 - [GlobalManager](../classes/server_global_manager.GlobalManager.md)
 
-### Type aliases
+### Type Aliases
 
 - [InitialExecutionServerDataFn](server_global_manager.md#initialexecutionserverdatafn)
 
-## Type aliases
+## Type Aliases
 
 ### InitialExecutionServerDataFn
 
-Ƭ **InitialExecutionServerDataFn**: (`manager`: [`GlobalManager`](../classes/server_global_manager.GlobalManager.md)) => `Promise`<`void`\> \| `void`
+Ƭ **InitialExecutionServerDataFn**: (`manager`: [`GlobalManager`](../classes/server_global_manager.GlobalManager.md)) => `Promise`\<`void`\> \| `void`
 
 #### Type declaration
 
-▸ (`manager`): `Promise`<`void`\> \| `void`
+▸ (`manager`): `Promise`\<`void`\> \| `void`
 
 This function is to be executed during intialization of the global manager
 in server data mode, in order for you, the developer to setup server
@@ -34,8 +34,8 @@ data and other resources
 
 ##### Returns
 
-`Promise`<`void`\> \| `void`
+`Promise`\<`void`\> \| `void`
 
 #### Defined in
 
-[server/global-manager.ts:54](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L54)
+[server/global-manager.ts:54](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L54)

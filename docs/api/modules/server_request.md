@@ -12,7 +12,7 @@
 
 ### httpRequest
 
-▸ **httpRequest**<`T`\>(`data`): `Promise`<`IHTTPResponse`<`T`\>\>
+▸ **httpRequest**\<`T`\>(`data`): `Promise`\<`IHTTPResponse`\<`T`\>\>
 
 #### Type parameters
 
@@ -28,8 +28,8 @@
 
 #### Returns
 
-`Promise`<`IHTTPResponse`<`T`\>\>
+`Promise`\<`IHTTPResponse`\<`T`\>\>
 
 #### Defined in
 
-[server/request.ts:28](https://github.com/onzag/itemize/blob/a24376ed/server/request.ts#L28)
+[server/request.ts:29](https://github.com/onzag/itemize/blob/59702dd5/server/request.ts#L29)

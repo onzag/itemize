@@ -21,4 +21,4 @@ this is also used in conditions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:386](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L386)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:387](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L387)

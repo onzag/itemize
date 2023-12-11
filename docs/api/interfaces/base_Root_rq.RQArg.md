@@ -17,6 +17,7 @@
 - [array](base_Root_rq.RQArg.md#array)
 - [description](base_Root_rq.RQArg.md#description)
 - [properties](base_Root_rq.RQArg.md#properties)
+- [recordsObj](base_Root_rq.RQArg.md#recordsobj)
 - [required](base_Root_rq.RQArg.md#required)
 - [type](base_Root_rq.RQArg.md#type)
 - [values](base_Root_rq.RQArg.md#values)
@@ -33,7 +34,7 @@ RQBase.array
 
 #### Defined in
 
-[base/Root/rq.ts:25](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L25)
+[base/Root/rq.ts:26](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L26)
 
 ___
 
@@ -47,7 +48,7 @@ RQBase.description
 
 #### Defined in
 
-[base/Root/rq.ts:29](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L29)
+[base/Root/rq.ts:30](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L30)
 
 ___
 
@@ -61,7 +62,21 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:33](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L33)
+[base/Root/rq.ts:35](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L35)
+
+___
+
+### recordsObj
+
+• `Optional` **recordsObj**: `boolean`
+
+#### Inherited from
+
+RQBase.recordsObj
+
+#### Defined in
+
+[base/Root/rq.ts:31](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L31)
 
 ___
 
@@ -75,13 +90,13 @@ RQBase.required
 
 #### Defined in
 
-[base/Root/rq.ts:28](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L28)
+[base/Root/rq.ts:29](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L29)
 
 ___
 
 ### type
 
-• **type**: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"object"`` \| ``"integer"`` \| ``"any"`` \| ``"binary"`` \| ``"integer-positive"``
+• **type**: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"object"`` \| ``"binary"`` \| ``"integer"`` \| ``"integer-positive"`` \| ``"any"``
 
 #### Inherited from
 
@@ -89,7 +104,7 @@ RQBase.type
 
 #### Defined in
 
-[base/Root/rq.ts:26](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L26)
+[base/Root/rq.ts:27](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L27)
 
 ___
 
@@ -103,4 +118,4 @@ RQBase.values
 
 #### Defined in
 
-[base/Root/rq.ts:27](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L27)
+[base/Root/rq.ts:28](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L28)

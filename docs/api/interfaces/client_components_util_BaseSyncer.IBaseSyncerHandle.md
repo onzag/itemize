@@ -6,69 +6,81 @@
 
 ## Table of contents
 
-### Methods
+### Properties
 
 - [onDismount](client_components_util_BaseSyncer.IBaseSyncerHandle.md#ondismount)
 - [onFailedSync](client_components_util_BaseSyncer.IBaseSyncerHandle.md#onfailedsync)
 - [setSync](client_components_util_BaseSyncer.IBaseSyncerHandle.md#setsync)
 
-## Methods
+## Properties
 
 ### onDismount
 
-▸ **onDismount**(`id`): `void`
+• **onDismount**: (`id`: `string`) => `void`
 
-#### Parameters
+#### Type declaration
+
+▸ (`id`): `void`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `id` | `string` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:6](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L6)
+[client/components/util/BaseSyncer.tsx:6](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L6)
 
 ___
 
 ### onFailedSync
 
-▸ **onFailedSync**(`err?`): `void`
+• **onFailedSync**: (`err?`: [`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)) => `void`
 
-#### Parameters
+#### Type declaration
+
+▸ (`err?`): `void`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `err?` | [`EndpointErrorType`](../modules/base_errors.md#endpointerrortype) |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:7](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L7)
+[client/components/util/BaseSyncer.tsx:7](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L7)
 
 ___
 
 ### setSync
 
-▸ **setSync**(`id`, `state`): `void`
+• **setSync**: (`id`: `string`, `state`: `boolean`) => `void`
 
-#### Parameters
+#### Type declaration
+
+▸ (`id`, `state`): `void`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `id` | `string` |
 | `state` | `boolean` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:8](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L8)
+[client/components/util/BaseSyncer.tsx:8](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L8)

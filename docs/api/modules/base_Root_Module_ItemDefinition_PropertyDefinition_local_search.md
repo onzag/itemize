@@ -3,7 +3,7 @@
 # Module: base/Root/Module/ItemDefinition/PropertyDefinition/local-search
 
 This file contains helper local functions that are used against
-graphql values in order to perform local searches as if it was
+rq values in order to perform local searches as if it was
 running in the server side, these tend to run in the IndexedDB
 database
 
@@ -38,7 +38,7 @@ a boolean on whether it matches
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:93](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L93)
+[base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:93](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L93)
 
 ___
 
@@ -63,4 +63,4 @@ a boolean on whether it matches
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:21](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L21)
+[base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:21](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L21)

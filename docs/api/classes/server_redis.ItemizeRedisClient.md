@@ -42,7 +42,7 @@ eg. if it loses connection, so it avoids queueing
 
 ### constructor
 
-• **new ItemizeRedisClient**(`name`, `redisClient`)
+• **new ItemizeRedisClient**(`name`, `redisClient`): [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
 
 Construct a new itemize redis client
 
@@ -53,19 +53,23 @@ Construct a new itemize redis client
 | `name` | `string` | a name, not very relevant, used for debugging |
 | `redisClient` | `RedisClient` | the redis client in question |
 
+#### Returns
+
+[`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+
 #### Defined in
 
-[server/redis.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L42)
+[server/redis.ts:42](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L42)
 
 ## Properties
 
 ### del
 
-• **del**: (`key`: `string`) => `Promise`<`void`\>
+• **del**: (`key`: `string`) => `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`key`): `Promise`<`void`\>
+▸ (`key`): `Promise`\<`void`\>
 
 ##### Parameters
 
@@ -75,21 +79,21 @@ Construct a new itemize redis client
 
 ##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/redis.ts:30](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L30)
+[server/redis.ts:30](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L30)
 
 ___
 
 ### exists
 
-• **exists**: (`key`: `string`) => `Promise`<`number`\>
+• **exists**: (`key`: `string`) => `Promise`\<`number`\>
 
 #### Type declaration
 
-▸ (`key`): `Promise`<`number`\>
+▸ (`key`): `Promise`\<`number`\>
 
 ##### Parameters
 
@@ -99,21 +103,21 @@ ___
 
 ##### Returns
 
-`Promise`<`number`\>
+`Promise`\<`number`\>
 
 #### Defined in
 
-[server/redis.ts:34](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L34)
+[server/redis.ts:34](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L34)
 
 ___
 
 ### expire
 
-• **expire**: (`key`: `string`, `seconds`: `number`) => `Promise`<`void`\>
+• **expire**: (`key`: `string`, `seconds`: `number`) => `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`key`, `seconds`): `Promise`<`void`\>
+▸ (`key`, `seconds`): `Promise`\<`void`\>
 
 ##### Parameters
 
@@ -124,39 +128,39 @@ ___
 
 ##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/redis.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L33)
+[server/redis.ts:33](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L33)
 
 ___
 
 ### flushall
 
-• **flushall**: () => `Promise`<`void`\>
+• **flushall**: () => `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (): `Promise`<`void`\>
+▸ (): `Promise`\<`void`\>
 
 ##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/redis.ts:32](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L32)
+[server/redis.ts:32](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L32)
 
 ___
 
 ### get
 
-• **get**: (`key`: `string`) => `Promise`<`string`\>
+• **get**: (`key`: `string`) => `Promise`\<`string`\>
 
 #### Type declaration
 
-▸ (`key`): `Promise`<`string`\>
+▸ (`key`): `Promise`\<`string`\>
 
 ##### Parameters
 
@@ -166,21 +170,21 @@ ___
 
 ##### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Defined in
 
-[server/redis.ts:25](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L25)
+[server/redis.ts:25](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L25)
 
 ___
 
 ### hdel
 
-• **hdel**: (`tkey`: `string`, `key`: `string`) => `Promise`<`void`\>
+• **hdel**: (`tkey`: `string`, `key`: `string`) => `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`tkey`, `key`): `Promise`<`void`\>
+▸ (`tkey`, `key`): `Promise`\<`void`\>
 
 ##### Parameters
 
@@ -191,21 +195,21 @@ ___
 
 ##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/redis.ts:31](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L31)
+[server/redis.ts:31](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L31)
 
 ___
 
 ### hexists
 
-• **hexists**: (`tkey`: `string`, `key`: `string`) => `Promise`<`number`\>
+• **hexists**: (`tkey`: `string`, `key`: `string`) => `Promise`\<`number`\>
 
 #### Type declaration
 
-▸ (`tkey`, `key`): `Promise`<`number`\>
+▸ (`tkey`, `key`): `Promise`\<`number`\>
 
 ##### Parameters
 
@@ -216,21 +220,21 @@ ___
 
 ##### Returns
 
-`Promise`<`number`\>
+`Promise`\<`number`\>
 
 #### Defined in
 
-[server/redis.ts:35](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L35)
+[server/redis.ts:35](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L35)
 
 ___
 
 ### hget
 
-• **hget**: (`tkey`: `string`, `key`: `string`) => `Promise`<`string`\>
+• **hget**: (`tkey`: `string`, `key`: `string`) => `Promise`\<`string`\>
 
 #### Type declaration
 
-▸ (`tkey`, `key`): `Promise`<`string`\>
+▸ (`tkey`, `key`): `Promise`\<`string`\>
 
 ##### Parameters
 
@@ -241,21 +245,21 @@ ___
 
 ##### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Defined in
 
-[server/redis.ts:26](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L26)
+[server/redis.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L26)
 
 ___
 
 ### hgetall
 
-• **hgetall**: (`tkey`: `string`) => `Promise`<{ [k: string]: `string`;  }\>
+• **hgetall**: (`tkey`: `string`) => `Promise`\<\{ `[k: string]`: `string`;  }\>
 
 #### Type declaration
 
-▸ (`tkey`): `Promise`<{ [k: string]: `string`;  }\>
+▸ (`tkey`): `Promise`\<\{ `[k: string]`: `string`;  }\>
 
 ##### Parameters
 
@@ -265,21 +269,21 @@ ___
 
 ##### Returns
 
-`Promise`<{ [k: string]: `string`;  }\>
+`Promise`\<\{ `[k: string]`: `string`;  }\>
 
 #### Defined in
 
-[server/redis.ts:27](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L27)
+[server/redis.ts:27](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L27)
 
 ___
 
 ### hset
 
-• **hset**: (`tkey`: `string`, `key`: `string`, `value`: `string`) => `Promise`<`void`\>
+• **hset**: (`tkey`: `string`, `key`: `string`, `value`: `string`) => `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`tkey`, `key`, `value`): `Promise`<`void`\>
+▸ (`tkey`, `key`, `value`): `Promise`\<`void`\>
 
 ##### Parameters
 
@@ -291,11 +295,11 @@ ___
 
 ##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/redis.ts:29](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L29)
+[server/redis.ts:29](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L29)
 
 ___
 
@@ -305,7 +309,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:21](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L21)
+[server/redis.ts:21](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L21)
 
 ___
 
@@ -315,7 +319,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:20](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L20)
+[server/redis.ts:20](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L20)
 
 ___
 
@@ -325,7 +329,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:23](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L23)
+[server/redis.ts:23](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L23)
 
 ___
 
@@ -335,17 +339,17 @@ ___
 
 #### Defined in
 
-[server/redis.ts:24](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L24)
+[server/redis.ts:24](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L24)
 
 ___
 
 ### set
 
-• **set**: (`key`: `string`, `value`: `string`) => `Promise`<`void`\>
+• **set**: (`key`: `string`, `value`: `string`) => `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`key`, `value`): `Promise`<`void`\>
+▸ (`key`, `value`): `Promise`\<`void`\>
 
 ##### Parameters
 
@@ -356,17 +360,17 @@ ___
 
 ##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/redis.ts:28](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L28)
+[server/redis.ts:28](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L28)
 
 ## Methods
 
 ### callFn
 
-▸ `Private` **callFn**(`fn`): (...`args`: `any`[]) => `Promise`<`any`\>
+▸ **callFn**(`fn`): (...`args`: `any`[]) => `Promise`\<`any`\>
 
 Just wrap the standard promise function so that it won't execute when redis is dead
 
@@ -374,13 +378,13 @@ Just wrap the standard promise function so that it won't execute when redis is d
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `fn` | (...`args`: `any`[]) => `Promise`<`any`\> | the function to wrap |
+| `fn` | (...`args`: `any`[]) => `Promise`\<`any`\> | the function to wrap |
 
 #### Returns
 
 `fn`
 
-▸ (...`args`): `Promise`<`any`\>
+▸ (`...args`): `Promise`\<`any`\>
 
 Just wrap the standard promise function so that it won't execute when redis is dead
 
@@ -392,17 +396,17 @@ Just wrap the standard promise function so that it won't execute when redis is d
 
 ##### Returns
 
-`Promise`<`any`\>
+`Promise`\<`any`\>
 
 #### Defined in
 
-[server/redis.ts:154](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L154)
+[server/redis.ts:154](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L154)
 
 ___
 
 ### setup
 
-▸ **setup**(`onConnect?`): `Promise`<[`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)\>
+▸ **setup**(`onConnect?`): `Promise`\<[`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)\>
 
 Setup a client, should be called just right after construction
 
@@ -410,15 +414,15 @@ Setup a client, should be called just right after construction
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `onConnect?` | (`client`: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md), `isReconnect`: `boolean`) => `Promise`<`void`\> | a function to call after connecting happened |
+| `onConnect?` | (`client`: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md), `isReconnect`: `boolean`) => `Promise`\<`void`\> | a function to call after connecting happened |
 
 #### Returns
 
-`Promise`<[`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)\>
+`Promise`\<[`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)\>
 
 the client itself, once it has been done and the connect function has ran, considering itself ready
 to take on connections
 
 #### Defined in
 
-[server/redis.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L68)
+[server/redis.ts:68](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L68)

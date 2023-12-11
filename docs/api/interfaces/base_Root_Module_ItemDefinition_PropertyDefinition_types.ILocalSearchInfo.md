@@ -15,32 +15,22 @@
 ### Properties
 
 - [args](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#args)
-- [gqlValue](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#gqlvalue)
 - [id](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#id)
 - [include](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#include)
 - [itemDefinition](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#itemdefinition)
 - [prefix](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#prefix)
 - [property](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#property)
+- [rqValue](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md#rqvalue)
 
 ## Properties
 
 ### args
 
-• **args**: [`IGQLArgs`](gql_querier.IGQLArgs.md)
+• **args**: [`IRQArgs`](rq_querier.IRQArgs.md)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:191](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L191)
-
-___
-
-### gqlValue
-
-• **gqlValue**: [`IGQLValue`](gql_querier.IGQLValue.md)
-
-#### Defined in
-
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:192](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L192)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:189](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L189)
 
 ___
 
@@ -54,7 +44,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:66](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L66)
 
 ___
 
@@ -68,7 +58,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:72](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L72)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
 
 ___
 
@@ -82,7 +72,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:71](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L71)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
 
 ___
 
@@ -96,7 +86,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
 
 ___
 
@@ -110,4 +100,14 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
+
+___
+
+### rqValue
+
+• **rqValue**: [`IRQValue`](rq_querier.IRQValue.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:190](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L190)

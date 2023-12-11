@@ -41,61 +41,61 @@ https://gist.githubusercontent.com/piraveen/fafd0d984b2236e809d03a0e306c8a4d/raw
 
 ### arrCountries
 
-• **arrCountries**: [`ICountryType`](../interfaces/imported_resources.ICountryType.md)[]
+• `Const` **arrCountries**: [`ICountryType`](../interfaces/imported_resources.ICountryType.md)[]
 
 #### Defined in
 
-[imported-resources/index.ts:70](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L70)
+[imported-resources/index.ts:70](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L70)
 
 ___
 
 ### arrCurrencies
 
-• **arrCurrencies**: [`ICurrencyType`](../interfaces/imported_resources.ICurrencyType.md)[]
+• `Const` **arrCurrencies**: [`ICurrencyType`](../interfaces/imported_resources.ICurrencyType.md)[]
 
 #### Defined in
 
-[imported-resources/index.ts:79](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L79)
+[imported-resources/index.ts:79](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L79)
 
 ___
 
 ### arrLanguages
 
-• **arrLanguages**: [`ILanguageType`](../interfaces/imported_resources.ILanguageType.md)[]
+• `Const` **arrLanguages**: [`ILanguageType`](../interfaces/imported_resources.ILanguageType.md)[]
 
 #### Defined in
 
-[imported-resources/index.ts:88](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L88)
+[imported-resources/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L88)
 
 ___
 
 ### countries
 
-• **countries**: [`ICountryDataType`](../interfaces/imported_resources.ICountryDataType.md)
+• `Const` **countries**: [`ICountryDataType`](../interfaces/imported_resources.ICountryDataType.md)
 
 #### Defined in
 
-[imported-resources/index.ts:67](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L67)
+[imported-resources/index.ts:67](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L67)
 
 ___
 
 ### currencies
 
-• **currencies**: [`ICurrencyDataType`](../interfaces/imported_resources.ICurrencyDataType.md)
+• `Const` **currencies**: [`ICurrencyDataType`](../interfaces/imported_resources.ICurrencyDataType.md)
 
 #### Defined in
 
-[imported-resources/index.ts:68](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L68)
+[imported-resources/index.ts:68](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L68)
 
 ___
 
 ### languages
 
-• **languages**: [`ILanguageDataType`](../interfaces/imported_resources.ILanguageDataType.md)
+• `Const` **languages**: [`ILanguageDataType`](../interfaces/imported_resources.ILanguageDataType.md)
 
 #### Defined in
 
-[imported-resources/index.ts:69](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L69)
+[imported-resources/index.ts:69](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L69)
 
 ## Functions
 
@@ -115,4 +115,4 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:98](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L98)
+[imported-resources/index.ts:98](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L98)

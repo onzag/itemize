@@ -71,7 +71,7 @@
 
 ### constructor
 
-• **new ElasticQueryBuilder**(`request`)
+• **new ElasticQueryBuilder**(`request`): [`ElasticQueryBuilder`](server_elastic.ElasticQueryBuilder.md)
 
 #### Parameters
 
@@ -79,9 +79,13 @@
 | :------ | :------ |
 | `request` | `SearchRequest` |
 
+#### Returns
+
+[`ElasticQueryBuilder`](server_elastic.ElasticQueryBuilder.md)
+
 #### Defined in
 
-[server/elastic.ts:2923](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2923)
+[server/elastic.ts:2923](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2923)
 
 ## Properties
 
@@ -91,7 +95,7 @@
 
 #### Defined in
 
-[server/elastic.ts:2920](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2920)
+[server/elastic.ts:2920](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2920)
 
 ___
 
@@ -101,7 +105,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2921](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2921)
+[server/elastic.ts:2921](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2921)
 
 ___
 
@@ -111,13 +115,13 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2919](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2919)
+[server/elastic.ts:2919](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2919)
 
 ## Methods
 
 ### \_q
 
-▸ `Private` **_q**(`q`, `type`, `options?`): `void`
+▸ **_q**(`q`, `type`, `options?`): `void`
 
 #### Parameters
 
@@ -133,7 +137,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3045](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3045)
+[server/elastic.ts:3045](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3045)
 
 ___
 
@@ -156,7 +160,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3406](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3406)
+[server/elastic.ts:3406](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3406)
 
 ___
 
@@ -169,7 +173,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `id` | `string` |
-| `agg` | `Record`<`string`, `AggregationsAggregationContainer`\> |
+| `agg` | `Record`\<`string`, `AggregationsAggregationContainer`\> |
 | `filter?` | `QueryDslQueryContainer` \| `SubBuilderFn` |
 | `options` | `IElasticBasicOptions` |
 
@@ -179,7 +183,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3369](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3369)
+[server/elastic.ts:3369](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3369)
 
 ___
 
@@ -199,7 +203,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3361](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3361)
+[server/elastic.ts:3361](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3361)
 
 ___
 
@@ -213,7 +217,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3429](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3429)
+[server/elastic.ts:3429](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3429)
 
 ___
 
@@ -233,7 +237,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3308](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3308)
+[server/elastic.ts:3308](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3308)
 
 ___
 
@@ -253,7 +257,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3312](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3312)
+[server/elastic.ts:3312](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3312)
 
 ___
 
@@ -277,7 +281,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3345](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3345)
+[server/elastic.ts:3345](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3345)
 
 ___
 
@@ -301,7 +305,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3332](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3332)
+[server/elastic.ts:3332](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3332)
 
 ___
 
@@ -315,7 +319,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3357](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3357)
+[server/elastic.ts:3357](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3357)
 
 ___
 
@@ -335,7 +339,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3316](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3316)
+[server/elastic.ts:3316](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3316)
 
 ___
 
@@ -355,7 +359,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3279](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3279)
+[server/elastic.ts:3279](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3279)
 
 ___
 
@@ -375,7 +379,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2930](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2930)
+[server/elastic.ts:2930](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2930)
 
 ___
 
@@ -396,7 +400,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3094](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3094)
+[server/elastic.ts:3094](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3094)
 
 ___
 
@@ -408,7 +412,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -417,7 +421,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3139](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3139)
+[server/elastic.ts:3139](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3139)
 
 ___
 
@@ -429,7 +433,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -438,7 +442,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3153](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3153)
+[server/elastic.ts:3153](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3153)
 
 ___
 
@@ -450,7 +454,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -459,7 +463,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3167](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3167)
+[server/elastic.ts:3167](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3167)
 
 ___
 
@@ -480,7 +484,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3098](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3098)
+[server/elastic.ts:3098](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3098)
 
 ___
 
@@ -492,7 +496,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -501,7 +505,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3146](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3146)
+[server/elastic.ts:3146](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3146)
 
 ___
 
@@ -513,7 +517,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -522,7 +526,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3160](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3160)
+[server/elastic.ts:3160](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3160)
 
 ___
 
@@ -534,7 +538,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -543,7 +547,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3174](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3174)
+[server/elastic.ts:3174](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3174)
 
 ___
 
@@ -555,7 +559,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `termRule` | `Partial`<`Record`<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
+| `termRule` | `Partial`\<`Record`\<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -564,7 +568,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3118](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3118)
+[server/elastic.ts:3118](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3118)
 
 ___
 
@@ -585,7 +589,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3132](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3132)
+[server/elastic.ts:3132](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3132)
 
 ___
 
@@ -597,7 +601,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `termRule` | `Partial`<`Record`<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
+| `termRule` | `Partial`\<`Record`\<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -606,7 +610,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3110](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3110)
+[server/elastic.ts:3110](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3110)
 
 ___
 
@@ -627,7 +631,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3125](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3125)
+[server/elastic.ts:3125](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3125)
 
 ___
 
@@ -647,7 +651,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3417](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3417)
+[server/elastic.ts:3417](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3417)
 
 ___
 
@@ -661,7 +665,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3421](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3421)
+[server/elastic.ts:3421](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3421)
 
 ___
 
@@ -681,7 +685,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3320](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3320)
+[server/elastic.ts:3320](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3320)
 
 ___
 
@@ -701,7 +705,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3324](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3324)
+[server/elastic.ts:3324](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3324)
 
 ___
 
@@ -721,7 +725,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3328](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3328)
+[server/elastic.ts:3328](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3328)
 
 ___
 
@@ -735,7 +739,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3425](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3425)
+[server/elastic.ts:3425](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3425)
 
 ___
 
@@ -755,7 +759,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3264](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3264)
+[server/elastic.ts:3264](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3264)
 
 ___
 
@@ -775,7 +779,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3270](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3270)
+[server/elastic.ts:3270](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3270)
 
 ___
 
@@ -795,7 +799,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3260](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3260)
+[server/elastic.ts:3260](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3260)
 
 ___
 
@@ -815,7 +819,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3252](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3252)
+[server/elastic.ts:3252](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3252)
 
 ___
 
@@ -836,7 +840,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3102](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3102)
+[server/elastic.ts:3102](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3102)
 
 ___
 
@@ -848,7 +852,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -857,7 +861,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3210](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3210)
+[server/elastic.ts:3210](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3210)
 
 ___
 
@@ -869,7 +873,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -878,7 +882,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3224](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3224)
+[server/elastic.ts:3224](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3224)
 
 ___
 
@@ -890,7 +894,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -899,7 +903,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3238](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3238)
+[server/elastic.ts:3238](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3238)
 
 ___
 
@@ -920,7 +924,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3106](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3106)
+[server/elastic.ts:3106](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3106)
 
 ___
 
@@ -932,7 +936,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `QueryDslMatchQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -941,7 +945,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3217](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3217)
+[server/elastic.ts:3217](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3217)
 
 ___
 
@@ -953,7 +957,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -962,7 +966,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3231](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3231)
+[server/elastic.ts:3231](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3231)
 
 ___
 
@@ -974,7 +978,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `matchRule` | `Partial`<`Record`<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
+| `matchRule` | `Partial`\<`Record`\<`string`, `string` \| `QueryDslMatchPhraseQuery`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -983,7 +987,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3245](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3245)
+[server/elastic.ts:3245](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3245)
 
 ___
 
@@ -995,7 +999,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `termRule` | `Partial`<`Record`<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
+| `termRule` | `Partial`\<`Record`\<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -1004,7 +1008,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3189](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3189)
+[server/elastic.ts:3189](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3189)
 
 ___
 
@@ -1025,7 +1029,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3203](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3203)
+[server/elastic.ts:3203](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3203)
 
 ___
 
@@ -1037,7 +1041,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `termRule` | `Partial`<`Record`<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
+| `termRule` | `Partial`\<`Record`\<`string`, `QueryDslTermQuery` \| `FieldValue`\>\> |
 | `options` | `IElasticBasicOptions` |
 
 #### Returns
@@ -1046,7 +1050,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3181](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3181)
+[server/elastic.ts:3181](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3181)
 
 ___
 
@@ -1067,7 +1071,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3196](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3196)
+[server/elastic.ts:3196](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3196)
 
 ___
 
@@ -1087,4 +1091,4 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3256](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L3256)
+[server/elastic.ts:3256](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3256)

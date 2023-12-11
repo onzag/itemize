@@ -40,11 +40,11 @@ This file contains the sql functionality to be used with the location type
 
 | Name | Type |
 | :------ | :------ |
-| `properties` | `Object` |
+| `properties` | {} |
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:59](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L59)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:59](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L59)
 
 ___
 
@@ -68,7 +68,7 @@ the order by rule string array
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:338](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L338)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:338](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L338)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:270](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L270)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:270](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L270)
 
 ___
 
@@ -112,7 +112,7 @@ a partial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:22](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:22](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L22)
 
 ___
 
@@ -128,7 +128,7 @@ Provides the btree indexable functionality
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:387](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L387)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:387](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L387)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:199](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L199)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:199](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L199)
 
 ___
 
@@ -172,7 +172,7 @@ a partial row match
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:364](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L364)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:364](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L364)
 
 ___
 
@@ -197,7 +197,7 @@ a partial row
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:107](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L107)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:107](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L107)
 
 ___
 
@@ -221,7 +221,7 @@ the order by rule string array
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:326](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L326)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:326](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L326)
 
 ___
 
@@ -246,7 +246,7 @@ a property definition supported location type, or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:176](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L176)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:176](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L176)
 
 ___
 
@@ -270,7 +270,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:377](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L377)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:377](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L377)
 
 ___
 
@@ -294,7 +294,7 @@ a boolean on whether it was searched by it, or an order by rule (also when it wa
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:222](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L222)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:222](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L222)
 
 ___
 
@@ -316,4 +316,4 @@ provides the SQL select form for the location type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:91](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L91)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:91](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L91)

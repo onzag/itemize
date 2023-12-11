@@ -23,7 +23,7 @@ Creates an entry for a given property id
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertyEntryProps`](../interfaces/client_components_property_base.IPropertyEntryProps.md)<[`IPropertyEntryRendererProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> | the props for the entry |
+| `props` | [`IPropertyEntryProps`](../interfaces/client_components_property_base.IPropertyEntryProps.md)\<[`IPropertyEntryRendererProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md)\<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> | the props for the entry |
 
 #### Returns
 
@@ -33,4 +33,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/Entry.tsx:17](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Entry.tsx#L17)
+[client/components/property/Entry.tsx:17](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Entry.tsx#L17)

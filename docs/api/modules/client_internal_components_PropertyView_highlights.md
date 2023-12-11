@@ -32,4 +32,4 @@
 
 #### Defined in
 
-[client/internal/components/PropertyView/highlights.ts:4](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/highlights.ts#L4)
+[client/internal/components/PropertyView/highlights.ts:4](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/highlights.ts#L4)

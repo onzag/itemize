@@ -28,7 +28,7 @@ by default it just compares
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `arg` | [`ILocalEqualInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalEqualInfo.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\> | the local information |
+| `arg` | [`ILocalEqualInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalEqualInfo.md)\<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\> | the local information |
 
 #### Returns
 
@@ -38,7 +38,7 @@ a boolean on whether it equals or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:32](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L32)
+[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:32](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L32)
 
 ___
 
@@ -65,4 +65,4 @@ a boolean on whether it equals
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:22](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:22](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L22)

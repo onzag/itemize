@@ -44,7 +44,7 @@ a react node
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:386](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L386)
+[client/components/localization/I18nRead.tsx:386](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nRead.tsx#L386)
 
 ___
 
@@ -66,4 +66,4 @@ The i18n read as a react hook
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:463](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L463)
+[client/components/localization/I18nRead.tsx:463](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nRead.tsx#L463)

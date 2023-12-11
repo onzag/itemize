@@ -21,11 +21,11 @@ The element wrappers
 
 #### Index signature
 
-▪ [key: `string`]: `React.ComponentType`<[`ISlateEditorWrapperElementProps`](client_fast_prototyping_components_slate.ISlateEditorWrapperElementProps.md)\>
+▪ [key: `string`]: `React.ComponentType`\<[`ISlateEditorWrapperElementProps`](client_fast_prototyping_components_slate.ISlateEditorWrapperElementProps.md)\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:775](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L775)
+[client/fast-prototyping/components/slate/index.tsx:775](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L775)
 
 ___
 
@@ -35,8 +35,8 @@ ___
 
 #### Index signature
 
-▪ [key: `string`]: `React.ComponentType`<[`ISlateEditorWrapperElementProps`](client_fast_prototyping_components_slate.ISlateEditorWrapperElementProps.md)\>
+▪ [key: `string`]: `React.ComponentType`\<[`ISlateEditorWrapperElementProps`](client_fast_prototyping_components_slate.ISlateEditorWrapperElementProps.md)\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:778](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L778)
+[client/fast-prototyping/components/slate/index.tsx:778](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L778)

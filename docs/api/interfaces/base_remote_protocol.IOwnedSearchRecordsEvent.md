@@ -5,7 +5,7 @@
 [base/remote-protocol](../modules/base_remote_protocol.md).IOwnedSearchRecordsEvent
 
 The interface adds the creator in its event
-check [IOwnedSearchRegisterRequest](base_remote_protocol.IOwnedSearchRegisterRequest.md)
+check [[IOwnedSearchRegisterRequest]]
 
 ## Hierarchy
 
@@ -38,13 +38,13 @@ check [IOwnedSearchRegisterRequest](base_remote_protocol.IOwnedSearchRegisterReq
 
 #### Defined in
 
-[base/remote-protocol.ts:138](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L138)
+[base/remote-protocol.ts:138](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L138)
 
 ___
 
 ### createdRecords
 
-• **createdRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **createdRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Inherited from
 
@@ -52,13 +52,13 @@ IBaseSearchRecordsEvent.createdRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:112](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L112)
+[base/remote-protocol.ts:112](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L112)
 
 ___
 
 ### deletedRecords
 
-• **deletedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **deletedRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Inherited from
 
@@ -66,13 +66,13 @@ IBaseSearchRecordsEvent.deletedRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:117](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L117)
+[base/remote-protocol.ts:117](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L117)
 
 ___
 
 ### lostRecords
 
-• **lostRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **lostRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 the records that have been deleted
 
@@ -82,13 +82,13 @@ IBaseSearchRecordsEvent.lostRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:116](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L116)
+[base/remote-protocol.ts:116](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L116)
 
 ___
 
 ### modifiedRecords
 
-• **modifiedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **modifiedRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 the records that have been modified
 
@@ -98,7 +98,7 @@ IBaseSearchRecordsEvent.modifiedRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:121](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L121)
+[base/remote-protocol.ts:121](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L121)
 
 ___
 
@@ -114,13 +114,13 @@ IBaseSearchRecordsEvent.newLastModified
 
 #### Defined in
 
-[base/remote-protocol.ts:125](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L125)
+[base/remote-protocol.ts:125](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L125)
 
 ___
 
 ### newRecords
 
-• **newRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **newRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 the new records that have been added
 
@@ -130,7 +130,7 @@ IBaseSearchRecordsEvent.newRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L111)
+[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L111)
 
 ___
 
@@ -146,4 +146,4 @@ IBaseSearchRecordsEvent.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L107)
+[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L107)

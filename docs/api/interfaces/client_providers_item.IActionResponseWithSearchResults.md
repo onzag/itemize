@@ -35,7 +35,7 @@ A response given by search
 
 #### Defined in
 
-[client/providers/item.tsx:203](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L203)
+[client/providers/item.tsx:203](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L203)
 
 ___
 
@@ -47,7 +47,7 @@ Only truly relevant when pileSearch is used
 
 #### Defined in
 
-[client/providers/item.tsx:208](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L208)
+[client/providers/item.tsx:208](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L208)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:200](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L200)
+[client/providers/item.tsx:200](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L200)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L168)
+[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L168)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:201](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L201)
+[client/providers/item.tsx:201](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L201)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:202](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L202)
+[client/providers/item.tsx:202](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L202)
 
 ___
 
@@ -101,27 +101,27 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:204](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L204)
+[client/providers/item.tsx:204](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L204)
 
 ___
 
 ### records
 
-• **records**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **records**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Defined in
 
-[client/providers/item.tsx:198](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L198)
+[client/providers/item.tsx:198](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L198)
 
 ___
 
 ### results
 
-• **results**: [`IGQLValue`](gql_querier.IGQLValue.md)[]
+• **results**: [`IRQValue`](rq_querier.IRQValue.md)[]
 
 #### Defined in
 
-[client/providers/item.tsx:199](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L199)
+[client/providers/item.tsx:199](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L199)
 
 ___
 
@@ -131,4 +131,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:197](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L197)
+[client/providers/item.tsx:197](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L197)

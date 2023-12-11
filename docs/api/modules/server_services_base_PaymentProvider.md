@@ -22,7 +22,7 @@ with all the necessary functions that it should offer
 - [IPaymentProviderPaymentExtraInfoWithHiddenMetadata](../interfaces/server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md)
 - [IPaymentUniqueLocation](../interfaces/server_services_base_PaymentProvider.IPaymentUniqueLocation.md)
 
-### Type aliases
+### Type Aliases
 
 - [PaymentEventListener](server_services_base_PaymentProvider.md#paymenteventlistener)
 
@@ -30,15 +30,15 @@ with all the necessary functions that it should offer
 
 - [statusToEvents](server_services_base_PaymentProvider.md#statustoevents)
 
-## Type aliases
+## Type Aliases
 
 ### PaymentEventListener
 
-Ƭ **PaymentEventListener**: (`evObj`: [`IPaymentEventObject`](../interfaces/server_services_base_PaymentProvider.IPaymentEventObject.md)) => `Promise`<`void`\> \| `void`
+Ƭ **PaymentEventListener**: (`evObj`: [`IPaymentEventObject`](../interfaces/server_services_base_PaymentProvider.IPaymentEventObject.md)) => `Promise`\<`void`\> \| `void`
 
 #### Type declaration
 
-▸ (`evObj`): `Promise`<`void`\> \| `void`
+▸ (`evObj`): `Promise`\<`void`\> \| `void`
 
 Represents a payment event listener that is added to the payment provider
 in the addEventListener interaction
@@ -55,17 +55,17 @@ needs to know when the event is done to perform cleanup functions
 
 ##### Returns
 
-`Promise`<`void`\> \| `void`
+`Promise`\<`void`\> \| `void`
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:185](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L185)
+[server/services/base/PaymentProvider.ts:185](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L185)
 
 ## Variables
 
 ### statusToEvents
 
-• **statusToEvents**: `Record`<[`PaymentStatusType`](../enums/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.PaymentStatusType.md), [`PaymentEvent`](../enums/server_services_base_PaymentProvider.PaymentEvent.md)\>
+• `Const` **statusToEvents**: `Record`\<[`PaymentStatusType`](../enums/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.PaymentStatusType.md), [`PaymentEvent`](../enums/server_services_base_PaymentProvider.PaymentEvent.md)\>
 
 Provides a conversion between a status change or status creation
 to an event type, it's pretty much a 1 to 1, there are of course
@@ -73,4 +73,4 @@ the events CREATED and DESTROYED, but those are not status changes
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:225](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L225)
+[server/services/base/PaymentProvider.ts:225](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L225)

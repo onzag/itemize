@@ -16,7 +16,7 @@ using fetch requests that ultimately end up running these functions
 
 ### serverSideIndexChecker
 
-▸ **serverSideIndexChecker**(`appData`, `itemDefinition`, `include`, `property`, `value`, `id`, `version`): `Promise`<`boolean`\>
+▸ **serverSideIndexChecker**(`appData`, `itemDefinition`, `include`, `property`, `value`, `id`, `version`): `Promise`\<`boolean`\>
 
 The server side index checker checks for unique indexes within properties
 
@@ -34,10 +34,10 @@ The server side index checker checks for unique indexes within properties
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 a boolean on whether the unique index is valid
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts:27](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts:27](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts#L27)

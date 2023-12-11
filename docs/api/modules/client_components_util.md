@@ -45,7 +45,7 @@ a query string url with the service worker query string parameters
 
 #### Defined in
 
-[client/components/util/index.tsx:273](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L273)
+[client/components/util/index.tsx:273](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L273)
 
 ___
 
@@ -59,7 +59,7 @@ Gets all the available image sizes for a given file
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `fileData` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the file data |
+| `fileData` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) | the file data |
 
 #### Returns
 
@@ -67,7 +67,7 @@ Gets all the available image sizes for a given file
 
 #### Defined in
 
-[client/components/util/index.tsx:197](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L197)
+[client/components/util/index.tsx:197](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L197)
 
 ___
 
@@ -86,7 +86,7 @@ local files are supported
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `fileData` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the file itself |
+| `fileData` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) | the file itself |
 | `property` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property in question this file applies to |
 | `imageSizes?` | [`IImageSizes`](../interfaces/client_components_util.IImageSizes.md) | an optional already calculated image sizes, via the imageSizeRetriever; if not provided it is calculated |
 
@@ -96,4 +96,4 @@ local files are supported
 
 #### Defined in
 
-[client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L25)
+[client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L25)

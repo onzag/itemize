@@ -78,7 +78,7 @@ to perform queries against elastic
 
 ### constructor
 
-• **new ItemizeElasticClient**(`root`, `rawDB`, `elasticClient`, `langAnalyzers`)
+• **new ItemizeElasticClient**(`root`, `rawDB`, `elasticClient`, `langAnalyzers`): [`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md)
 
 #### Parameters
 
@@ -89,9 +89,13 @@ to perform queries against elastic
 | `elasticClient` | `default` |
 | `langAnalyzers` | `ILangAnalyzers` |
 
+#### Returns
+
+[`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md)
+
 #### Defined in
 
-[server/elastic.ts:237](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L237)
+[server/elastic.ts:237](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L237)
 
 ## Properties
 
@@ -101,11 +105,11 @@ to perform queries against elastic
 
 #### Index signature
 
-▪ [n: `string`]: `Promise`<`boolean`\>
+▪ [n: `string`]: `Promise`\<`boolean`\>
 
 #### Defined in
 
-[server/elastic.ts:232](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L232)
+[server/elastic.ts:232](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L232)
 
 ___
 
@@ -115,7 +119,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:217](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L217)
+[server/elastic.ts:217](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L217)
 
 ___
 
@@ -125,7 +129,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:221](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L221)
+[server/elastic.ts:221](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L221)
 
 ___
 
@@ -135,17 +139,17 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:223](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L223)
+[server/elastic.ts:223](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L223)
 
 ___
 
 ### pings
 
-• `Private` **pings**: `IElasticPingSetter`<`any`, `any`\>[] = `[]`
+• `Private` **pings**: `IElasticPingSetter`\<`any`, `any`\>[] = `[]`
 
 #### Defined in
 
-[server/elastic.ts:234](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L234)
+[server/elastic.ts:234](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L234)
 
 ___
 
@@ -155,17 +159,17 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:235](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L235)
+[server/elastic.ts:235](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L235)
 
 ___
 
 ### prepareInstancePromise
 
-• `Private` **prepareInstancePromise**: `Promise`<`void`\>
+• `Private` **prepareInstancePromise**: `Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:229](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L229)
+[server/elastic.ts:229](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L229)
 
 ___
 
@@ -183,7 +187,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:230](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L230)
+[server/elastic.ts:230](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L230)
 
 ___
 
@@ -193,7 +197,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:218](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L218)
+[server/elastic.ts:218](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L218)
 
 ___
 
@@ -203,7 +207,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:219](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L219)
+[server/elastic.ts:219](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L219)
 
 ___
 
@@ -213,7 +217,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:220](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L220)
+[server/elastic.ts:220](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L220)
 
 ___
 
@@ -223,11 +227,11 @@ ___
 
 #### Index signature
 
-▪ [key: `string`]: `Promise`<`void`\>
+▪ [key: `string`]: `Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:224](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L224)
+[server/elastic.ts:224](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L224)
 
 ___
 
@@ -237,17 +241,17 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:222](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L222)
+[server/elastic.ts:222](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L222)
 
 ___
 
 ### serverDataPromise
 
-• `Private` **serverDataPromise**: `Promise`<`void`\>
+• `Private` **serverDataPromise**: `Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:226](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L226)
+[server/elastic.ts:226](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L226)
 
 ___
 
@@ -265,27 +269,27 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:227](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L227)
+[server/elastic.ts:227](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L227)
 
 ## Methods
 
 ### \_rebuildAllIndexes
 
-▸ `Private` **_rebuildAllIndexes**(): `Promise`<`string`[]\>
+▸ **_rebuildAllIndexes**(): `Promise`\<`string`[]\>
 
 #### Returns
 
-`Promise`<`string`[]\>
+`Promise`\<`string`[]\>
 
 #### Defined in
 
-[server/elastic.ts:423](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L423)
+[server/elastic.ts:423](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L423)
 
 ___
 
 ### \_rebuildIndexGroup
 
-▸ `Private` **_rebuildIndexGroup**(`qualifiedName`, `value`, `isInitialRebuildIndexes`): `Promise`<`void`\>
+▸ **_rebuildIndexGroup**(`qualifiedName`, `value`, `isInitialRebuildIndexes`): `Promise`\<`void`\>
 
 This function is used to internally rebuild an index
 
@@ -299,17 +303,17 @@ This function is used to internally rebuild an index
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:645](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L645)
+[server/elastic.ts:645](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L645)
 
 ___
 
 ### \_runConsistencyCheck
 
-▸ `Private` **_runConsistencyCheck**(`rawDBClient`, `idef`, `timeRan`, `batchNumber`, `knownStatusInfo`, `knownLimiters`, `ensuranceCache`): `Promise`<`boolean`\>
+▸ **_runConsistencyCheck**(`rawDBClient`, `idef`, `timeRan`, `batchNumber`, `knownStatusInfo`, `knownLimiters`, `ensuranceCache`): `Promise`\<`boolean`\>
 
 #### Parameters
 
@@ -325,17 +329,17 @@ ___
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Defined in
 
-[server/elastic.ts:1088](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1088)
+[server/elastic.ts:1088](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L1088)
 
 ___
 
 ### createDocument
 
-▸ **createDocument**(`itemDefinition`, `language`, `id`, `version`, `value?`): `Promise`<`void`\>
+▸ **createDocument**(`itemDefinition`, `language`, `id`, `version`, `value?`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -349,17 +353,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2573](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2573)
+[server/elastic.ts:2573](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2573)
 
 ___
 
 ### createDocumentUnknownEverything
 
-▸ **createDocumentUnknownEverything**(`itemDefinition`, `id`, `version`): `Promise`<`void`\>
+▸ **createDocumentUnknownEverything**(`itemDefinition`, `id`, `version`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -371,17 +375,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2229](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2229)
+[server/elastic.ts:2229](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2229)
 
 ___
 
 ### createOrUpdateSimpleIndex
 
-▸ `Private` **createOrUpdateSimpleIndex**(`id`, `value`): `Promise`<`void`\>
+▸ **createOrUpdateSimpleIndex**(`id`, `value`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -392,17 +396,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:560](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L560)
+[server/elastic.ts:560](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L560)
 
 ___
 
 ### createPing
 
-▸ **createPing**<`N`, `T`\>(`setter`): `void`
+▸ **createPing**\<`N`, `T`\>(`setter`): `void`
 
 #### Type parameters
 
@@ -415,7 +419,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `setter` | `IElasticPingSetter`<`N`, `T`\> |
+| `setter` | `IElasticPingSetter`\<`N`, `T`\> |
 
 #### Returns
 
@@ -423,13 +427,13 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2653](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2653)
+[server/elastic.ts:2653](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2653)
 
 ___
 
 ### deleteDocument
 
-▸ **deleteDocument**(`itemDefinition`, `language`, `id`, `version`): `Promise`<`void`\>
+▸ **deleteDocument**(`itemDefinition`, `language`, `id`, `version`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -442,17 +446,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2178](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2178)
+[server/elastic.ts:2178](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2178)
 
 ___
 
 ### deleteDocumentUnknownLanguage
 
-▸ **deleteDocumentUnknownLanguage**(`itemDefinition`, `id`, `version`): `Promise`<`void`\>
+▸ **deleteDocumentUnknownLanguage**(`itemDefinition`, `id`, `version`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -464,38 +468,38 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2162](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2162)
+[server/elastic.ts:2162](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2162)
 
 ___
 
 ### deleteDocumentsUnknownLanguage
 
-▸ **deleteDocumentsUnknownLanguage**(`itemDefinition`, `ids`): `Promise`<`void`\>
+▸ **deleteDocumentsUnknownLanguage**(`itemDefinition`, `ids`): `Promise`\<`void`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `itemDefinition` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `ids` | (`string` \| { `id`: `string` ; `version`: `string`  })[] |
+| `ids` | (`string` \| \{ `id`: `string` ; `version`: `string`  })[] |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2117](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2117)
+[server/elastic.ts:2117](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2117)
 
 ___
 
 ### deletePingsFor
 
-▸ **deletePingsFor**(`dataIndex`, `statusIndex`, `instanceId`): `Promise`<``"NOT_DEAD"`` \| ``"OK"``\>
+▸ **deletePingsFor**(`dataIndex`, `statusIndex`, `instanceId`): `Promise`\<``"OK"`` \| ``"NOT_DEAD"``\>
 
 #### Parameters
 
@@ -507,17 +511,17 @@ ___
 
 #### Returns
 
-`Promise`<``"NOT_DEAD"`` \| ``"OK"``\>
+`Promise`\<``"OK"`` \| ``"NOT_DEAD"``\>
 
 #### Defined in
 
-[server/elastic.ts:2735](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2735)
+[server/elastic.ts:2735](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2735)
 
 ___
 
 ### ensureIndexInGroup
 
-▸ `Private` **ensureIndexInGroup**(`indexName`, `language`, `value`, `cache?`): `Promise`<`any`\>
+▸ **ensureIndexInGroup**(`indexName`, `language`, `value`, `cache?`): `Promise`\<`any`\>
 
 #### Parameters
 
@@ -530,38 +534,38 @@ ___
 
 #### Returns
 
-`Promise`<`any`\>
+`Promise`\<`any`\>
 
 #### Defined in
 
-[server/elastic.ts:1967](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1967)
+[server/elastic.ts:1967](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L1967)
 
 ___
 
 ### ensureIndexes
 
-▸ **ensureIndexes**(`itemDefinitionOrModule`, `throwError?`): `Promise`<`boolean`\>
+▸ **ensureIndexes**(`itemDefinitionOrModule`, `throwError?`): `Promise`\<`boolean`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) |
 | `throwError?` | `boolean` |
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Defined in
 
-[server/elastic.ts:872](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L872)
+[server/elastic.ts:872](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L872)
 
 ___
 
 ### ensureSimpleIndex
 
-▸ **ensureSimpleIndex**(`id`, `schema`, `throwError?`): `Promise`<`boolean`\>
+▸ **ensureSimpleIndex**(`id`, `schema`, `throwError?`): `Promise`\<`boolean`\>
 
 #### Parameters
 
@@ -573,17 +577,17 @@ ___
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Defined in
 
-[server/elastic.ts:827](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L827)
+[server/elastic.ts:827](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L827)
 
 ___
 
 ### executeCountQuery
 
-▸ **executeCountQuery**(`elasticQuery`, `options?`): `Promise`<`CountResponse`\>
+▸ **executeCountQuery**(`elasticQuery`, `options?`): `Promise`\<`CountResponse`\>
 
 #### Parameters
 
@@ -594,17 +598,17 @@ ___
 
 #### Returns
 
-`Promise`<`CountResponse`\>
+`Promise`\<`CountResponse`\>
 
 #### Defined in
 
-[server/elastic.ts:2643](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2643)
+[server/elastic.ts:2643](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2643)
 
 ___
 
 ### executePing
 
-▸ `Private` **executePing**(`index`): `Promise`<`void`\>
+▸ **executePing**(`index`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -614,31 +618,31 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2667](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2667)
+[server/elastic.ts:2667](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2667)
 
 ___
 
 ### executePings
 
-▸ `Private` **executePings**(): `Promise`<`void`\>
+▸ **executePings**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2717](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2717)
+[server/elastic.ts:2717](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2717)
 
 ___
 
 ### executeQuery
 
-▸ **executeQuery**(`elasticQuery`, `options?`): `Promise`<`SearchResponse`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`<`string`, `AggregationsAggregate`\>\>\>
+▸ **executeQuery**(`elasticQuery`, `options?`): `Promise`\<`SearchResponse`\<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`\<`string`, `AggregationsAggregate`\>\>\>
 
 #### Parameters
 
@@ -649,17 +653,17 @@ ___
 
 #### Returns
 
-`Promise`<`SearchResponse`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`<`string`, `AggregationsAggregate`\>\>\>
+`Promise`\<`SearchResponse`\<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`\<`string`, `AggregationsAggregate`\>\>\>
 
 #### Defined in
 
-[server/elastic.ts:2634](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2634)
+[server/elastic.ts:2634](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2634)
 
 ___
 
 ### generateMissingIndexInGroup
 
-▸ `Private` **generateMissingIndexInGroup**(`indexName`, `language`, `value`): `Promise`<`void`\>
+▸ **generateMissingIndexInGroup**(`indexName`, `language`, `value`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -671,17 +675,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2004](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2004)
+[server/elastic.ts:2004](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2004)
 
 ___
 
 ### getAllStoredPingsAt
 
-▸ **getAllStoredPingsAt**<`N`\>(`dataIndex`): `Promise`<{ [key: string]: `N`;  }\>
+▸ **getAllStoredPingsAt**\<`N`\>(`dataIndex`): `Promise`\<\{ `[key: string]`: `N`;  }\>
 
 #### Type parameters
 
@@ -697,17 +701,17 @@ ___
 
 #### Returns
 
-`Promise`<{ [key: string]: `N`;  }\>
+`Promise`\<\{ `[key: string]`: `N`;  }\>
 
 #### Defined in
 
-[server/elastic.ts:2721](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2721)
+[server/elastic.ts:2721](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2721)
 
 ___
 
 ### getDocumentBasicInfo
 
-▸ **getDocumentBasicInfo**(`itemDefinition`, `id`, `version`): `Promise`<`IDocumentBasicInfo`[]\>
+▸ **getDocumentBasicInfo**(`itemDefinition`, `id`, `version`): `Promise`\<`IDocumentBasicInfo`[]\>
 
 #### Parameters
 
@@ -719,11 +723,11 @@ ___
 
 #### Returns
 
-`Promise`<`IDocumentBasicInfo`[]\>
+`Promise`\<`IDocumentBasicInfo`[]\>
 
 #### Defined in
 
-[server/elastic.ts:2070](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2070)
+[server/elastic.ts:2070](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2070)
 
 ___
 
@@ -735,7 +739,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) |
 | `language?` | `string` |
 | `types?` | (`string` \| [`default`](base_Root_Module_ItemDefinition.default.md))[] |
 
@@ -745,13 +749,13 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2605](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2605)
+[server/elastic.ts:2605](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2605)
 
 ___
 
 ### getSeqNoInfo
 
-▸ **getSeqNoInfo**(`info`): `Promise`<`IDocumentSeqNoInfo`\>
+▸ **getSeqNoInfo**(`info`): `Promise`\<`IDocumentSeqNoInfo`\>
 
 #### Parameters
 
@@ -761,17 +765,17 @@ ___
 
 #### Returns
 
-`Promise`<`IDocumentSeqNoInfo`\>
+`Promise`\<`IDocumentSeqNoInfo`\>
 
 #### Defined in
 
-[server/elastic.ts:2040](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2040)
+[server/elastic.ts:2040](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2040)
 
 ___
 
 ### guessGeoIpFor
 
-▸ **guessGeoIpFor**(`ip`): `Promise`<{ `city_name?`: `string` ; `continent_name?`: `string` ; `country_iso_code?`: `string` ; `country_name?`: `string` ; `location?`: { `lat`: `number` ; `lon`: `number`  } ; `region_iso_code?`: `string` ; `region_name?`: `string`  }\>
+▸ **guessGeoIpFor**(`ip`): `Promise`\<\{ `city_name?`: `string` ; `continent_name?`: `string` ; `country_iso_code?`: `string` ; `country_name?`: `string` ; `location?`: \{ `lat`: `number` ; `lon`: `number`  } ; `region_iso_code?`: `string` ; `region_name?`: `string`  }\>
 
 #### Parameters
 
@@ -781,17 +785,17 @@ ___
 
 #### Returns
 
-`Promise`<{ `city_name?`: `string` ; `continent_name?`: `string` ; `country_iso_code?`: `string` ; `country_name?`: `string` ; `location?`: { `lat`: `number` ; `lon`: `number`  } ; `region_iso_code?`: `string` ; `region_name?`: `string`  }\>
+`Promise`\<\{ `city_name?`: `string` ; `continent_name?`: `string` ; `country_iso_code?`: `string` ; `country_name?`: `string` ; `location?`: \{ `lat`: `number` ; `lon`: `number`  } ; `region_iso_code?`: `string` ; `region_name?`: `string`  }\>
 
 #### Defined in
 
-[server/elastic.ts:2789](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2789)
+[server/elastic.ts:2789](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2789)
 
 ___
 
 ### guessLanguageFor
 
-▸ **guessLanguageFor**(`text`): `Promise`<{ `model_id`: `string` ; `predicted_value`: `string` ; `prediction_probability`: `string` ; `prediction_score`: `string`  }\>
+▸ **guessLanguageFor**(`text`): `Promise`\<\{ `model_id`: `string` ; `predicted_value`: `string` ; `prediction_probability`: `string` ; `prediction_score`: `string`  }\>
 
 #### Parameters
 
@@ -801,17 +805,17 @@ ___
 
 #### Returns
 
-`Promise`<{ `model_id`: `string` ; `predicted_value`: `string` ; `prediction_probability`: `string` ; `prediction_score`: `string`  }\>
+`Promise`\<\{ `model_id`: `string` ; `predicted_value`: `string` ; `prediction_probability`: `string` ; `prediction_score`: `string`  }\>
 
 #### Defined in
 
-[server/elastic.ts:2830](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2830)
+[server/elastic.ts:2830](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2830)
 
 ___
 
 ### informNewServerData
 
-▸ **informNewServerData**(`serverData`): `Promise`<`void`\>
+▸ **informNewServerData**(`serverData`): `Promise`\<`void`\>
 
 This function is automatically called by the global manager when new server
 data has been obtained, you should not use it by yourself
@@ -824,11 +828,11 @@ data has been obtained, you should not use it by yourself
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:274](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L274)
+[server/elastic.ts:274](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L274)
 
 ___
 
@@ -840,7 +844,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `onElement?` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `onElement?` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) |
 
 #### Returns
 
@@ -848,13 +852,13 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1082](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1082)
+[server/elastic.ts:1082](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L1082)
 
 ___
 
 ### performElasticSelect
 
-▸ **performElasticSelect**(`itemDefinitionOrModule`, `selecter`, `language?`): `Promise`<`SearchResponse`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`<`string`, `AggregationsAggregate`\>\>\>
+▸ **performElasticSelect**(`itemDefinitionOrModule`, `selecter`, `language?`): `Promise`\<`SearchResponse`\<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`\<`string`, `AggregationsAggregate`\>\>\>
 
 Performs an elastic search
 
@@ -864,23 +868,23 @@ This is the function you use
 
 | Name | Type |
 | :------ | :------ |
-| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) |
 | `selecter` | (`builder`: [`ElasticQueryBuilder`](server_elastic.ElasticQueryBuilder.md)) => `void` |
 | `language?` | `string` |
 
 #### Returns
 
-`Promise`<`SearchResponse`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`<`string`, `AggregationsAggregate`\>\>\>
+`Promise`\<`SearchResponse`\<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`\<`string`, `AggregationsAggregate`\>\>\>
 
 #### Defined in
 
-[server/elastic.ts:2595](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2595)
+[server/elastic.ts:2595](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2595)
 
 ___
 
 ### prepareInstance
 
-▸ **prepareInstance**(): `Promise`<`void`\>
+▸ **prepareInstance**(): `Promise`\<`void`\>
 
 Prepares the itemize instance so that all the necessary meta indexes are contained
 and checks wether existant indexes match the shape, this can take a very long time
@@ -888,19 +892,19 @@ this function is called automatically by the global manager
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise
 
 #### Defined in
 
-[server/elastic.ts:373](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L373)
+[server/elastic.ts:373](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L373)
 
 ___
 
 ### rebuildIndexes
 
-▸ **rebuildIndexes**(`itemDefinitionOrModule`): `Promise`<`void`\>
+▸ **rebuildIndexes**(`itemDefinitionOrModule`): `Promise`\<`void`\>
 
 Builds an index from scratch if this is found not to match
 the given schema, this function is ran automatically and you are not
@@ -910,21 +914,21 @@ supposed to use it
 
 | Name | Type |
 | :------ | :------ |
-| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:805](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L805)
+[server/elastic.ts:805](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L805)
 
 ___
 
 ### retrieveCurrentSchemaDefinition
 
-▸ `Private` **retrieveCurrentSchemaDefinition**(`indexName`): `Promise`<`IndicesGetMappingResponse`\>
+▸ **retrieveCurrentSchemaDefinition**(`indexName`): `Promise`\<`IndicesGetMappingResponse`\>
 
 For a given index, either itself or wildcard form it will
 return all the mappings that it knows to have, if no mapping
@@ -938,19 +942,19 @@ are found it will return null
 
 #### Returns
 
-`Promise`<`IndicesGetMappingResponse`\>
+`Promise`\<`IndicesGetMappingResponse`\>
 
 whatever it finds, or null if the index does not exist
 
 #### Defined in
 
-[server/elastic.ts:491](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L491)
+[server/elastic.ts:491](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L491)
 
 ___
 
 ### retrieveIndexStatusInfo
 
-▸ `Private` **retrieveIndexStatusInfo**(`qualifiedName`): `Promise`<`IElasticIndexInformationType`\>
+▸ **retrieveIndexStatusInfo**(`qualifiedName`): `Promise`\<`IElasticIndexInformationType`\>
 
 retrieves the status information for a given index, also uses cahing to ensure
 consistency
@@ -963,17 +967,17 @@ consistency
 
 #### Returns
 
-`Promise`<`IElasticIndexInformationType`\>
+`Promise`\<`IElasticIndexInformationType`\>
 
 #### Defined in
 
-[server/elastic.ts:535](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L535)
+[server/elastic.ts:535](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L535)
 
 ___
 
 ### runConsistencyCheck
 
-▸ **runConsistencyCheck**(`onElement?`, `force?`): `Promise`<`void`\>
+▸ **runConsistencyCheck**(`onElement?`, `force?`): `Promise`\<`void`\>
 
 This is a fairly redundant function used to manually repopulate the indexes based on the last time
 they were manually repopulated, this is a redundant function because most of the time those records
@@ -1017,22 +1021,22 @@ all the records that match given ids on the list, if it finds two of those, one 
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `onElement?` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) | the element to run the consistency check on, if none specified will run it on everything |
+| `onElement?` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) | the element to run the consistency check on, if none specified will run it on everything |
 | `force?` | `boolean` | by default the consistency will wait for preparation and will not overlap other consistency checks, use this to just run it right away regardless regardless of anything |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:1023](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1023)
+[server/elastic.ts:1023](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L1023)
 
 ___
 
 ### setIndexStatusInfo
 
-▸ `Private` **setIndexStatusInfo**(`qualifiedName`, `value`): `Promise`<`void`\>
+▸ **setIndexStatusInfo**(`qualifiedName`, `value`): `Promise`\<`void`\>
 
 Updates the index status info for a given index or group
 of indexes given its qualified name
@@ -1046,17 +1050,17 @@ of indexes given its qualified name
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:515](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L515)
+[server/elastic.ts:515](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L515)
 
 ___
 
 ### updateDocument
 
-▸ **updateDocument**(`itemDefinition`, `language`, `id`, `version`, `value?`): `Promise`<`void`\>
+▸ **updateDocument**(`itemDefinition`, `language`, `id`, `version`, `value?`): `Promise`\<`void`\>
 
 Updates a document for a given index
 if the index does not exist the whole operation is ingored and instead
@@ -1078,17 +1082,17 @@ The execution will not do a thing if
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2331](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2331)
+[server/elastic.ts:2331](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2331)
 
 ___
 
 ### updateDocumentUnknownEverything
 
-▸ **updateDocumentUnknownEverything**(`itemDefinition`, `id`, `version`): `Promise`<`void`\>
+▸ **updateDocumentUnknownEverything**(`itemDefinition`, `id`, `version`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -1100,17 +1104,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2268](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2268)
+[server/elastic.ts:2268](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2268)
 
 ___
 
 ### updateDocumentUnknownOriginalLanguage
 
-▸ **updateDocumentUnknownOriginalLanguage**(`itemDefinition`, `language`, `id`, `version`, `value?`): `Promise`<`void`\>
+▸ **updateDocumentUnknownOriginalLanguage**(`itemDefinition`, `language`, `id`, `version`, `value?`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -1124,17 +1128,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:2309](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2309)
+[server/elastic.ts:2309](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2309)
 
 ___
 
 ### updateIndices
 
-▸ **updateIndices**(`onElement?`, `force?`): `Promise`<`void`\>
+▸ **updateIndices**(`onElement?`, `force?`): `Promise`\<`void`\>
 
 An alias for running a consistency check
 
@@ -1145,32 +1149,32 @@ if it believes it is doing something that warrants that mechanism
 
 | Name | Type |
 | :------ | :------ |
-| `onElement?` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `onElement?` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) |
 | `force?` | `boolean` |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/elastic.ts:976](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L976)
+[server/elastic.ts:976](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L976)
 
 ___
 
 ### waitForServerData
 
-▸ `Private` **waitForServerData**(): `Promise`<`void`\>
+▸ **waitForServerData**(): `Promise`\<`void`\>
 
 A function used within this class in order to wait for the server
 data to be ready
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise
 
 #### Defined in
 
-[server/elastic.ts:359](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L359)
+[server/elastic.ts:359](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L359)

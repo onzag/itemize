@@ -40,7 +40,7 @@ of context
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:218](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L218)
+[client/components/localization/I18nReadError.tsx:218](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nReadError.tsx#L218)
 
 ___
 
@@ -62,4 +62,4 @@ The i18n read error as a react hook
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:264](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L264)
+[client/components/localization/I18nReadError.tsx:264](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nReadError.tsx#L264)

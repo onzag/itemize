@@ -8,44 +8,44 @@ An enum which is useful for numeric types
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [FLOAT](client_internal_components_PropertyEntry_PropertyEntryField.NumericType.md#float)
 - [INTEGER](client_internal_components_PropertyEntry_PropertyEntryField.NumericType.md#integer)
 - [NAN](client_internal_components_PropertyEntry_PropertyEntryField.NumericType.md#nan)
 
-## Enumeration members
+## Enumeration Members
 
 ### FLOAT
 
-• **FLOAT** = `0`
+• **FLOAT** = ``0``
 
 For currency, unit and number
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L25)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L25)
 
 ___
 
 ### INTEGER
 
-• **INTEGER** = `1`
+• **INTEGER** = ``1``
 
 For year, integer
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L29)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L29)
 
 ___
 
 ### NAN
 
-• **NAN** = `2`
+• **NAN** = ``2``
 
 Not a number, for textual types
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L33)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L33)

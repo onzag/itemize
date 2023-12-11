@@ -26,20 +26,20 @@ that occur within a property of an item
 - [IPropertyDefinitionRuleDataType](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRuleDataType.md)
 - [IPropertyDefinitionState](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionCheckerFunctionType](base_Root_Module_ItemDefinition_PropertyDefinition.md#propertydefinitioncheckerfunctiontype)
 - [PropertyDefinitionValueType](base_Root_Module_ItemDefinition_PropertyDefinition.md#propertydefinitionvaluetype)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionCheckerFunctionType
 
-Ƭ **PropertyDefinitionCheckerFunctionType**: (`itemDefinition`: [`default`](../classes/base_Root_Module_ItemDefinition.default.md), `include`: [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md), `property`: [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md), `value`: [`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype), `id`: `string`, `version`: `string`) => `Promise`<`boolean`\>
+Ƭ **PropertyDefinitionCheckerFunctionType**: (`itemDefinition`: [`default`](../classes/base_Root_Module_ItemDefinition.default.md), `include`: [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md), `property`: [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md), `value`: [`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype), `id`: `string`, `version`: `string`) => `Promise`\<`boolean`\>
 
 #### Type declaration
 
-▸ (`itemDefinition`, `include`, `property`, `value`, `id`, `version`): `Promise`<`boolean`\>
+▸ (`itemDefinition`, `include`, `property`, `value`, `id`, `version`): `Promise`\<`boolean`\>
 
 Represents the external checkers that are used to
 check index values
@@ -57,11 +57,11 @@ check index values
 
 ##### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:399](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L399)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:400](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L400)
 
 ___
 
@@ -73,4 +73,4 @@ And this is combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:391](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L391)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:392](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L392)

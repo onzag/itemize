@@ -22,22 +22,22 @@ since the value can be blocked
 
 ### fields
 
-• **fields**: [`IGQLRequestFields`](gql_querier.IGQLRequestFields.md)
+• **fields**: [`IRQRequestFields`](rq_querier.IRQRequestFields.md)
 
 The fields that can be requested for that value
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:102](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L102)
+[client/internal/workers/cache/cache.worker.class.ts:102](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L102)
 
 ___
 
 ### value
 
-• **value**: [`IGQLValue`](gql_querier.IGQLValue.md)
+• **value**: [`IRQValue`](rq_querier.IRQValue.md)
 
 The value of the match
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:98](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L98)
+[client/internal/workers/cache/cache.worker.class.ts:98](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L98)

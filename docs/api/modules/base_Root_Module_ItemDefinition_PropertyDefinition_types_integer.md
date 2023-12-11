@@ -6,7 +6,7 @@ Contains the integer type description
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedIntegerType](base_Root_Module_ItemDefinition_PropertyDefinition_types_integer.md#propertydefinitionsupportedintegertype)
 
@@ -14,7 +14,7 @@ Contains the integer type description
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_integer.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedIntegerType
 
@@ -24,16 +24,16 @@ The integer is descibred by a number
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:42](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L42)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:41](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L41)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedIntegerType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_integer.md#propertydefinitionsupportedintegertype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedIntegerType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_integer.md#propertydefinitionsupportedintegertype)\>
 
 The type defines the behaviour of integers in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:47](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L47)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:46](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L46)

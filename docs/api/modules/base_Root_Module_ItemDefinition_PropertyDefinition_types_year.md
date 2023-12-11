@@ -6,7 +6,7 @@ Contains the year type description
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedYearType](base_Root_Module_ItemDefinition_PropertyDefinition_types_year.md#propertydefinitionsupportedyeartype)
 
@@ -14,7 +14,7 @@ Contains the year type description
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_year.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedYearType
 
@@ -24,16 +24,16 @@ Years are simple integers
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts:43](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts#L43)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts:42](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts#L42)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedYearType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_year.md#propertydefinitionsupportedyeartype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedYearType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_year.md#propertydefinitionsupportedyeartype)\>
 
 The type describes how the year type behaves in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts:48](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts#L48)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts:47](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/year.ts#L47)

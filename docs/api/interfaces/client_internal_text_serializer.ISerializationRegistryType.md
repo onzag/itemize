@@ -41,7 +41,7 @@ Specify which children are allowed for a given object type
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:204](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L204)
+[client/internal/text/serializer/index.ts:204](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L204)
 
 ___
 
@@ -58,7 +58,7 @@ within it
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:257](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L257)
+[client/internal/text/serializer/index.ts:257](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L257)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:296](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L296)
+[client/internal/text/serializer/index.ts:296](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L296)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:286](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L286)
+[client/internal/text/serializer/index.ts:286](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L286)
 
 ___
 
@@ -108,7 +108,7 @@ node into the rich element counterpart as required
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:172](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L172)
+[client/internal/text/serializer/index.ts:172](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L172)
 
 ___
 
@@ -131,7 +131,7 @@ a space is necessary between inline nodes for them to be selected
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:241](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L241)
+[client/internal/text/serializer/index.ts:241](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L241)
 
 ___
 
@@ -147,7 +147,7 @@ Specifies which elements are allowed to be merged with the next element
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:282](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L282)
+[client/internal/text/serializer/index.ts:282](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L282)
 
 ___
 
@@ -166,7 +166,7 @@ unnecessary if allows children text is true
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:275](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L275)
+[client/internal/text/serializer/index.ts:275](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L275)
 
 ___
 
@@ -182,7 +182,7 @@ When received an invalid children that are not in ALLOWS_CHILDREN
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:219](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L219)
+[client/internal/text/serializer/index.ts:219](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L219)
 
 ___
 
@@ -199,7 +199,7 @@ true
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:227](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L227)
+[client/internal/text/serializer/index.ts:227](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L227)
 
 ___
 
@@ -216,7 +216,7 @@ inside of it
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:212](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L212)
+[client/internal/text/serializer/index.ts:212](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L212)
 
 ___
 
@@ -229,11 +229,11 @@ into a react component
 
 #### Index signature
 
-▪ [type: `string`]: (`arg`: [`IReactifyArg`](client_internal_text_serializer.IReactifyArg.md)<[`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IText`](client_internal_text_serializer_types_text.IText.md)\>) => `React.ReactNode`
+▪ [type: `string`]: (`arg`: [`IReactifyArg`](client_internal_text_serializer.IReactifyArg.md)\<[`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IText`](client_internal_text_serializer_types_text.IText.md)\>) => `React.ReactNode`
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:197](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L197)
+[client/internal/text/serializer/index.ts:197](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L197)
 
 ___
 
@@ -253,7 +253,7 @@ eg. paragraph, file, image etc...
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:160](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L160)
+[client/internal/text/serializer/index.ts:160](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L160)
 
 ___
 
@@ -270,7 +270,7 @@ within it
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:265](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L265)
+[client/internal/text/serializer/index.ts:265](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L265)
 
 ___
 
@@ -287,4 +287,4 @@ within it
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:249](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L249)
+[client/internal/text/serializer/index.ts:249](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L249)

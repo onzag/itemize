@@ -9,7 +9,7 @@ for file contains
 
 ## Hierarchy
 
-- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`PropertyDefinitionSupportedFileType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)\>
+- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)\<[`PropertyDefinitionSupportedFileType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)\>
 
   ↳ **`IPropertyViewFileRendererProps`**
 
@@ -22,12 +22,9 @@ for file contains
 - [extension](client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md#extension)
 - [imageSrcSet](client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md#imagesrcset)
 - [isSupportedImage](client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md#issupportedimage)
+- [openFile](client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md#openfile)
 - [prettySize](client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md#prettysize)
 - [rtl](client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md#rtl)
-
-### Methods
-
-- [openFile](client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md#openfile)
 
 ## Properties
 
@@ -47,13 +44,13 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
 
 ___
 
 ### currentValue
 
-• **currentValue**: [`IGQLFile`](gql_querier.IGQLFile.md)
+• **currentValue**: [`IRQFile`](rq_querier.IRQFile.md)
 
 The current value to be displayed
 
@@ -63,7 +60,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -75,7 +72,7 @@ The extension of that file
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:37](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L37)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:37](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFile.tsx#L37)
 
 ___
 
@@ -88,7 +85,7 @@ that is attached to that image
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L29)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFile.tsx#L29)
 
 ___
 
@@ -100,7 +97,27 @@ whether the file is a supported image
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:24](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L24)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFile.tsx#L24)
+
+___
+
+### openFile
+
+• **openFile**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+open the current file
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyView/PropertyViewFile.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFile.tsx#L41)
 
 ___
 
@@ -112,7 +129,7 @@ The size of the file in a human readable form
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L33)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFile.tsx#L33)
 
 ___
 
@@ -128,20 +145,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L15)
-
-## Methods
-
-### openFile
-
-▸ **openFile**(): `void`
-
-open the current file
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyView/PropertyViewFile.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L41)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)

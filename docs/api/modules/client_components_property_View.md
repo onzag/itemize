@@ -25,7 +25,7 @@ The viewer can be used with meta properties, such as created_at edited_at, etc..
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertyViewProps`](../interfaces/client_components_property_base.IPropertyViewProps.md)<[`IPropertyViewRendererProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> | the props for the view |
+| `props` | [`IPropertyViewProps`](../interfaces/client_components_property_base.IPropertyViewProps.md)\<[`IPropertyViewRendererProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewRendererProps.md)\<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> | the props for the view |
 
 #### Returns
 
@@ -35,4 +35,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/View.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/View.tsx#L20)
+[client/components/property/View.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/View.tsx#L20)

@@ -8,7 +8,7 @@ The property view location renderer props
 
 ## Hierarchy
 
-- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>
+- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)\<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>
 
   ↳ **`IPropertyViewLocationRendererProps`**
 
@@ -19,13 +19,10 @@ The property view location renderer props
 - [args](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#args)
 - [canResetViewportCenter](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#canresetviewportcenter)
 - [currentValue](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#currentvalue)
-- [rtl](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#rtl)
-- [viewport](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#viewport)
-
-### Methods
-
 - [onResetViewportCenter](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#onresetviewportcenter)
 - [onViewportChange](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#onviewportchange)
+- [rtl](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#rtl)
+- [viewport](client_internal_components_PropertyView_PropertyViewLocation.IPropertyViewLocationRendererProps.md#viewport)
 
 ## Properties
 
@@ -45,7 +42,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -59,7 +56,7 @@ be reset
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:34](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewLocation.tsx#L34)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:34](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L34)
 
 ___
 
@@ -75,7 +72,53 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
+
+___
+
+### onResetViewportCenter
+
+• **onResetViewportCenter**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Reset viewport center
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L28)
+
+___
+
+### onViewportChange
+
+• **onViewportChange**: (`viewport`: [`IViewport`](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewport.md)) => `void`
+
+#### Type declaration
+
+▸ (`viewport`): `void`
+
+The viewport change event
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `viewport` | [`IViewport`](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewport.md) |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L24)
 
 ___
 
@@ -91,7 +134,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
 
 ___
 
@@ -103,42 +146,4 @@ A viewport that is currently in use
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewLocation.tsx#L20)
-
-## Methods
-
-### onResetViewportCenter
-
-▸ **onResetViewportCenter**(): `void`
-
-Reset viewport center
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewLocation.tsx#L28)
-
-___
-
-### onViewportChange
-
-▸ **onViewportChange**(`viewport`): `void`
-
-The viewport change event
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `viewport` | [`IViewport`](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewport.md) |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:24](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewLocation.tsx#L24)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L20)

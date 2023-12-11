@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/components/navigation/LocationStateReader](../modules/client_components_navigation_LocationStateReader.md) / ILocationStateReaderProps
 
-# Interface: ILocationStateReaderProps<S\>
+# Interface: ILocationStateReaderProps\<S\>
 
 [client/components/navigation/LocationStateReader](../modules/client_components_navigation_LocationStateReader.md).ILocationStateReaderProps
 
@@ -14,7 +14,7 @@ The props for the location state reader
 
 ## Hierarchy
 
-- [`ILocationStateReaderOptions`](client_components_navigation_LocationStateReader.ILocationStateReaderOptions.md)<`S`\>
+- [`ILocationStateReaderOptions`](client_components_navigation_LocationStateReader.ILocationStateReaderOptions.md)\<`S`\>
 
   ↳ **`ILocationStateReaderProps`**
 
@@ -22,15 +22,42 @@ The props for the location state reader
 
 ### Properties
 
+- [children](client_components_navigation_LocationStateReader.ILocationStateReaderProps.md#children)
 - [defaultState](client_components_navigation_LocationStateReader.ILocationStateReaderProps.md#defaultstate)
 - [delayedUpdates](client_components_navigation_LocationStateReader.ILocationStateReaderProps.md#delayedupdates)
 - [stateIsInQueryString](client_components_navigation_LocationStateReader.ILocationStateReaderProps.md#stateisinquerystring)
 
-### Methods
-
-- [children](client_components_navigation_LocationStateReader.ILocationStateReaderProps.md#children)
-
 ## Properties
+
+### children
+
+• **children**: (`state`: `S`, `setState`: (`state`: `Partial`\<`S`\>, `replace?`: `boolean`) => `void`, `isSynced`: `boolean`, `runWhenSynced`: (`fn`: () => `void`) => `void`) => `ReactNode`
+
+#### Type declaration
+
+▸ (`state`, `setState`, `isSynced`, `runWhenSynced`): `ReactNode`
+
+The consumer children, which passes
+a state and a setState function
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `state` | `S` |
+| `setState` | (`state`: `Partial`\<`S`\>, `replace?`: `boolean`) => `void` |
+| `isSynced` | `boolean` |
+| `runWhenSynced` | (`fn`: () => `void`) => `void` |
+
+##### Returns
+
+`ReactNode`
+
+#### Defined in
+
+[client/components/navigation/LocationStateReader.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L41)
+
+___
 
 ### defaultState
 
@@ -44,7 +71,7 @@ The default state of the reader
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:19](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L19)
+[client/components/navigation/LocationStateReader.tsx:19](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L19)
 
 ___
 
@@ -61,7 +88,7 @@ state is kept for the children
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L30)
+[client/components/navigation/LocationStateReader.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L30)
 
 ___
 
@@ -79,30 +106,4 @@ only support strings as values
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L25)
-
-## Methods
-
-### children
-
-▸ **children**(`state`, `setState`, `isSynced`, `runWhenSynced`): `ReactNode`
-
-The consumer children, which passes
-a state and a setState function
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `state` | `S` |
-| `setState` | (`state`: `Partial`<`S`\>, `replace?`: `boolean`) => `void` |
-| `isSynced` | `boolean` |
-| `runWhenSynced` | (`fn`: () => `void`) => `void` |
-
-#### Returns
-
-`ReactNode`
-
-#### Defined in
-
-[client/components/navigation/LocationStateReader.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L41)
+[client/components/navigation/LocationStateReader.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L25)

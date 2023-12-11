@@ -19,7 +19,11 @@ to the generic loader, but simpler
 
 - [accessibleCount](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#accessiblecount)
 - [currentPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#currentpage)
+- [dismissError](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#dismisserror)
 - [error](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#error)
+- [goToNextPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#gotonextpage)
+- [goToPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#gotopage)
+- [goToPrevPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#gotoprevpage)
 - [hasNextPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#hasnextpage)
 - [hasPrevPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#hasprevpage)
 - [isLoadingSearchResults](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#isloadingsearchresults)
@@ -27,18 +31,11 @@ to the generic loader, but simpler
 - [metadata](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#metadata)
 - [offset](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#offset)
 - [pageCount](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#pagecount)
+- [refreshPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#refreshpage)
 - [searchId](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#searchid)
 - [searchRecords](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#searchrecords)
 - [searching](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#searching)
 - [totalCount](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#totalcount)
-
-### Methods
-
-- [dismissError](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#dismisserror)
-- [goToNextPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#gotonextpage)
-- [goToPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#gotopage)
-- [goToPrevPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#gotoprevpage)
-- [refreshPage](client_components_search_PagedSearchLoader.IPagedSearchLoaderArg.md#refreshpage)
 
 ## Properties
 
@@ -57,7 +54,7 @@ better them to refine the search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:116](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L116)
+[client/components/search/SearchLoader.tsx:116](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L116)
 
 ___
 
@@ -69,7 +66,31 @@ Such as the current page which is the same, note that it's 0 indexed
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L20)
+[client/components/search/PagedSearchLoader.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/PagedSearchLoader.tsx#L20)
+
+___
+
+### dismissError
+
+• **dismissError**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+dismiss the errors
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[ISearchLoaderArg](client_components_search_SearchLoader.ISearchLoaderArg.md).[dismissError](client_components_search_SearchLoader.ISearchLoaderArg.md#dismisserror)
+
+#### Defined in
+
+[client/components/search/SearchLoader.tsx:141](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L141)
 
 ___
 
@@ -86,7 +107,73 @@ the search results of a given page
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:137](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L137)
+[client/components/search/SearchLoader.tsx:137](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L137)
+
+___
+
+### goToNextPage
+
+• **goToNextPage**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+A function to go to previous page
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/search/PagedSearchLoader.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/PagedSearchLoader.tsx#L24)
+
+___
+
+### goToPage
+
+• **goToPage**: (`n`: `number`) => `void`
+
+#### Type declaration
+
+▸ (`n`): `void`
+
+And another to go to a specific page number
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `n` | `number` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/search/PagedSearchLoader.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/PagedSearchLoader.tsx#L32)
+
+___
+
+### goToPrevPage
+
+• **goToPrevPage**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+A function to go to next
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/search/PagedSearchLoader.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/PagedSearchLoader.tsx#L28)
 
 ___
 
@@ -102,7 +189,7 @@ whether there's a next page from the current selected
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:120](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L120)
+[client/components/search/SearchLoader.tsx:120](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L120)
 
 ___
 
@@ -118,7 +205,7 @@ Whether there's a previous page from the current selected
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L124)
+[client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L124)
 
 ___
 
@@ -139,7 +226,7 @@ traditional search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:92](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L92)
+[client/components/search/SearchLoader.tsx:92](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L92)
 
 ___
 
@@ -155,7 +242,7 @@ the limit used during the search action
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:128](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L128)
+[client/components/search/SearchLoader.tsx:128](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L128)
 
 ___
 
@@ -171,7 +258,7 @@ metadata that was given during the search operation for additional details
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:150](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L150)
+[client/components/search/SearchLoader.tsx:150](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L150)
 
 ___
 
@@ -187,7 +274,7 @@ The offset used during the search action
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:132](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L132)
+[client/components/search/SearchLoader.tsx:132](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L132)
 
 ___
 
@@ -206,7 +293,32 @@ the page count is only has to do with the accessible count of matches
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:104](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L104)
+[client/components/search/SearchLoader.tsx:104](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L104)
+
+___
+
+### refreshPage
+
+• **refreshPage**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+refresh the page, while itemize content is fully dynamic, it's still possible, eg.
+say you got an error, you can ask for a refresh
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[ISearchLoaderArg](client_components_search_SearchLoader.ISearchLoaderArg.md).[refreshPage](client_components_search_SearchLoader.ISearchLoaderArg.md#refreshpage)
+
+#### Defined in
+
+[client/components/search/SearchLoader.tsx:146](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L146)
 
 ___
 
@@ -223,13 +335,13 @@ search and this search only
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:78](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L78)
+[client/components/search/SearchLoader.tsx:78](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L78)
 
 ___
 
 ### searchRecords
 
-• **searchRecords**: `IGQLSearchRecordWithPopulateData`[]
+• **searchRecords**: `IRQSearchRecordWithPopulateData`[]
 
 the search records are records that allow to be requested
 as well as organized, partial information of a search result
@@ -240,7 +352,7 @@ as well as organized, partial information of a search result
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:97](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L97)
+[client/components/search/SearchLoader.tsx:97](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L97)
 
 ___
 
@@ -257,7 +369,7 @@ parameters in order to retrieve records
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:83](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L83)
+[client/components/search/SearchLoader.tsx:83](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L83)
 
 ___
 
@@ -274,99 +386,4 @@ in the server side
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:109](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L109)
-
-## Methods
-
-### dismissError
-
-▸ **dismissError**(): `void`
-
-dismiss the errors
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[ISearchLoaderArg](client_components_search_SearchLoader.ISearchLoaderArg.md).[dismissError](client_components_search_SearchLoader.ISearchLoaderArg.md#dismisserror)
-
-#### Defined in
-
-[client/components/search/SearchLoader.tsx:141](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L141)
-
-___
-
-### goToNextPage
-
-▸ **goToNextPage**(): `void`
-
-A function to go to previous page
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/components/search/PagedSearchLoader.tsx:24](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L24)
-
-___
-
-### goToPage
-
-▸ **goToPage**(`n`): `void`
-
-And another to go to a specific page number
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `n` | `number` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/components/search/PagedSearchLoader.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L32)
-
-___
-
-### goToPrevPage
-
-▸ **goToPrevPage**(): `void`
-
-A function to go to next
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/components/search/PagedSearchLoader.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L28)
-
-___
-
-### refreshPage
-
-▸ **refreshPage**(): `void`
-
-refresh the page, while itemize content is fully dynamic, it's still possible, eg.
-say you got an error, you can ask for a refresh
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[ISearchLoaderArg](client_components_search_SearchLoader.ISearchLoaderArg.md).[refreshPage](client_components_search_SearchLoader.ISearchLoaderArg.md#refreshpage)
-
-#### Defined in
-
-[client/components/search/SearchLoader.tsx:146](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L146)
+[client/components/search/SearchLoader.tsx:109](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L109)

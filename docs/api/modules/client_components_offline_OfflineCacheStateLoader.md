@@ -34,7 +34,7 @@
 
 #### Defined in
 
-[client/components/offline/OfflineCacheStateLoader.tsx:86](https://github.com/onzag/itemize/blob/a24376ed/client/components/offline/OfflineCacheStateLoader.tsx#L86)
+[client/components/offline/OfflineCacheStateLoader.tsx:86](https://github.com/onzag/itemize/blob/59702dd5/client/components/offline/OfflineCacheStateLoader.tsx#L86)
 
 ___
 
@@ -60,4 +60,4 @@ ___
 
 #### Defined in
 
-[client/components/offline/OfflineCacheStateLoader.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/offline/OfflineCacheStateLoader.tsx#L26)
+[client/components/offline/OfflineCacheStateLoader.tsx:26](https://github.com/onzag/itemize/blob/59702dd5/client/components/offline/OfflineCacheStateLoader.tsx#L26)

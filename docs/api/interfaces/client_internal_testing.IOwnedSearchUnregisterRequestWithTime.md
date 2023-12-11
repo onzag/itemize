@@ -4,6 +4,8 @@
 
 [client/internal/testing](../modules/client_internal_testing.md).IOwnedSearchUnregisterRequestWithTime
 
+The unregister version of [[IOwnedSearchRegisterRequest]]
+
 ## Hierarchy
 
 - [`IOwnedSearchUnregisterRequest`](base_remote_protocol.IOwnedSearchUnregisterRequest.md)
@@ -30,7 +32,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:489](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L489)
+[base/remote-protocol.ts:489](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L489)
 
 ___
 
@@ -44,7 +46,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:478](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L478)
+[base/remote-protocol.ts:478](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L478)
 
 ___
 
@@ -54,4 +56,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:87](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L87)
+[client/internal/testing.ts:87](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L87)

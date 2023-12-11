@@ -23,7 +23,7 @@ an entry for a TagList value
 
 ### style
 
-• **style**: `Object`
+• `Const` **style**: `Object`
 
 The styles of the renderer
 
@@ -31,56 +31,56 @@ The styles of the renderer
 
 | Name | Type |
 | :------ | :------ |
-| `autosuggestContainer` | `Object` |
+| `autosuggestContainer` | \{ `display`: `string` = "block"; `position`: `string` = "relative"; `width`: `string` = "100%" } |
 | `autosuggestContainer.display` | `string` |
 | `autosuggestContainer.position` | `string` |
 | `autosuggestContainer.width` | `string` |
-| `autosuggestContainerOpen` | `Object` |
-| `autosuggestFirstSectionContainer` | `Object` |
-| `autosuggestFirstSuggestion` | `Object` |
-| `autosuggestInput` | `Object` |
-| `autosuggestInputOpen` | `Object` |
-| `autosuggestMenuItem` | `Object` |
+| `autosuggestContainerOpen` | {} |
+| `autosuggestFirstSectionContainer` | {} |
+| `autosuggestFirstSuggestion` | {} |
+| `autosuggestInput` | {} |
+| `autosuggestInputOpen` | {} |
+| `autosuggestMenuItem` | \{ `height`: `string` = "auto"; `paddingBottom`: `string` = "8px !important"; `paddingTop`: `string` = "4px !important" } |
 | `autosuggestMenuItem.height` | `string` |
 | `autosuggestMenuItem.paddingBottom` | `string` |
 | `autosuggestMenuItem.paddingTop` | `string` |
-| `autosuggestMenuItemMainText` | `Object` |
+| `autosuggestMenuItemMainText` | \{ `fontSize`: `string` = "1rem"; `lineHeight`: `string` = "1rem" } |
 | `autosuggestMenuItemMainText.fontSize` | `string` |
 | `autosuggestMenuItemMainText.lineHeight` | `string` |
-| `autosuggestMenuItemSubText` | `Object` |
+| `autosuggestMenuItemSubText` | \{ `fontSize`: `string` = "0.75rem"; `lineHeight`: `string` = "0.75rem" } |
 | `autosuggestMenuItemSubText.fontSize` | `string` |
 | `autosuggestMenuItemSubText.lineHeight` | `string` |
-| `autosuggestSectionContainer` | `Object` |
-| `autosuggestSectionTitle` | `Object` |
-| `autosuggestSuggestion` | `Object` |
-| `autosuggestSuggestionHighlighted` | `Object` |
-| `autosuggestSuggestionsContainer` | `Object` |
+| `autosuggestSectionContainer` | {} |
+| `autosuggestSectionTitle` | {} |
+| `autosuggestSuggestion` | {} |
+| `autosuggestSuggestionHighlighted` | {} |
+| `autosuggestSuggestionsContainer` | \{ `display`: `string` = "block"; `position`: ``"absolute"`` ; `top`: `string` ; `width`: `string` = "100%"; `zIndex`: `number` = 1000 } |
 | `autosuggestSuggestionsContainer.display` | `string` |
 | `autosuggestSuggestionsContainer.position` | ``"absolute"`` |
 | `autosuggestSuggestionsContainer.top` | `string` |
 | `autosuggestSuggestionsContainer.width` | `string` |
 | `autosuggestSuggestionsContainer.zIndex` | `number` |
-| `autosuggestSuggestionsContainerOpen` | `Object` |
-| `autosuggestSuggestionsList` | `Object` |
-| `chip` | `Object` |
+| `autosuggestSuggestionsContainerOpen` | {} |
+| `autosuggestSuggestionsList` | {} |
+| `chip` | \{ `margin`: `string` = "10px 10px 0 10px" } |
 | `chip.margin` | `string` |
-| `container` | `Object` |
+| `container` | \{ `paddingBottom`: `string` = "1.3rem"; `width`: `string` = "100%" } |
 | `container.paddingBottom` | `string` |
 | `container.width` | `string` |
-| `description` | `Object` |
+| `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
-| `entry` | `Object` |
+| `entry` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `entry.alignItems` | `string` |
 | `entry.display` | `string` |
 | `entry.flexDirection` | `string` |
 | `entry.justifyContent` | `string` |
 | `entry.width` | `string` |
-| `errorMessage` | `Object` |
+| `errorMessage` | \{ `color`: `string` = "#f44336"; `fontSize`: `string` = "0.85rem"; `height`: `string` = "1.3rem" } |
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `fieldInput` | `Object` |
-| `fieldInput.& > input` | `Object` |
+| `fieldInput` | \{ `& > input`: \{ `flex`: `string` = "1 0 auto"; `marginBottom`: `string` = "-10px"; `padding`: `string` = "10px 0"; `width`: `string` = "200px" } ; `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexWrap`: `string` = "wrap"; `paddingBottom`: `string` = "10px"; `paddingLeft`: `string` = "12px"; `paddingTop`: `string` = "20px" } |
+| `fieldInput.& > input` | \{ `flex`: `string` = "1 0 auto"; `marginBottom`: `string` = "-10px"; `padding`: `string` = "10px 0"; `width`: `string` = "200px" } |
 | `fieldInput.& > input.flex` | `string` |
 | `fieldInput.& > input.marginBottom` | `string` |
 | `fieldInput.& > input.padding` | `string` |
@@ -91,13 +91,13 @@ The styles of the renderer
 | `fieldInput.paddingBottom` | `string` |
 | `fieldInput.paddingLeft` | `string` |
 | `fieldInput.paddingTop` | `string` |
-| `icon` | `Object` |
+| `icon` | \{ `color`: `string` = "#424242" } |
 | `icon.color` | `string` |
-| `label` | (`isInvalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
+| `label` | (`isInvalid`: `boolean`) => \{ `&.focused`: \{ `color`: `string`  } ; `color`: `string`  } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L32)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L32)
 
 ## Functions
 
@@ -124,4 +124,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:159](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L159)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:159](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L159)

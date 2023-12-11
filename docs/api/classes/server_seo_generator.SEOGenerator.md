@@ -56,7 +56,7 @@ because it is an entry type all their urls will be prefixed for the webpage with
 
 ### constructor
 
-• **new SEOGenerator**(`rules`, `rawDB`, `root`, `supportedLanguages`, `hostname`, `buildnumber`)
+• **new SEOGenerator**(`rules`, `rawDB`, `root`, `supportedLanguages`, `hostname`, `buildnumber`): [`SEOGenerator`](server_seo_generator.SEOGenerator.md)
 
 Buillds a new seo generator
 
@@ -71,9 +71,13 @@ Buillds a new seo generator
 | `hostname` | `string` | the hostname that we are creating sitemaps for |
 | `buildnumber` | `string` | - |
 
+#### Returns
+
+[`SEOGenerator`](server_seo_generator.SEOGenerator.md)
+
 #### Defined in
 
-[server/seo/generator.ts:59](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L59)
+[server/seo/generator.ts:59](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L59)
 
 ## Properties
 
@@ -83,7 +87,7 @@ Buillds a new seo generator
 
 #### Defined in
 
-[server/seo/generator.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L48)
+[server/seo/generator.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L48)
 
 ___
 
@@ -93,7 +97,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L47)
+[server/seo/generator.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L47)
 
 ___
 
@@ -103,7 +107,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L44)
+[server/seo/generator.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L44)
 
 ___
 
@@ -113,7 +117,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L43)
+[server/seo/generator.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L43)
 
 ___
 
@@ -123,7 +127,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L45)
+[server/seo/generator.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L45)
 
 ___
 
@@ -133,13 +137,13 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L46)
+[server/seo/generator.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L46)
 
 ## Methods
 
 ### defaultParametrizer
 
-▸ `Private` **defaultParametrizer**(`arg`): [`ISEOParametrizer`](../interfaces/server_seo.ISEOParametrizer.md)[]
+▸ **defaultParametrizer**(`arg`): [`ISEOParametrizer`](../interfaces/server_seo.ISEOParametrizer.md)[]
 
 #### Parameters
 
@@ -155,13 +159,13 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:193](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L193)
+[server/seo/generator.ts:193](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L193)
 
 ___
 
 ### provide
 
-▸ **provide**(`req`, `res`): `Promise`<`void`\>
+▸ **provide**(`req`, `res`): `Promise`\<`void`\>
 
 This is what does the processing hooking directly into the sitemap.xml
 
@@ -174,8 +178,8 @@ This is what does the processing hooking directly into the sitemap.xml
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/seo/generator.ts:83](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L83)
+[server/seo/generator.ts:83](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L83)

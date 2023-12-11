@@ -32,4 +32,4 @@ each and context key for usage in templating
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/templating.tsx:228](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/drawer/templating.tsx#L228)
+[client/fast-prototyping/components/slate/drawer/templating.tsx:228](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/drawer/templating.tsx#L228)

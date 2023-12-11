@@ -13,7 +13,6 @@
 - [config](server.IAppDataType.md#config)
 - [customRoles](server.IAppDataType.md#customroles)
 - [customServices](server.IAppDataType.md#customservices)
-- [customUserTokenQuery](server.IAppDataType.md#customusertokenquery)
 - [databaseConfig](server.IAppDataType.md#databaseconfig)
 - [databaseConnection](server.IAppDataType.md#databaseconnection)
 - [domain](server.IAppDataType.md#domain)
@@ -46,6 +45,7 @@
 - [storage](server.IAppDataType.md#storage)
 - [triggers](server.IAppDataType.md#triggers)
 - [userLocalizationService](server.IAppDataType.md#userlocalizationservice)
+- [userTokenQuery](server.IAppDataType.md#usertokenquery)
 - [ussdService](server.IAppDataType.md#ussdservice)
 
 ## Properties
@@ -56,7 +56,7 @@
 
 #### Defined in
 
-[server/index.ts:194](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L194)
+[server/index.ts:192](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L192)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:187](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L187)
+[server/index.ts:185](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L185)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:182](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L182)
+[server/index.ts:180](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L180)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:211](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L211)
+[server/index.ts:208](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L208)
 
 ___
 
@@ -96,21 +96,11 @@ ___
 
 #### Index signature
 
-▪ [name: `string`]: [`ServiceProvider`](../classes/server_services.ServiceProvider.md)<`any`\>
+▪ [name: `string`]: [`ServiceProvider`](../classes/server_services.ServiceProvider.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:207](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L207)
-
-___
-
-### customUserTokenQuery
-
-• **customUserTokenQuery**: `any`
-
-#### Defined in
-
-[server/index.ts:197](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L197)
+[server/index.ts:204](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L204)
 
 ___
 
@@ -120,7 +110,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:184](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L184)
+[server/index.ts:182](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L182)
 
 ___
 
@@ -130,7 +120,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:185](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L185)
+[server/index.ts:183](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L183)
 
 ___
 
@@ -140,7 +130,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:214](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L214)
+[server/index.ts:211](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L211)
 
 ___
 
@@ -150,7 +140,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:213](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L213)
+[server/index.ts:210](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L210)
 
 ___
 
@@ -160,7 +150,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:210](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L210)
+[server/index.ts:207](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L207)
 
 ___
 
@@ -170,7 +160,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:180](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L180)
+[server/index.ts:178](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L178)
 
 ___
 
@@ -180,7 +170,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:181](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L181)
+[server/index.ts:179](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L179)
 
 ___
 
@@ -190,7 +180,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:177](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L177)
+[server/index.ts:175](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L175)
 
 ___
 
@@ -200,17 +190,17 @@ ___
 
 #### Defined in
 
-[server/index.ts:186](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L186)
+[server/index.ts:184](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L184)
 
 ___
 
 ### locationSearchService
 
-• **locationSearchService**: [`default`](../classes/server_services_base_LocationSearchProvider.default.md)<`any`\>
+• **locationSearchService**: [`default`](../classes/server_services_base_LocationSearchProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:204](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L204)
+[server/index.ts:201](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L201)
 
 ___
 
@@ -222,53 +212,53 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `debug` | (`arg`: [`IItemizeLoggingStructure`](server_logger.IItemizeLoggingStructure.md)<`any`\>) => `void` |
-| `error` | (`arg`: [`IItemizeLoggingErrorStructure`](server_logger.IItemizeLoggingErrorStructure.md)<`any`\>) => `void` |
-| `info` | (`arg`: [`IItemizeLoggingStructure`](server_logger.IItemizeLoggingStructure.md)<`any`\>) => `void` |
+| `debug` | (`arg`: [`IItemizeLoggingStructure`](server_logger.IItemizeLoggingStructure.md)\<`any`\>) => `void` |
+| `error` | (`arg`: [`IItemizeLoggingErrorStructure`](server_logger.IItemizeLoggingErrorStructure.md)\<`any`\>) => `void` |
+| `info` | (`arg`: [`IItemizeLoggingStructure`](server_logger.IItemizeLoggingStructure.md)\<`any`\>) => `void` |
 
 #### Defined in
 
-[server/index.ts:198](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L198)
+[server/index.ts:195](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L195)
 
 ___
 
 ### loggingService
 
-• **loggingService**: [`default`](../classes/server_services_base_LoggingProvider.default.md)<`any`\>
+• **loggingService**: [`default`](../classes/server_services_base_LoggingProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:202](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L202)
+[server/index.ts:199](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L199)
 
 ___
 
 ### mailService
 
-• **mailService**: [`default`](../classes/server_services_base_MailProvider.default.md)<`any`\>
+• **mailService**: [`default`](../classes/server_services_base_MailProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:199](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L199)
+[server/index.ts:196](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L196)
 
 ___
 
 ### paymentService
 
-• **paymentService**: [`default`](../classes/server_services_base_PaymentProvider.default.md)<`any`\>
+• **paymentService**: [`default`](../classes/server_services_base_PaymentProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:201](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L201)
+[server/index.ts:198](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L198)
 
 ___
 
 ### phoneService
 
-• **phoneService**: [`default`](../classes/server_services_base_PhoneProvider.default.md)<`any`\>
+• **phoneService**: [`default`](../classes/server_services_base_PhoneProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:200](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L200)
+[server/index.ts:197](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L197)
 
 ___
 
@@ -278,7 +268,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:212](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L212)
+[server/index.ts:209](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L209)
 
 ___
 
@@ -288,7 +278,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:188](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L188)
+[server/index.ts:186](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L186)
 
 ___
 
@@ -298,7 +288,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:189](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L189)
+[server/index.ts:187](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L187)
 
 ___
 
@@ -308,7 +298,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:192](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L192)
+[server/index.ts:190](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L190)
 
 ___
 
@@ -318,7 +308,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:193](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L193)
+[server/index.ts:191](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L191)
 
 ___
 
@@ -328,7 +318,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:190](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L190)
+[server/index.ts:188](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L188)
 
 ___
 
@@ -338,7 +328,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:191](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L191)
+[server/index.ts:189](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L189)
 
 ___
 
@@ -348,7 +338,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:206](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L206)
+[server/index.ts:203](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L203)
 
 ___
 
@@ -358,17 +348,17 @@ ___
 
 #### Defined in
 
-[server/index.ts:174](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L174)
+[server/index.ts:172](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L172)
 
 ___
 
 ### rootPool
 
-• **rootPool**: `Pool`<[`default`](../classes/base_Root.default.md)\>
+• **rootPool**: `Pool`\<[`default`](../classes/base_Root.default.md)\>
 
 #### Defined in
 
-[server/index.ts:175](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L175)
+[server/index.ts:173](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L173)
 
 ___
 
@@ -378,7 +368,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:176](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L176)
+[server/index.ts:174](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L174)
 
 ___
 
@@ -388,7 +378,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:183](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L183)
+[server/index.ts:181](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L181)
 
 ___
 
@@ -398,7 +388,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:179](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L179)
+[server/index.ts:177](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L177)
 
 ___
 
@@ -408,7 +398,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:178](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L178)
+[server/index.ts:176](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L176)
 
 ___
 
@@ -418,7 +408,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:196](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L196)
+[server/index.ts:194](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L194)
 
 ___
 
@@ -428,24 +418,52 @@ ___
 
 #### Defined in
 
-[server/index.ts:195](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L195)
+[server/index.ts:193](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L193)
 
 ___
 
 ### userLocalizationService
 
-• **userLocalizationService**: [`default`](../classes/server_services_base_UserLocalizationProvider.default.md)<`any`\>
+• **userLocalizationService**: [`default`](../classes/server_services_base_UserLocalizationProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:203](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L203)
+[server/index.ts:200](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L200)
+
+___
+
+### userTokenQuery
+
+• **userTokenQuery**: (`arg`: \{ `country?`: `string` ; `password?`: `string` ; `token?`: `string` ; `username?`: `string`  }) => `Promise`\<\{ `id`: `string` ; `role`: `string` ; `token`: `string`  }\>
+
+#### Type declaration
+
+▸ (`arg`): `Promise`\<\{ `id`: `string` ; `role`: `string` ; `token`: `string`  }\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | `Object` |
+| `arg.country?` | `string` |
+| `arg.password?` | `string` |
+| `arg.token?` | `string` |
+| `arg.username?` | `string` |
+
+##### Returns
+
+`Promise`\<\{ `id`: `string` ; `role`: `string` ; `token`: `string`  }\>
+
+#### Defined in
+
+[server/index.ts:212](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L212)
 
 ___
 
 ### ussdService
 
-• **ussdService**: [`default`](../classes/server_services_base_USSDProvider.default.md)<`any`\>
+• **ussdService**: [`default`](../classes/server_services_base_USSDProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:205](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L205)
+[server/index.ts:202](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L202)

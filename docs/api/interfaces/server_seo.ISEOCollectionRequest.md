@@ -9,12 +9,9 @@
 ### Properties
 
 - [collectAllVersions](server_seo.ISEOCollectionRequest.md#collectallversions)
+- [customWhere](server_seo.ISEOCollectionRequest.md#customwhere)
 - [extraColumns](server_seo.ISEOCollectionRequest.md#extracolumns)
 - [itemOrModule](server_seo.ISEOCollectionRequest.md#itemormodule)
-
-### Methods
-
-- [customWhere](server_seo.ISEOCollectionRequest.md#customwhere)
 
 ## Properties
 
@@ -26,7 +23,31 @@ By default only the base version is collected, if you wish you can collect all t
 
 #### Defined in
 
-[server/seo/index.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L33)
+[server/seo/index.ts:33](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L33)
+
+___
+
+### customWhere
+
+• `Optional` **customWhere**: (`b`: [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md)) => `void`
+
+#### Type declaration
+
+▸ (`b`): `void`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `b` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[server/seo/index.ts:29](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L29)
 
 ___
 
@@ -36,7 +57,7 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:28](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L28)
+[server/seo/index.ts:28](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L28)
 
 ___
 
@@ -46,24 +67,4 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:27](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L27)
-
-## Methods
-
-### customWhere
-
-▸ `Optional` **customWhere**(`b`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `b` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[server/seo/index.ts:29](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L29)
+[server/seo/index.ts:27](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L27)

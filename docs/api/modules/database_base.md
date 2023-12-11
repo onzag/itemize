@@ -16,14 +16,14 @@ Contains the base query builder and a conditional one
 - [IConditionalBuilderConditionType](../interfaces/database_base.IConditionalBuilderConditionType.md)
 - [IManyValueType](../interfaces/database_base.IManyValueType.md)
 
-### Type aliases
+### Type Aliases
 
 - [BasicBindingType](database_base.md#basicbindingtype)
 - [ConditionalBuilderFn](database_base.md#conditionalbuilderfn)
 - [ExtendedBindingType](database_base.md#extendedbindingtype)
 - [ValueType](database_base.md#valuetype)
 
-## Type aliases
+## Type Aliases
 
 ### BasicBindingType
 
@@ -34,13 +34,13 @@ supports string, number, boolean or an array of those
 
 #### Defined in
 
-[database/base.ts:17](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L17)
+[database/base.ts:17](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L17)
 
 ___
 
 ### ConditionalBuilderFn
 
-Ƭ **ConditionalBuilderFn**<`T`\>: (`builder`: `T`) => `void`
+Ƭ **ConditionalBuilderFn**\<`T`\>: (`builder`: `T`) => `void`
 
 #### Type parameters
 
@@ -67,7 +67,7 @@ conditions that are nested
 
 #### Defined in
 
-[database/base.ts:218](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L218)
+[database/base.ts:218](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L218)
 
 ___
 
@@ -81,7 +81,7 @@ plus the query builder itself that can act as a compounded binding element
 
 #### Defined in
 
-[database/base.ts:24](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L24)
+[database/base.ts:24](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L24)
 
 ___
 
@@ -95,4 +95,4 @@ and raw values represented by an array and its bindings
 
 #### Defined in
 
-[database/base.ts:11](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L11)
+[database/base.ts:11](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L11)

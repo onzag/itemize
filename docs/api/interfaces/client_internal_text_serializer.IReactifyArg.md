@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/internal/text/serializer](../modules/client_internal_text_serializer.md) / IReactifyArg
 
-# Interface: IReactifyArg<T\>
+# Interface: IReactifyArg\<T\>
 
 [client/internal/text/serializer](../modules/client_internal_text_serializer.md).IReactifyArg
 
@@ -42,7 +42,7 @@ usage
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:100](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L100)
+[client/internal/text/serializer/index.ts:100](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L100)
 
 ___
 
@@ -54,20 +54,20 @@ Render the element as a template, rather than as a simple single level component
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:115](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L115)
+[client/internal/text/serializer/index.ts:115](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L115)
 
 ___
 
 ### customProps
 
-• `Optional` **customProps**: `DetailedHTMLProps`<`HTMLAttributes`<`HTMLElement`\>, `HTMLElement`\>
+• `Optional` **customProps**: `DetailedHTMLProps`\<`HTMLAttributes`\<`HTMLElement`\>, `HTMLElement`\>
 
 Give the element custom properties, these properties will override the way the element
 is bound, you can pass children via these props
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:111](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L111)
+[client/internal/text/serializer/index.ts:111](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L111)
 
 ___
 
@@ -79,7 +79,7 @@ This is the element that must be converted
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:94](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L94)
+[client/internal/text/serializer/index.ts:94](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L94)
 
 ___
 
@@ -91,7 +91,7 @@ Some extra options for utilities
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:138](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L138)
+[client/internal/text/serializer/index.ts:138](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L138)
 
 ___
 
@@ -103,7 +103,7 @@ A key to use in the react component
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:134](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L134)
+[client/internal/text/serializer/index.ts:134](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L134)
 
 ___
 
@@ -116,7 +116,7 @@ or null if no parent is known
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:143](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L143)
+[client/internal/text/serializer/index.ts:143](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L143)
 
 ___
 
@@ -130,7 +130,7 @@ to the reactification
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:106](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L106)
+[client/internal/text/serializer/index.ts:106](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L106)
 
 ___
 
@@ -142,7 +142,7 @@ The template arguments to be used that represent the current context
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:119](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L119)
+[client/internal/text/serializer/index.ts:119](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L119)
 
 ___
 
@@ -155,7 +155,7 @@ attributes of a base context
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:130](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L130)
+[client/internal/text/serializer/index.ts:130](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L130)
 
 ___
 
@@ -169,7 +169,7 @@ as such they are overwritten when matching  the tree
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:125](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L125)
+[client/internal/text/serializer/index.ts:125](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L125)
 
 ___
 
@@ -182,4 +182,4 @@ or null if no tree is available
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:148](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L148)
+[client/internal/text/serializer/index.ts:148](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L148)

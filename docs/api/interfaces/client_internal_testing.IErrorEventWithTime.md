@@ -4,6 +4,8 @@
 
 [client/internal/testing](../modules/client_internal_testing.md).IErrorEventWithTime
 
+The shape of the error itself
+
 ## Hierarchy
 
 - [`IErrorEvent`](base_remote_protocol.IErrorEvent.md)
@@ -30,7 +32,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L47)
+[base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L47)
 
 ___
 
@@ -44,7 +46,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L48)
+[base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L48)
 
 ___
 
@@ -54,4 +56,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L55)
+[client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L55)

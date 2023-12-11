@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:788](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L788)
+[base/remote-protocol.ts:788](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L788)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:783](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L783)
+[base/remote-protocol.ts:783](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L783)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:784](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L784)
+[base/remote-protocol.ts:784](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L784)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:787](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L787)
+[base/remote-protocol.ts:787](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L787)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:782](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L782)
+[base/remote-protocol.ts:782](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L782)
 
 ___
 
@@ -75,17 +75,17 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:786](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L786)
+[base/remote-protocol.ts:786](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L786)
 
 ___
 
 ### source
 
-• **source**: ``"local"`` \| ``"global"``
+• **source**: ``"global"`` \| ``"local"``
 
 #### Defined in
 
-[base/remote-protocol.ts:785](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L785)
+[base/remote-protocol.ts:785](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L785)
 
 ___
 
@@ -95,4 +95,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:781](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L781)
+[base/remote-protocol.ts:781](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L781)

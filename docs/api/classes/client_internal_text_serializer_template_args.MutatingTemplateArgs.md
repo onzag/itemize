@@ -20,7 +20,7 @@ Allows to specify not very defined arguments into the serializer during a dynami
 
 ### constructor
 
-• **new MutatingTemplateArgs**(`mutatingWrapper`)
+• **new MutatingTemplateArgs**(`mutatingWrapper`): [`MutatingTemplateArgs`](client_internal_text_serializer_template_args.MutatingTemplateArgs.md)
 
 #### Parameters
 
@@ -28,9 +28,13 @@ Allows to specify not very defined arguments into the serializer during a dynami
 | :------ | :------ |
 | `mutatingWrapper` | [`TemplateArgMutatingWrapperFn`](../modules/client_internal_text_serializer_template_args.md#templateargmutatingwrapperfn) |
 
+#### Returns
+
+[`MutatingTemplateArgs`](client_internal_text_serializer_template_args.MutatingTemplateArgs.md)
+
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:165](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L165)
+[client/internal/text/serializer/template-args.ts:165](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L165)
 
 ## Properties
 
@@ -40,4 +44,4 @@ Allows to specify not very defined arguments into the serializer during a dynami
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:164](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L164)
+[client/internal/text/serializer/template-args.ts:164](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L164)

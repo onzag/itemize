@@ -57,7 +57,7 @@
 
 ### constructor
 
-• **new GlobalManager**(`buildnumber`, `root`, `databaseConnection`, `rawDB`, `elastic`, `globalCache`, `redisPub`, `redisSub`, `config`, `sensitiveConfig`, `currencyFactorsProvider`, `mailProvider`, `phoneProvider`, `registry`, `initialExecutionServerDataFn`)
+• **new GlobalManager**(`buildnumber`, `root`, `databaseConnection`, `rawDB`, `elastic`, `globalCache`, `redisPub`, `redisSub`, `config`, `sensitiveConfig`, `currencyFactorsProvider`, `mailProvider`, `phoneProvider`, `registry`, `initialExecutionServerDataFn`): [`GlobalManager`](server_global_manager.GlobalManager.md)
 
 #### Parameters
 
@@ -73,15 +73,19 @@
 | `redisSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
 | `sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
-| `currencyFactorsProvider` | [`default`](server_services_base_CurrencyFactorsProvider.default.md)<`any`\> |
-| `mailProvider` | [`default`](server_services_base_MailProvider.default.md)<`any`\> |
-| `phoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)<`any`\> |
+| `currencyFactorsProvider` | [`default`](server_services_base_CurrencyFactorsProvider.default.md)\<`any`\> |
+| `mailProvider` | [`default`](server_services_base_MailProvider.default.md)\<`any`\> |
+| `phoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)\<`any`\> |
 | `registry` | [`RegistryService`](server_services_registry.RegistryService.md) |
 | `initialExecutionServerDataFn` | [`InitialExecutionServerDataFn`](../modules/server_global_manager.md#initialexecutionserverdatafn) |
 
+#### Returns
+
+[`GlobalManager`](server_global_manager.GlobalManager.md)
+
 #### Defined in
 
-[server/global-manager.ts:82](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L82)
+[server/global-manager.ts:82](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L82)
 
 ## Properties
 
@@ -91,7 +95,7 @@
 
 #### Defined in
 
-[server/global-manager.ts:70](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L70)
+[server/global-manager.ts:70](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L70)
 
 ___
 
@@ -101,7 +105,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:58](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L58)
+[server/global-manager.ts:58](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L58)
 
 ___
 
@@ -111,17 +115,17 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:74](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L74)
+[server/global-manager.ts:74](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L74)
 
 ___
 
 ### currencyFactorsProvider
 
-• `Private` **currencyFactorsProvider**: [`default`](server_services_base_CurrencyFactorsProvider.default.md)<`any`\>
+• `Private` **currencyFactorsProvider**: [`default`](server_services_base_CurrencyFactorsProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/global-manager.ts:71](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L71)
+[server/global-manager.ts:71](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L71)
 
 ___
 
@@ -131,11 +135,11 @@ ___
 
 #### Index signature
 
-▪ [name: `string`]: [`ServiceProvider`](server_services.ServiceProvider.md)<`any`\>
+▪ [name: `string`]: [`ServiceProvider`](server_services.ServiceProvider.md)\<`any`\>
 
 #### Defined in
 
-[server/global-manager.ts:75](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L75)
+[server/global-manager.ts:75](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L75)
 
 ___
 
@@ -145,7 +149,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:59](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L59)
+[server/global-manager.ts:59](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L59)
 
 ___
 
@@ -155,7 +159,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:61](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L61)
+[server/global-manager.ts:61](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L61)
 
 ___
 
@@ -165,7 +169,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:69](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L69)
+[server/global-manager.ts:69](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L69)
 
 ___
 
@@ -175,7 +179,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:62](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L62)
+[server/global-manager.ts:62](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L62)
 
 ___
 
@@ -185,7 +189,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:65](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L65)
+[server/global-manager.ts:65](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L65)
 
 ___
 
@@ -195,17 +199,17 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L80)
+[server/global-manager.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L80)
 
 ___
 
 ### mailProvider
 
-• **mailProvider**: [`default`](server_services_base_MailProvider.default.md)<`any`\>
+• **mailProvider**: [`default`](server_services_base_MailProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/global-manager.ts:73](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L73)
+[server/global-manager.ts:73](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L73)
 
 ___
 
@@ -215,17 +219,17 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:66](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L66)
+[server/global-manager.ts:66](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L66)
 
 ___
 
 ### phoneProvider
 
-• **phoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)<`any`\>
+• **phoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)\<`any`\>
 
 #### Defined in
 
-[server/global-manager.ts:79](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L79)
+[server/global-manager.ts:79](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L79)
 
 ___
 
@@ -235,7 +239,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:60](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L60)
+[server/global-manager.ts:60](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L60)
 
 ___
 
@@ -245,7 +249,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:63](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L63)
+[server/global-manager.ts:63](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L63)
 
 ___
 
@@ -255,7 +259,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:64](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L64)
+[server/global-manager.ts:64](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L64)
 
 ___
 
@@ -265,7 +269,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:78](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L78)
+[server/global-manager.ts:78](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L78)
 
 ___
 
@@ -275,7 +279,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:57](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L57)
+[server/global-manager.ts:57](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L57)
 
 ___
 
@@ -285,7 +289,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:72](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L72)
+[server/global-manager.ts:72](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L72)
 
 ___
 
@@ -295,7 +299,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:67](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L67)
+[server/global-manager.ts:67](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L67)
 
 ___
 
@@ -305,77 +309,77 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L68)
+[server/global-manager.ts:68](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L68)
 
 ## Methods
 
 ### addAdminUserIfMissing
 
-▸ `Private` **addAdminUserIfMissing**(): `Promise`<`void`\>
+▸ **addAdminUserIfMissing**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:214](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L214)
+[server/global-manager.ts:214](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L214)
 
 ___
 
 ### calculateServerData
 
-▸ `Private` **calculateServerData**(): `Promise`<`void`\>
+▸ **calculateServerData**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:1209](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1209)
+[server/global-manager.ts:1209](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L1209)
 
 ___
 
 ### executeInitialServerDataFunction
 
-▸ **executeInitialServerDataFunction**(): `Promise`<`void`\>
+▸ **executeInitialServerDataFunction**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:590](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L590)
+[server/global-manager.ts:590](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L590)
 
 ___
 
 ### informNewServerData
 
-▸ `Private` **informNewServerData**(): `Promise`<`void`\>
+▸ **informNewServerData**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:1236](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1236)
+[server/global-manager.ts:1236](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L1236)
 
 ___
 
 ### initializeServices
 
-▸ **initializeServices**(): `Promise`<`void`\>
+▸ **initializeServices**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:195](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L195)
+[server/global-manager.ts:195](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L195)
 
 ___
 
@@ -387,7 +391,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `service` | [`ServiceProvider`](server_services.ServiceProvider.md)<`any`\> |
+| `service` | [`ServiceProvider`](server_services.ServiceProvider.md)\<`any`\> |
 
 #### Returns
 
@@ -395,13 +399,13 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:174](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L174)
+[server/global-manager.ts:174](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L174)
 
 ___
 
 ### processIdef
 
-▸ `Private` **processIdef**(`idef`): `void`
+▸ **processIdef**(`idef`): `void`
 
 #### Parameters
 
@@ -415,13 +419,13 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:516](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L516)
+[server/global-manager.ts:516](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L516)
 
 ___
 
 ### processModule
 
-▸ `Private` **processModule**(`mod`): `void`
+▸ **processModule**(`mod`): `void`
 
 #### Parameters
 
@@ -435,27 +439,27 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:477](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L477)
+[server/global-manager.ts:477](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L477)
 
 ___
 
 ### releaseBlocks
 
-▸ **releaseBlocks**(): `Promise`<`void`\>
+▸ **releaseBlocks**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:604](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L604)
+[server/global-manager.ts:604](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L604)
 
 ___
 
 ### releaseBlocksFor
 
-▸ **releaseBlocksFor**(`m`): `Promise`<`void`\>
+▸ **releaseBlocksFor**(`m`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -465,11 +469,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:567](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L567)
+[server/global-manager.ts:567](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L567)
 
 ___
 
@@ -483,13 +487,13 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:658](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L658)
+[server/global-manager.ts:658](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L658)
 
 ___
 
 ### runFor
 
-▸ `Private` **runFor**(`tableName`, `isModule`, `properties`, `since`): `Promise`<`void`\>
+▸ **runFor**(`tableName`, `isModule`, `properties`, `since`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -502,17 +506,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:1069](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1069)
+[server/global-manager.ts:1069](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L1069)
 
 ___
 
 ### runForIdef
 
-▸ `Private` **runForIdef**(`idef`): `Promise`<`void`\>
+▸ **runForIdef**(`idef`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -522,17 +526,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:1021](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1021)
+[server/global-manager.ts:1021](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L1021)
 
 ___
 
 ### runForModule
 
-▸ `Private` **runForModule**(`mod`): `Promise`<`void`\>
+▸ **runForModule**(`mod`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -542,22 +546,22 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:998](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L998)
+[server/global-manager.ts:998](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L998)
 
 ___
 
 ### runOnce
 
-▸ `Private` **runOnce**(): `Promise`<`void`\>
+▸ **runOnce**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/global-manager.ts:990](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L990)
+[server/global-manager.ts:990](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L990)

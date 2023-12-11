@@ -8,7 +8,7 @@ Here it is, the mighty
 
 ## Hierarchy
 
-- `Component`<`IActualItemProviderProps`, `IActualItemProviderState`\>
+- `Component`\<`IActualItemProviderProps`, `IActualItemProviderState`\>
 
   ↳ **`ActualItemProvider`**
 
@@ -136,7 +136,7 @@ Here it is, the mighty
 
 ### constructor
 
-• **new ActualItemProvider**(`props`)
+• **new ActualItemProvider**(`props`): [`ActualItemProvider`](client_providers_item.ActualItemProvider.md)
 
 #### Parameters
 
@@ -144,23 +144,27 @@ Here it is, the mighty
 | :------ | :------ |
 | `props` | `IActualItemProviderProps` |
 
+#### Returns
+
+[`ActualItemProvider`](client_providers_item.ActualItemProvider.md)
+
 #### Overrides
 
-React.Component&lt;IActualItemProviderProps, IActualItemProviderState\&gt;.constructor
+React.Component\&lt;IActualItemProviderProps, IActualItemProviderState\&gt;.constructor
 
 #### Defined in
 
-[client/providers/item.tsx:2292](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2292)
+[client/providers/item.tsx:2292](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2292)
 
 ## Properties
 
 ### activeSearchPromise
 
-• `Private` **activeSearchPromise**: `Promise`<{ `options`: [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md) ; `response`: [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)  }\> = `null`
+• `Private` **activeSearchPromise**: `Promise`\<\{ `options`: [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md) ; `response`: [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)  }\> = `null`
 
 #### Defined in
 
-[client/providers/item.tsx:2285](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2285)
+[client/providers/item.tsx:2285](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2285)
 
 ___
 
@@ -170,17 +174,17 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2286](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2286)
+[client/providers/item.tsx:2286](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2286)
 
 ___
 
 ### activeSubmitPromise
 
-• `Private` **activeSubmitPromise**: `Promise`<{ `options`: [`IActionSubmitOptions`](../interfaces/client_providers_item.IActionSubmitOptions.md) ; `response`: [`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)  }\> = `null`
+• `Private` **activeSubmitPromise**: `Promise`\<\{ `options`: [`IActionSubmitOptions`](../interfaces/client_providers_item.IActionSubmitOptions.md) ; `response`: [`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)  }\> = `null`
 
 #### Defined in
 
-[client/providers/item.tsx:2281](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2281)
+[client/providers/item.tsx:2281](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2281)
 
 ___
 
@@ -190,7 +194,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2282](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2282)
+[client/providers/item.tsx:2282](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2282)
 
 ___
 
@@ -200,7 +204,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1956](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1956)
+[client/providers/item.tsx:1956](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1956)
 
 ___
 
@@ -210,7 +214,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2275](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2275)
+[client/providers/item.tsx:2275](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2275)
 
 ___
 
@@ -231,7 +235,7 @@ search id was changed and for what, and trigger automatic search
 
 #### Defined in
 
-[client/providers/item.tsx:1909](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1909)
+[client/providers/item.tsx:1909](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1909)
 
 ___
 
@@ -243,7 +247,7 @@ The consumabel qs state that is being set
 
 #### Defined in
 
-[client/providers/item.tsx:1970](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1970)
+[client/providers/item.tsx:1970](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1970)
 
 ___
 
@@ -253,7 +257,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1971](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1971)
+[client/providers/item.tsx:1971](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1971)
 
 ___
 
@@ -273,7 +277,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -281,7 +287,7 @@ React.Component.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
@@ -291,7 +297,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1913](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1913)
+[client/providers/item.tsx:1913](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1913)
 
 ___
 
@@ -301,7 +307,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1889](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1889)
+[client/providers/item.tsx:1889](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1889)
 
 ___
 
@@ -311,7 +317,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1887](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1887)
+[client/providers/item.tsx:1887](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1887)
 
 ___
 
@@ -321,7 +327,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1894](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1894)
+[client/providers/item.tsx:1894](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1894)
 
 ___
 
@@ -331,13 +337,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1893](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1893)
+[client/providers/item.tsx:1893](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1893)
 
 ___
 
 ### lastLoadValuePromise
 
-• `Private` **lastLoadValuePromise**: `Promise`<`void`\> = `null`
+• `Private` **lastLoadValuePromise**: `Promise`\<`void`\> = `null`
 
 Some functons such as submit, on property change
 events where we request new values for the
@@ -347,7 +353,7 @@ event
 
 #### Defined in
 
-[client/providers/item.tsx:1952](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1952)
+[client/providers/item.tsx:1952](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1952)
 
 ___
 
@@ -357,7 +363,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1953](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1953)
+[client/providers/item.tsx:1953](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1953)
 
 ___
 
@@ -375,7 +381,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1954](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1954)
+[client/providers/item.tsx:1954](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1954)
 
 ___
 
@@ -390,7 +396,7 @@ value and not overwrite if we have changed such value hot
 
 #### Defined in
 
-[client/providers/item.tsx:1942](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1942)
+[client/providers/item.tsx:1942](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1942)
 
 ___
 
@@ -400,7 +406,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1943](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1943)
+[client/providers/item.tsx:1943](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1943)
 
 ___
 
@@ -410,7 +416,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2273](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2273)
+[client/providers/item.tsx:2273](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2273)
 
 ___
 
@@ -426,7 +432,7 @@ a change event while this instance is mounting, during cleanup
 
 #### Defined in
 
-[client/providers/item.tsx:1902](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1902)
+[client/providers/item.tsx:1902](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1902)
 
 ___
 
@@ -454,13 +460,13 @@ is not requested
 
 #### Defined in
 
-[client/providers/item.tsx:1934](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1934)
+[client/providers/item.tsx:1934](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1934)
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<`IActualItemProviderProps`\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<`IActualItemProviderProps`\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -468,7 +474,7 @@ React.Component.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -476,8 +482,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -489,7 +496,7 @@ React.Component.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
@@ -499,7 +506,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2290](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2290)
+[client/providers/item.tsx:2290](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2290)
 
 ___
 
@@ -509,7 +516,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1914](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1914)
+[client/providers/item.tsx:1914](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1914)
 
 ___
 
@@ -519,13 +526,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1960](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1960)
+[client/providers/item.tsx:1960](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1960)
 
 ___
 
 ### state
 
-• **state**: `Readonly`<`IActualItemProviderState`\>
+• **state**: `Readonly`\<`IActualItemProviderState`\>
 
 #### Inherited from
 
@@ -533,7 +540,7 @@ React.Component.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
@@ -543,17 +550,17 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1965](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1965)
+[client/providers/item.tsx:1965](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1965)
 
 ___
 
 ### submitBlockPromises
 
-• `Private` **submitBlockPromises**: `Promise`<`any`\>[] = `[]`
+• `Private` **submitBlockPromises**: `Promise`\<`any`\>[] = `[]`
 
 #### Defined in
 
-[client/providers/item.tsx:2278](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2278)
+[client/providers/item.tsx:2278](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2278)
 
 ___
 
@@ -563,13 +570,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2268](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2268)
+[client/providers/item.tsx:2268](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2268)
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -588,7 +595,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -596,13 +605,13 @@ React.Component.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -612,15 +621,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -628,13 +640,13 @@ React.Component.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -647,22 +659,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`IActualItemProviderProps`\> |
+| `nextProps` | `Readonly`\<`IActualItemProviderProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -670,13 +685,13 @@ React.Component.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -687,23 +702,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`IActualItemProviderProps`\> |
-| `nextState` | `Readonly`<`IActualItemProviderState`\> |
+| `nextProps` | `Readonly`\<`IActualItemProviderProps`\> |
+| `nextState` | `Readonly`\<`IActualItemProviderState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -711,7 +729,7 @@ React.Component.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
@@ -731,13 +749,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2357](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2357)
+[client/providers/item.tsx:2357](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2357)
 
 ___
 
 ### changeListener
 
-▸ **changeListener**(`repairCorruption?`): `Promise`<`void`\>
+▸ **changeListener**(`repairCorruption?`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -747,11 +765,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3279](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3279)
+[client/providers/item.tsx:3279](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3279)
 
 ___
 
@@ -765,7 +783,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3225](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3225)
+[client/providers/item.tsx:3225](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3225)
 
 ___
 
@@ -778,12 +796,12 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `options` | `Object` |
-| `options.includeOverrides?` | [`IIncludeOverride`](../interfaces/client_internal_gql_client_util.IIncludeOverride.md)[] |
+| `options.includeOverrides?` | [`IIncludeOverride`](../interfaces/client_internal_rq_client_util.IIncludeOverride.md)[] |
 | `options.includes?` | `Object` |
 | `options.onlyIncludeIfDiffersFromAppliedValue?` | `boolean` |
 | `options.policies?` | [`PolicyPathType`](../modules/client_providers_item.md#policypathtype)[] |
 | `options.properties` | `string`[] |
-| `options.propertyOverrides?` | [`IPropertyOverride`](../interfaces/client_internal_gql_client_util.IPropertyOverride.md)[] |
+| `options.propertyOverrides?` | [`IPropertyOverride`](../interfaces/client_internal_rq_client_util.IPropertyOverride.md)[] |
 
 #### Returns
 
@@ -791,7 +809,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4204](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4204)
+[client/providers/item.tsx:4204](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4204)
 
 ___
 
@@ -813,7 +831,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4510](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4510)
+[client/providers/item.tsx:4510](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4510)
 
 ___
 
@@ -836,13 +854,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4522](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4522)
+[client/providers/item.tsx:4522](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4522)
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -864,17 +882,17 @@ React.Component.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
 ### componentDidMount
 
-▸ **componentDidMount**(): `Promise`<`void`\>
+▸ **componentDidMount**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Overrides
 
@@ -882,13 +900,13 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/providers/item.tsx:2585](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2585)
+[client/providers/item.tsx:2585](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2585)
 
 ___
 
 ### componentDidUpdate
 
-▸ **componentDidUpdate**(`prevProps`, `prevState`): `Promise`<`void`\>
+▸ **componentDidUpdate**(`prevProps`, `prevState`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -899,7 +917,7 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Overrides
 
@@ -907,13 +925,13 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/providers/item.tsx:2849](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2849)
+[client/providers/item.tsx:2849](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2849)
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -921,15 +939,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -937,13 +958,13 @@ React.Component.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -954,22 +975,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`IActualItemProviderProps`\> |
+| `nextProps` | `Readonly`\<`IActualItemProviderProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -977,7 +1001,7 @@ React.Component.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
@@ -995,13 +1019,13 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/providers/item.tsx:4171](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4171)
+[client/providers/item.tsx:4171](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4171)
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -1010,23 +1034,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`IActualItemProviderProps`\> |
-| `nextState` | `Readonly`<`IActualItemProviderState`\> |
+| `nextProps` | `Readonly`\<`IActualItemProviderProps`\> |
+| `nextState` | `Readonly`\<`IActualItemProviderState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -1034,13 +1061,13 @@ React.Component.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
 ### delete
 
-▸ **delete**(`options?`): `Promise`<[`IBasicActionResponse`](../interfaces/client_providers_item.IBasicActionResponse.md)\>
+▸ **delete**(`options?`): `Promise`\<[`IBasicActionResponse`](../interfaces/client_providers_item.IBasicActionResponse.md)\>
 
 #### Parameters
 
@@ -1050,11 +1077,11 @@ ___
 
 #### Returns
 
-`Promise`<[`IBasicActionResponse`](../interfaces/client_providers_item.IBasicActionResponse.md)\>
+`Promise`\<[`IBasicActionResponse`](../interfaces/client_providers_item.IBasicActionResponse.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:4387](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4387)
+[client/providers/item.tsx:4387](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4387)
 
 ___
 
@@ -1068,7 +1095,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6034](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6034)
+[client/providers/item.tsx:6034](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6034)
 
 ___
 
@@ -1082,7 +1109,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6058](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6058)
+[client/providers/item.tsx:6058](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6058)
 
 ___
 
@@ -1096,7 +1123,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6026](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6026)
+[client/providers/item.tsx:6026](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6026)
 
 ___
 
@@ -1110,7 +1137,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6066](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6066)
+[client/providers/item.tsx:6066](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6066)
 
 ___
 
@@ -1124,7 +1151,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6146](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6146)
+[client/providers/item.tsx:6146](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6146)
 
 ___
 
@@ -1138,7 +1165,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6042](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6042)
+[client/providers/item.tsx:6042](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6042)
 
 ___
 
@@ -1152,13 +1179,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6050](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6050)
+[client/providers/item.tsx:6050](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6050)
 
 ___
 
 ### downloadState
 
-▸ **downloadState**(`specificProperties?`, `specificIncludes?`): `Promise`<`Blob`\>
+▸ **downloadState**(`specificProperties?`, `specificIncludes?`): `Promise`\<`Blob`\>
 
 #### Parameters
 
@@ -1169,17 +1196,17 @@ ___
 
 #### Returns
 
-`Promise`<`Blob`\>
+`Promise`\<`Blob`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3468](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3468)
+[client/providers/item.tsx:3468](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3468)
 
 ___
 
 ### downloadStateAt
 
-▸ **downloadStateAt**(`id`, `version`, `specificProperties?`, `specificIncludes?`): `Promise`<`Blob`\>
+▸ **downloadStateAt**(`id`, `version`, `specificProperties?`, `specificIncludes?`): `Promise`\<`Blob`\>
 
 #### Parameters
 
@@ -1192,11 +1219,11 @@ ___
 
 #### Returns
 
-`Promise`<`Blob`\>
+`Promise`\<`Blob`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3471](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3471)
+[client/providers/item.tsx:3471](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3471)
 
 ___
 
@@ -1220,19 +1247,19 @@ React.Component.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
 ### getItemState
 
-▸ `Private` **getItemState**(`props?`): [`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
+▸ **getItemState**(`props?`): [`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `props` | `Readonly`<`IActualItemProviderProps`\> & `Readonly`<{ `children?`: `ReactNode`  }\> |
+| `props` | `Readonly`\<`IActualItemProviderProps`\> & `Readonly`\<\{ `children?`: `ReactNode`  }\> |
 
 #### Returns
 
@@ -1240,13 +1267,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3276](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3276)
+[client/providers/item.tsx:3276](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3276)
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -1259,8 +1286,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<`IActualItemProviderProps`\> |
-| `prevState` | `Readonly`<`IActualItemProviderState`\> |
+| `prevProps` | `Readonly`\<`IActualItemProviderProps`\> |
+| `prevState` | `Readonly`\<`IActualItemProviderState`\> |
 
 #### Returns
 
@@ -1272,13 +1299,13 @@ React.Component.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
 ### giveEmulatedInvalidError
 
-▸ **giveEmulatedInvalidError**(`stateApplied`, `withIdVersion`, `withSearchResults`, `errMessageOverride?`, `errorOverride?`): [`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md) \| [`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)
+▸ **giveEmulatedInvalidError**(`stateApplied`, `withIdVersion`, `withSearchResults`, `errMessageOverride?`, `errorOverride?`): [`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md) \| [`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)
 
 #### Parameters
 
@@ -1292,11 +1319,11 @@ ___
 
 #### Returns
 
-[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md) \| [`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)
+[`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md) \| [`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)
 
 #### Defined in
 
-[client/providers/item.tsx:4330](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4330)
+[client/providers/item.tsx:4330](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4330)
 
 ___
 
@@ -1308,7 +1335,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `p` | `Promise`<`any`\> |
+| `p` | `Promise`\<`any`\> |
 
 #### Returns
 
@@ -1316,13 +1343,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2373](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2373)
+[client/providers/item.tsx:2373](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2373)
 
 ___
 
 ### installInternalSearchDestructionMarker
 
-▸ `Private` **installInternalSearchDestructionMarker**(`marker`, `unmark`): `void`
+▸ **installInternalSearchDestructionMarker**(`marker`, `unmark`): `void`
 
 #### Parameters
 
@@ -1337,7 +1364,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6183](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6183)
+[client/providers/item.tsx:6183](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6183)
 
 ___
 
@@ -1357,7 +1384,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2505](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2505)
+[client/providers/item.tsx:2505](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2505)
 
 ___
 
@@ -1377,58 +1404,58 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2489](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2489)
+[client/providers/item.tsx:2489](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2489)
 
 ___
 
 ### loadListener
 
-▸ **loadListener**(): `Promise`<`void`\>
+▸ **loadListener**(): `Promise`\<`void`\>
 
 This listener triggers on load and the search
 loader triggers it
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3370](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3370)
+[client/providers/item.tsx:3370](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3370)
 
 ___
 
 ### loadStateFromFile
 
-▸ **loadStateFromFile**(`state`, `specificProperties?`, `specificIncludes?`): `Promise`<`void`\>
+▸ **loadStateFromFile**(`state`, `specificProperties?`, `specificIncludes?`): `Promise`\<`void`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `Blob` \| `File` |
+| `state` | `File` \| `Blob` |
 | `specificProperties?` | `string`[] |
 | `specificIncludes?` | `Object` |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3445](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3445)
+[client/providers/item.tsx:3445](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3445)
 
 ___
 
 ### loadStateFromFileAt
 
-▸ **loadStateFromFileAt**(`state`, `id`, `version?`, `specificProperties?`, `specificIncludes?`): `Promise`<`void`\>
+▸ **loadStateFromFileAt**(`state`, `id`, `version?`, `specificProperties?`, `specificIncludes?`): `Promise`\<`void`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `Blob` \| `File` |
+| `state` | `File` \| `Blob` |
 | `id` | `string` |
 | `version?` | `string` |
 | `specificProperties?` | `string`[] |
@@ -1436,17 +1463,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3448](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3448)
+[client/providers/item.tsx:3448](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3448)
 
 ___
 
 ### loadStoredState
 
-▸ **loadStoredState**(`location`): `Promise`<`void`\>
+▸ **loadStoredState**(`location`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -1456,17 +1483,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3503](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3503)
+[client/providers/item.tsx:3503](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3503)
 
 ___
 
 ### loadValue
 
-▸ **loadValue**(`denyCaches?`): `Promise`<[`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)\>
+▸ **loadValue**(`denyCaches?`): `Promise`\<[`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)\>
 
 #### Parameters
 
@@ -1476,11 +1503,11 @@ ___
 
 #### Returns
 
-`Promise`<[`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)\>
+`Promise`\<[`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:3540](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3540)
+[client/providers/item.tsx:3540](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3540)
 
 ___
 
@@ -1500,13 +1527,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3822](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3822)
+[client/providers/item.tsx:3822](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3822)
 
 ___
 
 ### markForDestruction
 
-▸ **markForDestruction**(`unmount`, `unmark`, `props?`): `Promise`<`void`\>
+▸ **markForDestruction**(`unmount`, `unmark`, `props?`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -1518,17 +1545,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:2376](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2376)
+[client/providers/item.tsx:2376](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2376)
 
 ___
 
 ### markSearchForDestruction
 
-▸ **markSearchForDestruction**(`type`, `qualifiedName`, `owner`, `parent`, `property`, `unmount`, `unmark`): `Promise`<`void`\>
+▸ **markSearchForDestruction**(`type`, `qualifiedName`, `owner`, `parent`, `property`, `unmount`, `unmark`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -1544,11 +1571,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:2428](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2428)
+[client/providers/item.tsx:2428](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2428)
 
 ___
 
@@ -1568,7 +1595,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2692](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2692)
+[client/providers/item.tsx:2692](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2692)
 
 ___
 
@@ -1582,7 +1609,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2564](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2564)
+[client/providers/item.tsx:2564](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2564)
 
 ___
 
@@ -1603,13 +1630,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4186](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4186)
+[client/providers/item.tsx:4186](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4186)
 
 ___
 
 ### onPropertyChange
 
-▸ **onPropertyChange**(`property`, `value`, `internalValue`): `Promise`<`void`\>
+▸ **onPropertyChange**(`property`, `value`, `internalValue`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -1621,11 +1648,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:4045](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4045)
+[client/providers/item.tsx:4045](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4045)
 
 ___
 
@@ -1639,13 +1666,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3944](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3944)
+[client/providers/item.tsx:3944](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3944)
 
 ___
 
 ### onPropertyChangeOrRestoreQsSync
 
-▸ `Private` **onPropertyChangeOrRestoreQsSync**(`property`): `void`
+▸ **onPropertyChangeOrRestoreQsSync**(`property`): `void`
 
 #### Parameters
 
@@ -1659,7 +1686,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3991](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3991)
+[client/providers/item.tsx:3991](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3991)
 
 ___
 
@@ -1682,7 +1709,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4108](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4108)
+[client/providers/item.tsx:4108](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4108)
 
 ___
 
@@ -1706,7 +1733,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4090](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4090)
+[client/providers/item.tsx:4090](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4090)
 
 ___
 
@@ -1728,7 +1755,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4070](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4070)
+[client/providers/item.tsx:4070](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4070)
 
 ___
 
@@ -1748,13 +1775,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4027](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4027)
+[client/providers/item.tsx:4027](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4027)
 
 ___
 
 ### onSearchReload
 
-▸ **onSearchReload**(`arg`): `Promise`<`void`\>
+▸ **onSearchReload**(`arg`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -1764,11 +1791,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:6074](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6074)
+[client/providers/item.tsx:6074](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6074)
 
 ___
 
@@ -1788,7 +1815,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6162](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6162)
+[client/providers/item.tsx:6162](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6162)
 
 ___
 
@@ -1808,7 +1835,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2365](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2365)
+[client/providers/item.tsx:2365](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2365)
 
 ___
 
@@ -1822,7 +1849,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3208](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3208)
+[client/providers/item.tsx:3208](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3208)
 
 ___
 
@@ -1843,7 +1870,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6108](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6108)
+[client/providers/item.tsx:6108](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6108)
 
 ___
 
@@ -1863,7 +1890,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2497](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2497)
+[client/providers/item.tsx:2497](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2497)
 
 ___
 
@@ -1881,7 +1908,7 @@ React.Component.render
 
 #### Defined in
 
-[client/providers/item.tsx:6198](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6198)
+[client/providers/item.tsx:6198](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6198)
 
 ___
 
@@ -1901,13 +1928,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4121](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4121)
+[client/providers/item.tsx:4121](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4121)
 
 ___
 
 ### search
 
-▸ **search**(`originalOptions`): `Promise`<[`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)\>
+▸ **search**(`originalOptions`): `Promise`\<[`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)\>
 
 #### Parameters
 
@@ -1917,17 +1944,17 @@ ___
 
 #### Returns
 
-`Promise`<[`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)\>
+`Promise`\<[`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:5312](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L5312)
+[client/providers/item.tsx:5312](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L5312)
 
 ___
 
 ### searchFeedback
 
-▸ `Private` **searchFeedback**(`state`): `void`
+▸ **searchFeedback**(`state`): `void`
 
 #### Parameters
 
@@ -1941,13 +1968,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5266](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L5266)
+[client/providers/item.tsx:5266](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L5266)
 
 ___
 
 ### searchListenersSetup
 
-▸ `Private` **searchListenersSetup**(`state`, `requestFeedbackToo?`): `void`
+▸ **searchListenersSetup**(`state`, `requestFeedbackToo?`): `void`
 
 #### Parameters
 
@@ -1962,13 +1989,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5197](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L5197)
+[client/providers/item.tsx:5197](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L5197)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -1980,7 +2007,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `IActualItemProviderState` \| (`prevState`: `Readonly`<`IActualItemProviderState`\>, `props`: `Readonly`<`IActualItemProviderProps`\>) => `IActualItemProviderState` \| `Pick`<`IActualItemProviderState`, `K`\> \| `Pick`<`IActualItemProviderState`, `K`\> |
+| `state` | `IActualItemProviderState` \| (`prevState`: `Readonly`\<`IActualItemProviderState`\>, `props`: `Readonly`\<`IActualItemProviderProps`\>) => `IActualItemProviderState` \| `Pick`\<`IActualItemProviderState`, `K`\> \| `Pick`\<`IActualItemProviderState`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -1993,13 +2020,13 @@ React.Component.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
 ### setStateToCurrentValueWithExternalChecking
 
-▸ **setStateToCurrentValueWithExternalChecking**(`currentUpdateId`): `Promise`<`void`\>
+▸ **setStateToCurrentValueWithExternalChecking**(`currentUpdateId`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -2009,11 +2036,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3912](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3912)
+[client/providers/item.tsx:3912](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3912)
 
 ___
 
@@ -2027,7 +2054,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2735](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2735)
+[client/providers/item.tsx:2735](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2735)
 
 ___
 
@@ -2052,27 +2079,27 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/providers/item.tsx:2811](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2811)
+[client/providers/item.tsx:2811](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2811)
 
 ___
 
 ### storeStateDelayed
 
-▸ `Private` **storeStateDelayed**(): `Promise`<`void`\>
+▸ **storeStateDelayed**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:3180](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3180)
+[client/providers/item.tsx:3180](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L3180)
 
 ___
 
 ### submit
 
-▸ **submit**(`originalOptions`): `Promise`<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\>
+▸ **submit**(`originalOptions`): `Promise`\<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\>
 
 #### Parameters
 
@@ -2082,11 +2109,11 @@ ___
 
 #### Returns
 
-`Promise`<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\>
+`Promise`\<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:4693](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4693)
+[client/providers/item.tsx:4693](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L4693)
 
 ___
 
@@ -2100,7 +2127,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2778](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2778)
+[client/providers/item.tsx:2778](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2778)
 
 ___
 
@@ -2114,13 +2141,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6171](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6171)
+[client/providers/item.tsx:6171](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6171)
 
 ___
 
 ### getDerivedServerSideStateFromProps
 
-▸ `Static` **getDerivedServerSideStateFromProps**(`props`, `state`): `Promise`<`Partial`<`IActualItemProviderState`\>\>
+▸ **getDerivedServerSideStateFromProps**(`props`, `state`): `Promise`\<`Partial`\<`IActualItemProviderState`\>\>
 
 #### Parameters
 
@@ -2131,17 +2158,17 @@ ___
 
 #### Returns
 
-`Promise`<`Partial`<`IActualItemProviderState`\>\>
+`Promise`\<`Partial`\<`IActualItemProviderState`\>\>
 
 #### Defined in
 
-[client/providers/item.tsx:2087](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2087)
+[client/providers/item.tsx:2087](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2087)
 
 ___
 
 ### getDerivedStateFromProps
 
-▸ `Static` **getDerivedStateFromProps**(`props`, `state`): `Partial`<`IActualItemProviderState`\>
+▸ **getDerivedStateFromProps**(`props`, `state`): `Partial`\<`IActualItemProviderState`\>
 
 #### Parameters
 
@@ -2152,17 +2179,17 @@ ___
 
 #### Returns
 
-`Partial`<`IActualItemProviderState`\>
+`Partial`\<`IActualItemProviderState`\>
 
 #### Defined in
 
-[client/providers/item.tsx:1993](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1993)
+[client/providers/item.tsx:1993](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1993)
 
 ___
 
 ### getItemStateStatic
 
-▸ `Static` `Private` **getItemStateStatic**(`props`): [`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
+▸ **getItemStateStatic**(`props`): [`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
 
 #### Parameters
 
@@ -2176,13 +2203,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1973](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1973)
+[client/providers/item.tsx:1973](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1973)
 
 ___
 
 ### setupInitialState
 
-▸ `Static` **setupInitialState**(`props`): `IActualItemProviderState`
+▸ **setupInitialState**(`props`): `IActualItemProviderState`
 
 #### Parameters
 
@@ -2196,4 +2223,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2151](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2151)
+[client/providers/item.tsx:2151](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L2151)

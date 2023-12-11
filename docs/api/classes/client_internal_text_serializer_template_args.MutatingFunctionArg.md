@@ -20,7 +20,7 @@ Allows to specify a context mutating function into the serializer during a dynam
 
 ### constructor
 
-• **new MutatingFunctionArg**(`mutatingFunctionWrapper`)
+• **new MutatingFunctionArg**(`mutatingFunctionWrapper`): [`MutatingFunctionArg`](client_internal_text_serializer_template_args.MutatingFunctionArg.md)
 
 #### Parameters
 
@@ -28,9 +28,13 @@ Allows to specify a context mutating function into the serializer during a dynam
 | :------ | :------ |
 | `mutatingFunctionWrapper` | [`TemplateArgFunctionalWrapperFn`](../modules/client_internal_text_serializer_template_args.md#templateargfunctionalwrapperfn) |
 
+#### Returns
+
+[`MutatingFunctionArg`](client_internal_text_serializer_template_args.MutatingFunctionArg.md)
+
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:177](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L177)
+[client/internal/text/serializer/template-args.ts:177](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L177)
 
 ## Properties
 
@@ -40,4 +44,4 @@ Allows to specify a context mutating function into the serializer during a dynam
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:176](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L176)
+[client/internal/text/serializer/template-args.ts:176](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L176)

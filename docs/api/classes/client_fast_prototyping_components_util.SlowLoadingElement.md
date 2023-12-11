@@ -9,7 +9,7 @@ so that they don't have to slow down the execution of other code, doesn't play n
 
 ## Hierarchy
 
-- `Component`<`SlowLoadingElementProps`, `SlowLoadingElementState`\>
+- `Component`\<`SlowLoadingElementProps`, `SlowLoadingElementState`\>
 
   ↳ **`SlowLoadingElement`**
 
@@ -52,7 +52,7 @@ so that they don't have to slow down the execution of other code, doesn't play n
 
 ### constructor
 
-• **new SlowLoadingElement**(`props`)
+• **new SlowLoadingElement**(`props`): [`SlowLoadingElement`](client_fast_prototyping_components_util.SlowLoadingElement.md)
 
 #### Parameters
 
@@ -60,13 +60,17 @@ so that they don't have to slow down the execution of other code, doesn't play n
 | :------ | :------ |
 | `props` | `SlowLoadingElementProps` |
 
+#### Returns
+
+[`SlowLoadingElement`](client_fast_prototyping_components_util.SlowLoadingElement.md)
+
 #### Overrides
 
-React.Component&lt;SlowLoadingElementProps, SlowLoadingElementState\&gt;.constructor
+React.Component\&lt;SlowLoadingElementProps, SlowLoadingElementState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:155](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L155)
+[client/fast-prototyping/components/util.tsx:155](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L155)
 
 ## Properties
 
@@ -86,7 +90,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -94,13 +100,13 @@ React.Component.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<`SlowLoadingElementProps`\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<`SlowLoadingElementProps`\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -108,7 +114,7 @@ React.Component.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -116,8 +122,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -129,13 +136,13 @@ React.Component.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### state
 
-• **state**: `Readonly`<`SlowLoadingElementState`\>
+• **state**: `Readonly`\<`SlowLoadingElementState`\>
 
 #### Inherited from
 
@@ -143,7 +150,7 @@ React.Component.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
@@ -157,13 +164,13 @@ to load
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:140](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L140)
+[client/fast-prototyping/components/util.tsx:140](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L140)
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -182,7 +189,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -190,13 +199,13 @@ React.Component.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -206,15 +215,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -222,13 +234,13 @@ React.Component.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -241,22 +253,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`SlowLoadingElementProps`\> |
+| `nextProps` | `Readonly`\<`SlowLoadingElementProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -264,13 +279,13 @@ React.Component.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -281,23 +296,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`SlowLoadingElementProps`\> |
-| `nextState` | `Readonly`<`SlowLoadingElementState`\> |
+| `nextProps` | `Readonly`\<`SlowLoadingElementProps`\> |
+| `nextState` | `Readonly`\<`SlowLoadingElementState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -305,13 +323,13 @@ React.Component.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -333,7 +351,7 @@ React.Component.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
@@ -351,7 +369,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:180](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L180)
+[client/fast-prototyping/components/util.tsx:180](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L180)
 
 ___
 
@@ -376,13 +394,13 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:183](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L183)
+[client/fast-prototyping/components/util.tsx:183](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L183)
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -390,15 +408,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -406,13 +427,13 @@ React.Component.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -423,22 +444,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`SlowLoadingElementProps`\> |
+| `nextProps` | `Readonly`\<`SlowLoadingElementProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -446,7 +470,7 @@ React.Component.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
@@ -464,13 +488,13 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:189](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L189)
+[client/fast-prototyping/components/util.tsx:189](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L189)
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -479,23 +503,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`SlowLoadingElementProps`\> |
-| `nextState` | `Readonly`<`SlowLoadingElementState`\> |
+| `nextProps` | `Readonly`\<`SlowLoadingElementProps`\> |
+| `nextState` | `Readonly`\<`SlowLoadingElementState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -503,7 +530,7 @@ React.Component.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
@@ -527,13 +554,13 @@ React.Component.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -546,8 +573,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<`SlowLoadingElementProps`\> |
-| `prevState` | `Readonly`<`SlowLoadingElementState`\> |
+| `prevProps` | `Readonly`\<`SlowLoadingElementProps`\> |
+| `prevState` | `Readonly`\<`SlowLoadingElementState`\> |
 
 #### Returns
 
@@ -559,7 +586,7 @@ React.Component.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
@@ -573,7 +600,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:163](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L163)
+[client/fast-prototyping/components/util.tsx:163](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L163)
 
 ___
 
@@ -591,13 +618,13 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:192](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L192)
+[client/fast-prototyping/components/util.tsx:192](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L192)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -609,7 +636,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `SlowLoadingElementState` \| (`prevState`: `Readonly`<`SlowLoadingElementState`\>, `props`: `Readonly`<`SlowLoadingElementProps`\>) => `SlowLoadingElementState` \| `Pick`<`SlowLoadingElementState`, `K`\> \| `Pick`<`SlowLoadingElementState`, `K`\> |
+| `state` | `SlowLoadingElementState` \| (`prevState`: `Readonly`\<`SlowLoadingElementState`\>, `props`: `Readonly`\<`SlowLoadingElementProps`\>) => `SlowLoadingElementState` \| `Pick`\<`SlowLoadingElementState`, `K`\> \| `Pick`\<`SlowLoadingElementState`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -622,7 +649,7 @@ React.Component.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
@@ -647,13 +674,13 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:175](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L175)
+[client/fast-prototyping/components/util.tsx:175](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L175)
 
 ___
 
 ### getDerivedStateFromProps
 
-▸ `Static` **getDerivedStateFromProps**(`props`, `state`): `Partial`<`SlowLoadingElementState`\>
+▸ **getDerivedStateFromProps**(`props`, `state`): `Partial`\<`SlowLoadingElementState`\>
 
 #### Parameters
 
@@ -664,8 +691,8 @@ ___
 
 #### Returns
 
-`Partial`<`SlowLoadingElementState`\>
+`Partial`\<`SlowLoadingElementState`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:142](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/util.tsx#L142)
+[client/fast-prototyping/components/util.tsx:142](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/util.tsx#L142)

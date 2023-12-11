@@ -34,7 +34,7 @@ nor property definitions
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `props` | `Object` | the props |
-| `props.renderer?` | `ComponentType`<[`IRendererProps`](../interfaces/client_internal_renderer.IRendererProps.md)\> | - |
+| `props.renderer?` | `ComponentType`\<[`IRendererProps`](../interfaces/client_internal_renderer.IRendererProps.md)\> | - |
 | `props.rendererArgs?` | `object` | - |
 | `props.value` | `string` | - |
 
@@ -46,7 +46,7 @@ areact element
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:370](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L370)
+[client/internal/components/PropertyView/index.tsx:370](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L370)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `props` | [`IPropertyViewMainHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewMainHandlerProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype), [`IPropertyViewRendererProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> |
+| `props` | [`IPropertyViewMainHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewMainHandlerProps.md)\<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype), [`IPropertyViewRendererProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewRendererProps.md)\<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> |
 
 #### Returns
 
@@ -66,4 +66,4 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:429](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L429)
+[client/internal/components/PropertyView/index.tsx:429](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L429)

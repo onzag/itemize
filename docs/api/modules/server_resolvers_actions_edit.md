@@ -7,50 +7,29 @@
 ### Functions
 
 - [editItemDefinition](server_resolvers_actions_edit.md#edititemdefinition)
-- [editItemDefinitionFn](server_resolvers_actions_edit.md#edititemdefinitionfn)
 - [editItemDefinitionFnRQ](server_resolvers_actions_edit.md#edititemdefinitionfnrq)
 
 ## Functions
 
 ### editItemDefinition
 
-▸ **editItemDefinition**(`appData`, `resolverArgs`, `resolverItemDefinition`): `Promise`<{ `DATA`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) = gqlValue }\>
+▸ **editItemDefinition**(`appData`, `resolverItemDefinition`, `resolverArgs`): `Promise`\<\{ `DATA`: [`IRQValue`](../interfaces/rq_querier.IRQValue.md) = value }\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
 | `resolverItemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `resolverArgs` | [`IRQResolverArgs`](../interfaces/base_Root_rq.IRQResolverArgs.md) |
 
 #### Returns
 
-`Promise`<{ `DATA`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) = gqlValue }\>
+`Promise`\<\{ `DATA`: [`IRQValue`](../interfaces/rq_querier.IRQValue.md) = value }\>
 
 #### Defined in
 
-[server/resolvers/actions/edit.ts:39](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/edit.ts#L39)
-
-___
-
-### editItemDefinitionFn
-
-▸ **editItemDefinitionFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-
-#### Returns
-
-[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Defined in
-
-[server/resolvers/actions/edit.ts:679](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/edit.ts#L679)
+[server/resolvers/actions/edit.ts:39](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/edit.ts#L39)
 
 ___
 
@@ -70,4 +49,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/edit.ts:683](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/edit.ts#L683)
+[server/resolvers/actions/edit.ts:676](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/edit.ts#L676)

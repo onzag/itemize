@@ -6,38 +6,38 @@
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [SEARCH](server_resolvers_triggers.SearchTriggerActions.md#search)
 - [SEARCHED](server_resolvers_triggers.SearchTriggerActions.md#searched)
 - [SEARCHED\_SYNC](server_resolvers_triggers.SearchTriggerActions.md#searched_sync)
 
-## Enumeration members
+## Enumeration Members
 
 ### SEARCH
 
-• **SEARCH** = `0`
+• **SEARCH** = ``0``
 
 #### Defined in
 
-[server/resolvers/triggers.ts:25](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L25)
+[server/resolvers/triggers.ts:25](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L25)
 
 ___
 
 ### SEARCHED
 
-• **SEARCHED** = `2`
+• **SEARCHED** = ``2``
 
 #### Defined in
 
-[server/resolvers/triggers.ts:27](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L27)
+[server/resolvers/triggers.ts:27](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L27)
 
 ___
 
 ### SEARCHED\_SYNC
 
-• **SEARCHED\_SYNC** = `1`
+• **SEARCHED\_SYNC** = ``1``
 
 #### Defined in
 
-[server/resolvers/triggers.ts:26](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L26)
+[server/resolvers/triggers.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L26)

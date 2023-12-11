@@ -40,7 +40,7 @@ is specified as that requires loading
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:149](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/ItemLoader.tsx#L149)
+[client/components/item/ItemLoader.tsx:149](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemLoader.tsx#L149)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:159](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/ItemLoader.tsx#L159)
+[client/components/item/ItemLoader.tsx:159](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemLoader.tsx#L159)

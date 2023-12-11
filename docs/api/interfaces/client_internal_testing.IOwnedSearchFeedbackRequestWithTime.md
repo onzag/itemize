@@ -4,6 +4,8 @@
 
 [client/internal/testing](../modules/client_internal_testing.md).IOwnedSearchFeedbackRequestWithTime
 
+The feedback version of [[IParentedSearchRegisterRequest]]
+
 ## Hierarchy
 
 - [`IOwnedSearchFeedbackRequest`](base_remote_protocol.IOwnedSearchFeedbackRequest.md)
@@ -31,7 +33,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:639](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L639)
+[base/remote-protocol.ts:639](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L639)
 
 ___
 
@@ -49,7 +51,7 @@ something has been added
 
 #### Defined in
 
-[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L628)
+[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L628)
 
 ___
 
@@ -66,7 +68,7 @@ or item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L622)
+[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L622)
 
 ___
 
@@ -76,4 +78,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L67)
+[client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L67)

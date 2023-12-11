@@ -40,65 +40,65 @@ emulated searches within it
 
 ### CACHE\_NAME
 
-• **CACHE\_NAME**: ``"ITEMIZE_CACHE"``
+• `Const` **CACHE\_NAME**: ``"ITEMIZE_CACHE"``
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:260](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L260)
+[client/internal/workers/cache/cache.worker.class.ts:260](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L260)
 
 ___
 
 ### METADATA\_TABLE\_NAME
 
-• **METADATA\_TABLE\_NAME**: ``"metadata"``
+• `Const` **METADATA\_TABLE\_NAME**: ``"metadata"``
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:51](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L51)
+[client/internal/workers/cache/cache.worker.class.ts:51](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L51)
 
 ___
 
 ### POLYFILLED\_INDEXED\_DB
 
-• **POLYFILLED\_INDEXED\_DB**: `Object` = `{}`
+• `Const` **POLYFILLED\_INDEXED\_DB**: `Object` = `{}`
 
 #### Index signature
 
-▪ [storeName: `string`]: { [key: string]: `any`;  }
+▪ [storeName: `string`]: \{ `[key: string]`: `any`;  }
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:54](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L54)
+[client/internal/workers/cache/cache.worker.class.ts:54](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L54)
 
 ___
 
 ### QUERIES\_TABLE\_NAME
 
-• **QUERIES\_TABLE\_NAME**: ``"queries"``
+• `Const` **QUERIES\_TABLE\_NAME**: ``"queries"``
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:48](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L48)
+[client/internal/workers/cache/cache.worker.class.ts:48](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L48)
 
 ___
 
 ### SEARCHES\_TABLE\_NAME
 
-• **SEARCHES\_TABLE\_NAME**: ``"searches"``
+• `Const` **SEARCHES\_TABLE\_NAME**: ``"searches"``
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:49](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L49)
+[client/internal/workers/cache/cache.worker.class.ts:49](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L49)
 
 ___
 
 ### STATES\_TABLE\_NAME
 
-• **STATES\_TABLE\_NAME**: ``"states"``
+• `Const` **STATES\_TABLE\_NAME**: ``"states"``
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:50](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L50)
+[client/internal/workers/cache/cache.worker.class.ts:50](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L50)
 
 ## Functions
 
@@ -110,7 +110,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `partialValue` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) |
+| `partialValue` | [`IRQValue`](../interfaces/rq_querier.IRQValue.md) |
 | `itemDef` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) |
 | `property` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
@@ -121,7 +121,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:230](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L230)
+[client/internal/workers/cache/cache.worker.class.ts:230](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L230)
 
 ___
 
@@ -141,4 +141,4 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:28](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L28)
+[client/internal/workers/cache/cache.worker.class.ts:28](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L28)

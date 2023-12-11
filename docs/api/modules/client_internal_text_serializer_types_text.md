@@ -23,7 +23,7 @@ quite different things from the rich element itself
 
 ### STANDARD\_TEXT\_NODE
 
-▸ `Const` **STANDARD_TEXT_NODE**(`text?`): [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)
+▸ **STANDARD_TEXT_NODE**(`text?`): [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)
 
 Represents a standard text node as it should be given
 for a void text node
@@ -40,7 +40,7 @@ for a void text node
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/types/text.tsx#L19)
+[client/internal/text/serializer/types/text.tsx:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/types/text.tsx#L19)
 
 ___
 
@@ -63,4 +63,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:35](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/types/text.tsx#L35)
+[client/internal/text/serializer/types/text.tsx:35](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/types/text.tsx#L35)

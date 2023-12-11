@@ -46,7 +46,7 @@ react style object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:111](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L111)
+[client/internal/text/serializer/base.tsx:111](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L111)
 
 ___
 
@@ -69,7 +69,7 @@ and leaves all the ones that are not in common
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:1146](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L1146)
+[client/internal/text/serializer/base.tsx:1146](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L1146)
 
 ___
 
@@ -93,7 +93,7 @@ and whatnot that are shared in between all the rich elements
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:903](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L903)
+[client/internal/text/serializer/base.tsx:903](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L903)
 
 ___
 
@@ -111,9 +111,9 @@ form, basically converts the element into a react one
 | `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry that is currently in use |
 | `Tag` | `string` | the tag we are using for the component to render |
 | `baseClass` | `string` | the base class that should have |
-| `children` | ([`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md))[] | represents the children in the serialized form, as in RichElement or text nodes that it has as children and should be used, that is of course unless these children are overriden by other nodes |
+| `children` | ([`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement))[] | represents the children in the serialized form, as in RichElement or text nodes that it has as children and should be used, that is of course unless these children are overriden by other nodes |
 | `wrapChildren` | (`node`: `ReactNode`) => `ReactNode` | a function that is given so that you can return new children to wrap the current children, basically define your own children wrappage, for example, images and videos provide their own custom children nested structure |
-| `arg` | [`IReactifyArg`](../interfaces/client_internal_text_serializer.IReactifyArg.md)<[`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)\> | the reactification argument that is passed originally to the reactification function and provides the fine customization details as well as custom children in case and whether it should be a template or not |
+| `arg` | [`IReactifyArg`](../interfaces/client_internal_text_serializer.IReactifyArg.md)\<[`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement)\> | the reactification argument that is passed originally to the reactification function and provides the fine customization details as well as custom children in case and whether it should be a template or not |
 
 #### Returns
 
@@ -121,7 +121,7 @@ form, basically converts the element into a react one
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:432](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L432)
+[client/internal/text/serializer/base.tsx:432](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L432)
 
 ___
 
@@ -146,7 +146,7 @@ of a component to give value to a function
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:169](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L169)
+[client/internal/text/serializer/base.tsx:169](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L169)
 
 ___
 
@@ -172,7 +172,7 @@ including those that are meant to be mutating
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:212](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L212)
+[client/internal/text/serializer/base.tsx:212](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L212)
 
 ___
 
@@ -192,7 +192,7 @@ as a RichElement to a HTML element
 | `tag` | `string` | the tag to use to build this element |
 | `baseClass` | `string` | the base class to use, eg. image, container, etc... |
 | `attrs` | [`IAttrs`](../interfaces/client_internal_text_serializer_base.IAttrs.md) | the attributes to use |
-| `children` | ([`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md))[] | the children that also need to be serialized under it note that they need to be explictly set even if they are in the base |
+| `children` | ([`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement))[] | the children that also need to be serialized under it note that they need to be explictly set even if they are in the base |
 
 #### Returns
 
@@ -202,4 +202,4 @@ a html element
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:344](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L344)
+[client/internal/text/serializer/base.tsx:344](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L344)

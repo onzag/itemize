@@ -32,4 +32,4 @@ as well as allows to set active, hover and standard styles for the component
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/styles.tsx:332](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/drawer/styles.tsx#L332)
+[client/fast-prototyping/components/slate/drawer/styles.tsx:332](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/drawer/styles.tsx#L332)

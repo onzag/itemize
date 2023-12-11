@@ -32,13 +32,10 @@ the blur from happening
 - [children](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#children)
 - [currentLoadError](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#currentloaderror)
 - [disabled](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#disabled)
+- [dismissCurrentLoadError](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#dismisscurrentloaderror)
 - [featureSupport](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#featuresupport)
 - [helpers](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#helpers)
 - [state](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#state)
-
-### Methods
-
-- [dismissCurrentLoadError](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#dismisscurrentloaderror)
 
 ## Properties
 
@@ -53,7 +50,7 @@ where it is expected to be used
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L827)
+[client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L827)
 
 ___
 
@@ -69,7 +66,7 @@ indeed provide this as a prop for the render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:835](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L835)
+[client/fast-prototyping/components/slate/index.tsx:835](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L835)
 
 ___
 
@@ -81,7 +78,28 @@ Whether it is disabled
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L803)
+[client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L803)
+
+___
+
+### dismissCurrentLoadError
+
+• **dismissCurrentLoadError**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Dismiss the current load error follows the same logic
+as the currentLoadError
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:840](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L840)
 
 ___
 
@@ -95,7 +113,7 @@ and whatnot from it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L815)
+[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L815)
 
 ___
 
@@ -108,7 +126,7 @@ and modify nodes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L820)
+[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L820)
 
 ___
 
@@ -122,21 +140,4 @@ so it can get state information
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L809)
-
-## Methods
-
-### dismissCurrentLoadError
-
-▸ **dismissCurrentLoadError**(): `void`
-
-Dismiss the current load error follows the same logic
-as the currentLoadError
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:840](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L840)
+[client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L809)

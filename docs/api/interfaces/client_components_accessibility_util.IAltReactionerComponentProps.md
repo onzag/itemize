@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:23](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L23)
+[client/components/accessibility/util.tsx:23](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L23)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L25)
+[client/components/accessibility/util.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L25)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L20)
+[client/components/accessibility/util.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L20)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L26)
+[client/components/accessibility/util.tsx:26](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L26)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L22)
+[client/components/accessibility/util.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L22)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:21](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L21)
+[client/components/accessibility/util.tsx:21](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L21)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:27](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L27)
+[client/components/accessibility/util.tsx:27](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L27)
 
 ___
 
@@ -95,4 +95,4 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:24](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L24)
+[client/components/accessibility/util.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L24)

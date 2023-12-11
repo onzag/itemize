@@ -24,7 +24,7 @@ advanced stuff off itemize and one that should be simplified
 
 ## Hierarchy
 
-- `Component`<`ISlateEditorProps`, `ISlateEditorState`\>
+- `Component`\<`ISlateEditorProps`, `ISlateEditorState`\>
 
   ↳ **`SlateEditor`**
 
@@ -162,7 +162,7 @@ advanced stuff off itemize and one that should be simplified
 
 ### constructor
 
-• **new SlateEditor**(`props`)
+• **new SlateEditor**(`props`): [`SlateEditor`](client_fast_prototyping_components_slate.SlateEditor.md)
 
 Constructs a new instance of the slate editor component
 
@@ -172,13 +172,17 @@ Constructs a new instance of the slate editor component
 | :------ | :------ | :------ |
 | `props` | `ISlateEditorProps` | the props |
 
+#### Returns
+
+[`SlateEditor`](client_fast_prototyping_components_slate.SlateEditor.md)
+
 #### Overrides
 
-React.Component&lt;ISlateEditorProps, ISlateEditorState\&gt;.constructor
+React.Component\&lt;ISlateEditorProps, ISlateEditorState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1276](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1276)
+[client/fast-prototyping/components/slate/index.tsx:1276](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1276)
 
 ## Properties
 
@@ -198,7 +202,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -206,17 +212,17 @@ React.Component.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
 ### editableRef
 
-• `Private` **editableRef**: `RefObject`<`HTMLDivElement`\>
+• `Private` **editableRef**: `RefObject`\<`HTMLDivElement`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1140](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1140)
+[client/fast-prototyping/components/slate/index.tsx:1140](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1140)
 
 ___
 
@@ -229,7 +235,7 @@ using slate
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1115](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1115)
+[client/fast-prototyping/components/slate/index.tsx:1115](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1115)
 
 ___
 
@@ -239,7 +245,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1121](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1121)
+[client/fast-prototyping/components/slate/index.tsx:1121](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1121)
 
 ___
 
@@ -249,7 +255,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1138](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1138)
+[client/fast-prototyping/components/slate/index.tsx:1138](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1138)
 
 ___
 
@@ -269,7 +275,7 @@ recalculation not to reuse old anchors
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1134](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1134)
+[client/fast-prototyping/components/slate/index.tsx:1134](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1134)
 
 ___
 
@@ -279,7 +285,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1137](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1137)
+[client/fast-prototyping/components/slate/index.tsx:1137](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1137)
 
 ___
 
@@ -289,7 +295,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1136](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1136)
+[client/fast-prototyping/components/slate/index.tsx:1136](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1136)
 
 ___
 
@@ -299,13 +305,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1122](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1122)
+[client/fast-prototyping/components/slate/index.tsx:1122](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1122)
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<`ISlateEditorProps`\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<`ISlateEditorProps`\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -313,7 +319,7 @@ React.Component.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -321,8 +327,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -334,13 +341,13 @@ React.Component.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### state
 
-• **state**: `Readonly`<`ISlateEditorState`\>
+• **state**: `Readonly`\<`ISlateEditorState`\>
 
 #### Inherited from
 
@@ -348,7 +355,7 @@ React.Component.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
@@ -361,23 +368,23 @@ the user stops typing and not on every keystroke, because rich text is expensive
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1120](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1120)
+[client/fast-prototyping/components/slate/index.tsx:1120](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1120)
 
 ___
 
 ### wrapperRef
 
-• `Private` **wrapperRef**: `RefObject`<`any`\>
+• `Private` **wrapperRef**: `RefObject`\<`any`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1141](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1141)
+[client/fast-prototyping/components/slate/index.tsx:1141](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1141)
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -396,7 +403,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -404,13 +413,13 @@ React.Component.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -420,15 +429,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -436,13 +448,13 @@ React.Component.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -455,22 +467,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`ISlateEditorProps`\> |
+| `nextProps` | `Readonly`\<`ISlateEditorProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -478,13 +493,13 @@ React.Component.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -495,23 +510,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`ISlateEditorProps`\> |
-| `nextState` | `Readonly`<`ISlateEditorState`\> |
+| `nextProps` | `Readonly`\<`ISlateEditorProps`\> |
+| `nextState` | `Readonly`\<`ISlateEditorState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -519,13 +537,13 @@ React.Component.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
 ### \_getVideoSrcOriginAndStatus
 
-▸ `Private` **_getVideoSrcOriginAndStatus**(`url`): `Object`
+▸ **_getVideoSrcOriginAndStatus**(`url`): `Object`
 
 #### Parameters
 
@@ -545,7 +563,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4039](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4039)
+[client/fast-prototyping/components/slate/index.tsx:4039](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4039)
 
 ___
 
@@ -561,7 +579,7 @@ the render element function to be used in slate editor
 | :------ | :------ | :------ |
 | `props` | `RenderElementProps` | the properties that slate provides to render the component |
 | `isSelected` | `boolean` | - |
-| `selectionCriteria` | ``"block"`` \| ``"inline"`` \| ``"superblock"`` | - |
+| `selectionCriteria` | ``"inline"`` \| ``"block"`` \| ``"superblock"`` | - |
 | `isPrimary` | `boolean` | - |
 
 #### Returns
@@ -570,13 +588,13 @@ the render element function to be used in slate editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2735](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2735)
+[client/fast-prototyping/components/slate/index.tsx:2735](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2735)
 
 ___
 
 ### availableFilteringFunction
 
-▸ `Private` **availableFilteringFunction**(`feature`, `featureAll`, `featureList`, `i18nLocation`): `IAvailableElementCSSClassName`[]
+▸ **availableFilteringFunction**(`feature`, `featureAll`, `featureList`, `i18nLocation`): `IAvailableElementCSSClassName`[]
 
 This is a helper function that is used in order to extract the available
 classes that we have for usage within rich classes, container, and customs
@@ -599,7 +617,7 @@ of what we can actually use
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4742](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4742)
+[client/fast-prototyping/components/slate/index.tsx:4742](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4742)
 
 ___
 
@@ -618,7 +636,7 @@ list one
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2097](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2097)
+[client/fast-prototyping/components/slate/index.tsx:2097](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2097)
 
 ___
 
@@ -644,7 +662,7 @@ that are currently selected (or it will override with the defaults)
 
 | Name | Type |
 | :------ | :------ |
-| `allowsInsertElement` | (`element`: [`RichElement`](../modules/client_internal_text_serializer.md#richelement), `opts`: { `collapsed?`: `boolean` ; `extended?`: `boolean` ; `selected?`: `boolean`  }) => `boolean` |
+| `allowsInsertElement` | (`element`: [`RichElement`](../modules/client_internal_text_serializer.md#richelement), `opts`: \{ `collapsed?`: `boolean` ; `extended?`: `boolean` ; `selected?`: `boolean`  }) => `boolean` |
 | `allowsText` | `boolean` |
 | `blockIsVoid` | `boolean` |
 | `blockUIHandler` | [`ITemplateArgUIHandlerDefinition`](../interfaces/client_internal_text_serializer_template_args.ITemplateArgUIHandlerDefinition.md) |
@@ -679,7 +697,7 @@ that are currently selected (or it will override with the defaults)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2228](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2228)
+[client/fast-prototyping/components/slate/index.tsx:2228](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2228)
 
 ___
 
@@ -702,13 +720,13 @@ be toggled in the environment it is
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3860](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3860)
+[client/fast-prototyping/components/slate/index.tsx:3860](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3860)
 
 ___
 
 ### cloneElementAt
 
-▸ `Private` **cloneElementAt**(`fromPath`, `toPath`): `void`
+▸ **cloneElementAt**(`fromPath`, `toPath`): `void`
 
 #### Parameters
 
@@ -723,13 +741,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1801](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1801)
+[client/fast-prototyping/components/slate/index.tsx:1801](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1801)
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -751,19 +769,19 @@ React.Component.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
 ### componentDidMount
 
-▸ **componentDidMount**(): `Promise`<`void`\>
+▸ **componentDidMount**(): `Promise`\<`void`\>
 
 Basic old school component did mount
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Overrides
 
@@ -771,7 +789,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4801](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4801)
+[client/fast-prototyping/components/slate/index.tsx:4801](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4801)
 
 ___
 
@@ -783,8 +801,8 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<`ISlateEditorProps`\> |
-| `prevState` | `Readonly`<`ISlateEditorState`\> |
+| `prevProps` | `Readonly`\<`ISlateEditorProps`\> |
+| `prevState` | `Readonly`\<`ISlateEditorState`\> |
 | `snapshot?` | `any` |
 
 #### Returns
@@ -797,13 +815,13 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4826](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4826)
+[client/fast-prototyping/components/slate/index.tsx:4826](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4826)
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -811,15 +829,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -827,13 +848,13 @@ React.Component.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -844,22 +865,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`ISlateEditorProps`\> |
+| `nextProps` | `Readonly`\<`ISlateEditorProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -867,7 +891,7 @@ React.Component.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
@@ -888,13 +912,13 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4857](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4857)
+[client/fast-prototyping/components/slate/index.tsx:4857](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4857)
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -903,23 +927,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`ISlateEditorProps`\> |
-| `nextState` | `Readonly`<`ISlateEditorState`\> |
+| `nextProps` | `Readonly`\<`ISlateEditorProps`\> |
+| `nextState` | `Readonly`\<`ISlateEditorState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -927,7 +954,7 @@ React.Component.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
@@ -942,7 +969,7 @@ backwards event
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `unit` | ``"block"`` \| ``"character"`` \| ``"word"`` \| ``"line"`` | the unit we are dealing with |
+| `unit` | ``"word"`` \| ``"line"`` \| ``"block"`` \| ``"character"`` | the unit we are dealing with |
 
 #### Returns
 
@@ -950,7 +977,7 @@ backwards event
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2047](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2047)
+[client/fast-prototyping/components/slate/index.tsx:2047](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2047)
 
 ___
 
@@ -965,7 +992,7 @@ backwards event
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `unit` | ``"block"`` \| ``"character"`` \| ``"word"`` \| ``"line"`` | the unit we are dealing with |
+| `unit` | ``"word"`` \| ``"line"`` \| ``"block"`` \| ``"character"`` | the unit we are dealing with |
 
 #### Returns
 
@@ -973,13 +1000,13 @@ backwards event
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2024](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2024)
+[client/fast-prototyping/components/slate/index.tsx:2024](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2024)
 
 ___
 
 ### deleteNodeAt
 
-▸ `Private` **deleteNodeAt**(`path`): `void`
+▸ **deleteNodeAt**(`path`): `void`
 
 #### Parameters
 
@@ -993,7 +1020,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1764](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1764)
+[client/fast-prototyping/components/slate/index.tsx:1764](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1764)
 
 ___
 
@@ -1013,7 +1040,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3135](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3135)
+[client/fast-prototyping/components/slate/index.tsx:3135](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3135)
 
 ___
 
@@ -1030,7 +1057,7 @@ or one that has been manually selected using selectPath
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3241](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3241)
+[client/fast-prototyping/components/slate/index.tsx:3241](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3241)
 
 ___
 
@@ -1044,7 +1071,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3578](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3578)
+[client/fast-prototyping/components/slate/index.tsx:3578](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3578)
 
 ___
 
@@ -1058,13 +1085,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3837](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3837)
+[client/fast-prototyping/components/slate/index.tsx:3837](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3837)
 
 ___
 
 ### findAndAppendFilesToDataTransfer
 
-▸ **findAndAppendFilesToDataTransfer**(`data`, `element`): `Promise`<`any`\>
+▸ **findAndAppendFilesToDataTransfer**(`data`, `element`): `Promise`\<`any`\>
 
 Runs per each rich element that has just been copied to the clipboard
 
@@ -1077,17 +1104,17 @@ Runs per each rich element that has just been copied to the clipboard
 
 #### Returns
 
-`Promise`<`any`\>
+`Promise`\<`any`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1689](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1689)
+[client/fast-prototyping/components/slate/index.tsx:1689](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1689)
 
 ___
 
 ### findAndInsertFilesFromDataTransfer
 
-▸ **findAndInsertFilesFromDataTransfer**(`data`, `element`): `Promise`<[`RichElement`](../modules/client_internal_text_serializer.md#richelement)\>
+▸ **findAndInsertFilesFromDataTransfer**(`data`, `element`): `Promise`\<[`RichElement`](../modules/client_internal_text_serializer.md#richelement)\>
 
 This function runs and prepares the tree that is to be inserted into the
 pasted content
@@ -1101,11 +1128,11 @@ pasted content
 
 #### Returns
 
-`Promise`<[`RichElement`](../modules/client_internal_text_serializer.md#richelement)\>
+`Promise`\<[`RichElement`](../modules/client_internal_text_serializer.md#richelement)\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1459](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1459)
+[client/fast-prototyping/components/slate/index.tsx:1459](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1459)
 
 ___
 
@@ -1121,13 +1148,13 @@ A helper function to call react focus back into the editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3267](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3267)
+[client/fast-prototyping/components/slate/index.tsx:3267](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3267)
 
 ___
 
 ### focusAt
 
-▸ **focusAt**(`at`): `Promise`<`void`\>
+▸ **focusAt**(`at`): `Promise`\<`void`\>
 
 An async function that is a bit of a hack to focus at a given
 range, because of the way slate works it needs to be async
@@ -1140,13 +1167,13 @@ range, because of the way slate works it needs to be async
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise once it's done
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3279](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3279)
+[client/fast-prototyping/components/slate/index.tsx:3279](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3279)
 
 ___
 
@@ -1160,7 +1187,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:5013](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L5013)
+[client/fast-prototyping/components/slate/index.tsx:5013](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L5013)
 
 ___
 
@@ -1174,7 +1201,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4972](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4972)
+[client/fast-prototyping/components/slate/index.tsx:4972](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4972)
 
 ___
 
@@ -1198,7 +1225,7 @@ React.Component.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
@@ -1220,7 +1247,7 @@ Formats the current text as bold
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4690](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4690)
+[client/fast-prototyping/components/slate/index.tsx:4690](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4690)
 
 ___
 
@@ -1234,7 +1261,7 @@ Provides the context a given node is sitting in
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `n` | `Node` \| `Path` | the node in question |
+| `n` | `Path` \| `Node` | the node in question |
 | `level?` | ``"final"`` \| ``"select-context"`` \| ``"select-loop"`` | - |
 | `onlySwichingContext?` | `boolean` | provides the context only if it was set by the given node otherwise it will return null |
 
@@ -1244,13 +1271,13 @@ Provides the context a given node is sitting in
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2701](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2701)
+[client/fast-prototyping/components/slate/index.tsx:2701](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2701)
 
 ___
 
 ### getDataURI
 
-▸ **getDataURI**(`blob`): `Promise`<`string`\>
+▸ **getDataURI**(`blob`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -1260,11 +1287,11 @@ ___
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1665](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1665)
+[client/fast-prototyping/components/slate/index.tsx:1665](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1665)
 
 ___
 
@@ -1280,7 +1307,7 @@ Provides a fallback for insert when no insert region is found
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3302](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3302)
+[client/fast-prototyping/components/slate/index.tsx:3302](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3302)
 
 ___
 
@@ -1297,7 +1324,7 @@ to know what it can and can't do
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4946](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4946)
+[client/fast-prototyping/components/slate/index.tsx:4946](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4946)
 
 ___
 
@@ -1314,13 +1341,13 @@ to construct rich text data
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4871](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4871)
+[client/fast-prototyping/components/slate/index.tsx:4871](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4871)
 
 ___
 
 ### getNodeAt
 
-▸ `Private` **getNodeAt**(`path`): [`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)
+▸ **getNodeAt**(`path`): [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](../modules/client_internal_text_serializer.md#richelement)
 
 #### Parameters
 
@@ -1330,11 +1357,11 @@ ___
 
 #### Returns
 
-[`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)
+[`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](../modules/client_internal_text_serializer.md#richelement)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1798](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1798)
+[client/fast-prototyping/components/slate/index.tsx:1798](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1798)
 
 ___
 
@@ -1348,7 +1375,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3229](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3229)
+[client/fast-prototyping/components/slate/index.tsx:3229](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3229)
 
 ___
 
@@ -1362,7 +1389,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3233](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3233)
+[client/fast-prototyping/components/slate/index.tsx:3233](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3233)
 
 ___
 
@@ -1376,13 +1403,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2718](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2718)
+[client/fast-prototyping/components/slate/index.tsx:2718](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2718)
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -1395,8 +1422,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<`ISlateEditorProps`\> |
-| `prevState` | `Readonly`<`ISlateEditorState`\> |
+| `prevProps` | `Readonly`\<`ISlateEditorProps`\> |
+| `prevState` | `Readonly`\<`ISlateEditorState`\> |
 
 #### Returns
 
@@ -1408,21 +1435,21 @@ React.Component.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
 ### getState
 
-▸ **getState**(): `Readonly`<`ISlateEditorState`\>
+▸ **getState**(): `Readonly`\<`ISlateEditorState`\>
 
 #### Returns
 
-`Readonly`<`ISlateEditorState`\>
+`Readonly`\<`ISlateEditorState`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4849](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4849)
+[client/fast-prototyping/components/slate/index.tsx:4849](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4849)
 
 ___
 
@@ -1438,7 +1465,7 @@ Performs a hard blur event and the paths are cleared out
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3091](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3091)
+[client/fast-prototyping/components/slate/index.tsx:3091](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3091)
 
 ___
 
@@ -1454,13 +1481,13 @@ Override for the default editor insert break function
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1914](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1914)
+[client/fast-prototyping/components/slate/index.tsx:1914](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1914)
 
 ___
 
 ### insertContainer
 
-▸ **insertContainer**(`type?`): `Promise`<`void`\>
+▸ **insertContainer**(`type?`): `Promise`\<`void`\>
 
 Will insert a container at the given location
 
@@ -1472,17 +1499,17 @@ Will insert a container at the given location
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4234](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4234)
+[client/fast-prototyping/components/slate/index.tsx:4234](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4234)
 
 ___
 
 ### insertCustom
 
-▸ **insertCustom**(`type`): `Promise`<`void`\>
+▸ **insertCustom**(`type`): `Promise`\<`void`\>
 
 Inserts a custom element
 
@@ -1494,17 +1521,17 @@ Inserts a custom element
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4270](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4270)
+[client/fast-prototyping/components/slate/index.tsx:4270](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4270)
 
 ___
 
 ### insertData
 
-▸ **insertData**(`data`): `Promise`<`void`\>
+▸ **insertData**(`data`): `Promise`\<`void`\>
 
 This function runs when we are inserting using the slate clipboard
 
@@ -1516,11 +1543,11 @@ This function runs when we are inserting using the slate clipboard
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1581](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1581)
+[client/fast-prototyping/components/slate/index.tsx:1581](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1581)
 
 ___
 
@@ -1542,13 +1569,13 @@ Inserts an element at a given position
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4644](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4644)
+[client/fast-prototyping/components/slate/index.tsx:4644](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4644)
 
 ___
 
 ### insertFile
 
-▸ **insertFile**(`file`): `Promise`<`void`\>
+▸ **insertFile**(`file`): `Promise`\<`void`\>
 
 Will insert a file based on the information given it uses
 the standard on insert file function in order to perfom it
@@ -1561,17 +1588,17 @@ the standard on insert file function in order to perfom it
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4186](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4186)
+[client/fast-prototyping/components/slate/index.tsx:4186](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4186)
 
 ___
 
 ### insertImage
 
-▸ **insertImage**(`file`, `standalone`): `Promise`<`void`\>
+▸ **insertImage**(`file`, `standalone`): `Promise`\<`void`\>
 
 Will insert an image based on a given file that has
 been taken as an input
@@ -1590,19 +1617,19 @@ returns a void promise
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise once it's done
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3331](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3331)
+[client/fast-prototyping/components/slate/index.tsx:3331](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3331)
 
 ___
 
 ### insertList
 
-▸ **insertList**(`type`): `Promise`<`void`\>
+▸ **insertList**(`type`): `Promise`\<`void`\>
 
 Makes a list out of the current element
 
@@ -1610,28 +1637,28 @@ Makes a list out of the current element
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `type` | ``"bulleted"`` \| ``"numbered"`` | the type of the list that is to be toggled, either bulleted or number |
+| `type` | ``"numbered"`` \| ``"bulleted"`` | the type of the list that is to be toggled, either bulleted or number |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4368](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4368)
+[client/fast-prototyping/components/slate/index.tsx:4368](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4368)
 
 ___
 
 ### insertNodeAt
 
-▸ `Private` **insertNodeAt**(`path`, `node`, `targetIndex`): `void`
+▸ **insertNodeAt**(`path`, `node`, `targetIndex`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `path` | `Path` |
-| `node` | [`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](../modules/client_internal_text_serializer.md#richelement) |
 | `targetIndex` | `number` |
 
 #### Returns
@@ -1640,7 +1667,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1769](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1769)
+[client/fast-prototyping/components/slate/index.tsx:1769](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1769)
 
 ___
 
@@ -1665,7 +1692,7 @@ alt+enter in order to escape the superblock
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2133](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2133)
+[client/fast-prototyping/components/slate/index.tsx:2133](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2133)
 
 ___
 
@@ -1687,7 +1714,7 @@ Inserts a table at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3464](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3464)
+[client/fast-prototyping/components/slate/index.tsx:3464](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3464)
 
 ___
 
@@ -1701,7 +1728,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3497](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3497)
+[client/fast-prototyping/components/slate/index.tsx:3497](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3497)
 
 ___
 
@@ -1715,7 +1742,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3625](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3625)
+[client/fast-prototyping/components/slate/index.tsx:3625](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3625)
 
 ___
 
@@ -1739,7 +1766,7 @@ to template text, except it uses html content instead to replace the inner html
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3434](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3434)
+[client/fast-prototyping/components/slate/index.tsx:3434](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3434)
 
 ___
 
@@ -1764,7 +1791,7 @@ a void promise
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3391](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3391)
+[client/fast-prototyping/components/slate/index.tsx:3391](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3391)
 
 ___
 
@@ -1788,7 +1815,7 @@ a boolean on whether it succeeded
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4146](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4146)
+[client/fast-prototyping/components/slate/index.tsx:4146](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4146)
 
 ___
 
@@ -1812,7 +1839,7 @@ a boolean on whether it represents an inline element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1898](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1898)
+[client/fast-prototyping/components/slate/index.tsx:1898](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1898)
 
 ___
 
@@ -1836,13 +1863,13 @@ a boolean on whether it represents a void element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1907](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1907)
+[client/fast-prototyping/components/slate/index.tsx:1907](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1907)
 
 ___
 
 ### mergeNodesAt
 
-▸ `Private` **mergeNodesAt**(`basePath`, `referencePath`): `void`
+▸ **mergeNodesAt**(`basePath`, `referencePath`): `void`
 
 #### Parameters
 
@@ -1857,13 +1884,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1774](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1774)
+[client/fast-prototyping/components/slate/index.tsx:1774](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1774)
 
 ___
 
 ### moveNodeAt
 
-▸ `Private` **moveNodeAt**(`fromPath`, `toPath`): `void`
+▸ **moveNodeAt**(`fromPath`, `toPath`): `void`
 
 #### Parameters
 
@@ -1878,7 +1905,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1812](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1812)
+[client/fast-prototyping/components/slate/index.tsx:1812](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1812)
 
 ___
 
@@ -1901,7 +1928,7 @@ Allows to move between two paths as it moves elements to one place to another
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3182](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3182)
+[client/fast-prototyping/components/slate/index.tsx:3182](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3182)
 
 ___
 
@@ -1916,7 +1943,7 @@ of the standard editor
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `entry` | `NodeEntry`<`Node`\> | the entry we are normalizing |
+| `entry` | `NodeEntry`\<`Node`\> | the entry we are normalizing |
 
 #### Returns
 
@@ -1924,7 +1951,7 @@ of the standard editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1824](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1824)
+[client/fast-prototyping/components/slate/index.tsx:1824](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1824)
 
 ___
 
@@ -1946,7 +1973,7 @@ Triggers on an on change whent he field is blurred
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2542](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2542)
+[client/fast-prototyping/components/slate/index.tsx:2542](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2542)
 
 ___
 
@@ -1969,7 +1996,7 @@ this function hits every time on every change of the rich text
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3060](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3060)
+[client/fast-prototyping/components/slate/index.tsx:3060](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3060)
 
 ___
 
@@ -1993,7 +2020,7 @@ and has changed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2520](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2520)
+[client/fast-prototyping/components/slate/index.tsx:2520](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2520)
 
 ___
 
@@ -2007,7 +2034,7 @@ Triggers on the keydown of the slate editor itself
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `e` | `KeyboardEvent`<`Element`\> | the event |
+| `e` | `KeyboardEvent`\<`Element`\> | the event |
 
 #### Returns
 
@@ -2015,7 +2042,7 @@ Triggers on the keydown of the slate editor itself
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4787](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4787)
+[client/fast-prototyping/components/slate/index.tsx:4787](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4787)
 
 ___
 
@@ -2035,7 +2062,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:5026](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L5026)
+[client/fast-prototyping/components/slate/index.tsx:5026](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L5026)
 
 ___
 
@@ -2055,7 +2082,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2722](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2722)
+[client/fast-prototyping/components/slate/index.tsx:2722](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2722)
 
 ___
 
@@ -2077,7 +2104,7 @@ the function that is called by slate to render text
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3035](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3035)
+[client/fast-prototyping/components/slate/index.tsx:3035](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3035)
 
 ___
 
@@ -2100,7 +2127,7 @@ this allows such a path to be selected and be marked into the selection
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3163](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3163)
+[client/fast-prototyping/components/slate/index.tsx:3163](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3163)
 
 ___
 
@@ -2121,7 +2148,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3117](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3117)
+[client/fast-prototyping/components/slate/index.tsx:3117](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3117)
 
 ___
 
@@ -2145,7 +2172,7 @@ at the given path
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4510](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4510)
+[client/fast-prototyping/components/slate/index.tsx:4510](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4510)
 
 ___
 
@@ -2173,7 +2200,7 @@ key is not understood properly, keys should be valid
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4584](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4584)
+[client/fast-prototyping/components/slate/index.tsx:4584](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4584)
 
 ___
 
@@ -2196,7 +2223,7 @@ Sets the active style for the element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4550](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4550)
+[client/fast-prototyping/components/slate/index.tsx:4550](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4550)
 
 ___
 
@@ -2219,7 +2246,7 @@ Sets the context key
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4658](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4658)
+[client/fast-prototyping/components/slate/index.tsx:4658](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4658)
 
 ___
 
@@ -2242,13 +2269,13 @@ Sets the for-each loop key
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4681](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4681)
+[client/fast-prototyping/components/slate/index.tsx:4681](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4681)
 
 ___
 
 ### setFragmentData
 
-▸ **setFragmentData**(`data`): `Promise`<`void`\>
+▸ **setFragmentData**(`data`): `Promise`\<`void`\>
 
 This function runs when we are preparing the slate clipboard
 
@@ -2260,11 +2287,11 @@ This function runs when we are preparing the slate clipboard
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1726](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1726)
+[client/fast-prototyping/components/slate/index.tsx:1726](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1726)
 
 ___
 
@@ -2287,7 +2314,7 @@ Sets the template hover style for the element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4536](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4536)
+[client/fast-prototyping/components/slate/index.tsx:4536](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4536)
 
 ___
 
@@ -2310,7 +2337,7 @@ Sets the context key
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4669](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4669)
+[client/fast-prototyping/components/slate/index.tsx:4669](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4669)
 
 ___
 
@@ -2333,13 +2360,13 @@ Sets the rich classes of the element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4564](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4564)
+[client/fast-prototyping/components/slate/index.tsx:4564](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4564)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -2351,7 +2378,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `ISlateEditorState` \| (`prevState`: `Readonly`<`ISlateEditorState`\>, `props`: `Readonly`<`ISlateEditorProps`\>) => `ISlateEditorState` \| `Pick`<`ISlateEditorState`, `K`\> \| `Pick`<`ISlateEditorState`, `K`\> |
+| `state` | `ISlateEditorState` \| (`prevState`: `Readonly`\<`ISlateEditorState`\>, `props`: `Readonly`\<`ISlateEditorProps`\>) => `ISlateEditorState` \| `Pick`\<`ISlateEditorState`, `K`\> \| `Pick`\<`ISlateEditorState`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -2364,7 +2391,7 @@ React.Component.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
@@ -2387,7 +2414,7 @@ Sets the current style for the element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4522](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4522)
+[client/fast-prototyping/components/slate/index.tsx:4522](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4522)
 
 ___
 
@@ -2416,7 +2443,7 @@ ui handled component
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4605](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4605)
+[client/fast-prototyping/components/slate/index.tsx:4605](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4605)
 
 ___
 
@@ -2440,7 +2467,7 @@ Sets ui handler args to a given element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4621](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4621)
+[client/fast-prototyping/components/slate/index.tsx:4621](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4621)
 
 ___
 
@@ -2462,7 +2489,7 @@ Sets the value off the rich text
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2630](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2630)
+[client/fast-prototyping/components/slate/index.tsx:2630](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2630)
 
 ___
 
@@ -2489,7 +2516,7 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:2586](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L2586)
+[client/fast-prototyping/components/slate/index.tsx:2586](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L2586)
 
 ___
 
@@ -2505,13 +2532,13 @@ Performs a soft blur event
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3130](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3130)
+[client/fast-prototyping/components/slate/index.tsx:3130](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3130)
 
 ___
 
 ### splitElementAndEscapeChildIntoParentAt
 
-▸ `Private` **splitElementAndEscapeChildIntoParentAt**(`path`, `escapingChildIndex`): `void`
+▸ **splitElementAndEscapeChildIntoParentAt**(`path`, `escapingChildIndex`): `void`
 
 #### Parameters
 
@@ -2526,7 +2553,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1786](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1786)
+[client/fast-prototyping/components/slate/index.tsx:1786](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1786)
 
 ___
 
@@ -2551,23 +2578,23 @@ a boolean if the link was valid and toggleLink
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4440](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4440)
+[client/fast-prototyping/components/slate/index.tsx:4440](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4440)
 
 ___
 
 ### toggleQuote
 
-▸ **toggleQuote**(): `Promise`<`void`\>
+▸ **toggleQuote**(): `Promise`\<`void`\>
 
 Makes a quote out of the current element
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4305](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4305)
+[client/fast-prototyping/components/slate/index.tsx:4305](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4305)
 
 ___
 
@@ -2590,13 +2617,13 @@ is selected, aka the first row
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3927](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3927)
+[client/fast-prototyping/components/slate/index.tsx:3927](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3927)
 
 ___
 
 ### toggleTitle
 
-▸ **toggleTitle**(`type`): `Promise`<`void`\>
+▸ **toggleTitle**(`type`): `Promise`\<`void`\>
 
 Makes a title out of the current element
 
@@ -2608,11 +2635,11 @@ Makes a title out of the current element
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4336](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4336)
+[client/fast-prototyping/components/slate/index.tsx:4336](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4336)
 
 ___
 
@@ -2633,20 +2660,20 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4391](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4391)
+[client/fast-prototyping/components/slate/index.tsx:4391](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4391)
 
 ___
 
 ### updateNodeAt
 
-▸ `Private` **updateNodeAt**(`path`, `v`): `void`
+▸ **updateNodeAt**(`path`, `v`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `path` | `Path` |
-| `v` | `Partial`<[`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)\> |
+| `v` | `Partial`\<[`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](../modules/client_internal_text_serializer.md#richelement)\> |
 
 #### Returns
 
@@ -2654,7 +2681,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1759](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1759)
+[client/fast-prototyping/components/slate/index.tsx:1759](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1759)
 
 ___
 
@@ -2675,7 +2702,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3415](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3415)
+[client/fast-prototyping/components/slate/index.tsx:3415](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3415)
 
 ___
 
@@ -2696,7 +2723,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:3372](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L3372)
+[client/fast-prototyping/components/slate/index.tsx:3372](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L3372)
 
 ___
 
@@ -2716,13 +2743,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:4121](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L4121)
+[client/fast-prototyping/components/slate/index.tsx:4121](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L4121)
 
 ___
 
 ### wrapNodeAt
 
-▸ `Private` **wrapNodeAt**(`path`, `wrappers`): `void`
+▸ **wrapNodeAt**(`path`, `wrappers`): `void`
 
 #### Parameters
 
@@ -2737,13 +2764,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1791](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1791)
+[client/fast-prototyping/components/slate/index.tsx:1791](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1791)
 
 ___
 
 ### getDerivedStateFromProps
 
-▸ `Static` **getDerivedStateFromProps**(`props`, `state`): `Partial`<`ISlateEditorState`\>
+▸ **getDerivedStateFromProps**(`props`, `state`): `Partial`\<`ISlateEditorState`\>
 
 The standard derived state function is used in order to set the state in an effective way
 it is used because the behaviour of this editor is rather complex
@@ -2757,10 +2784,10 @@ it is used because the behaviour of this editor is rather complex
 
 #### Returns
 
-`Partial`<`ISlateEditorState`\>
+`Partial`\<`ISlateEditorState`\>
 
 a partial of the new state or null
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1150](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L1150)
+[client/fast-prototyping/components/slate/index.tsx:1150](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L1150)

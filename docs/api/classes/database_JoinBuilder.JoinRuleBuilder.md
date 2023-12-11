@@ -46,7 +46,7 @@ Represents the join rule basically the real LEFT JOIN, RIGHT  JOIN, INNER JOIN a
 
 ### constructor
 
-• **new JoinRuleBuilder**(`parent?`, `type`)
+• **new JoinRuleBuilder**(`parent?`, `type`): [`JoinRuleBuilder`](database_JoinBuilder.JoinRuleBuilder.md)
 
 Build a new conditional builder
 
@@ -57,13 +57,17 @@ Build a new conditional builder
 | `parent` | [`ConditionalBuilder`](database_base.ConditionalBuilder.md) | `null` | the parent of it |
 | `type` | `string` | `undefined` | the type, WHERE, ON, etc... it will be used |
 
+#### Returns
+
+[`JoinRuleBuilder`](database_JoinBuilder.JoinRuleBuilder.md)
+
 #### Inherited from
 
 [ConditionalBuilder](database_base.ConditionalBuilder.md).[constructor](database_base.ConditionalBuilder.md#constructor)
 
 #### Defined in
 
-[database/base.ts:248](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L248)
+[database/base.ts:248](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L248)
 
 ## Properties
 
@@ -80,7 +84,7 @@ you fancy
 
 #### Defined in
 
-[database/base.ts:241](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L241)
+[database/base.ts:241](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L241)
 
 ## Methods
 
@@ -106,7 +110,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
 
 ___
 
@@ -132,7 +136,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
 
 ___
 
@@ -154,7 +158,7 @@ itself
 
 #### Defined in
 
-[database/base.ts:352](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L352)
+[database/base.ts:352](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L352)
 
 ___
 
@@ -174,7 +178,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
 
 ___
 
@@ -196,7 +200,7 @@ a string that represents the condition
 
 #### Defined in
 
-[database/base.ts:362](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L362)
+[database/base.ts:362](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L362)
 
 ___
 
@@ -212,7 +216,7 @@ Makes a new condition based on an expression or a subrule function
 | :------ | :------ | :------ |
 | `gate` | ``"AND"`` \| ``"OR"`` | the gate to use |
 | `prefix` | `string` | an optional prefix to the rule, if none, make it null |
-| `rule` | `string` \| [`QueryBuilder`](database_base.QueryBuilder.md) \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<`any`\> | either the expression itself or a subcondition |
+| `rule` | `string` \| [`QueryBuilder`](database_base.QueryBuilder.md) \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<`any`\> | either the expression itself or a subcondition |
 | `bindings?` | [`BasicBindingType`](../modules/database_base.md#basicbindingtype)[] | the bindings for the expression, will not be used if using a subcondition |
 
 #### Returns
@@ -227,7 +231,7 @@ itself
 
 #### Defined in
 
-[database/base.ts:291](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L291)
+[database/base.ts:291](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L291)
 
 ___
 
@@ -250,7 +254,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
 
 ___
 
@@ -271,7 +275,7 @@ whatsoever
 
 #### Defined in
 
-[database/base.ts:259](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L259)
+[database/base.ts:259](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L259)
 
 ___
 
@@ -285,7 +289,7 @@ Specifies a rule where the conditiuon applies this is an AND rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`JoinRuleBuilder`](database_JoinBuilder.JoinRuleBuilder.md)\> | the rule to join with |
+| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`JoinRuleBuilder`](database_JoinBuilder.JoinRuleBuilder.md)\> | the rule to join with |
 | `bindings?` | (`string` \| `number`)[] | the bindings for the expression |
 
 #### Returns
@@ -296,7 +300,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:27](https://github.com/onzag/itemize/blob/a24376ed/database/JoinBuilder.ts#L27)
+[database/JoinBuilder.ts:27](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L27)
 
 ___
 
@@ -321,7 +325,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:47](https://github.com/onzag/itemize/blob/a24376ed/database/JoinBuilder.ts#L47)
+[database/JoinBuilder.ts:47](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L47)
 
 ___
 
@@ -335,7 +339,7 @@ Specifies a rule where the conditiuon applies this is an OR rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`JoinRuleBuilder`](database_JoinBuilder.JoinRuleBuilder.md)\> | the rule to join with |
+| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`JoinRuleBuilder`](database_JoinBuilder.JoinRuleBuilder.md)\> | the rule to join with |
 | `bindings?` | (`string` \| `number`)[] | the bindings for the expression |
 
 #### Returns
@@ -346,7 +350,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:37](https://github.com/onzag/itemize/blob/a24376ed/database/JoinBuilder.ts#L37)
+[database/JoinBuilder.ts:37](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L37)
 
 ___
 
@@ -371,7 +375,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:57](https://github.com/onzag/itemize/blob/a24376ed/database/JoinBuilder.ts#L57)
+[database/JoinBuilder.ts:57](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L57)
 
 ___
 
@@ -391,7 +395,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
 
 ___
 
@@ -418,7 +422,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
 
 ___
 
@@ -445,7 +449,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
 
 ___
 
@@ -465,7 +469,7 @@ Specifies how to subcondition this conditional builder
 
 #### Defined in
 
-[database/JoinBuilder.ts:16](https://github.com/onzag/itemize/blob/a24376ed/database/JoinBuilder.ts#L16)
+[database/JoinBuilder.ts:16](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L16)
 
 ___
 
@@ -487,4 +491,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)

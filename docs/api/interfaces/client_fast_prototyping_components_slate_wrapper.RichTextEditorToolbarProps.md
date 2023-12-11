@@ -20,10 +20,12 @@ the state of the wrapper or other functions
 
 - [children](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#children)
 - [currentLoadError](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#currentloaderror)
+- [customExtraChildren](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#customextrachildren)
 - [customToolbar](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#customtoolbar)
 - [disabled](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#disabled)
 - [disjointedMode](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#disjointedmode)
 - [disjointedModeKeepToolbar](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#disjointedmodekeeptoolbar)
+- [dismissCurrentLoadError](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#dismisscurrentloaderror)
 - [drawerExtras](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#drawerextras)
 - [drawerOpen](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#draweropen)
 - [featureSupport](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#featuresupport)
@@ -32,11 +34,17 @@ the state of the wrapper or other functions
 - [i18nGenericError](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#i18ngenericerror)
 - [i18nOk](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#i18nok)
 - [i18nRichInfo](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#i18nrichinfo)
+- [onHeightChange](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#onheightchange)
 - [reactionerDisabled](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#reactionerdisabled)
 - [reactionerKey](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#reactionerkey)
 - [reactionerPriority](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#reactionerpriority)
 - [reactionerUseInFlow](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#reactioneruseinflow)
+- [requestFile](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#requestfile)
+- [requestImage](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#requestimage)
+- [setToolbarState](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#settoolbarstate)
+- [shouldHaveDrawer](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#shouldhavedrawer)
 - [state](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#state)
+- [toggleDrawer](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#toggledrawer)
 - [toolbarClassName](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#toolbarclassname)
 - [toolbarExtras](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#toolbarextras)
 - [toolbarHeight](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#toolbarheight)
@@ -47,17 +55,6 @@ the state of the wrapper or other functions
 - [wrapperSx](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#wrappersx)
 - [wrapperTextEditorClassName](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#wrappertexteditorclassname)
 - [wrapperTextEditorSx](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#wrappertexteditorsx)
-
-### Methods
-
-- [customExtraChildren](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#customextrachildren)
-- [dismissCurrentLoadError](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#dismisscurrentloaderror)
-- [onHeightChange](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#onheightchange)
-- [requestFile](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#requestfile)
-- [requestImage](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#requestimage)
-- [setToolbarState](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#settoolbarstate)
-- [shouldHaveDrawer](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#shouldhavedrawer)
-- [toggleDrawer](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md#toggledrawer)
 
 ## Properties
 
@@ -76,7 +73,7 @@ where it is expected to be used
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L827)
+[client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L827)
 
 ___
 
@@ -96,7 +93,38 @@ indeed provide this as a prop for the render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:835](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L835)
+[client/fast-prototyping/components/slate/index.tsx:835](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L835)
+
+___
+
+### customExtraChildren
+
+• `Optional` **customExtraChildren**: (`characterCount`: `number`, `wordCount`: `number`) => `ReactNode`
+
+#### Type declaration
+
+▸ (`characterCount`, `wordCount`): `ReactNode`
+
+A function to define custom extra children
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `characterCount` | `number` |
+| `wordCount` | `number` |
+
+##### Returns
+
+`ReactNode`
+
+#### Inherited from
+
+[IMaterialUISlateWrapperProps](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md).[customExtraChildren](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#customextrachildren)
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:485](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L485)
 
 ___
 
@@ -112,7 +140,7 @@ Function to be used to specify a whole custom toolbar down to the very basics
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:452](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L452)
+[client/fast-prototyping/components/slate/wrapper.tsx:452](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L452)
 
 ___
 
@@ -128,7 +156,7 @@ Whether it is disabled
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L803)
+[client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L803)
 
 ___
 
@@ -144,7 +172,7 @@ The disjointed mode
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:464](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L464)
+[client/fast-prototyping/components/slate/wrapper.tsx:464](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L464)
 
 ___
 
@@ -158,7 +186,32 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:465](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L465)
+[client/fast-prototyping/components/slate/wrapper.tsx:465](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L465)
+
+___
+
+### dismissCurrentLoadError
+
+• **dismissCurrentLoadError**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Dismiss the current load error follows the same logic
+as the currentLoadError
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[IMaterialUISlateWrapperProps](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md).[dismissCurrentLoadError](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#dismisscurrentloaderror)
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:840](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L840)
 
 ___
 
@@ -174,7 +227,7 @@ Drawer extras for the ui handled types
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:456](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L456)
+[client/fast-prototyping/components/slate/wrapper.tsx:456](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L456)
 
 ___
 
@@ -187,7 +240,7 @@ a lot of functionality to edit the currently selected element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:506](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L506)
+[client/fast-prototyping/components/slate/wrapper.tsx:506](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L506)
 
 ___
 
@@ -205,7 +258,7 @@ and whatnot from it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L815)
+[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L815)
 
 ___
 
@@ -222,7 +275,7 @@ and modify nodes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L820)
+[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L820)
 
 ___
 
@@ -238,7 +291,7 @@ Whether to hide the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:460](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L460)
+[client/fast-prototyping/components/slate/wrapper.tsx:460](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L460)
 
 ___
 
@@ -254,7 +307,7 @@ A generic error message
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:435](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L435)
+[client/fast-prototyping/components/slate/wrapper.tsx:435](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L435)
 
 ___
 
@@ -270,7 +323,7 @@ A generic ok
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:439](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L439)
+[client/fast-prototyping/components/slate/wrapper.tsx:439](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L439)
 
 ___
 
@@ -286,7 +339,33 @@ The whole of the i18n rich information that is given by default
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:443](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L443)
+[client/fast-prototyping/components/slate/wrapper.tsx:443](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L443)
+
+___
+
+### onHeightChange
+
+• **onHeightChange**: (`newHeight`: `number`) => `void`
+
+#### Type declaration
+
+▸ (`newHeight`): `void`
+
+Called when the height changes
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `newHeight` | `number` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:553](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L553)
 
 ___
 
@@ -300,7 +379,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:492](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L492)
+[client/fast-prototyping/components/slate/wrapper.tsx:492](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L492)
 
 ___
 
@@ -314,7 +393,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:491](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L491)
+[client/fast-prototyping/components/slate/wrapper.tsx:491](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L491)
 
 ___
 
@@ -330,7 +409,7 @@ For generating an alt badge reactioner
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:490](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L490)
+[client/fast-prototyping/components/slate/wrapper.tsx:490](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L490)
 
 ___
 
@@ -344,7 +423,96 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:493](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L493)
+[client/fast-prototyping/components/slate/wrapper.tsx:493](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L493)
+
+___
+
+### requestFile
+
+• **requestFile**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Call to request a file, opens a dialog so requires a state
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:531](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L531)
+
+___
+
+### requestImage
+
+• **requestImage**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+call to request an image, opens a dialog so requires a state
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:526](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L526)
+
+___
+
+### setToolbarState
+
+• **setToolbarState**: (`state`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`state`): `void`
+
+sets the toolbar state
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `state` | `string` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:536](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L536)
+
+___
+
+### shouldHaveDrawer
+
+• **shouldHaveDrawer**: () => `boolean`
+
+#### Type declaration
+
+▸ (): `boolean`
+
+A function that specifies whether the drawer should
+exist
+
+##### Returns
+
+`boolean`
+
+a boolean as the answer
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:543](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L543)
 
 ___
 
@@ -360,7 +528,27 @@ The current state
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:511](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L511)
+[client/fast-prototyping/components/slate/wrapper.tsx:511](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L511)
+
+___
+
+### toggleDrawer
+
+• **toggleDrawer**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Toggle the drawer open or close
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:548](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L548)
 
 ___
 
@@ -376,7 +564,7 @@ Add a class name to the toolbar in the wrapper
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:480](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L480)
+[client/fast-prototyping/components/slate/wrapper.tsx:480](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L480)
 
 ___
 
@@ -393,7 +581,7 @@ to be used either by ui handled components and whatnot
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:448](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L448)
+[client/fast-prototyping/components/slate/wrapper.tsx:448](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L448)
 
 ___
 
@@ -405,7 +593,7 @@ The toolbar height
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:521](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L521)
+[client/fast-prototyping/components/slate/wrapper.tsx:521](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L521)
 
 ___
 
@@ -417,13 +605,13 @@ A custom toolbar state
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:516](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L516)
+[client/fast-prototyping/components/slate/wrapper.tsx:516](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L516)
 
 ___
 
 ### toolbarSx
 
-• `Optional` **toolbarSx**: `SxProps`<{}\>
+• `Optional` **toolbarSx**: `SxProps`\<{}\>
 
 #### Inherited from
 
@@ -431,7 +619,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:481](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L481)
+[client/fast-prototyping/components/slate/wrapper.tsx:481](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L481)
 
 ___
 
@@ -447,7 +635,7 @@ The wrapper variant
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:431](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L431)
+[client/fast-prototyping/components/slate/wrapper.tsx:431](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L431)
 
 ___
 
@@ -463,13 +651,13 @@ Add a class name to the entire wrapper
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:469](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L469)
+[client/fast-prototyping/components/slate/wrapper.tsx:469](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L469)
 
 ___
 
 ### wrapperSx
 
-• `Optional` **wrapperSx**: `SxProps`<{}\>
+• `Optional` **wrapperSx**: `SxProps`\<{}\>
 
 #### Inherited from
 
@@ -477,7 +665,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:470](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L470)
+[client/fast-prototyping/components/slate/wrapper.tsx:470](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L470)
 
 ___
 
@@ -493,13 +681,13 @@ Add a class name to the container in the wrapper
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:474](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L474)
+[client/fast-prototyping/components/slate/wrapper.tsx:474](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L474)
 
 ___
 
 ### wrapperTextEditorSx
 
-• `Optional` **wrapperTextEditorSx**: `SxProps`<{}\>
+• `Optional` **wrapperTextEditorSx**: `SxProps`\<{}\>
 
 #### Inherited from
 
@@ -507,163 +695,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:475](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L475)
-
-## Methods
-
-### customExtraChildren
-
-▸ `Optional` **customExtraChildren**(`characterCount`, `wordCount`): `ReactNode`
-
-A function to define custom extra children
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `characterCount` | `number` |
-| `wordCount` | `number` |
-
-#### Returns
-
-`ReactNode`
-
-#### Inherited from
-
-[IMaterialUISlateWrapperProps](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md).[customExtraChildren](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#customextrachildren)
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:485](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L485)
-
-___
-
-### dismissCurrentLoadError
-
-▸ **dismissCurrentLoadError**(): `void`
-
-Dismiss the current load error follows the same logic
-as the currentLoadError
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[IMaterialUISlateWrapperProps](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md).[dismissCurrentLoadError](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#dismisscurrentloaderror)
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:840](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L840)
-
-___
-
-### onHeightChange
-
-▸ **onHeightChange**(`newHeight`): `void`
-
-Called when the height changes
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `newHeight` | `number` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:553](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L553)
-
-___
-
-### requestFile
-
-▸ **requestFile**(): `void`
-
-Call to request a file, opens a dialog so requires a state
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:531](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L531)
-
-___
-
-### requestImage
-
-▸ **requestImage**(): `void`
-
-call to request an image, opens a dialog so requires a state
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:526](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L526)
-
-___
-
-### setToolbarState
-
-▸ **setToolbarState**(`state`): `void`
-
-sets the toolbar state
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `state` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:536](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L536)
-
-___
-
-### shouldHaveDrawer
-
-▸ **shouldHaveDrawer**(): `boolean`
-
-A function that specifies whether the drawer should
-exist
-
-#### Returns
-
-`boolean`
-
-a boolean as the answer
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:543](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L543)
-
-___
-
-### toggleDrawer
-
-▸ **toggleDrawer**(): `void`
-
-Toggle the drawer open or close
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:548](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L548)
+[client/fast-prototyping/components/slate/wrapper.tsx:475](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L475)

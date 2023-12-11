@@ -16,8 +16,8 @@
 
 ### AltPriorityShifterContext
 
-• **AltPriorityShifterContext**: `Context`<{ `amount`: `number` = 0; `disable`: `boolean` = false }\>
+• `Const` **AltPriorityShifterContext**: `Context`\<\{ `amount`: `number` = 0; `disable`: `boolean` = false }\>
 
 #### Defined in
 
-[client/components/accessibility/AltPriorityShifter.tsx:4](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltPriorityShifter.tsx#L4)
+[client/components/accessibility/AltPriorityShifter.tsx:4](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltPriorityShifter.tsx#L4)

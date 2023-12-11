@@ -19,11 +19,8 @@ how a menu is to be built
 - [path](client_fast_prototyping_components_navbar_menu.IMenuEntry.md#path)
 - [role](client_fast_prototyping_components_navbar_menu.IMenuEntry.md#role)
 - [roles](client_fast_prototyping_components_navbar_menu.IMenuEntry.md#roles)
-- [wrapperKey](client_fast_prototyping_components_navbar_menu.IMenuEntry.md#wrapperkey)
-
-### Methods
-
 - [wrapper](client_fast_prototyping_components_navbar_menu.IMenuEntry.md#wrapper)
+- [wrapperKey](client_fast_prototyping_components_navbar_menu.IMenuEntry.md#wrapperkey)
 
 ## Properties
 
@@ -35,7 +32,7 @@ A badge to display
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:57](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L57)
+[client/fast-prototyping/components/navbar/menu.tsx:57](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L57)
 
 ___
 
@@ -47,7 +44,7 @@ The arguments to pass to the i18nRead element in order to display some text
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:70](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L70)
+[client/fast-prototyping/components/navbar/menu.tsx:70](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L70)
 
 ___
 
@@ -59,7 +56,7 @@ The icon to use
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:53](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L53)
+[client/fast-prototyping/components/navbar/menu.tsx:53](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L53)
 
 ___
 
@@ -72,7 +69,7 @@ will need the module specified if this one specified
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:66](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L66)
+[client/fast-prototyping/components/navbar/menu.tsx:66](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L66)
 
 ___
 
@@ -84,7 +81,7 @@ The module to load in the module provider (optional)
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:61](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L61)
+[client/fast-prototyping/components/navbar/menu.tsx:61](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L61)
 
 ___
 
@@ -97,7 +94,7 @@ location
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:49](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L49)
+[client/fast-prototyping/components/navbar/menu.tsx:49](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L49)
 
 ___
 
@@ -109,7 +106,7 @@ The role that has access to this
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:74](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L74)
+[client/fast-prototyping/components/navbar/menu.tsx:74](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L74)
 
 ___
 
@@ -121,7 +118,33 @@ Many roles, a list of roles, role (Single) has priority over this
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:78](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L78)
+[client/fast-prototyping/components/navbar/menu.tsx:78](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L78)
+
+___
+
+### wrapper
+
+• `Optional` **wrapper**: (`entry`: `ReactNode`) => `ReactNode`
+
+#### Type declaration
+
+▸ (`entry`): `ReactNode`
+
+A wrapper to wrap the content
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `entry` | `ReactNode` |
+
+##### Returns
+
+`ReactNode`
+
+#### Defined in
+
+[client/fast-prototyping/components/navbar/menu.tsx:82](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L82)
 
 ___
 
@@ -134,26 +157,4 @@ but if path is a function you rather specify this
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:87](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L87)
-
-## Methods
-
-### wrapper
-
-▸ `Optional` **wrapper**(`entry`): `ReactNode`
-
-A wrapper to wrap the content
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `entry` | `ReactNode` |
-
-#### Returns
-
-`ReactNode`
-
-#### Defined in
-
-[client/fast-prototyping/components/navbar/menu.tsx:82](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L82)
+[client/fast-prototyping/components/navbar/menu.tsx:87](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/menu.tsx#L87)

@@ -18,7 +18,7 @@ Contains the fast prototyping element for renering a file entry
 
 ### style
 
-• **style**: `Object`
+• `Const` **style**: `Object`
 
 the styles for the file entry
 
@@ -26,48 +26,48 @@ the styles for the file entry
 
 | Name | Type |
 | :------ | :------ |
-| `button` | `Object` |
+| `button` | \{ `flexGrow`: `number` = 1; `height`: `string` = "2.5rem" } |
 | `button.flexGrow` | `number` |
 | `button.height` | `string` |
-| `buttonContainer` | `Object` |
+| `buttonContainer` | \{ `bottom`: `string` = "0"; `display`: `string` = "flex"; `left`: `string` = "0"; `position`: `string` = "absolute"; `right`: `string` = "0" } |
 | `buttonContainer.bottom` | `string` |
 | `buttonContainer.display` | `string` |
 | `buttonContainer.left` | `string` |
 | `buttonContainer.position` | `string` |
 | `buttonContainer.right` | `string` |
-| `buttonIcon` | `Object` |
+| `buttonIcon` | \{ `marginLeft`: `string` = "0.75rem" } |
 | `buttonIcon.marginLeft` | `string` |
-| `container` | `Object` |
+| `container` | \{ `width`: `string` = "100%" } |
 | `container.width` | `string` |
-| `description` | `Object` |
+| `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
-| `entry` | `Object` |
+| `entry` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `entry.alignItems` | `string` |
 | `entry.display` | `string` |
 | `entry.flexDirection` | `string` |
 | `entry.justifyContent` | `string` |
 | `entry.width` | `string` |
-| `errorMessage` | `Object` |
+| `errorMessage` | \{ `color`: `string` = "#f44336"; `fontSize`: `string` = "0.85rem"; `height`: `string` = "1.3rem" } |
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `fileDeleteButton` | `Object` |
-| `fileRejectedDescription` | `Object` |
+| `fileDeleteButton` | {} |
+| `fileRejectedDescription` | \{ `fontSize`: `string` = "0.75rem"; `overflow`: `string` = "hidden"; `textAlign`: `string` = "center"; `textOverflow`: `string` = "ellipsis"; `width`: `string` = "100%" } |
 | `fileRejectedDescription.fontSize` | `string` |
 | `fileRejectedDescription.overflow` | `string` |
 | `fileRejectedDescription.textAlign` | `string` |
 | `fileRejectedDescription.textOverflow` | `string` |
 | `fileRejectedDescription.width` | `string` |
-| `icon` | `Object` |
+| `icon` | \{ `color`: `string` = "#424242" } |
 | `icon.color` | `string` |
-| `label` | (`isInvalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `alignItems`: `string` = "center"; `color`: `string` ; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
+| `label` | (`isInvalid`: `boolean`) => \{ `&.focused`: \{ `color`: `string`  } ; `alignItems`: `string` = "center"; `color`: `string` ; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `paper` | `any` |
-| `paperAccepting` | `Object` |
+| `paperAccepting` | \{ `borderColor`: `string` = "#42a5f5 !important" } |
 | `paperAccepting.borderColor` | `string` |
-| `paperIconAdd` | `Object` |
+| `paperIconAdd` | \{ `fontSize`: `string` = "100px"; `opacity`: `number` = 0.1 } |
 | `paperIconAdd.fontSize` | `string` |
 | `paperIconAdd.opacity` | `number` |
-| `paperPlaceholder` | `Object` |
+| `paperPlaceholder` | \{ `borderRadius`: `string` = "25px"; `color`: `string` = "rgb(117, 117, 117)"; `display`: `string` = "block"; `flexGrow`: `number` = 2; `fontSize`: `string` = "1rem"; `margin`: `string` = "0 25px"; `padding`: `string` = "25px 0"; `textAlign`: `string` = "center"; `userSelect`: `string` = "none" } |
 | `paperPlaceholder.borderRadius` | `string` |
 | `paperPlaceholder.color` | `string` |
 | `paperPlaceholder.display` | `string` |
@@ -77,12 +77,12 @@ the styles for the file entry
 | `paperPlaceholder.padding` | `string` |
 | `paperPlaceholder.textAlign` | `string` |
 | `paperPlaceholder.userSelect` | `string` |
-| `paperRejecting` | `Object` |
+| `paperRejecting` | \{ `borderColor`: `string` = "#f44336 !important" } |
 | `paperRejecting.borderColor` | `string` |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:36](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L36)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L36)
 
 ## Functions
 
@@ -107,4 +107,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:169](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L169)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:169](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L169)

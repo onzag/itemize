@@ -10,15 +10,17 @@ related files index.ts and checkers.ts
 
 ## Table of contents
 
-### Properties
+### Variables
 
 - [default](base_Root_Module_ItemDefinition_PropertiesValueMappingDefiniton_schema.md#default)
 
-## Properties
+## Variables
 
 ### default
 
 • **default**: `Object`
+
+The default property value mapping definition schema
 
 #### Type declaration
 
@@ -27,8 +29,12 @@ related files index.ts and checkers.ts
 | `$id` | `string` |
 | `additionalProperties` | `boolean` |
 | `minProperties` | `number` |
-| `patternProperties` | `Object` |
-| `patternProperties.^[a-z_]+$` | `Object` |
-| `patternProperties.^[a-z_]+$.oneOf` | ({ `additionalProperties`: `boolean` = false; `properties`: { `exactValue`: `undefined` = {}; `property`: { `pattern`: `string` = "^[a-z\_]+$"; `type`: `string` = "string" }  } ; `required`: `string`[]  } \| { `additionalProperties`: `boolean` = false; `properties`: { `exactValue`: {} = {}; `property`: `undefined`  } ; `required`: `string`[]  })[] |
+| `patternProperties` | \{ `^[a-z_]+$`: \{ `oneOf`: (\{ `additionalProperties`: `boolean` = false; `properties`: \{ `exactValue?`: `undefined` = \{}; `property`: \{ `pattern`: `string` = "^[a-z\_]+$"; `type`: `string` = "string" }  } ; `required`: `string`[]  } \| \{ `additionalProperties`: `boolean` = false; `properties`: \{ `exactValue`: {} = \{}; `property?`: `undefined`  } ; `required`: `string`[]  })[] ; `type`: `string` = "object" }  } |
+| `patternProperties.^[a-z_]+$` | \{ `oneOf`: (\{ `additionalProperties`: `boolean` = false; `properties`: \{ `exactValue?`: `undefined` = \{}; `property`: \{ `pattern`: `string` = "^[a-z\_]+$"; `type`: `string` = "string" }  } ; `required`: `string`[]  } \| \{ `additionalProperties`: `boolean` = false; `properties`: \{ `exactValue`: {} = \{}; `property?`: `undefined`  } ; `required`: `string`[]  })[] ; `type`: `string` = "object" } |
+| `patternProperties.^[a-z_]+$.oneOf` | (\{ `additionalProperties`: `boolean` = false; `properties`: \{ `exactValue?`: `undefined` = \{}; `property`: \{ `pattern`: `string` = "^[a-z\_]+$"; `type`: `string` = "string" }  } ; `required`: `string`[]  } \| \{ `additionalProperties`: `boolean` = false; `properties`: \{ `exactValue`: {} = \{}; `property?`: `undefined`  } ; `required`: `string`[]  })[] |
 | `patternProperties.^[a-z_]+$.type` | `string` |
 | `type` | `string` |
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/schema.ts:14](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/schema.ts#L14)

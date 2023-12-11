@@ -38,7 +38,7 @@ The select query builder that allows to create SELECT queries
 
 ### constructor
 
-• **new CloseCursorBuilder**(`name`)
+• **new CloseCursorBuilder**(`name`): [`CloseCursorBuilder`](database_CloseCursorBuilder.CloseCursorBuilder.md)
 
 Builds a new declare query builder
 
@@ -48,13 +48,17 @@ Builds a new declare query builder
 | :------ | :------ | :------ |
 | `name` | `string` | the name |
 
+#### Returns
+
+[`CloseCursorBuilder`](database_CloseCursorBuilder.CloseCursorBuilder.md)
+
 #### Overrides
 
 [QueryBuilder](database_base.QueryBuilder.md).[constructor](database_base.QueryBuilder.md#constructor)
 
 #### Defined in
 
-[database/CloseCursorBuilder.ts:18](https://github.com/onzag/itemize/blob/a24376ed/database/CloseCursorBuilder.ts#L18)
+[database/CloseCursorBuilder.ts:18](https://github.com/onzag/itemize/blob/59702dd5/database/CloseCursorBuilder.ts#L18)
 
 ## Properties
 
@@ -64,7 +68,7 @@ Builds a new declare query builder
 
 #### Defined in
 
-[database/CloseCursorBuilder.ts:12](https://github.com/onzag/itemize/blob/a24376ed/database/CloseCursorBuilder.ts#L12)
+[database/CloseCursorBuilder.ts:12](https://github.com/onzag/itemize/blob/59702dd5/database/CloseCursorBuilder.ts#L12)
 
 ## Methods
 
@@ -90,7 +94,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
 
 ___
 
@@ -116,7 +120,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
 
 ___
 
@@ -136,7 +140,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
 
 ___
 
@@ -158,7 +162,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/CloseCursorBuilder.ts:30](https://github.com/onzag/itemize/blob/a24376ed/database/CloseCursorBuilder.ts#L30)
+[database/CloseCursorBuilder.ts:30](https://github.com/onzag/itemize/blob/59702dd5/database/CloseCursorBuilder.ts#L30)
 
 ___
 
@@ -181,7 +185,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
 
 ___
 
@@ -201,7 +205,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
 
 ___
 
@@ -228,7 +232,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
 
 ___
 
@@ -255,7 +259,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
 
 ___
 
@@ -277,4 +281,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)

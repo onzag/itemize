@@ -27,7 +27,7 @@ it is not valid for the render static
 
 ### constructor
 
-• **new TemplateArgs**(`properties`)
+• **new TemplateArgs**(`properties`): [`TemplateArgs`](client_internal_text_serializer_template_args.TemplateArgs.md)
 
 #### Parameters
 
@@ -35,9 +35,13 @@ it is not valid for the render static
 | :------ | :------ |
 | `properties` | [`ITemplateArgsProperties`](../interfaces/client_internal_text_serializer_template_args.ITemplateArgsProperties.md) |
 
+#### Returns
+
+[`TemplateArgs`](client_internal_text_serializer_template_args.TemplateArgs.md)
+
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:150](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L150)
+[client/internal/text/serializer/template-args.ts:150](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L150)
 
 ## Properties
 
@@ -47,7 +51,7 @@ it is not valid for the render static
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:147](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L147)
+[client/internal/text/serializer/template-args.ts:147](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L147)
 
 ___
 
@@ -71,7 +75,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:148](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L148)
+[client/internal/text/serializer/template-args.ts:148](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L148)
 
 ## Methods
 
@@ -91,4 +95,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:154](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L154)
+[client/internal/text/serializer/template-args.ts:154](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L154)

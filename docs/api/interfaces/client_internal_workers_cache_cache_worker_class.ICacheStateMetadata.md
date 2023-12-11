@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:66](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L66)
+[client/internal/workers/cache/cache.worker.class.ts:66](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L66)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:65](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L65)
+[client/internal/workers/cache/cache.worker.class.ts:65](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L65)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:68](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L68)
+[client/internal/workers/cache/cache.worker.class.ts:68](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L68)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:67](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L67)
+[client/internal/workers/cache/cache.worker.class.ts:67](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L67)

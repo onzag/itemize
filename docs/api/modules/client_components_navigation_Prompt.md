@@ -11,15 +11,15 @@ as the navigation tries to change location
 
 - [default](../classes/client_components_navigation_Prompt.default.md)
 
-### Type aliases
+### Type Aliases
 
 - [PromptDialogComponent](client_components_navigation_Prompt.md#promptdialogcomponent)
 
-## Type aliases
+## Type Aliases
 
 ### PromptDialogComponent
 
-Ƭ **PromptDialogComponent**: `React.ComponentType`<{ `args?`: `any` ; `confirmationCallbackError`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `confirming`: `boolean` ; `open`: `boolean` ; `confirmationCallbackErrorClean`: () => `void` ; `onCancel`: () => `void` ; `onConfirm`: () => `void` ; `onDiscard`: () => `void`  }\>
+Ƭ **PromptDialogComponent**: `React.ComponentType`\<\{ `args?`: `any` ; `confirmationCallbackError`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `confirmationCallbackErrorClean`: () => `void` ; `confirming`: `boolean` ; `onCancel`: () => `void` ; `onConfirm`: () => `void` ; `onDiscard`: () => `void` ; `open`: `boolean`  }\>
 
 The prompt dialog component is used when possible by
 react router, and since this prompt is just logical
@@ -27,4 +27,4 @@ it needs to consume such component
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:19](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/Prompt.tsx#L19)
+[client/components/navigation/Prompt.tsx:19](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L19)

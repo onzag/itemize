@@ -45,72 +45,72 @@
 
 ### ALLOWED\_CLASSES
 
-• **ALLOWED\_CLASSES**: `string`[]
+• `Const` **ALLOWED\_CLASSES**: `string`[]
 
 The list of allowed classes for text as defined by the text-specs
 this will prevent users from class injection
 
 #### Defined in
 
-[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L31)
+[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L31)
 
 ___
 
 ### ALLOWED\_CLASSES\_PREFIXES
 
-• **ALLOWED\_CLASSES\_PREFIXES**: `string`[]
+• `Const` **ALLOWED\_CLASSES\_PREFIXES**: `string`[]
 
 The list of allowed prefixes
 
 #### Defined in
 
-[client/internal/text/index.tsx:46](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L46)
+[client/internal/text/index.tsx:46](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L46)
 
 ___
 
 ### CONTAINER\_CLASS
 
-• **CONTAINER\_CLASS**: ``"container"``
+• `Const` **CONTAINER\_CLASS**: ``"container"``
 
 #### Defined in
 
-[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L38)
+[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L38)
 
 ___
 
 ### CONTAINER\_CLASS\_PREFIX
 
-• **CONTAINER\_CLASS\_PREFIX**: `string`
+• `Const` **CONTAINER\_CLASS\_PREFIX**: `string`
 
 #### Defined in
 
-[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L39)
+[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L39)
 
 ___
 
 ### CUSTOM\_CLASS\_PREFIX
 
-• **CUSTOM\_CLASS\_PREFIX**: ``"custom-"``
+• `Const` **CUSTOM\_CLASS\_PREFIX**: ``"custom-"``
 
 #### Defined in
 
-[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L40)
+[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L40)
 
 ___
 
 ### RICH\_TEXT\_CLASS\_PREFIX
 
-• **RICH\_TEXT\_CLASS\_PREFIX**: ``"rich-text--"``
+• `Const` **RICH\_TEXT\_CLASS\_PREFIX**: ``"rich-text--"``
 
 #### Defined in
 
-[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L37)
+[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L37)
 
 ___
 
 ### SANITIZE\_CONFIG
 
-• **SANITIZE\_CONFIG**: `Object`
+• `Const` **SANITIZE\_CONFIG**: `Object`
 
 Sanitazation standard configuraton
 
@@ -124,79 +124,79 @@ Sanitazation standard configuraton
 
 #### Defined in
 
-[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L18)
+[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L18)
 
 ___
 
 ### SUPPORTED\_CONTENT\_MODIFIERS
 
-• **SUPPORTED\_CONTENT\_MODIFIERS**: `string`[]
+• `Const` **SUPPORTED\_CONTENT\_MODIFIERS**: `string`[]
 
 Modify the content of the children based on
 the template args
 
 #### Defined in
 
-[client/internal/text/index.tsx:90](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L90)
+[client/internal/text/index.tsx:90](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L90)
 
 ___
 
 ### SUPPORTED\_HANDLERS
 
-• **SUPPORTED\_HANDLERS**: `string`[]
+• `Const` **SUPPORTED\_HANDLERS**: `string`[]
 
 Custom handlers to modify the information within the system
 use args
 
 #### Defined in
 
-[client/internal/text/index.tsx:99](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L99)
+[client/internal/text/index.tsx:99](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L99)
 
 ___
 
 ### SUPPORTED\_TEMPLATE\_EVENTS
 
-• **SUPPORTED\_TEMPLATE\_EVENTS**: `string`[]
+• `Const` **SUPPORTED\_TEMPLATE\_EVENTS**: `string`[]
 
 Template events that are supported these
 exist as data-on-[event]="{{event}}"
 
 #### Defined in
 
-[client/internal/text/index.tsx:54](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L54)
+[client/internal/text/index.tsx:54](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L54)
 
 ___
 
 ### SUPPORTED\_TEMPLATE\_STYLES
 
-• **SUPPORTED\_TEMPLATE\_STYLES**: `string`[]
+• `Const` **SUPPORTED\_TEMPLATE\_STYLES**: `string`[]
 
 Styles that might pop in when using templates
 exist as data-[supportedTemplateStyle]-style="position:absolute;"
 
 #### Defined in
 
-[client/internal/text/index.tsx:81](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L81)
+[client/internal/text/index.tsx:81](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L81)
 
 ___
 
 ### TABLE\_CLASS\_PREFIX
 
-• **TABLE\_CLASS\_PREFIX**: ``"table-"``
+• `Const` **TABLE\_CLASS\_PREFIX**: ``"table-"``
 
 #### Defined in
 
-[client/internal/text/index.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L41)
+[client/internal/text/index.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L41)
 
 ___
 
 ### nodesThatRepresentLines
 
-• **nodesThatRepresentLines**: `string`[]
+• `Const` **nodesThatRepresentLines**: `string`[]
 
 #### Defined in
 
-[client/internal/text/index.tsx:1119](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1119)
+[client/internal/text/index.tsx:1119](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L1119)
 
 ## Functions
 
@@ -219,7 +219,7 @@ compares two text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:1094](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1094)
+[client/internal/text/index.tsx:1094](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L1094)
 
 ___
 
@@ -242,7 +242,7 @@ compares two plain text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:1114](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1114)
+[client/internal/text/index.tsx:1114](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L1114)
 
 ___
 
@@ -262,7 +262,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:1145](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1145)
+[client/internal/text/index.tsx:1145](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L1145)
 
 ___
 
@@ -276,7 +276,7 @@ Counts the size of the document
 
 | Name | Type |
 | :------ | :------ |
-| `root` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `root` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -284,7 +284,7 @@ Counts the size of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:732](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L732)
+[client/internal/text/index.tsx:732](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L732)
 
 ___
 
@@ -298,7 +298,7 @@ Counts the size and words of the document
 
 | Name | Type |
 | :------ | :------ |
-| `root` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `root` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -306,7 +306,7 @@ Counts the size and words of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:769](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L769)
+[client/internal/text/index.tsx:769](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L769)
 
 ___
 
@@ -318,7 +318,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `root` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `root` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -326,7 +326,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:751](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L751)
+[client/internal/text/index.tsx:751](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L751)
 
 ___
 
@@ -355,7 +355,7 @@ the given content
 
 #### Defined in
 
-[client/internal/text/index.tsx:798](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L798)
+[client/internal/text/index.tsx:798](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L798)
 
 ___
 
@@ -383,7 +383,7 @@ a node
 
 #### Defined in
 
-[client/internal/text/index.tsx:338](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L338)
+[client/internal/text/index.tsx:338](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L338)
 
 ___
 
@@ -418,7 +418,7 @@ use the renderTemplateDynamically method
 
 #### Defined in
 
-[client/internal/text/index.tsx:1006](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1006)
+[client/internal/text/index.tsx:1006](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L1006)
 
 ___
 
@@ -444,7 +444,7 @@ this function does not sanitize!!!
 
 #### Defined in
 
-[client/internal/text/index.tsx:973](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L973)
+[client/internal/text/index.tsx:973](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L973)
 
 ___
 
@@ -477,7 +477,7 @@ takes a document instead
 
 #### Defined in
 
-[client/internal/text/index.tsx:1032](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1032)
+[client/internal/text/index.tsx:1032](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L1032)
 
 ___
 
@@ -504,7 +504,7 @@ then be passed to the serializer or displayed as it is
 
 #### Defined in
 
-[client/internal/text/index.tsx:282](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L282)
+[client/internal/text/index.tsx:282](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L282)
 
 ___
 
@@ -527,7 +527,7 @@ HTML
 
 #### Defined in
 
-[client/internal/text/index.tsx:677](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L677)
+[client/internal/text/index.tsx:677](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L677)
 
 ___
 
@@ -550,4 +550,4 @@ rather than a bunch of nodes
 
 #### Defined in
 
-[client/internal/text/index.tsx:692](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L692)
+[client/internal/text/index.tsx:692](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/index.tsx#L692)

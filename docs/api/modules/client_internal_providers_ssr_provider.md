@@ -26,13 +26,13 @@ The ssr provider file
 
 ### SSRContext
 
-• **SSRContext**: `Context`<[`ISSRContextType`](../interfaces/client_internal_providers_ssr_provider.ISSRContextType.md)\>
+• `Const` **SSRContext**: `Context`\<[`ISSRContextType`](../interfaces/client_internal_providers_ssr_provider.ISSRContextType.md)\>
 
 The ssr context passes the context value all the way to all the components
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:123](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L123)
+[client/internal/providers/ssr-provider.tsx:123](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L123)
 
 ## Functions
 
@@ -60,4 +60,4 @@ This should sit on top of the itemize app
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:144](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L144)
+[client/internal/providers/ssr-provider.tsx:144](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L144)

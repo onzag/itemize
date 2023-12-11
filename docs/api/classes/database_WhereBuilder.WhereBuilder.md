@@ -59,7 +59,7 @@ extends the conditional builder since it's basically a nesting condition
 
 ### constructor
 
-• **new WhereBuilder**(`parent?`)
+• **new WhereBuilder**(`parent?`): [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
 
 Creates a new where builder instance
 
@@ -69,13 +69,17 @@ Creates a new where builder instance
 | :------ | :------ | :------ | :------ |
 | `parent` | [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md) | `null` | the parent where builder in question |
 
+#### Returns
+
+[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
 #### Overrides
 
 [ConditionalBuilder](database_base.ConditionalBuilder.md).[constructor](database_base.ConditionalBuilder.md#constructor)
 
 #### Defined in
 
-[database/WhereBuilder.ts:21](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L21)
+[database/WhereBuilder.ts:21](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L21)
 
 ## Properties
 
@@ -92,7 +96,7 @@ you fancy
 
 #### Defined in
 
-[database/base.ts:241](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L241)
+[database/base.ts:241](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L241)
 
 ## Methods
 
@@ -118,7 +122,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
 
 ___
 
@@ -144,7 +148,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
 
 ___
 
@@ -158,7 +162,7 @@ Specifies a simple expression as an AND rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)\> | the expression in question |
+| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)\> | the expression in question |
 | `bindings?` | (`string` \| `number`)[] | the bindings for that rule |
 
 #### Returns
@@ -169,7 +173,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:209](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L209)
+[database/WhereBuilder.ts:209](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L209)
 
 ___
 
@@ -190,7 +194,7 @@ ___
 
 #### Defined in
 
-[database/WhereBuilder.ts:223](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L223)
+[database/WhereBuilder.ts:223](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L223)
 
 ___
 
@@ -216,7 +220,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L112)
+[database/WhereBuilder.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L112)
 
 ___
 
@@ -240,7 +244,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:178](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L178)
+[database/WhereBuilder.ts:178](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L178)
 
 ___
 
@@ -264,7 +268,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L168)
+[database/WhereBuilder.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L168)
 
 ___
 
@@ -278,7 +282,7 @@ Specifies a condition for an EXISTS rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
+| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
 
 #### Returns
 
@@ -288,7 +292,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:38](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L38)
+[database/WhereBuilder.ts:38](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L38)
 
 ___
 
@@ -312,7 +316,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:86](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L86)
+[database/WhereBuilder.ts:86](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L86)
 
 ___
 
@@ -326,7 +330,7 @@ Specifies a condition for an EXISTS rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
+| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
 
 #### Returns
 
@@ -336,7 +340,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:50](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L50)
+[database/WhereBuilder.ts:50](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L50)
 
 ___
 
@@ -358,7 +362,7 @@ itself
 
 #### Defined in
 
-[database/base.ts:352](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L352)
+[database/base.ts:352](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L352)
 
 ___
 
@@ -378,7 +382,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
 
 ___
 
@@ -400,7 +404,7 @@ a string that represents the condition
 
 #### Defined in
 
-[database/base.ts:362](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L362)
+[database/base.ts:362](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L362)
 
 ___
 
@@ -416,7 +420,7 @@ Makes a new condition based on an expression or a subrule function
 | :------ | :------ | :------ |
 | `gate` | ``"AND"`` \| ``"OR"`` | the gate to use |
 | `prefix` | `string` | an optional prefix to the rule, if none, make it null |
-| `rule` | `string` \| [`QueryBuilder`](database_base.QueryBuilder.md) \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<`any`\> | either the expression itself or a subcondition |
+| `rule` | `string` \| [`QueryBuilder`](database_base.QueryBuilder.md) \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<`any`\> | either the expression itself or a subcondition |
 | `bindings?` | [`BasicBindingType`](../modules/database_base.md#basicbindingtype)[] | the bindings for the expression, will not be used if using a subcondition |
 
 #### Returns
@@ -431,7 +435,7 @@ itself
 
 #### Defined in
 
-[database/base.ts:291](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L291)
+[database/base.ts:291](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L291)
 
 ___
 
@@ -454,7 +458,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
 
 ___
 
@@ -475,7 +479,7 @@ whatsoever
 
 #### Defined in
 
-[database/base.ts:259](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L259)
+[database/base.ts:259](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L259)
 
 ___
 
@@ -489,7 +493,7 @@ Specifies a simple expression as a OR rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)\> | the expression in question |
+| `rule` | `string` \| [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)\> | the expression in question |
 | `bindings?` | (`string` \| `number`)[] | the bindings for that rule |
 
 #### Returns
@@ -500,7 +504,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:219](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L219)
+[database/WhereBuilder.ts:219](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L219)
 
 ___
 
@@ -521,7 +525,7 @@ ___
 
 #### Defined in
 
-[database/WhereBuilder.ts:233](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L233)
+[database/WhereBuilder.ts:233](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L233)
 
 ___
 
@@ -547,7 +551,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:141](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L141)
+[database/WhereBuilder.ts:141](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L141)
 
 ___
 
@@ -571,7 +575,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:198](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L198)
+[database/WhereBuilder.ts:198](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L198)
 
 ___
 
@@ -595,7 +599,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:188](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L188)
+[database/WhereBuilder.ts:188](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L188)
 
 ___
 
@@ -609,7 +613,7 @@ Specifies a condition for an EXISTS rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
+| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
 
 #### Returns
 
@@ -619,7 +623,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:62](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L62)
+[database/WhereBuilder.ts:62](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L62)
 
 ___
 
@@ -643,7 +647,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L98)
+[database/WhereBuilder.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L98)
 
 ___
 
@@ -657,7 +661,7 @@ Specifies a condition for an EXISTS rule
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
+| `arg` | [`ConditionalBuilderFn`](../modules/database_base.md#conditionalbuilderfn)\<[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)\> | a function that provides a select builder |
 
 #### Returns
 
@@ -667,7 +671,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:74](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L74)
+[database/WhereBuilder.ts:74](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L74)
 
 ___
 
@@ -687,7 +691,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
 
 ___
 
@@ -714,7 +718,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
 
 ___
 
@@ -741,7 +745,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
 
 ___
 
@@ -763,7 +767,7 @@ a new subcondition instance parented by this one
 
 #### Defined in
 
-[database/WhereBuilder.ts:29](https://github.com/onzag/itemize/blob/a24376ed/database/WhereBuilder.ts#L29)
+[database/WhereBuilder.ts:29](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L29)
 
 ___
 
@@ -785,4 +789,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)

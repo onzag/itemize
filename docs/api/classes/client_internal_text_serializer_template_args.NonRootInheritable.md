@@ -20,7 +20,7 @@ Makes a value non root inheritable
 
 ### constructor
 
-• **new NonRootInheritable**(`value`)
+• **new NonRootInheritable**(`value`): [`NonRootInheritable`](client_internal_text_serializer_template_args.NonRootInheritable.md)
 
 #### Parameters
 
@@ -28,9 +28,13 @@ Makes a value non root inheritable
 | :------ | :------ |
 | `value` | `TemplateArgProperty` |
 
+#### Returns
+
+[`NonRootInheritable`](client_internal_text_serializer_template_args.NonRootInheritable.md)
+
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:136](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L136)
+[client/internal/text/serializer/template-args.ts:136](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L136)
 
 ## Properties
 
@@ -40,4 +44,4 @@ Makes a value non root inheritable
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:135](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L135)
+[client/internal/text/serializer/template-args.ts:135](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L135)

@@ -7,56 +7,33 @@
 ### Functions
 
 - [getItemDefinition](server_resolvers_actions_get.md#getitemdefinition)
-- [getItemDefinitionFn](server_resolvers_actions_get.md#getitemdefinitionfn)
 - [getItemDefinitionFnRQ](server_resolvers_actions_get.md#getitemdefinitionfnrq)
 - [getItemDefinitionList](server_resolvers_actions_get.md#getitemdefinitionlist)
-- [getItemDefinitionListFn](server_resolvers_actions_get.md#getitemdefinitionlistfn)
 - [getItemDefinitionListFnRQ](server_resolvers_actions_get.md#getitemdefinitionlistfnrq)
 - [getModuleList](server_resolvers_actions_get.md#getmodulelist)
-- [getModuleListFn](server_resolvers_actions_get.md#getmodulelistfn)
 - [getModuleListFnRQ](server_resolvers_actions_get.md#getmodulelistfnrq)
 
 ## Functions
 
 ### getItemDefinition
 
-▸ **getItemDefinition**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<`any`\>
+▸ **getItemDefinition**(`appData`, `itemDefinition`, `resolverArgs`): `Promise`\<`any`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `resolverArgs` | [`IRQResolverArgs`](../interfaces/base_Root_rq.IRQResolverArgs.md) |
 
 #### Returns
 
-`Promise`<`any`\>
+`Promise`\<`any`\>
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L36)
-
-___
-
-### getItemDefinitionFn
-
-▸ **getItemDefinitionFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-
-#### Returns
-
-[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Defined in
-
-[server/resolvers/actions/get.ts:924](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L924)
+[server/resolvers/actions/get.ts:35](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/get.ts#L35)
 
 ___
 
@@ -76,49 +53,29 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:936](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L936)
+[server/resolvers/actions/get.ts:923](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/get.ts#L923)
 
 ___
 
 ### getItemDefinitionList
 
-▸ **getItemDefinitionList**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
+▸ **getItemDefinitionList**(`appData`, `itemDefinition`, `resolverArgs`): `Promise`\<\{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `resolverArgs` | [`IRQResolverArgs`](../interfaces/base_Root_rq.IRQResolverArgs.md) |
 
 #### Returns
 
-`Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
+`Promise`\<\{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:315](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L315)
-
-___
-
-### getItemDefinitionListFn
-
-▸ **getItemDefinitionListFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-
-#### Returns
-
-[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Defined in
-
-[server/resolvers/actions/get.ts:928](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L928)
+[server/resolvers/actions/get.ts:314](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/get.ts#L314)
 
 ___
 
@@ -138,49 +95,29 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:940](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L940)
+[server/resolvers/actions/get.ts:927](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/get.ts#L927)
 
 ___
 
 ### getModuleList
 
-▸ **getModuleList**(`appData`, `resolverArgs`, `mod`): `Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
+▸ **getModuleList**(`appData`, `mod`, `resolverArgs`): `Promise`\<\{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) |
+| `resolverArgs` | [`IRQResolverArgs`](../interfaces/base_Root_rq.IRQResolverArgs.md) |
 
 #### Returns
 
-`Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
+`Promise`\<\{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:638](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L638)
-
-___
-
-### getModuleListFn
-
-▸ **getModuleListFn**(`appData`): [`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-
-#### Returns
-
-[`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
-
-#### Defined in
-
-[server/resolvers/actions/get.ts:932](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L932)
+[server/resolvers/actions/get.ts:637](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/get.ts#L637)
 
 ___
 
@@ -200,4 +137,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:944](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L944)
+[server/resolvers/actions/get.ts:931](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/get.ts#L931)

@@ -50,7 +50,7 @@ The select query builder that allows to create SELECT queries
 
 ### constructor
 
-• **new FetchOrMoveFromCursorBuilder**(`type`, `name`)
+• **new FetchOrMoveFromCursorBuilder**(`type`, `name`): [`FetchOrMoveFromCursorBuilder`](database_FetchOrMoveFromCursorBuilder.FetchOrMoveFromCursorBuilder.md)
 
 Builds a new declare query builder
 
@@ -61,13 +61,17 @@ Builds a new declare query builder
 | `type` | ``"FETCH"`` \| ``"MOVE"`` | - |
 | `name` | `string` | the name |
 
+#### Returns
+
+[`FetchOrMoveFromCursorBuilder`](database_FetchOrMoveFromCursorBuilder.FetchOrMoveFromCursorBuilder.md)
+
 #### Overrides
 
 [QueryBuilder](database_base.QueryBuilder.md).[constructor](database_base.QueryBuilder.md#constructor)
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:23](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L23)
+[database/FetchOrMoveFromCursorBuilder.ts:23](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L23)
 
 ## Properties
 
@@ -77,7 +81,7 @@ Builds a new declare query builder
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:16](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L16)
+[database/FetchOrMoveFromCursorBuilder.ts:16](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L16)
 
 ___
 
@@ -87,7 +91,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:17](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L17)
+[database/FetchOrMoveFromCursorBuilder.ts:17](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L17)
 
 ___
 
@@ -97,7 +101,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:15](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L15)
+[database/FetchOrMoveFromCursorBuilder.ts:15](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L15)
 
 ___
 
@@ -107,7 +111,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:14](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L14)
+[database/FetchOrMoveFromCursorBuilder.ts:14](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L14)
 
 ## Methods
 
@@ -127,7 +131,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:52](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L52)
+[database/FetchOrMoveFromCursorBuilder.ts:52](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L52)
 
 ___
 
@@ -153,7 +157,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
 
 ___
 
@@ -179,7 +183,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
 
 ___
 
@@ -199,7 +203,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:67](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L67)
+[database/FetchOrMoveFromCursorBuilder.ts:67](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L67)
 
 ___
 
@@ -219,7 +223,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
 
 ___
 
@@ -241,7 +245,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:86](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L86)
+[database/FetchOrMoveFromCursorBuilder.ts:86](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L86)
 
 ___
 
@@ -255,7 +259,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:42](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L42)
+[database/FetchOrMoveFromCursorBuilder.ts:42](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L42)
 
 ___
 
@@ -275,7 +279,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:62](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L62)
+[database/FetchOrMoveFromCursorBuilder.ts:62](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L62)
 
 ___
 
@@ -298,7 +302,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
 
 ___
 
@@ -312,7 +316,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:47](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L47)
+[database/FetchOrMoveFromCursorBuilder.ts:47](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L47)
 
 ___
 
@@ -326,7 +330,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:32](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L32)
+[database/FetchOrMoveFromCursorBuilder.ts:32](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L32)
 
 ___
 
@@ -346,7 +350,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
 
 ___
 
@@ -360,7 +364,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:37](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L37)
+[database/FetchOrMoveFromCursorBuilder.ts:37](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L37)
 
 ___
 
@@ -380,7 +384,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:57](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L57)
+[database/FetchOrMoveFromCursorBuilder.ts:57](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L57)
 
 ___
 
@@ -401,7 +405,7 @@ ___
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:72](https://github.com/onzag/itemize/blob/a24376ed/database/FetchOrMoveFromCursorBuilder.ts#L72)
+[database/FetchOrMoveFromCursorBuilder.ts:72](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L72)
 
 ___
 
@@ -428,7 +432,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
 
 ___
 
@@ -455,7 +459,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
 
 ___
 
@@ -477,4 +481,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)

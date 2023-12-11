@@ -4,33 +4,46 @@
 
 ## Table of contents
 
+### Namespaces
+
+- [default](client_components_accessibility_AltScroller.default.md)
+
 ### Classes
 
 - [ActualAltScroller](../classes/client_components_accessibility_AltScroller.ActualAltScroller.md)
 
-### Variables
-
-- [default](client_components_accessibility_AltScroller.md#default)
-
 ### Functions
 
+- [default](client_components_accessibility_AltScroller.md#default)
 - [getRelevant](client_components_accessibility_AltScroller.md#getrelevant)
 - [hideAll](client_components_accessibility_AltScroller.md#hideall)
 - [scrollCurrent](client_components_accessibility_AltScroller.md#scrollcurrent)
 - [setScrollerBlockStatus](client_components_accessibility_AltScroller.md#setscrollerblockstatus)
 - [showRelevant](client_components_accessibility_AltScroller.md#showrelevant)
 
-## Variables
+## Functions
 
 ### default
 
-• **default**: `ForwardRefExoticComponent`<`IAltScrollerProps` & `RefAttributes`<[`ActualAltScroller`](../classes/client_components_accessibility_AltScroller.ActualAltScroller.md)\>\>
+▸ **default**(`props`): `ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\>
+
+**NOTE**: Exotic components are not callable.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `IAltScrollerProps` & `RefAttributes`\<[`ActualAltScroller`](../classes/client_components_accessibility_AltScroller.ActualAltScroller.md)\> |
+
+#### Returns
+
+`ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\>
 
 #### Defined in
 
-[client/components/accessibility/AltScroller.tsx:322](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltScroller.tsx#L322)
+node_modules/@types/react/index.d.ts:354
 
-## Functions
+___
 
 ### getRelevant
 
@@ -42,7 +55,7 @@
 
 #### Defined in
 
-[client/components/accessibility/AltScroller.tsx:123](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltScroller.tsx#L123)
+[client/components/accessibility/AltScroller.tsx:123](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltScroller.tsx#L123)
 
 ___
 
@@ -56,7 +69,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltScroller.tsx:61](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltScroller.tsx#L61)
+[client/components/accessibility/AltScroller.tsx:61](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltScroller.tsx#L61)
 
 ___
 
@@ -68,7 +81,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `dir` | ``"up"`` \| ``"left"`` \| ``"right"`` \| ``"down"`` |
+| `dir` | ``"left"`` \| ``"right"`` \| ``"down"`` \| ``"up"`` |
 | `cb?` | () => `void` |
 
 #### Returns
@@ -77,7 +90,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltScroller.tsx:87](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltScroller.tsx#L87)
+[client/components/accessibility/AltScroller.tsx:87](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltScroller.tsx#L87)
 
 ___
 
@@ -97,7 +110,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltScroller.tsx:79](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltScroller.tsx#L79)
+[client/components/accessibility/AltScroller.tsx:79](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltScroller.tsx#L79)
 
 ___
 
@@ -111,4 +124,4 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltScroller.tsx:135](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltScroller.tsx#L135)
+[client/components/accessibility/AltScroller.tsx:135](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltScroller.tsx#L135)

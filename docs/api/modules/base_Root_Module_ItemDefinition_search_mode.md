@@ -36,4 +36,4 @@ a raw json item definition form that represents the search mode
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/search-mode.ts:23](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/search-mode.ts#L23)
+[base/Root/Module/ItemDefinition/search-mode.ts:23](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/search-mode.ts#L23)

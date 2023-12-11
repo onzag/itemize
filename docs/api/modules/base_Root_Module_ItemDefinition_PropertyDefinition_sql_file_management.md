@@ -2,7 +2,7 @@
 
 # Module: base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management
 
-Contains the functionality that makes it so that when files come from graphql
+Contains the functionality that makes it so that when files come from rq
 streams and are to be stored in the database the files are sent somewhere else
 and the url is actually what it's stored
 
@@ -19,7 +19,7 @@ and the url is actually what it's stored
 
 ### deleteEverythingInFilesContainerId
 
-▸ **deleteEverythingInFilesContainerId**(`domain`, `uploadsClient`, `itemDefinitionOrModule`, `idVersionId`): `Promise`<`void`\>
+▸ **deleteEverythingInFilesContainerId**(`domain`, `uploadsClient`, `itemDefinitionOrModule`, `idVersionId`): `Promise`\<`void`\>
 
 Deletes the folder that contains all
 the file data
@@ -29,19 +29,19 @@ the file data
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `domain` | `string` | the domain we are working with |
-| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\> | the uploads client |
-| `itemDefinitionOrModule` | [`default`](../classes/base_Root_Module.default.md) \| [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition or module in question |
+| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\> | the uploads client |
+| `itemDefinitionOrModule` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) \| [`default`](../classes/base_Root_Module.default.md) | the item definition or module in question |
 | `idVersionId` | `string` | the transitory id to drop |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise from when this is done
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:391](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L391)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:391](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L391)
 
 ___
 
@@ -56,11 +56,11 @@ file value
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `newValues` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)[] | the new values as a list |
-| `oldValues` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)[] | the old values that this came from |
-| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\> | the uploads client |
+| `newValues` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md)[] | the new values as a list |
+| `oldValues` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md)[] | the old values that this came from |
+| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\> | the uploads client |
 | `domain` | `string` | - |
-| `itemDefinitionOrModule` | [`default`](../classes/base_Root_Module.default.md) \| [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition or module (for prop extension) these values are related to |
+| `itemDefinitionOrModule` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) \| [`default`](../classes/base_Root_Module.default.md) | the item definition or module (for prop extension) these values are related to |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include this values are related to |
 | `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property (must be of type file) |
 
@@ -74,11 +74,11 @@ streams to store in the remote storage solution
 | Name | Type |
 | :------ | :------ |
 | `consumeStreams` | [`ConsumeStreamsFnType`](base_Root_sql.md#consumestreamsfntype) |
-| `value` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)[] |
+| `value` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md)[] |
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:38](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:38](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L38)
 
 ___
 
@@ -94,11 +94,11 @@ should be of different id
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `newValue` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the new value |
-| `oldValue` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the old value |
-| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\> | - |
+| `newValue` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) | the new value |
+| `oldValue` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) | the old value |
+| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\> | - |
 | `domain` | `string` | the domain we are storing for |
-| `itemDefinitionOrModule` | [`default`](../classes/base_Root_Module.default.md) \| [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition or module these values are related to |
+| `itemDefinitionOrModule` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) \| [`default`](../classes/base_Root_Module.default.md) | the item definition or module these values are related to |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include this values are related to |
 | `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property (must be of type file) |
 
@@ -112,17 +112,17 @@ streams to store in the remote storage solution
 | Name | Type |
 | :------ | :------ |
 | `consumeStreams` | [`ConsumeStreamsFnType`](base_Root_sql.md#consumestreamsfntype) |
-| `value` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) |
+| `value` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) |
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:120](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L120)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:120](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L120)
 
 ___
 
 ### sqlUploadPipeFile
 
-▸ **sqlUploadPipeFile**(`uploadsClient`, `readStream`, `domain`, `remote`): `Promise`<`void`\>
+▸ **sqlUploadPipeFile**(`uploadsClient`, `readStream`, `domain`, `remote`): `Promise`\<`void`\>
 
 Uploads a file in a given upload container
 
@@ -130,17 +130,17 @@ Uploads a file in a given upload container
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\> | the uploads client |
+| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\> | the uploads client |
 | `readStream` | `ReadStream` \| `Sharp` | the read stream of the file |
 | `domain` | `string` | - |
 | `remote` | `string` | the remote name this file is uploaded as, it's whole path |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:473](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L473)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:473](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L473)

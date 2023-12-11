@@ -29,7 +29,7 @@ This is all the base resolvers we are expecting out off itemize
 
 #### Defined in
 
-[base/Root/rq.ts:120](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L120)
+[base/Root/rq.ts:108](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L108)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:122](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L122)
+[base/Root/rq.ts:110](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L110)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:121](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L121)
+[base/Root/rq.ts:109](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L109)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:113](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L113)
+[base/Root/rq.ts:101](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L101)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:114](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L114)
+[base/Root/rq.ts:102](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L102)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:119](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L119)
+[base/Root/rq.ts:107](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L107)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:115](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L115)
+[base/Root/rq.ts:103](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L103)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:116](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L116)
+[base/Root/rq.ts:104](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L104)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:117](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L117)
+[base/Root/rq.ts:105](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L105)
 
 ___
 
@@ -119,4 +119,4 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:118](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L118)
+[base/Root/rq.ts:106](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L106)

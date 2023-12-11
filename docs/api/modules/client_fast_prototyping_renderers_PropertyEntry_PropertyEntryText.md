@@ -23,7 +23,7 @@ any other non-subtype text, it will use the field instead
 
 ### style
 
-• **style**: `Object`
+• `Const` **style**: `Object`
 
 The styles for the text entry
 
@@ -31,47 +31,47 @@ The styles for the text entry
 
 | Name | Type |
 | :------ | :------ |
-| `container` | `Object` |
+| `container` | \{ `width`: `string` = "100%" } |
 | `container.width` | `string` |
-| `description` | `Object` |
+| `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
-| `entry` | `Object` |
+| `entry` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `entry.alignItems` | `string` |
 | `entry.display` | `string` |
 | `entry.flexDirection` | `string` |
 | `entry.justifyContent` | `string` |
 | `entry.width` | `string` |
-| `errorMessage` | `Object` |
+| `errorMessage` | \{ `color`: `string` = "#f44336"; `fontSize`: `string` = "0.85rem"; `height`: `string` = "1.3rem" } |
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `icon` | `Object` |
+| `icon` | \{ `color`: `string` = "#424242" } |
 | `icon.color` | `string` |
-| `iconButton` | `Object` |
-| `iconButton.&:hover` | `Object` |
+| `iconButton` | \{ `&:hover`: \{ `backgroundColor`: `string` = "#1976d2" } ; `backgroundColor`: `string` = "#2196f3"; `color`: `string` = "#fff" } |
+| `iconButton.&:hover` | \{ `backgroundColor`: `string` = "#1976d2" } |
 | `iconButton.&:hover.backgroundColor` | `string` |
 | `iconButton.backgroundColor` | `string` |
 | `iconButton.color` | `string` |
-| `label` | (`isInvalid`: `boolean`, `richText`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
-| `labelContainer` | `Object` |
+| `label` | (`isInvalid`: `boolean`, `richText`: `boolean`) => \{ `&.focused`: \{ `color`: `string`  } ; `color`: `string`  } |
+| `labelContainer` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `justifyContent`: `string` = "center" } |
 | `labelContainer.alignItems` | `string` |
 | `labelContainer.display` | `string` |
 | `labelContainer.justifyContent` | `string` |
-| `labelNoToolbar` | `Object` |
+| `labelNoToolbar` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `height`: `string` = "5rem"; `justifyContent`: `string` = "space-between"; `padding`: `string` = "1rem 0 0 0"; `width`: `string` = "100%" } |
 | `labelNoToolbar.alignItems` | `string` |
 | `labelNoToolbar.display` | `string` |
 | `labelNoToolbar.height` | `string` |
 | `labelNoToolbar.justifyContent` | `string` |
 | `labelNoToolbar.padding` | `string` |
 | `labelNoToolbar.width` | `string` |
-| `labelSingleLine` | `Object` |
+| `labelSingleLine` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `height`: `string` = "5rem"; `justifyContent`: `string` = "space-between"; `padding`: `string` = "1rem 0"; `width`: `string` = "100%" } |
 | `labelSingleLine.alignItems` | `string` |
 | `labelSingleLine.display` | `string` |
 | `labelSingleLine.height` | `string` |
 | `labelSingleLine.justifyContent` | `string` |
 | `labelSingleLine.padding` | `string` |
 | `labelSingleLine.width` | `string` |
-| `rawTextArea` | `Object` |
+| `rawTextArea` | \{ `border`: `string` = "none"; `boxShadow`: `string` = "none"; `fontSize`: `string` = "1rem"; `outline`: `string` = "none"; `overflow`: `string` = "hidden"; `padding`: `string` = "12px 15px"; `resize`: `string` = "none"; `width`: `string` = "100%" } |
 | `rawTextArea.border` | `string` |
 | `rawTextArea.boxShadow` | `string` |
 | `rawTextArea.fontSize` | `string` |
@@ -80,7 +80,7 @@ The styles for the text entry
 | `rawTextArea.padding` | `string` |
 | `rawTextArea.resize` | `string` |
 | `rawTextArea.width` | `string` |
-| `textButton` | `Object` |
+| `textButton` | \{ `alignItems`: `string` = "center"; `border`: `string` = "solid 1px rgba(0,0,0,0.1)"; `borderRadius`: `string` = "5px"; `display`: `string` = "flex"; `height`: `string` = "50px"; `justifyContent`: `string` = "center"; `margin`: `string` = "0"; `minWidth`: `string` = "50px"; `padding`: `string` = "0 10px" } |
 | `textButton.alignItems` | `string` |
 | `textButton.border` | `string` |
 | `textButton.borderRadius` | `string` |
@@ -93,4 +93,4 @@ The styles for the text entry
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L38)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:38](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L38)

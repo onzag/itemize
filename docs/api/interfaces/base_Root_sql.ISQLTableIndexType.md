@@ -22,7 +22,7 @@ The id of the index in order to perform double table indexes
 
 #### Defined in
 
-[base/Root/sql.ts:20](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L20)
+[base/Root/sql.ts:20](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L20)
 
 ___
 
@@ -36,7 +36,7 @@ performance effects
 
 #### Defined in
 
-[base/Root/sql.ts:30](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L30)
+[base/Root/sql.ts:30](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L30)
 
 ___
 
@@ -48,4 +48,4 @@ The type of the index, unique, gin, btree...
 
 #### Defined in
 
-[base/Root/sql.ts:24](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L24)
+[base/Root/sql.ts:24](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L24)

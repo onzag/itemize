@@ -40,7 +40,7 @@ instead of using this
 
 ### constructor
 
-• **new RawBuilder**(`raw`, `bindings?`)
+• **new RawBuilder**(`raw`, `bindings?`): [`RawBuilder`](database_RawBuilder.RawBuilder.md)
 
 Builds a new raw query
 
@@ -51,13 +51,17 @@ Builds a new raw query
 | `raw` | `string` | the raw query |
 | `bindings?` | (`string` \| `number`)[] | the bindings for such |
 
+#### Returns
+
+[`RawBuilder`](database_RawBuilder.RawBuilder.md)
+
 #### Overrides
 
 [QueryBuilder](database_base.QueryBuilder.md).[constructor](database_base.QueryBuilder.md#constructor)
 
 #### Defined in
 
-[database/RawBuilder.ts:25](https://github.com/onzag/itemize/blob/a24376ed/database/RawBuilder.ts#L25)
+[database/RawBuilder.ts:25](https://github.com/onzag/itemize/blob/59702dd5/database/RawBuilder.ts#L25)
 
 ## Properties
 
@@ -69,7 +73,7 @@ The raw expression
 
 #### Defined in
 
-[database/RawBuilder.ts:18](https://github.com/onzag/itemize/blob/a24376ed/database/RawBuilder.ts#L18)
+[database/RawBuilder.ts:18](https://github.com/onzag/itemize/blob/59702dd5/database/RawBuilder.ts#L18)
 
 ## Methods
 
@@ -95,7 +99,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
 
 ___
 
@@ -121,7 +125,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
 
 ___
 
@@ -141,7 +145,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
 
 ___
 
@@ -163,7 +167,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/RawBuilder.ts:39](https://github.com/onzag/itemize/blob/a24376ed/database/RawBuilder.ts#L39)
+[database/RawBuilder.ts:39](https://github.com/onzag/itemize/blob/59702dd5/database/RawBuilder.ts#L39)
 
 ___
 
@@ -186,7 +190,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
 
 ___
 
@@ -206,7 +210,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
 
 ___
 
@@ -233,7 +237,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
 
 ___
 
@@ -260,7 +264,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
 
 ___
 
@@ -282,4 +286,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)

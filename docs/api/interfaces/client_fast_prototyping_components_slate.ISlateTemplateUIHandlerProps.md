@@ -50,7 +50,7 @@ the args will be x and whatNot that are passed here
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L47)
+[client/internal/text/serializer/base.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L47)
 
 ___
 
@@ -62,7 +62,7 @@ The attributes that slate provides
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:128](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L128)
+[client/fast-prototyping/components/slate/index.tsx:128](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L128)
 
 ___
 
@@ -79,7 +79,7 @@ please ensure to use them specially if in slate mode
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:58](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L58)
+[client/internal/text/serializer/base.tsx:58](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L58)
 
 ___
 
@@ -95,7 +95,7 @@ An optional class name
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:62](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L62)
+[client/internal/text/serializer/base.tsx:62](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L62)
 
 ___
 
@@ -111,7 +111,7 @@ The element that the ui handler belongs to
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:53](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L53)
+[client/internal/text/serializer/base.tsx:53](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L53)
 
 ___
 
@@ -127,7 +127,7 @@ contains events that should be added to the element
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:78](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L78)
+[client/internal/text/serializer/base.tsx:78](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L78)
 
 ___
 
@@ -140,7 +140,7 @@ requests extra info
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:133](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L133)
+[client/fast-prototyping/components/slate/index.tsx:133](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L133)
 
 ___
 
@@ -152,7 +152,7 @@ Whether it is currently into an slate instance
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:124](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L124)
+[client/fast-prototyping/components/slate/index.tsx:124](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L124)
 
 ___
 
@@ -165,7 +165,7 @@ requests extra info
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:138](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L138)
+[client/fast-prototyping/components/slate/index.tsx:138](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L138)
 
 ___
 
@@ -181,7 +181,7 @@ The style object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:66](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L66)
+[client/internal/text/serializer/base.tsx:66](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L66)
 
 ___
 
@@ -197,7 +197,7 @@ The style active object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:70](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L70)
+[client/internal/text/serializer/base.tsx:70](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L70)
 
 ___
 
@@ -213,4 +213,4 @@ The style hover object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:74](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L74)
+[client/internal/text/serializer/base.tsx:74](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/base.tsx#L74)

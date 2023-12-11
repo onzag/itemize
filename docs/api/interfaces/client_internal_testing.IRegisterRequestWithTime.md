@@ -4,6 +4,9 @@
 
 [client/internal/testing](../modules/client_internal_testing.md).IRegisterRequestWithTime
 
+The register event contains the item definition qualified
+path name and the slot id
+
 ## Hierarchy
 
 - [`IRegisterRequest`](base_remote_protocol.IRegisterRequest.md)
@@ -31,7 +34,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:226](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L226)
+[base/remote-protocol.ts:226](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L226)
 
 ___
 
@@ -45,7 +48,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:225](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L225)
+[base/remote-protocol.ts:225](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L225)
 
 ___
 
@@ -55,7 +58,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:75](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L75)
+[client/internal/testing.ts:75](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L75)
 
 ___
 
@@ -69,4 +72,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:227](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L227)
+[base/remote-protocol.ts:227](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L227)

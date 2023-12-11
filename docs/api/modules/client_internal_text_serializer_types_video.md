@@ -36,4 +36,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/video.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/types/video.tsx#L20)
+[client/internal/text/serializer/types/video.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/types/video.tsx#L20)

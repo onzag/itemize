@@ -16,6 +16,7 @@ Options for deleting
 
 ### Properties
 
+- [beforeDelete](client_providers_item.IActionDeleteOptions.md#beforedelete)
 - [cleanSearchResultsOnAny](client_providers_item.IActionDeleteOptions.md#cleansearchresultsonany)
 - [cleanSearchResultsOnFailure](client_providers_item.IActionDeleteOptions.md#cleansearchresultsonfailure)
 - [cleanSearchResultsOnSuccess](client_providers_item.IActionDeleteOptions.md#cleansearchresultsonsuccess)
@@ -42,11 +43,30 @@ Options for deleting
 - [unpokeAfterFailure](client_providers_item.IActionDeleteOptions.md#unpokeafterfailure)
 - [unpokeAfterSuccess](client_providers_item.IActionDeleteOptions.md#unpokeaftersuccess)
 
-### Methods
-
-- [beforeDelete](client_providers_item.IActionDeleteOptions.md#beforedelete)
-
 ## Properties
+
+### beforeDelete
+
+• `Optional` **beforeDelete**: () => `boolean` \| `Promise`\<`boolean`\>
+
+#### Type declaration
+
+▸ (): `boolean` \| `Promise`\<`boolean`\>
+
+A function that executes before the delete gets done, this allows to prevent
+or not the deleting action
+
+##### Returns
+
+`boolean` \| `Promise`\<`boolean`\>
+
+a boolean or a promise with a boolean on whether one should proceed
+
+#### Defined in
+
+[client/providers/item.tsx:626](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L626)
+
+___
 
 ### cleanSearchResultsOnAny
 
@@ -63,7 +83,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L323)
+[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L323)
 
 ___
 
@@ -82,7 +102,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:330](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L330)
+[client/providers/item.tsx:330](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L330)
 
 ___
 
@@ -101,7 +121,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:316](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L316)
+[client/providers/item.tsx:316](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L316)
 
 ___
 
@@ -125,7 +145,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:381](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L381)
+[client/providers/item.tsx:381](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L381)
 
 ___
 
@@ -149,7 +169,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L369)
+[client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L369)
 
 ___
 
@@ -173,7 +193,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L357)
+[client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L357)
 
 ___
 
@@ -185,7 +205,7 @@ Id to delete for instead of the current one, allows for deleting another item fr
 
 #### Defined in
 
-[client/providers/item.tsx:611](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L611)
+[client/providers/item.tsx:611](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L611)
 
 ___
 
@@ -197,7 +217,7 @@ Version to delete for instead of the current one
 
 #### Defined in
 
-[client/providers/item.tsx:615](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L615)
+[client/providers/item.tsx:615](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L615)
 
 ___
 
@@ -218,7 +238,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:273](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L273)
+[client/providers/item.tsx:273](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L273)
 
 ___
 
@@ -239,7 +259,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:282](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L282)
+[client/providers/item.tsx:282](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L282)
 
 ___
 
@@ -260,7 +280,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:264](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L264)
+[client/providers/item.tsx:264](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L264)
 
 ___
 
@@ -272,7 +292,7 @@ Delete policies to include
 
 #### Defined in
 
-[client/providers/item.tsx:619](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L619)
+[client/providers/item.tsx:619](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L619)
 
 ___
 
@@ -288,7 +308,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:224](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L224)
+[client/providers/item.tsx:224](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L224)
 
 ___
 
@@ -304,7 +324,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:228](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L228)
+[client/providers/item.tsx:228](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L228)
 
 ___
 
@@ -320,20 +340,20 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L220)
+[client/providers/item.tsx:220](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L220)
 
 ___
 
 ### progresser
 
-• `Optional` **progresser**: [`ProgresserFn`](../modules/gql_querier.md#progresserfn)
+• `Optional` **progresser**: [`ProgresserFn`](../modules/rq_querier.md#progresserfn)
 
 Similar to submit this allows to use a progressing as a percentage
 in deletes this is mostly useless since it's basically instant
 
 #### Defined in
 
-[client/providers/item.tsx:631](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L631)
+[client/providers/item.tsx:631](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L631)
 
 ___
 
@@ -354,7 +374,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:246](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L246)
+[client/providers/item.tsx:246](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L246)
 
 ___
 
@@ -375,7 +395,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L255)
+[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L255)
 
 ___
 
@@ -396,7 +416,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:237](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L237)
+[client/providers/item.tsx:237](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L237)
 
 ___
 
@@ -413,7 +433,7 @@ given action completes
 
 #### Defined in
 
-[client/providers/item.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L340)
+[client/providers/item.tsx:340](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L340)
 
 ___
 
@@ -430,7 +450,7 @@ given action, completes and FAILED
 
 #### Defined in
 
-[client/providers/item.tsx:345](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L345)
+[client/providers/item.tsx:345](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L345)
 
 ___
 
@@ -447,7 +467,7 @@ given action, completes and SUCCEEDS
 
 #### Defined in
 
-[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L335)
+[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L335)
 
 ___
 
@@ -468,7 +488,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:300](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L300)
+[client/providers/item.tsx:300](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L300)
 
 ___
 
@@ -489,7 +509,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L309)
+[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L309)
 
 ___
 
@@ -510,23 +530,4 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L291)
-
-## Methods
-
-### beforeDelete
-
-▸ `Optional` **beforeDelete**(): `boolean` \| `Promise`<`boolean`\>
-
-A function that executes before the delete gets done, this allows to prevent
-or not the deleting action
-
-#### Returns
-
-`boolean` \| `Promise`<`boolean`\>
-
-a boolean or a promise with a boolean on whether one should proceed
-
-#### Defined in
-
-[client/providers/item.tsx:626](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L626)
+[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L291)

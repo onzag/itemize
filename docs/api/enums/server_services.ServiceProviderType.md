@@ -6,49 +6,49 @@
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [GLOBAL](server_services.ServiceProviderType.md#global)
 - [HYBRID](server_services.ServiceProviderType.md#hybrid)
 - [LOCAL](server_services.ServiceProviderType.md#local)
 - [NONE](server_services.ServiceProviderType.md#none)
 
-## Enumeration members
+## Enumeration Members
 
 ### GLOBAL
 
-• **GLOBAL** = `"GLOBAL"`
+• **GLOBAL** = ``"GLOBAL"``
 
 #### Defined in
 
-[server/services/index.ts:24](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L24)
+[server/services/index.ts:24](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L24)
 
 ___
 
 ### HYBRID
 
-• **HYBRID** = `"HYBRID"`
+• **HYBRID** = ``"HYBRID"``
 
 #### Defined in
 
-[server/services/index.ts:26](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L26)
+[server/services/index.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L26)
 
 ___
 
 ### LOCAL
 
-• **LOCAL** = `"LOCAL"`
+• **LOCAL** = ``"LOCAL"``
 
 #### Defined in
 
-[server/services/index.ts:25](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L25)
+[server/services/index.ts:25](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L25)
 
 ___
 
 ### NONE
 
-• **NONE** = `"NONE"`
+• **NONE** = ``"NONE"``
 
 #### Defined in
 
-[server/services/index.ts:27](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L27)
+[server/services/index.ts:27](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L27)

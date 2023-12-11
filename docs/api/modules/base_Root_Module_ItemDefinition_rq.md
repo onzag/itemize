@@ -2,7 +2,7 @@
 
 # Module: base/Root/Module/ItemDefinition/rq
 
-This file contains all the graphql functions that need to be used to request
+This file contains all the rq functions that need to be used to request
 and process an item definition, from the definition to how it must be queried
 
 ## Table of contents
@@ -37,7 +37,7 @@ and process an item definition, from the definition to how it must be queried
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/rq.ts:35](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/rq.ts#L35)
+[base/Root/Module/ItemDefinition/rq.ts:35](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/rq.ts#L35)
 
 ___
 
@@ -60,11 +60,11 @@ definitions
 
 [`RQField`](../interfaces/base_Root_rq.RQField.md)
 
-a partial graphql fields definition that only contains the policies
+a partial rq fields definition that only contains the policies
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/rq.ts:137](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/rq.ts#L137)
+[base/Root/Module/ItemDefinition/rq.ts:145](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/rq.ts#L145)
 
 ___
 
@@ -91,4 +91,4 @@ all the fields definition for the module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/rq.ts:176](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/rq.ts#L176)
+[base/Root/Module/ItemDefinition/rq.ts:185](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/rq.ts#L185)

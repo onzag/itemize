@@ -18,14 +18,14 @@ Represents a conditional builder condition
 
 ### condition
 
-• **condition**: `string` \| [`ConditionalBuilder`](../classes/database_base.ConditionalBuilder.md) \| [`QueryBuilder`](../classes/database_base.QueryBuilder.md)
+• **condition**: `string` \| [`QueryBuilder`](../classes/database_base.QueryBuilder.md) \| [`ConditionalBuilder`](../classes/database_base.ConditionalBuilder.md)
 
 The condition itself can be a subcondition
 or an expression itself
 
 #### Defined in
 
-[database/base.ts:203](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L203)
+[database/base.ts:203](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L203)
 
 ___
 
@@ -37,7 +37,7 @@ The gate that is going to use
 
 #### Defined in
 
-[database/base.ts:207](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L207)
+[database/base.ts:207](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L207)
 
 ___
 
@@ -49,4 +49,4 @@ An optional prefix that comes after the and rule
 
 #### Defined in
 
-[database/base.ts:211](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L211)
+[database/base.ts:211](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L211)

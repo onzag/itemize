@@ -4,7 +4,7 @@
 
 [base/remote-protocol](../modules/base_remote_protocol.md).IPropertySearchUnregisterRequest
 
-The unregister version of [IPropertySearchRegisterRequest](base_remote_protocol.IPropertySearchRegisterRequest.md)
+The unregister version of [[IPropertySearchRegisterRequest]]
 
 ## Hierarchy
 
@@ -28,7 +28,7 @@ The unregister version of [IPropertySearchRegisterRequest](base_remote_protocol.
 
 #### Defined in
 
-[base/remote-protocol.ts:515](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L515)
+[base/remote-protocol.ts:515](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L515)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:516](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L516)
+[base/remote-protocol.ts:516](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L516)
 
 ___
 
@@ -52,4 +52,4 @@ IBaseSearchUnregisterRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:478](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L478)
+[base/remote-protocol.ts:478](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L478)

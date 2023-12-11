@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/components/accessibility/AltReactioner](../modules/client_components_accessibility_AltReactioner.md) / ActualAltBase
 
-# Class: ActualAltBase<P, S\>
+# Class: ActualAltBase\<P, S\>
 
 [client/components/accessibility/AltReactioner](../modules/client_components_accessibility_AltReactioner.md).ActualAltBase
 
@@ -13,7 +13,7 @@
 
 ## Hierarchy
 
-- `PureComponent`<`P`, `S`\>
+- `PureComponent`\<`P`, `S`\>
 
   ↳ **`ActualAltBase`**
 
@@ -74,7 +74,7 @@
 
 ### constructor
 
-• **new ActualAltBase**<`P`, `S`\>(`props`)
+• **new ActualAltBase**\<`P`, `S`\>(`props`): [`ActualAltBase`](client_components_accessibility_AltReactioner.ActualAltBase.md)\<`P`, `S`\>
 
 #### Type parameters
 
@@ -89,23 +89,27 @@
 | :------ | :------ |
 | `props` | `P` |
 
+#### Returns
+
+[`ActualAltBase`](client_components_accessibility_AltReactioner.ActualAltBase.md)\<`P`, `S`\>
+
 #### Overrides
 
-React.PureComponent&lt;P, S\&gt;.constructor
+React.PureComponent\&lt;P, S\&gt;.constructor
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1042](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1042)
+[client/components/accessibility/AltReactioner.tsx:1042](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1042)
 
 ## Properties
 
 ### containerRef
 
-• **containerRef**: `RefObject`<`HTMLElement`\>
+• **containerRef**: `RefObject`\<`HTMLElement`\>
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1040](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1040)
+[client/components/accessibility/AltReactioner.tsx:1040](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1040)
 
 ___
 
@@ -125,7 +129,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -133,13 +139,13 @@ React.PureComponent.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<`P`\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<`P`\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -147,7 +153,7 @@ React.PureComponent.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -155,8 +161,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -168,13 +175,13 @@ React.PureComponent.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### state
 
-• **state**: `Readonly`<`S`\>
+• **state**: `Readonly`\<`S`\>
 
 #### Inherited from
 
@@ -182,13 +189,13 @@ React.PureComponent.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -207,7 +214,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -215,13 +224,13 @@ React.PureComponent.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -231,15 +240,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -247,13 +259,13 @@ React.PureComponent.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -266,22 +278,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`P`\> |
+| `nextProps` | `Readonly`\<`P`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -289,13 +304,13 @@ React.PureComponent.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -306,23 +321,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`P`\> |
-| `nextState` | `Readonly`<`S`\> |
+| `nextProps` | `Readonly`\<`P`\> |
+| `nextState` | `Readonly`\<`S`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -330,7 +348,7 @@ React.PureComponent.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
@@ -344,13 +362,13 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1415](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1415)
+[client/components/accessibility/AltReactioner.tsx:1415](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1415)
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -372,7 +390,7 @@ React.PureComponent.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
@@ -390,7 +408,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1440](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1440)
+[client/components/accessibility/AltReactioner.tsx:1440](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1440)
 
 ___
 
@@ -414,13 +432,13 @@ React.PureComponent.componentDidUpdate
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1085](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1085)
+[client/components/accessibility/AltReactioner.tsx:1085](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1085)
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -428,15 +446,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -444,13 +465,13 @@ React.PureComponent.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -461,22 +482,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`P`\> |
+| `nextProps` | `Readonly`\<`P`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -484,7 +508,7 @@ React.PureComponent.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
@@ -502,13 +526,13 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1444](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1444)
+[client/components/accessibility/AltReactioner.tsx:1444](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1444)
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -517,23 +541,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`P`\> |
-| `nextState` | `Readonly`<`S`\> |
+| `nextProps` | `Readonly`\<`P`\> |
+| `nextState` | `Readonly`\<`S`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -541,7 +568,7 @@ React.PureComponent.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
@@ -553,7 +580,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `how` | ``"precise"`` \| ``"above"`` \| ``"below"`` |
+| `how` | ``"above"`` \| ``"below"`` \| ``"precise"`` |
 
 #### Returns
 
@@ -561,7 +588,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1367](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1367)
+[client/components/accessibility/AltReactioner.tsx:1367](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1367)
 
 ___
 
@@ -585,7 +612,7 @@ React.PureComponent.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
@@ -599,7 +626,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1132](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1132)
+[client/components/accessibility/AltReactioner.tsx:1132](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1132)
 
 ___
 
@@ -613,7 +640,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1120](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1120)
+[client/components/accessibility/AltReactioner.tsx:1120](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1120)
 
 ___
 
@@ -627,7 +654,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1100](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1100)
+[client/components/accessibility/AltReactioner.tsx:1100](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1100)
 
 ___
 
@@ -641,13 +668,13 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1279](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1279)
+[client/components/accessibility/AltReactioner.tsx:1279](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1279)
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -660,8 +687,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<`P`\> |
-| `prevState` | `Readonly`<`S`\> |
+| `prevProps` | `Readonly`\<`P`\> |
+| `prevState` | `Readonly`\<`S`\> |
 
 #### Returns
 
@@ -673,7 +700,7 @@ React.PureComponent.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
@@ -691,7 +718,7 @@ the root and ending with the current
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1146](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1146)
+[client/components/accessibility/AltReactioner.tsx:1146](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1146)
 
 ___
 
@@ -703,7 +730,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `other` | [`ActualAltBase`](client_components_accessibility_AltReactioner.ActualAltBase.md)<`any`, `any`\> |
+| `other` | [`ActualAltBase`](client_components_accessibility_AltReactioner.ActualAltBase.md)\<`any`, `any`\> |
 
 #### Returns
 
@@ -711,7 +738,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1171](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1171)
+[client/components/accessibility/AltReactioner.tsx:1171](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1171)
 
 ___
 
@@ -725,7 +752,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1056](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1056)
+[client/components/accessibility/AltReactioner.tsx:1056](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1056)
 
 ___
 
@@ -739,7 +766,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1104](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1104)
+[client/components/accessibility/AltReactioner.tsx:1104](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1104)
 
 ___
 
@@ -753,7 +780,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1052](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1052)
+[client/components/accessibility/AltReactioner.tsx:1052](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1052)
 
 ___
 
@@ -767,7 +794,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1096](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1096)
+[client/components/accessibility/AltReactioner.tsx:1096](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1096)
 
 ___
 
@@ -781,7 +808,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1420](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1420)
+[client/components/accessibility/AltReactioner.tsx:1420](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1420)
 
 ___
 
@@ -795,7 +822,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1048](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1048)
+[client/components/accessibility/AltReactioner.tsx:1048](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1048)
 
 ___
 
@@ -809,7 +836,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1411](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1411)
+[client/components/accessibility/AltReactioner.tsx:1411](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1411)
 
 ___
 
@@ -829,7 +856,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1285](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1285)
+[client/components/accessibility/AltReactioner.tsx:1285](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1285)
 
 ___
 
@@ -847,7 +874,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1424](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1424)
+[client/components/accessibility/AltReactioner.tsx:1424](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1424)
 
 ___
 
@@ -869,13 +896,13 @@ when another alt is blocking this triggers
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1081](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1081)
+[client/components/accessibility/AltReactioner.tsx:1081](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1081)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -887,7 +914,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `S` \| (`prevState`: `Readonly`<`S`\>, `props`: `Readonly`<`P`\>) => `S` \| `Pick`<`S`, `K`\> \| `Pick`<`S`, `K`\> |
+| `state` | `S` \| (`prevState`: `Readonly`\<`S`\>, `props`: `Readonly`\<`P`\>) => `S` \| `Pick`\<`S`, `K`\> \| `Pick`\<`S`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -900,13 +927,13 @@ React.PureComponent.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
 ### shouldComponentUpdate
 
-▸ `Optional` **shouldComponentUpdate**(`nextProps`, `nextState`, `nextContext`): `boolean`
+▸ **shouldComponentUpdate**(`nextProps`, `nextState`, `nextContext`): `boolean`
 
 Called to determine whether the change in props and state should trigger a re-render.
 
@@ -921,8 +948,8 @@ and `componentDidUpdate` will not be called.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`P`\> |
-| `nextState` | `Readonly`<`S`\> |
+| `nextProps` | `Readonly`\<`P`\> |
+| `nextState` | `Readonly`\<`S`\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -935,7 +962,7 @@ React.PureComponent.shouldComponentUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:636
+node_modules/@types/react/index.d.ts:630
 
 ___
 
@@ -955,4 +982,4 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1323](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1323)
+[client/components/accessibility/AltReactioner.tsx:1323](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1323)

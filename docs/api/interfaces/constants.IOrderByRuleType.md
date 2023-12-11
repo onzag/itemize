@@ -6,4 +6,4 @@
 
 ## Indexable
 
-▪ [property: `string`]: { `direction`: ``"asc"`` \| ``"desc"`` ; `nulls`: ``"first"`` \| ``"last"`` ; `priority`: `number`  }
+▪ [property: `string`]: \{ `direction`: ``"asc"`` \| ``"desc"`` ; `nulls`: ``"first"`` \| ``"last"`` ; `priority`: `number`  }

@@ -15,6 +15,7 @@
 ### Properties
 
 - [currentRawValueSQL](server_cache.ICopyOptions.md#currentrawvaluesql)
+- [ifAlreadyExistsCall](server_cache.ICopyOptions.md#ifalreadyexistscall)
 - [ifAlreadyExistsReturn](server_cache.ICopyOptions.md#ifalreadyexistsreturn)
 - [ignoreAlreadyExists](server_cache.ICopyOptions.md#ignorealreadyexists)
 - [ignorePreSideEffects](server_cache.ICopyOptions.md#ignorepresideeffects)
@@ -28,10 +29,6 @@
 - [targetParent](server_cache.ICopyOptions.md#targetparent)
 - [targetVersion](server_cache.ICopyOptions.md#targetversion)
 
-### Methods
-
-- [ifAlreadyExistsCall](server_cache.ICopyOptions.md#ifalreadyexistscall)
-
 ## Properties
 
 ### currentRawValueSQL
@@ -40,7 +37,35 @@
 
 #### Defined in
 
-[server/cache.ts:109](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L109)
+[server/cache.ts:109](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L109)
+
+___
+
+### ifAlreadyExistsCall
+
+• `Optional` **ifAlreadyExistsCall**: (`v`: [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md)) => `void`
+
+#### Type declaration
+
+▸ (`v`): `void`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `v` | [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md) |
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[IWritingOptions](server_cache.IWritingOptions.md).[ifAlreadyExistsCall](server_cache.IWritingOptions.md#ifalreadyexistscall)
+
+#### Defined in
+
+[server/cache.ts:81](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L81)
 
 ___
 
@@ -54,7 +79,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L80)
+[server/cache.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L80)
 
 ___
 
@@ -68,7 +93,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:79](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L79)
+[server/cache.ts:79](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L79)
 
 ___
 
@@ -82,7 +107,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L68)
+[server/cache.ts:68](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L68)
 
 ___
 
@@ -96,7 +121,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:69](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L69)
+[server/cache.ts:69](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L69)
 
 ___
 
@@ -110,7 +135,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:66](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L66)
+[server/cache.ts:66](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L66)
 
 ___
 
@@ -124,7 +149,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:67](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L67)
+[server/cache.ts:67](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L67)
 
 ___
 
@@ -134,7 +159,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:101](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L101)
+[server/cache.ts:101](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L101)
 
 ___
 
@@ -144,7 +169,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:102](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L102)
+[server/cache.ts:102](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L102)
 
 ___
 
@@ -154,7 +179,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:99](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L99)
+[server/cache.ts:99](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L99)
 
 ___
 
@@ -164,7 +189,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:108](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L108)
+[server/cache.ts:108](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L108)
 
 ___
 
@@ -182,7 +207,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:103](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L103)
+[server/cache.ts:103](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L103)
 
 ___
 
@@ -192,28 +217,4 @@ ___
 
 #### Defined in
 
-[server/cache.ts:100](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L100)
-
-## Methods
-
-### ifAlreadyExistsCall
-
-▸ `Optional` **ifAlreadyExistsCall**(`v`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `v` | [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md) |
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[IWritingOptions](server_cache.IWritingOptions.md).[ifAlreadyExistsCall](server_cache.IWritingOptions.md#ifalreadyexistscall)
-
-#### Defined in
-
-[server/cache.ts:81](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L81)
+[server/cache.ts:100](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L100)

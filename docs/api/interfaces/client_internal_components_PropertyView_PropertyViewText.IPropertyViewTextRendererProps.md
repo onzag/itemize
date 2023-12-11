@@ -10,7 +10,7 @@ null subtype
 
 ## Hierarchy
 
-- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`IPropertyDefinitionSupportedTextType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>
+- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)\<[`IPropertyDefinitionSupportedTextType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>
 
   ↳ **`IPropertyViewTextRendererProps`**
 
@@ -44,7 +44,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -60,7 +60,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -72,7 +72,7 @@ The language used, or null, if no language found
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewText.tsx#L30)
+[client/internal/components/PropertyView/PropertyViewText.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewText.tsx#L30)
 
 ___
 
@@ -85,7 +85,7 @@ with the text type
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewText.tsx#L25)
+[client/internal/components/PropertyView/PropertyViewText.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewText.tsx#L25)
 
 ___
 
@@ -97,7 +97,7 @@ Whether it is rich text, as in its subtype is html
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:35](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewText.tsx#L35)
+[client/internal/components/PropertyView/PropertyViewText.tsx:35](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewText.tsx#L35)
 
 ___
 
@@ -113,16 +113,16 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
 
 ___
 
 ### subtype
 
-• **subtype**: ``"html"`` \| ``"plain"``
+• **subtype**: ``"plain"`` \| ``"html"``
 
 Whether it is type html or plain
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:39](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewText.tsx#L39)
+[client/internal/components/PropertyView/PropertyViewText.tsx:39](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewText.tsx#L39)

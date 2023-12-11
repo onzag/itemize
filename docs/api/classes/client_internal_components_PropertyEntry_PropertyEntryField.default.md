@@ -8,7 +8,7 @@ The property entry field handler
 
 ## Hierarchy
 
-- `Component`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>, `IPropertyEntryFieldState`\>
+- `Component`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>, `IPropertyEntryFieldState`\>
 
   ↳ **`default`**
 
@@ -56,24 +56,28 @@ The property entry field handler
 
 ### constructor
 
-• **new default**(`props`)
+• **new default**(`props`): [`default`](client_internal_components_PropertyEntry_PropertyEntryField.default.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\> |
+| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\> |
+
+#### Returns
+
+[`default`](client_internal_components_PropertyEntry_PropertyEntryField.default.md)
 
 #### Overrides
 
-React.Component&lt;
-    IPropertyEntryHandlerProps&lt;ValueType, IPropertyEntryFieldRendererProps\&gt;,
+React.Component\&lt;
+    IPropertyEntryHandlerProps\&lt;ValueType, IPropertyEntryFieldRendererProps\&gt;,
     IPropertyEntryFieldState
   \&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:300](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L300)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:300](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L300)
 
 ## Properties
 
@@ -93,7 +97,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -101,13 +107,13 @@ React.Component.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -115,7 +121,7 @@ React.Component.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -123,8 +129,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -136,13 +143,13 @@ React.Component.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### state
 
-• **state**: `Readonly`<`IPropertyEntryFieldState`\>
+• **state**: `Readonly`\<`IPropertyEntryFieldState`\>
 
 #### Inherited from
 
@@ -150,13 +157,13 @@ React.Component.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -175,7 +182,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -183,13 +192,13 @@ React.Component.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -199,15 +208,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -215,13 +227,13 @@ React.Component.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -234,22 +246,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -257,13 +272,13 @@ React.Component.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -274,23 +289,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
-| `nextState` | `Readonly`<`IPropertyEntryFieldState`\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
+| `nextState` | `Readonly`\<`IPropertyEntryFieldState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -298,13 +316,13 @@ React.Component.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -326,7 +344,7 @@ React.Component.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
@@ -344,7 +362,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:348](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L348)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:348](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L348)
 
 ___
 
@@ -356,7 +374,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\> |
+| `prevProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\> |
 
 #### Returns
 
@@ -368,13 +386,13 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:364](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L364)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:364](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L364)
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -382,15 +400,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -398,13 +419,13 @@ React.Component.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -415,22 +436,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -438,13 +462,13 @@ React.Component.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
 ### componentWillUnmount
 
-▸ `Optional` **componentWillUnmount**(): `void`
+▸ **componentWillUnmount**(): `void`
 
 Called immediately before a component is destroyed. Perform any necessary cleanup in this method, such as
 cancelled network requests, or cleaning up any DOM elements created in `componentDidMount`.
@@ -459,13 +483,13 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:641
+node_modules/@types/react/index.d.ts:635
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -474,23 +498,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
-| `nextState` | `Readonly`<`IPropertyEntryFieldState`\> |
+| `nextProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
+| `nextState` | `Readonly`\<`IPropertyEntryFieldState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -498,7 +525,7 @@ React.Component.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
@@ -512,7 +539,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:435](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L435)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:435](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L435)
 
 ___
 
@@ -536,7 +563,7 @@ React.Component.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
@@ -555,7 +582,7 @@ according to what we have selected in our localization options
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:575](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L575)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:575](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L575)
 
 ___
 
@@ -575,13 +602,13 @@ an array where, 0 is currentUnit by state, 1 is the standard metric unit code to
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:546](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L546)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:546](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L546)
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -594,8 +621,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
-| `prevState` | `Readonly`<`IPropertyEntryFieldState`\> |
+| `prevProps` | `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\> |
+| `prevState` | `Readonly`\<`IPropertyEntryFieldState`\> |
 
 #### Returns
 
@@ -607,7 +634,7 @@ React.Component.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
@@ -630,7 +657,7 @@ it is, and controls the internal value based on that
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:591](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L591)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:591](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L591)
 
 ___
 
@@ -652,7 +679,7 @@ Change the currency code
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:505](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L505)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:505](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L505)
 
 ___
 
@@ -674,7 +701,7 @@ Change the language code, only works for text types
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:488](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L488)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:488](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L488)
 
 ___
 
@@ -696,7 +723,7 @@ Changes the unit to a new unit
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:445](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L445)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:445](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L445)
 
 ___
 
@@ -714,13 +741,13 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:760](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L760)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:760](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L760)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -732,7 +759,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `IPropertyEntryFieldState` \| (`prevState`: `Readonly`<`IPropertyEntryFieldState`\>, `props`: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\>) => `IPropertyEntryFieldState` \| `Pick`<`IPropertyEntryFieldState`, `K`\> \| `Pick`<`IPropertyEntryFieldState`, `K`\> |
+| `state` | `IPropertyEntryFieldState` \| (`prevState`: `Readonly`\<`IPropertyEntryFieldState`\>, `props`: `Readonly`\<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\>\>) => `IPropertyEntryFieldState` \| `Pick`\<`IPropertyEntryFieldState`, `K`\> \| `Pick`\<`IPropertyEntryFieldState`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -745,7 +772,7 @@ React.Component.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
@@ -757,7 +784,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\> |
+| `nextProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)\<`ValueType`, [`IPropertyEntryFieldRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryField.IPropertyEntryFieldRendererProps.md)\> |
 | `nextState` | `IPropertyEntryFieldState` |
 
 #### Returns
@@ -770,7 +797,7 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:408](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L408)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:408](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L408)
 
 ___
 
@@ -795,4 +822,4 @@ a react element
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:325](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L325)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:325](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L325)

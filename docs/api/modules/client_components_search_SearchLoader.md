@@ -38,4 +38,4 @@ a react component
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:1102](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L1102)
+[client/components/search/SearchLoader.tsx:1103](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L1103)

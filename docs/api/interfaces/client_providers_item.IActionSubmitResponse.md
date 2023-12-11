@@ -31,7 +31,7 @@ A response given by submit and delete
 
 #### Defined in
 
-[client/providers/item.tsx:190](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L190)
+[client/providers/item.tsx:190](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L190)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:189](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L189)
+[client/providers/item.tsx:189](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L189)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L168)
+[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L168)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:186](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L186)
+[client/providers/item.tsx:186](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L186)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:188](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L188)
+[client/providers/item.tsx:188](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L188)
 
 ___
 
@@ -85,4 +85,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:187](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L187)
+[client/providers/item.tsx:187](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L187)

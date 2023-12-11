@@ -16,8 +16,8 @@
 
 - [blocking](server_cache.IUpdateOptions.md#blocking)
 - [containerId](server_cache.IUpdateOptions.md#containerid)
-- [currentGQLValue](server_cache.IUpdateOptions.md#currentgqlvalue)
 - [currentSQLValue](server_cache.IUpdateOptions.md#currentsqlvalue)
+- [currentrqValue](server_cache.IUpdateOptions.md#currentrqvalue)
 - [dictionary](server_cache.IUpdateOptions.md#dictionary)
 - [editedBy](server_cache.IUpdateOptions.md#editedby)
 - [ignorePreSideEffects](server_cache.IUpdateOptions.md#ignorepresideeffects)
@@ -43,7 +43,7 @@
 
 #### Defined in
 
-[server/cache.ts:124](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L124)
+[server/cache.ts:124](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L124)
 
 ___
 
@@ -53,17 +53,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:118](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L118)
-
-___
-
-### currentGQLValue
-
-• `Optional` **currentGQLValue**: [`IGQLValue`](gql_querier.IGQLValue.md)
-
-#### Defined in
-
-[server/cache.ts:114](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L114)
+[server/cache.ts:118](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L118)
 
 ___
 
@@ -73,7 +63,17 @@ ___
 
 #### Defined in
 
-[server/cache.ts:113](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L113)
+[server/cache.ts:113](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L113)
+
+___
+
+### currentrqValue
+
+• `Optional` **currentrqValue**: [`IRQValue`](rq_querier.IRQValue.md)
+
+#### Defined in
+
+[server/cache.ts:114](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L114)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:117](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L117)
+[server/cache.ts:117](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L117)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:115](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L115)
+[server/cache.ts:115](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L115)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L68)
+[server/cache.ts:68](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L68)
 
 ___
 
@@ -121,7 +121,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:69](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L69)
+[server/cache.ts:69](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L69)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:66](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L66)
+[server/cache.ts:66](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L66)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:116](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L116)
+[server/cache.ts:116](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L116)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:67](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L67)
+[server/cache.ts:67](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L67)
 
 ___
 
@@ -177,4 +177,4 @@ ___
 
 #### Defined in
 
-[server/cache.ts:119](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L119)
+[server/cache.ts:119](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L119)

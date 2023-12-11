@@ -6,7 +6,7 @@
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [ADDING\_CHILD](server_resolvers_roles.CustomRoleGranterEnvironment.md#adding_child)
 - [CREATION](server_resolvers_roles.CustomRoleGranterEnvironment.md#creation)
@@ -16,72 +16,72 @@
 - [SEARCHING\_RECORDS](server_resolvers_roles.CustomRoleGranterEnvironment.md#searching_records)
 - [SEARCHING\_TRADITIONAL](server_resolvers_roles.CustomRoleGranterEnvironment.md#searching_traditional)
 
-## Enumeration members
+## Enumeration Members
 
 ### ADDING\_CHILD
 
-• **ADDING\_CHILD** = `"ADDING_CHILD"`
+• **ADDING\_CHILD** = ``"ADDING_CHILD"``
 
 #### Defined in
 
-[server/resolvers/roles.ts:19](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L19)
+[server/resolvers/roles.ts:19](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L19)
 
 ___
 
 ### CREATION
 
-• **CREATION** = `"CREATION"`
+• **CREATION** = ``"CREATION"``
 
 #### Defined in
 
-[server/resolvers/roles.ts:13](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L13)
+[server/resolvers/roles.ts:13](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L13)
 
 ___
 
 ### MODIFYING
 
-• **MODIFYING** = `"MODIFYING"`
+• **MODIFYING** = ``"MODIFYING"``
 
 #### Defined in
 
-[server/resolvers/roles.ts:14](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L14)
+[server/resolvers/roles.ts:14](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L14)
 
 ___
 
 ### REMOVAL
 
-• **REMOVAL** = `"REMOVAL"`
+• **REMOVAL** = ``"REMOVAL"``
 
 #### Defined in
 
-[server/resolvers/roles.ts:18](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L18)
+[server/resolvers/roles.ts:18](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L18)
 
 ___
 
 ### RETRIEVING
 
-• **RETRIEVING** = `"RETRIEVING"`
+• **RETRIEVING** = ``"RETRIEVING"``
 
 #### Defined in
 
-[server/resolvers/roles.ts:15](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L15)
+[server/resolvers/roles.ts:15](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L15)
 
 ___
 
 ### SEARCHING\_RECORDS
 
-• **SEARCHING\_RECORDS** = `"SEARCHING_RECORDS"`
+• **SEARCHING\_RECORDS** = ``"SEARCHING_RECORDS"``
 
 #### Defined in
 
-[server/resolvers/roles.ts:17](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L17)
+[server/resolvers/roles.ts:17](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L17)
 
 ___
 
 ### SEARCHING\_TRADITIONAL
 
-• **SEARCHING\_TRADITIONAL** = `"SEARCHING_TRADITIONAL"`
+• **SEARCHING\_TRADITIONAL** = ``"SEARCHING_TRADITIONAL"``
 
 #### Defined in
 
-[server/resolvers/roles.ts:16](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L16)
+[server/resolvers/roles.ts:16](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L16)

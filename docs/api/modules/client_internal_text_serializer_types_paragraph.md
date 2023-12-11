@@ -26,7 +26,7 @@ for the paragraph element
 
 | Name | Type |
 | :------ | :------ |
-| `textOrInline?` | `string` \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) |
+| `textOrInline?` | `string` \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) |
 
 #### Returns
 
@@ -34,7 +34,7 @@ for the paragraph element
 
 #### Defined in
 
-[client/internal/text/serializer/types/paragraph.ts:15](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/types/paragraph.ts#L15)
+[client/internal/text/serializer/types/paragraph.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/types/paragraph.ts#L15)
 
 ___
 
@@ -57,4 +57,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/paragraph.ts:41](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/types/paragraph.ts#L41)
+[client/internal/text/serializer/types/paragraph.ts:41](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/types/paragraph.ts#L41)

@@ -11,18 +11,70 @@ for doing the conditional logic for deleting
 
 ### Properties
 
+- [clean](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#clean)
+- [delete](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#delete)
 - [deleteError](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#deleteerror)
 - [deleted](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#deleted)
 - [deleting](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#deleting)
-
-### Methods
-
-- [clean](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#clean)
-- [delete](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#delete)
 - [dismissDeleted](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#dismissdeleted)
 - [dismissError](client_components_item_DeleteActioner.IDeleteActionerInfoArgType.md#dismisserror)
 
 ## Properties
+
+### clean
+
+• **clean**: (`options`: [`IActionCleanOptions`](client_providers_item.IActionCleanOptions.md), `state`: ``"success"`` \| ``"fail"``, `avoidTriggeringUpdate?`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`options`, `state`, `avoidTriggeringUpdate?`): `void`
+
+clean function, also a mirror from the item definition one
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | [`IActionCleanOptions`](client_providers_item.IActionCleanOptions.md) |
+| `state` | ``"success"`` \| ``"fail"`` |
+| `avoidTriggeringUpdate?` | `boolean` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/item/DeleteActioner.tsx:55](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L55)
+
+___
+
+### delete
+
+• **delete**: (`options`: [`IActionDeleteOptions`](client_providers_item.IActionDeleteOptions.md)) => `Promise`\<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
+
+#### Type declaration
+
+▸ (`options`): `Promise`\<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
+
+actual performs the delete, this function is a mirror from the
+item definition provider one
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | [`IActionDeleteOptions`](client_providers_item.IActionDeleteOptions.md) |
+
+##### Returns
+
+`Promise`\<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
+
+#### Defined in
+
+[client/components/item/DeleteActioner.tsx:51](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L51)
+
+___
 
 ### deleteError
 
@@ -33,7 +85,7 @@ item definition slot
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DeleteActioner.tsx#L29)
+[client/components/item/DeleteActioner.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L29)
 
 ___
 
@@ -45,7 +97,7 @@ Whether it deleted, sucesfully
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DeleteActioner.tsx#L38)
+[client/components/item/DeleteActioner.tsx:38](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L38)
 
 ___
 
@@ -58,83 +110,44 @@ as you cannot really delete while deleting
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:34](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DeleteActioner.tsx#L34)
-
-## Methods
-
-### clean
-
-▸ **clean**(`options`, `state`, `avoidTriggeringUpdate?`): `void`
-
-clean function, also a mirror from the item definition one
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `options` | [`IActionCleanOptions`](client_providers_item.IActionCleanOptions.md) |
-| `state` | ``"success"`` \| ``"fail"`` |
-| `avoidTriggeringUpdate?` | `boolean` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/components/item/DeleteActioner.tsx:55](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DeleteActioner.tsx#L55)
-
-___
-
-### delete
-
-▸ **delete**(`options`): `Promise`<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
-
-actual performs the delete, this function is a mirror from the
-item definition provider one
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `options` | [`IActionDeleteOptions`](client_providers_item.IActionDeleteOptions.md) |
-
-#### Returns
-
-`Promise`<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
-
-#### Defined in
-
-[client/components/item/DeleteActioner.tsx:51](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DeleteActioner.tsx#L51)
+[client/components/item/DeleteActioner.tsx:34](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L34)
 
 ___
 
 ### dismissDeleted
 
-▸ **dismissDeleted**(): `void`
+• **dismissDeleted**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
 
 dismiss the deleted state and make it clean
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:46](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DeleteActioner.tsx#L46)
+[client/components/item/DeleteActioner.tsx:46](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L46)
 
 ___
 
 ### dismissError
 
-▸ **dismissError**(): `void`
+• **dismissError**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
 
 Dismiss the error state, and make it clean
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:42](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DeleteActioner.tsx#L42)
+[client/components/item/DeleteActioner.tsx:42](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L42)

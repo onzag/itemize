@@ -10,7 +10,7 @@
 - [IItemizeLoggingErrorStructure](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)
 - [IItemizeLoggingStructure](../interfaces/server_logger.IItemizeLoggingStructure.md)
 
-### Type aliases
+### Type Aliases
 
 - [ILoggerType](server_logger.md#iloggertype)
 
@@ -22,7 +22,7 @@
 
 - [extendLoggerWith](server_logger.md#extendloggerwith)
 
-## Type aliases
+## Type Aliases
 
 ### ILoggerType
 
@@ -30,25 +30,25 @@
 
 #### Defined in
 
-[server/logger.ts:121](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L121)
+[server/logger.ts:121](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L121)
 
 ## Variables
 
 ### logger
 
-• **logger**: `Object`
+• `Const` **logger**: `Object`
 
 #### Type declaration
 
 | Name | Type |
 | :------ | :------ |
-| `debug` | (`arg`: [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`any`\>) => `void` |
-| `error` | (`arg`: [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`any`\>) => `void` |
-| `info` | (`arg`: [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`any`\>) => `void` |
+| `debug` | (`arg`: [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`any`\>) => `void` |
+| `error` | (`arg`: [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)\<`any`\>) => `void` |
+| `info` | (`arg`: [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`any`\>) => `void` |
 
 #### Defined in
 
-[server/logger.ts:115](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L115)
+[server/logger.ts:115](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L115)
 
 ## Functions
 
@@ -60,7 +60,7 @@
 
 | Name | Type |
 | :------ | :------ |
-| `p` | [`default`](../classes/server_services_base_LoggingProvider.default.md)<`any`\> |
+| `p` | [`default`](../classes/server_services_base_LoggingProvider.default.md)\<`any`\> |
 
 #### Returns
 
@@ -68,4 +68,4 @@
 
 #### Defined in
 
-[server/logger.ts:148](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L148)
+[server/logger.ts:148](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L148)

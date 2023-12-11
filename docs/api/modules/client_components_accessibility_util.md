@@ -8,7 +8,7 @@
 
 - [IAltReactionerComponentProps](../interfaces/client_components_accessibility_util.IAltReactionerComponentProps.md)
 
-### Type aliases
+### Type Aliases
 
 - [AltReactionerComponentType](client_components_accessibility_util.md#altreactionercomponenttype)
 
@@ -17,15 +17,15 @@
 - [getAccessibilityEnabledCustomTextProcesser](client_components_accessibility_util.md#getaccessibilityenabledcustomtextprocesser)
 - [onKeyDown](client_components_accessibility_util.md#onkeydown)
 
-## Type aliases
+## Type Aliases
 
 ### AltReactionerComponentType
 
-Ƭ **AltReactionerComponentType**: `React.ComponentType`<[`IAltReactionerComponentProps`](../interfaces/client_components_accessibility_util.IAltReactionerComponentProps.md)\>
+Ƭ **AltReactionerComponentType**: `React.ComponentType`\<[`IAltReactionerComponentProps`](../interfaces/client_components_accessibility_util.IAltReactionerComponentProps.md)\>
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L30)
+[client/components/accessibility/util.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L30)
 
 ## Functions
 
@@ -97,7 +97,7 @@ Then use the deserialize function to get a tree, and feed that output to reactif
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:607](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L607)
+[client/components/accessibility/util.tsx:607](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L607)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `e` | `KeyboardEvent`<`Element`\> |
+| `e` | `KeyboardEvent`\<`Element`\> |
 
 #### Returns
 
@@ -117,4 +117,4 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:13](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L13)
+[client/components/accessibility/util.tsx:13](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/util.tsx#L13)

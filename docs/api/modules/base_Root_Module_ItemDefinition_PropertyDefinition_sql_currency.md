@@ -42,12 +42,12 @@ Contains the sql and server side specific functions for the currency type
 
 | Name | Type |
 | :------ | :------ |
-| `properties` | `Object` |
-| `runtime` | `Object` |
+| `properties` | {} |
+| `runtime` | {} |
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:36](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L36)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:36](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L36)
 
 ___
 
@@ -71,7 +71,7 @@ the elastic rule
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:399](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L399)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:399](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L399)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:259](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L259)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:259](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L259)
 
 ___
 
@@ -115,7 +115,7 @@ a partial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:19](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L19)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:19](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L19)
 
 ___
 
@@ -139,7 +139,7 @@ the columns to index
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:412](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L412)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:412](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L412)
 
 ___
 
@@ -163,7 +163,7 @@ a property definition supported currency type (or null)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:141](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L141)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:141](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L141)
 
 ___
 
@@ -187,7 +187,7 @@ a partial row match
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:461](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L461)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:461](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L461)
 
 ___
 
@@ -211,7 +211,7 @@ a partial row
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:80](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L80)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:80](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L80)
 
 ___
 
@@ -236,7 +236,7 @@ the sql mantenience rule
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:423](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L423)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:423](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L423)
 
 ___
 
@@ -260,7 +260,7 @@ an array of string with the rule options
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:389](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L389)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:389](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L389)
 
 ___
 
@@ -284,7 +284,7 @@ a property definition supported currency type (or null)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:154](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L154)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:154](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L154)
 
 ___
 
@@ -308,7 +308,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:471](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L471)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:471](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L471)
 
 ___
 
@@ -332,7 +332,7 @@ a boolean on whether it's searched by it or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:199](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L199)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:199](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L199)
 
 ___
 
@@ -355,7 +355,7 @@ does not need the normalized value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:68](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L68)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:68](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L68)
 
 ___
 
@@ -375,4 +375,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:28](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L28)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts:28](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/currency.ts#L28)

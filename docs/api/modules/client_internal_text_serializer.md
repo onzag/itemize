@@ -14,7 +14,7 @@ to handle the standard itemize text specification
 - [IRootLevelDocument](../interfaces/client_internal_text_serializer.IRootLevelDocument.md)
 - [ISerializationRegistryType](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md)
 
-### Type aliases
+### Type Aliases
 
 - [RichElement](client_internal_text_serializer.md#richelement)
 
@@ -48,7 +48,7 @@ to handle the standard itemize text specification
 - [normalizeElement](client_internal_text_serializer.md#normalizeelement)
 - [serialize](client_internal_text_serializer.md#serialize)
 
-## Type aliases
+## Type Aliases
 
 ### RichElement
 
@@ -59,20 +59,20 @@ but it's not a text
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:724](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L724)
+[client/internal/text/serializer/index.ts:724](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L724)
 
 ## Variables
 
 ### SERIALIZATION\_REGISTRY
 
-• **SERIALIZATION\_REGISTRY**: [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md)
+• `Const` **SERIALIZATION\_REGISTRY**: [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md)
 
 This is the actual serialization registry that the serializer is used
 by default is started up empty
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:312](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L312)
+[client/internal/text/serializer/index.ts:312](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L312)
 
 ## Functions
 
@@ -92,7 +92,7 @@ by default is started up empty
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:416](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L416)
+[client/internal/text/serializer/index.ts:416](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L416)
 
 ___
 
@@ -106,8 +106,8 @@ Checks whether two nodes are mergable
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `n1` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) | the first node |
-| `n2` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) | the second node |
+| `n1` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) | the first node |
+| `n2` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) | the second node |
 
 #### Returns
 
@@ -117,7 +117,7 @@ a boolean on whether they should merge
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1998](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1998)
+[client/internal/text/serializer/index.ts:1998](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L1998)
 
 ___
 
@@ -143,7 +143,7 @@ a root level document
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:935](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L935)
+[client/internal/text/serializer/index.ts:935](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L935)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1975](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1975)
+[client/internal/text/serializer/index.ts:1975](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L1975)
 
 ___
 
@@ -187,7 +187,7 @@ that is like a rich text, but split in paragraphs
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:2079](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L2079)
+[client/internal/text/serializer/index.ts:2079](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L2079)
 
 ___
 
@@ -207,7 +207,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:398](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L398)
+[client/internal/text/serializer/index.ts:398](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L398)
 
 ___
 
@@ -234,7 +234,7 @@ a context object or null if no context found or invalid
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:524](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L524)
+[client/internal/text/serializer/index.ts:524](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L524)
 
 ___
 
@@ -248,7 +248,7 @@ Provides the node info of a given node
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) | the node, either text or rich element |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) | the node, either text or rich element |
 | `i18nData` | [`IPropertyEntryI18nRichTextInfo`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryI18nRichTextInfo.md) | the i18n information to be used to create the name |
 
 #### Returns
@@ -259,7 +259,7 @@ the node information
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:661](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L661)
+[client/internal/text/serializer/index.ts:661](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L661)
 
 ___
 
@@ -280,7 +280,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:478](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L478)
+[client/internal/text/serializer/index.ts:478](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L478)
 
 ___
 
@@ -301,7 +301,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:494](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L494)
+[client/internal/text/serializer/index.ts:494](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L494)
 
 ___
 
@@ -324,7 +324,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:454](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L454)
+[client/internal/text/serializer/index.ts:454](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L454)
 
 ___
 
@@ -346,7 +346,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:434](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L434)
+[client/internal/text/serializer/index.ts:434](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L434)
 
 ___
 
@@ -368,7 +368,7 @@ Provides the correct uuid for a given text data
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:915](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L915)
+[client/internal/text/serializer/index.ts:915](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L915)
 
 ___
 
@@ -380,7 +380,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -388,7 +388,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:384](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L384)
+[client/internal/text/serializer/index.ts:384](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L384)
 
 ___
 
@@ -400,7 +400,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -408,7 +408,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:373](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L373)
+[client/internal/text/serializer/index.ts:373](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L373)
 
 ___
 
@@ -420,7 +420,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -428,7 +428,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:377](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L377)
+[client/internal/text/serializer/index.ts:377](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L377)
 
 ___
 
@@ -440,7 +440,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -448,7 +448,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:365](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L365)
+[client/internal/text/serializer/index.ts:365](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L365)
 
 ___
 
@@ -460,7 +460,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -468,7 +468,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:391](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L391)
+[client/internal/text/serializer/index.ts:391](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L391)
 
 ___
 
@@ -480,7 +480,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -488,7 +488,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:361](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L361)
+[client/internal/text/serializer/index.ts:361](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L361)
 
 ___
 
@@ -500,7 +500,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `node` | [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
+| `node` | [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
 
 #### Returns
 
@@ -508,7 +508,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:425](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L425)
+[client/internal/text/serializer/index.ts:425](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L425)
 
 ___
 
@@ -529,7 +529,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1048](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1048)
+[client/internal/text/serializer/index.ts:1048](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L1048)
 
 ___
 
@@ -553,7 +553,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1432](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1432)
+[client/internal/text/serializer/index.ts:1432](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L1432)
 
 ___
 
@@ -577,4 +577,4 @@ or a string for plain documents
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:744](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L744)
+[client/internal/text/serializer/index.ts:744](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/index.ts#L744)

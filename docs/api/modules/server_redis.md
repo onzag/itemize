@@ -19,7 +19,7 @@ the itemize redis client differs a little bit from the standard client
 
 ### setupRedisClient
 
-▸ **setupRedisClient**(`name`, `config`, `onConnect?`): `Promise`<[`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md)\>
+▸ **setupRedisClient**(`name`, `config`, `onConnect?`): `Promise`\<[`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md)\>
 
 Setups a redis client to be an itemize redis client
 
@@ -29,12 +29,12 @@ Setups a redis client to be an itemize redis client
 | :------ | :------ | :------ |
 | `name` | `string` | the name we want to give it |
 | `config` | [`ISingleRedisConfigRawJSONDataType`](../interfaces/config.ISingleRedisConfigRawJSONDataType.md) | the configuration for redis client |
-| `onConnect?` | (`client`: [`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md), `isReconnect`: `boolean`) => `Promise`<`void`\> | a function to run on connect |
+| `onConnect?` | (`client`: [`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md), `isReconnect`: `boolean`) => `Promise`\<`void`\> | a function to run on connect |
 
 #### Returns
 
-`Promise`<[`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md)\>
+`Promise`\<[`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md)\>
 
 #### Defined in
 
-[server/redis.ts:174](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L174)
+[server/redis.ts:174](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L174)

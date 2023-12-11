@@ -19,6 +19,8 @@ of the hidden metadata and contains the hidden metadata within itself
 
 ### Properties
 
+- [getHiddenMetadata](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#gethiddenmetadata)
+- [getHiddenMetadataAsJSON](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#gethiddenmetadataasjson)
 - [id](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#id)
 - [include](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#include)
 - [item](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#item)
@@ -28,17 +30,60 @@ of the hidden metadata and contains the hidden metadata within itself
 - [originalSQLData](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#originalsqldata)
 - [originalStatus](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#originalstatus)
 - [property](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#property)
+- [setHiddenMetadata](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#sethiddenmetadata)
 - [setHiddenMetadataAsJSON](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#sethiddenmetadataasjson)
 - [uuid](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#uuid)
 - [version](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#version)
 
-### Methods
-
-- [getHiddenMetadata](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#gethiddenmetadata)
-- [getHiddenMetadataAsJSON](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#gethiddenmetadataasjson)
-- [setHiddenMetadata](server_services_base_PaymentProvider.IPaymentProviderPaymentExtraInfoWithHiddenMetadata.md#sethiddenmetadata)
-
 ## Properties
+
+### getHiddenMetadata
+
+• **getHiddenMetadata**: () => `string`
+
+#### Type declaration
+
+▸ (): `string`
+
+Provides the current up to date hidden metadata
+
+##### Returns
+
+`string`
+
+#### Defined in
+
+[server/services/base/PaymentProvider.ts:142](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L142)
+
+___
+
+### getHiddenMetadataAsJSON
+
+• **getHiddenMetadataAsJSON**: (`attr?`: `string`) => `any`
+
+#### Type declaration
+
+▸ (`attr?`): `any`
+
+This function treats the hidden metadata as
+JSON, and provides the value, note that it will
+crash if it's invalid json
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `attr?` | `string` |
+
+##### Returns
+
+`any`
+
+#### Defined in
+
+[server/services/base/PaymentProvider.ts:152](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L152)
+
+___
 
 ### id
 
@@ -52,7 +97,7 @@ The id of the row where the payment is contained
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L88)
+[server/services/base/PaymentProvider.ts:88](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L88)
 
 ___
 
@@ -68,7 +113,7 @@ If the payment is part of a include, which include is it
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L80)
+[server/services/base/PaymentProvider.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L80)
 
 ___
 
@@ -84,7 +129,7 @@ The item that contains this payment
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L76)
+[server/services/base/PaymentProvider.ts:76](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L76)
 
 ___
 
@@ -100,7 +145,7 @@ The module where this payment is contained at
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:72](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L72)
+[server/services/base/PaymentProvider.ts:72](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L72)
 
 ___
 
@@ -113,7 +158,7 @@ had occurred
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:138](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L138)
+[server/services/base/PaymentProvider.ts:138](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L138)
 
 ___
 
@@ -131,7 +176,7 @@ this will be null if it was created
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:104](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L104)
+[server/services/base/PaymentProvider.ts:104](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L104)
 
 ___
 
@@ -149,7 +194,7 @@ this will be null if it was created
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:110](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L110)
+[server/services/base/PaymentProvider.ts:110](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L110)
 
 ___
 
@@ -167,7 +212,7 @@ this will be null if it was created
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:98](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L98)
+[server/services/base/PaymentProvider.ts:98](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L98)
 
 ___
 
@@ -183,7 +228,33 @@ The payment property itself
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:84](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L84)
+[server/services/base/PaymentProvider.ts:84](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L84)
+
+___
+
+### setHiddenMetadata
+
+• **setHiddenMetadata**: (`hiddenMetadata`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`hiddenMetadata`): `void`
+
+Sets the hidden metadata value
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `hiddenMetadata` | `string` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[server/services/base/PaymentProvider.ts:146](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L146)
 
 ___
 
@@ -197,7 +268,7 @@ thing
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:158](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L158)
+[server/services/base/PaymentProvider.ts:158](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L158)
 
 ___
 
@@ -214,7 +285,7 @@ the database
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:115](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L115)
+[server/services/base/PaymentProvider.ts:115](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L115)
 
 ___
 
@@ -230,66 +301,4 @@ The version of the row where the payment is contained
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:92](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L92)
-
-## Methods
-
-### getHiddenMetadata
-
-▸ **getHiddenMetadata**(): `string`
-
-Provides the current up to date hidden metadata
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[server/services/base/PaymentProvider.ts:142](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L142)
-
-___
-
-### getHiddenMetadataAsJSON
-
-▸ **getHiddenMetadataAsJSON**(`attr?`): `any`
-
-This function treats the hidden metadata as
-JSON, and provides the value, note that it will
-crash if it's invalid json
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `attr?` | `string` |
-
-#### Returns
-
-`any`
-
-#### Defined in
-
-[server/services/base/PaymentProvider.ts:152](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L152)
-
-___
-
-### setHiddenMetadata
-
-▸ **setHiddenMetadata**(`hiddenMetadata`): `void`
-
-Sets the hidden metadata value
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `hiddenMetadata` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[server/services/base/PaymentProvider.ts:146](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L146)
+[server/services/base/PaymentProvider.ts:92](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L92)

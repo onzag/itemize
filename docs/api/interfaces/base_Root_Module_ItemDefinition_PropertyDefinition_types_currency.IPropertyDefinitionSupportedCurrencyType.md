@@ -21,7 +21,7 @@ The currency definition is described by an object
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts:39](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts#L39)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts:38](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts#L38)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts:38](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts:37](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts#L37)

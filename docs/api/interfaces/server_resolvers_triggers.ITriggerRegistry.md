@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/resolvers/triggers.ts:227](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L227)
+[server/resolvers/triggers.ts:227](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L227)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:226](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L226)
+[server/resolvers/triggers.ts:226](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L226)

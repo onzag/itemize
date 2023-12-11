@@ -9,49 +9,49 @@ within an item definition
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [CREATE](base_Root_Module_ItemDefinition.ItemDefinitionIOActions.md#create)
 - [DELETE](base_Root_Module_ItemDefinition.ItemDefinitionIOActions.md#delete)
 - [EDIT](base_Root_Module_ItemDefinition.ItemDefinitionIOActions.md#edit)
 - [READ](base_Root_Module_ItemDefinition.ItemDefinitionIOActions.md#read)
 
-## Enumeration members
+## Enumeration Members
 
 ### CREATE
 
-• **CREATE** = `"CREATE"`
+• **CREATE** = ``"CREATE"``
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:467](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L467)
+[base/Root/Module/ItemDefinition/index.ts:466](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L466)
 
 ___
 
 ### DELETE
 
-• **DELETE** = `"DELETE"`
+• **DELETE** = ``"DELETE"``
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:469](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L469)
+[base/Root/Module/ItemDefinition/index.ts:468](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L468)
 
 ___
 
 ### EDIT
 
-• **EDIT** = `"EDIT"`
+• **EDIT** = ``"EDIT"``
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:468](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L468)
+[base/Root/Module/ItemDefinition/index.ts:467](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L467)
 
 ___
 
 ### READ
 
-• **READ** = `"READ"`
+• **READ** = ``"READ"``
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:466](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L466)
+[base/Root/Module/ItemDefinition/index.ts:465](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L465)

@@ -40,7 +40,7 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:70](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L70)
+[client/components/localization/AppLanguageRetriever.tsx:70](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L70)
 
 ___
 
@@ -55,10 +55,10 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `availableLanguages` | `IFnAppLanguageRetrieverLanguageFormType`[] |
-| `changeLanguageTo` | () => `any` \| [`ChangeLanguageToFn`](client_internal_providers_locale_provider.md#changelanguagetofn) |
+| `changeLanguageTo` | [`ChangeLanguageToFn`](client_internal_providers_locale_provider.md#changelanguagetofn) \| () => `any` |
 | `currentLanguage` | `IFnAppLanguageRetrieverLanguageFormType` |
 | `rtl` | `boolean` |
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:108](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L108)
+[client/components/localization/AppLanguageRetriever.tsx:108](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L108)

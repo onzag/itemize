@@ -12,11 +12,11 @@ to send errors from the server side to the client side
 
 - [EndpointError](../classes/base_errors.EndpointError.md)
 
-### Type aliases
+### Type Aliases
 
 - [EndpointErrorType](base_errors.md#endpointerrortype)
 
-## Type aliases
+## Type Aliases
 
 ### EndpointErrorType
 
@@ -26,4 +26,4 @@ All errors
 
 #### Defined in
 
-[base/errors.ts:70](https://github.com/onzag/itemize/blob/a24376ed/base/errors.ts#L70)
+[base/errors.ts:70](https://github.com/onzag/itemize/blob/59702dd5/base/errors.ts#L70)

@@ -36,7 +36,7 @@ The supported mime types for images
 
 #### Defined in
 
-[constants.ts:78](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L78)
+[constants.ts:67](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L67)
 
 ___
 
@@ -44,11 +44,11 @@ ___
 
 • `Optional` **MAX\_FIELD\_SIZE**: `number`
 
-The maximum size of a given graphql query in bytes
+The maximum size of a given rq query in bytes
 
 #### Defined in
 
-[constants.ts:58](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L58)
+[constants.ts:47](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L47)
 
 ___
 
@@ -61,7 +61,7 @@ top amount of files in a property
 
 #### Defined in
 
-[constants.ts:48](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L48)
+[constants.ts:37](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L37)
 
 ___
 
@@ -75,7 +75,7 @@ the max file size and this number to specify a size limit
 
 #### Defined in
 
-[constants.ts:54](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L54)
+[constants.ts:43](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L43)
 
 ___
 
@@ -88,7 +88,7 @@ your nginx config is in line with this number, this should be a byte number
 
 #### Defined in
 
-[constants.ts:43](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L43)
+[constants.ts:32](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L32)
 
 ___
 
@@ -102,7 +102,7 @@ this check is expensive so checking twice is not good
 
 #### Defined in
 
-[constants.ts:38](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L38)
+[constants.ts:27](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L27)
 
 ___
 
@@ -116,7 +116,7 @@ these are used for realtime updates
 
 #### Defined in
 
-[constants.ts:113](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L113)
+[constants.ts:102](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L102)
 
 ___
 
@@ -129,7 +129,7 @@ have that is build for the search mode
 
 #### Defined in
 
-[constants.ts:74](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L74)
+[constants.ts:63](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L63)
 
 ___
 
@@ -142,7 +142,7 @@ children can retrieve at once in a given search query
 
 #### Defined in
 
-[constants.ts:69](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L69)
+[constants.ts:58](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L58)
 
 ___
 
@@ -156,7 +156,7 @@ this also affects the get list command
 
 #### Defined in
 
-[constants.ts:64](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L64)
+[constants.ts:53](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L53)
 
 ___
 
@@ -168,7 +168,7 @@ Defines how many characters a string type might have
 
 #### Defined in
 
-[constants.ts:32](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L32)
+[constants.ts:21](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L21)
 
 ___
 
@@ -180,7 +180,7 @@ The maximum supported year
 
 #### Defined in
 
-[constants.ts:28](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L28)
+[constants.ts:17](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L17)
 
 ___
 
@@ -198,7 +198,7 @@ to specify it
 
 #### Defined in
 
-[constants.ts:123](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L123)
+[constants.ts:112](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L112)
 
 ___
 
@@ -213,7 +213,7 @@ this is a millisecond amount
 
 #### Defined in
 
-[constants.ts:93](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L93)
+[constants.ts:82](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L82)
 
 ___
 
@@ -229,7 +229,7 @@ this is a millisecond amount
 
 #### Defined in
 
-[constants.ts:86](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L86)
+[constants.ts:75](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L75)
 
 ___
 
@@ -244,7 +244,7 @@ indexes
 
 #### Defined in
 
-[constants.ts:100](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L100)
+[constants.ts:89](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L89)
 
 ___
 
@@ -259,4 +259,4 @@ by default this sends the status of the machine, CPU, memory usage, every
 
 #### Defined in
 
-[constants.ts:107](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L107)
+[constants.ts:96](https://github.com/onzag/itemize/blob/59702dd5/constants.ts#L96)

@@ -18,7 +18,7 @@ Contains the fast prototyping element for renering a file entry
 
 ### style
 
-• **style**: `Object`
+• `Const` **style**: `Object`
 
 the styles for the file entry
 
@@ -26,45 +26,45 @@ the styles for the file entry
 
 | Name | Type |
 | :------ | :------ |
-| `button` | `Object` |
+| `button` | \{ `flexGrow`: `number` = 1; `height`: `string` = "2.5rem" } |
 | `button.flexGrow` | `number` |
 | `button.height` | `string` |
-| `buttonContainer` | `Object` |
+| `buttonContainer` | \{ `bottom`: `string` = "0"; `display`: `string` = "flex"; `left`: `string` = "0"; `position`: `string` = "absolute"; `right`: `string` = "0" } |
 | `buttonContainer.bottom` | `string` |
 | `buttonContainer.display` | `string` |
 | `buttonContainer.left` | `string` |
 | `buttonContainer.position` | `string` |
 | `buttonContainer.right` | `string` |
-| `buttonIcon` | `Object` |
+| `buttonIcon` | \{ `marginLeft`: `string` = "0.75rem" } |
 | `buttonIcon.marginLeft` | `string` |
-| `container` | `Object` |
+| `container` | \{ `width`: `string` = "100%" } |
 | `container.width` | `string` |
-| `description` | `Object` |
+| `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
-| `entry` | `Object` |
+| `entry` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `entry.alignItems` | `string` |
 | `entry.display` | `string` |
 | `entry.flexDirection` | `string` |
 | `entry.justifyContent` | `string` |
 | `entry.width` | `string` |
-| `errorMessage` | `Object` |
+| `errorMessage` | \{ `color`: `string` = "#f44336"; `fontSize`: `string` = "0.85rem"; `height`: `string` = "1.3rem" } |
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `fileDeleteButton` | `Object` |
+| `fileDeleteButton` | \{ `position`: `string` = "absolute"; `right`: `number` = 0; `top`: `string` = "-25px" } |
 | `fileDeleteButton.position` | `string` |
 | `fileDeleteButton.right` | `number` |
 | `fileDeleteButton.top` | `string` |
-| `fileRejectedDescription` | `Object` |
+| `fileRejectedDescription` | \{ `fontSize`: `string` = "0.75rem"; `overflow`: `string` = "hidden"; `textAlign`: `string` = "center"; `textOverflow`: `string` = "ellipsis"; `width`: `string` = "100%" } |
 | `fileRejectedDescription.fontSize` | `string` |
 | `fileRejectedDescription.overflow` | `string` |
 | `fileRejectedDescription.textAlign` | `string` |
 | `fileRejectedDescription.textOverflow` | `string` |
 | `fileRejectedDescription.width` | `string` |
-| `icon` | `Object` |
+| `icon` | \{ `color`: `string` = "#424242" } |
 | `icon.color` | `string` |
-| `label` | (`isInvalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `alignItems`: `string` = "center"; `color`: `string` ; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
-| `paper` | `Object` |
+| `label` | (`isInvalid`: `boolean`) => \{ `&.focused`: \{ `color`: `string`  } ; `alignItems`: `string` = "center"; `color`: `string` ; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
+| `paper` | \{ `alignItems`: `string` = "center"; `backgroundColor`: `string` = "rgba(0, 0, 0, 0.09)"; `cursor`: `string` = "pointer"; `display`: `string` = "flex"; `flexWrap`: `string` = "wrap"; `height`: `string` = "auto"; `justifyContent`: `string` = "center"; `marginTop`: `string` = "5px"; `minHeight`: `string` = "200px"; `padding`: `string` = "20px 20px calc(2.5rem + 20px) 20px"; `position`: `string` = "relative"; `width`: `string` = "100%" } |
 | `paper.alignItems` | `string` |
 | `paper.backgroundColor` | `string` |
 | `paper.cursor` | `string` |
@@ -77,14 +77,14 @@ the styles for the file entry
 | `paper.padding` | `string` |
 | `paper.position` | `string` |
 | `paper.width` | `string` |
-| `paperIconAdd` | `Object` |
+| `paperIconAdd` | \{ `fontSize`: `string` = "100px"; `opacity`: `number` = 0.1 } |
 | `paperIconAdd.fontSize` | `string` |
 | `paperIconAdd.opacity` | `number` |
-| `paperPlaceholder` | (`accepting`: `boolean`, `rejecting`: `boolean`) => { `border`: `string` = "dotted 2px #ccc"; `borderColor`: `string` ; `borderRadius`: `string` = "25px"; `color`: `string` = "rgb(117, 117, 117)"; `display`: `string` = "block"; `flexGrow`: `number` = 2; `fontSize`: `string` = "1rem"; `margin`: `string` = "0 25px"; `padding`: `string` = "25px 0"; `textAlign`: `string` = "center"; `userSelect`: `string` = "none" } |
+| `paperPlaceholder` | (`accepting`: `boolean`, `rejecting`: `boolean`) => \{ `border`: `string` = "dotted 2px #ccc"; `borderColor`: `string` ; `borderRadius`: `string` = "25px"; `color`: `string` = "rgb(117, 117, 117)"; `display`: `string` = "block"; `flexGrow`: `number` = 2; `fontSize`: `string` = "1rem"; `margin`: `string` = "0 25px"; `padding`: `string` = "25px 0"; `textAlign`: `string` = "center"; `userSelect`: `string` = "none" } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:36](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L36)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L36)
 
 ## Functions
 
@@ -109,4 +109,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:164](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L164)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:164](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L164)

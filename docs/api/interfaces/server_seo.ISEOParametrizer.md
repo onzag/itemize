@@ -26,7 +26,7 @@ everything you need
 
 #### Defined in
 
-[server/seo/index.ts:23](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L23)
+[server/seo/index.ts:23](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L23)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:20](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L20)
+[server/seo/index.ts:20](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L20)

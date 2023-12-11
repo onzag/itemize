@@ -14,25 +14,15 @@
 
 ### Properties
 
-- [gqlValue](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#gqlvalue)
 - [id](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#id)
 - [include](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#include)
 - [itemDefinition](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#itemdefinition)
 - [prefix](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#prefix)
 - [property](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#property)
+- [rqValue](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#rqvalue)
 - [search](base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalStrSearchInfo.md#search)
 
 ## Properties
-
-### gqlValue
-
-• **gqlValue**: [`IGQLValue`](gql_querier.IGQLValue.md)
-
-#### Defined in
-
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:197](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L197)
-
-___
 
 ### id
 
@@ -44,7 +34,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:66](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L66)
 
 ___
 
@@ -58,7 +48,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:72](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L72)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
 
 ___
 
@@ -72,7 +62,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:71](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L71)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
 
 ___
 
@@ -86,7 +76,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
 
 ___
 
@@ -100,7 +90,17 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
+
+___
+
+### rqValue
+
+• **rqValue**: [`IRQValue`](rq_querier.IRQValue.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:195](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L195)
 
 ___
 
@@ -110,4 +110,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:196](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L196)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:194](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L194)

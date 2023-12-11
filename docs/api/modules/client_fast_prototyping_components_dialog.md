@@ -31,13 +31,13 @@ The dialog itself, non-responsive and rather generic
 
 #### Defined in
 
-[client/fast-prototyping/components/dialog.tsx:117](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/dialog.tsx#L117)
+[client/fast-prototyping/components/dialog.tsx:117](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/dialog.tsx#L117)
 
 ___
 
 ### DialogResponsive
 
-▸ `Const` **DialogResponsive**(`props`): `Element`
+▸ **DialogResponsive**(`props`): `Element`
 
 This is a responsive version of the dialog
 it's able to go in fullscreen mode automatically
@@ -55,4 +55,4 @@ takes all the other props
 
 #### Defined in
 
-[client/fast-prototyping/components/dialog.tsx:169](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/dialog.tsx#L169)
+[client/fast-prototyping/components/dialog.tsx:169](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/dialog.tsx#L169)

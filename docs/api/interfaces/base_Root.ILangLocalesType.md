@@ -11,4 +11,4 @@ usually only containing the name
 
 ## Indexable
 
-▪ [locale: `string`]: { `name`: `string` ; `rtl`: `boolean`  }
+▪ [locale: `string`]: \{ `name`: `string` ; `rtl`: `boolean`  }

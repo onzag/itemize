@@ -6,7 +6,7 @@ Contains the single file type description
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedFileType](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)
 
@@ -14,24 +14,24 @@ Contains the single file type description
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedFileType
 
-Ƭ **PropertyDefinitionSupportedFileType**: [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
+Ƭ **PropertyDefinitionSupportedFileType**: [`IRQFile`](../interfaces/rq_querier.IRQFile.md)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:13](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L13)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:13](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L13)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)\>
 
 The type value represents the behaviour of files in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:27](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:27](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L27)

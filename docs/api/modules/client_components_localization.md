@@ -30,4 +30,4 @@ Capitalizes a string, taking into consideration special characters
 
 #### Defined in
 
-[client/components/localization/index.tsx:13](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/index.tsx#L13)
+[client/components/localization/index.tsx:13](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/index.tsx#L13)

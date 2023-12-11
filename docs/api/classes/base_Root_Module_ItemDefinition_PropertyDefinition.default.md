@@ -47,7 +47,7 @@ are to be defined
 - [addChangeListener](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#addchangelistener)
 - [applyValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#applyvalue)
 - [buildFieldsForRoleAccess](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#buildfieldsforroleaccess)
-- [checkAgainstJSONDefinition](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#checkagainstjsondefinition)
+- [checkAgainstRQDefinition](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#checkagainstrqdefinition)
 - [checkRoleAccessFor](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#checkroleaccessfor)
 - [checkSoftReadRoleAccessFor](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#checksoftreadroleaccessfor)
 - [cleanState](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#cleanstate)
@@ -111,17 +111,17 @@ are to be defined
 - [setGlobalSuperEnforced](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#setglobalsuperenforced)
 - [setSuperEnforced](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#setsuperenforced)
 - [toJSON](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#tojson)
-- [checkAgainstJSONDefinition](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#checkagainstjsondefinition)
+- [checkAgainstRQDefinition](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#checkagainstrqdefinition-1)
 - [createFileForProperty](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#createfileforproperty)
 - [getQualifiedPolicyPrefix](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getqualifiedpolicyprefix)
-- [isValidValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#isvalidvalue)
+- [isValidValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#isvalidvalue-1)
 - [revokeFileForProperty](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#revokefileforproperty)
 
 ## Constructors
 
 ### constructor
 
-• **new default**(`rawJSON`, `parentModule`, `parentItemDefinition`, `isExtension`, `originatingInstance?`)
+• **new default**(`rawJSON`, `parentModule`, `parentItemDefinition`, `isExtension`, `originatingInstance?`): [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
 
 Builds a property definition
 
@@ -135,9 +135,13 @@ Builds a property definition
 | `isExtension` | `boolean` | whether it represents a prop extension (aka null parentItemDefinition) |
 | `originatingInstance?` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | usually null, but when properties are cloned, reinstantiated; this is the original instance that is attached to the root, the reason we need this is for merging functionality as it will keep itself attached to the root original property via this weak link |
 
+#### Returns
+
+[`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
+
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:969](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L969)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:883](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L883)
 
 ## Properties
 
@@ -147,7 +151,7 @@ Builds a property definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:951](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L951)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:865](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L865)
 
 ___
 
@@ -159,7 +163,7 @@ Processed rules for default from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:861](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L861)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:775](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L775)
 
 ___
 
@@ -171,26 +175,26 @@ Processed enforced values from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:869](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L869)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:783](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L783)
 
 ___
 
 ### globalSuperDefaultedValue
 
-• `Private` `Optional` **globalSuperDefaultedValue**: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)
+• `Private` `Optional` **globalSuperDefaultedValue**: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
 
 this applies for predefined properties basically this is the new
 default value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:890](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L890)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:804](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L804)
 
 ___
 
 ### globalSuperEnforcedValue
 
-• `Private` `Optional` **globalSuperEnforcedValue**: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)
+• `Private` `Optional` **globalSuperEnforcedValue**: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
 
 enforced values and defaulted values, this is usually set manually
 and it applies to includes usually with enforced property values
@@ -198,7 +202,7 @@ hence the enforced value is global
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:884](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L884)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:798](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L798)
 
 ___
 
@@ -210,7 +214,7 @@ Processed hidden conditions from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:873](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L873)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:787](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L787)
 
 ___
 
@@ -222,7 +226,7 @@ Processed rules for invalid if from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:865](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L865)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:779](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L779)
 
 ___
 
@@ -234,7 +238,7 @@ list of listeners
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:877](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L877)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:791](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L791)
 
 ___
 
@@ -247,7 +251,7 @@ directly attached to the tree
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:856](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L856)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:770](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L770)
 
 ___
 
@@ -259,7 +263,7 @@ The parent item definition, if any, not available to extensions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:847](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L847)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:761](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L761)
 
 ___
 
@@ -271,7 +275,7 @@ the parent module of the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:843](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L843)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:757](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L757)
 
 ___
 
@@ -281,7 +285,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:497](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L497)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:498](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L498)
 
 ___
 
@@ -291,7 +295,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:496](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L496)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:497](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L497)
 
 ___
 
@@ -303,7 +307,7 @@ Whether the property is an extension
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:851](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L851)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:765](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L765)
 
 ___
 
@@ -315,7 +319,7 @@ the raw data for the property definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:839](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L839)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:753](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L753)
 
 ___
 
@@ -331,7 +335,7 @@ representing the original applied state of the class
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:902](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L902)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:816](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L816)
 
 ___
 
@@ -347,7 +351,7 @@ an internal value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:935](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L935)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:849](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L849)
 
 ___
 
@@ -357,11 +361,11 @@ ___
 
 #### Index signature
 
-▪ [slotId: `string`]: [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
+▪ [slotId: `string`]: [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:952](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L952)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:866](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L866)
 
 ___
 
@@ -371,11 +375,11 @@ ___
 
 #### Index signature
 
-▪ [slotId: `string`]: [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
+▪ [slotId: `string`]: [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:955](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L955)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:869](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L869)
 
 ___
 
@@ -388,11 +392,11 @@ to be used in the client side
 
 #### Index signature
 
-▪ [slotId: `string`]: { `valid`: `boolean` ; `value`: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)  }
+▪ [slotId: `string`]: \{ `valid`: `boolean` ; `value`: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)  }
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:944](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L944)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:858](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L858)
 
 ___
 
@@ -406,11 +410,11 @@ the user interaction, values are enforced
 
 #### Index signature
 
-▪ [slotId: `string`]: { `owners`: `any`[] ; `value`: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)  }
+▪ [slotId: `string`]: \{ `owners`: `any`[] ; `value`: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)  }
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:910](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L910)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:824](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L824)
 
 ___
 
@@ -426,7 +430,7 @@ representing the state of the class
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:896](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L896)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:810](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L810)
 
 ___
 
@@ -444,7 +448,7 @@ is what is supposed to be used by the user
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:929](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L929)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:843](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L843)
 
 ___
 
@@ -462,7 +466,7 @@ apply value or set value by user
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:921](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L921)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:835](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L835)
 
 ___
 
@@ -472,7 +476,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:495](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L495)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:496](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L496)
 
 ___
 
@@ -482,7 +486,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:492](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L492)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:493](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L493)
 
 ## Methods
 
@@ -506,7 +510,7 @@ not to applied changes of the sorts
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1135](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1135)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1049](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1049)
 
 ___
 
@@ -535,13 +539,13 @@ into this, and not meant for user input
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1770](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1770)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1680](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1680)
 
 ___
 
 ### buildFieldsForRoleAccess
 
-▸ **buildFieldsForRoleAccess**(`action`, `role`, `userId`, `ownerUserId`, `rolesManager`): `Promise`<{}\>
+▸ **buildFieldsForRoleAccess**(`action`, `role`, `userId`, `ownerUserId`, `rolesManager`): `Promise`\<[`IRQRequestFields`](../interfaces/rq_querier.IRQRequestFields.md)\>
 
 Builds the fields for a given role and a given action and
 a given property
@@ -558,17 +562,17 @@ a given property
 
 #### Returns
 
-`Promise`<{}\>
+`Promise`\<[`IRQRequestFields`](../interfaces/rq_querier.IRQRequestFields.md)\>
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2479](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2479)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2389](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2389)
 
 ___
 
-### checkAgainstJSONDefinition
+### checkAgainstRQDefinition
 
-▸ **checkAgainstJSONDefinition**(`v`): `boolean`
+▸ **checkAgainstRQDefinition**(`v`): `boolean`
 
 #### Parameters
 
@@ -582,13 +586,13 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1493](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1493)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1403](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1403)
 
 ___
 
 ### checkRoleAccessFor
 
-▸ **checkRoleAccessFor**(`action`, `role`, `userId`, `ownerUserId`, `rolesManager`, `throwError`): `Promise`<`boolean`\>
+▸ **checkRoleAccessFor**(`action`, `role`, `userId`, `ownerUserId`, `rolesManager`, `throwError`): `Promise`\<`boolean`\>
 
 Checks the role access for a specific IO action to a specific role
 basically just returns a boolean
@@ -606,19 +610,19 @@ basically just returns a boolean
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 a boolean on whether it has been granted access
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2559](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2559)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2469](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2469)
 
 ___
 
 ### checkSoftReadRoleAccessFor
 
-▸ **checkSoftReadRoleAccessFor**(`role`, `userId`, `ownerUserId`, `rolesManager`): `Promise`<`boolean`\>
+▸ **checkSoftReadRoleAccessFor**(`role`, `userId`, `ownerUserId`, `rolesManager`): `Promise`\<`boolean`\>
 
 Checks the soft read role access to a given
 property
@@ -634,11 +638,11 @@ property
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2529](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2529)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2439](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2439)
 
 ___
 
@@ -652,7 +656,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1022](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1022)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:936](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L936)
 
 ___
 
@@ -676,7 +680,7 @@ it will not clear enforced values
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1940](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1940)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1850](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1850)
 
 ___
 
@@ -700,13 +704,13 @@ Clears a super enforced value set in a slot id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1619](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1619)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1529](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1529)
 
 ___
 
 ### getAppliedValue
 
-▸ **getAppliedValue**<`T`\>(`id`, `version`): `T`
+▸ **getAppliedValue**\<`T`\>(`id`, `version`): `T`
 
 Provides the applied value for a property
 
@@ -731,7 +735,7 @@ the applied value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1240](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1240)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1150](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1150)
 
 ___
 
@@ -756,13 +760,13 @@ the special property value, either a boolean, number or string, or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2366](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2366)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2276](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2276)
 
 ___
 
 ### getCurrentValue
 
-▸ **getCurrentValue**<`T`\>(`id`, `version`): `T`
+▸ **getCurrentValue**\<`T`\>(`id`, `version`): `T`
 
 Provides the current value of a property (as it is)
 for a given slot id
@@ -788,7 +792,7 @@ the current value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1190](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1190)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1100](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1100)
 
 ___
 
@@ -806,13 +810,13 @@ a property definition value, or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2419](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2419)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2329](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2329)
 
 ___
 
 ### getEnforcedValue
 
-▸ **getEnforcedValue**<`T`\>(`id`, `version`): `Object`
+▸ **getEnforcedValue**\<`T`\>(`id`, `version`): `Object`
 
 Provides the current enforced value (if any)
 to a given slot id
@@ -844,7 +848,7 @@ the value can be null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1044](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1044)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:958](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L958)
 
 ___
 
@@ -868,7 +872,7 @@ the locale data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2428](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2428)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2338](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2338)
 
 ___
 
@@ -886,7 +890,7 @@ the id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1117](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1117)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1031](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1031)
 
 ___
 
@@ -906,7 +910,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2343](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2343)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2253](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2253)
 
 ___
 
@@ -924,7 +928,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2323](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2323)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2233](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2233)
 
 ___
 
@@ -944,7 +948,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2353](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2353)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2263](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2263)
 
 ___
 
@@ -962,7 +966,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2332](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2332)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2242](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2242)
 
 ___
 
@@ -983,7 +987,7 @@ a new instance
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2114](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2114)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2024](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2024)
 
 ___
 
@@ -1001,7 +1005,7 @@ a item definition that holds this property if any
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2386](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2386)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2296](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2296)
 
 ___
 
@@ -1019,7 +1023,7 @@ a Module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2378](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2378)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2288](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2288)
 
 ___
 
@@ -1033,7 +1037,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2308](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2308)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2218](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2218)
 
 ___
 
@@ -1047,7 +1051,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2300](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2300)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2210](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2210)
 
 ___
 
@@ -1066,7 +1070,7 @@ the policy name
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2145](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2145)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2055](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2055)
 
 ___
 
@@ -1085,26 +1089,26 @@ the policy type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2136](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2136)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2046](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2046)
 
 ___
 
 ### getPropertyDefinitionDescription
 
-▸ **getPropertyDefinitionDescription**(): [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
+▸ **getPropertyDefinitionDescription**(): [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
 
 Provides the property definition description from the
 supported standards
 
 #### Returns
 
-[`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
+[`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>
 
 the property definition description for its type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2177](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2177)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2087](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2087)
 
 ___
 
@@ -1129,27 +1133,27 @@ a string for the qualified policy prefix for this specific property id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2638](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2638)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2548](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2548)
 
 ___
 
 ### getRequestFields
 
-▸ **getRequestFields**(): `Object`
+▸ **getRequestFields**(): [`IRQRequestFields`](../interfaces/rq_querier.IRQRequestFields.md)
 
 Provides the request fields that are necessary
 and contained within this property in order to be
-graphql requested, these come from the property description
+rq requested, these come from the property description
 
 #### Returns
 
-`Object`
+[`IRQRequestFields`](../interfaces/rq_querier.IRQRequestFields.md)
 
 the requested fields that are necessary
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1156](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1156)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1070](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1070)
 
 ___
 
@@ -1174,7 +1178,7 @@ an array of string for the roles
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2454](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2454)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2364](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2364)
 
 ___
 
@@ -1188,7 +1192,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2244](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2244)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2154](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2154)
 
 ___
 
@@ -1206,13 +1210,13 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2268](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2268)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2178](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2178)
 
 ___
 
 ### getState
 
-▸ **getState**<`T`\>(`id`, `version`): `Promise`<[`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>\>
+▸ **getState**\<`T`\>(`id`, `version`): `Promise`\<[`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<`T`\>\>
 
 provides the current useful value for the property defintion
 
@@ -1231,19 +1235,19 @@ provides the current useful value for the property defintion
 
 #### Returns
 
-`Promise`<[`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>\>
+`Promise`\<[`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<`T`\>\>
 
 a promise for the current value state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1352](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1352)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1262](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1262)
 
 ___
 
 ### getStateNoExternalChecking
 
-▸ **getStateNoExternalChecking**<`T`\>(`id`, `version`, `emulateExternalChecking?`): [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>
+▸ **getStateNoExternalChecking**\<`T`\>(`id`, `version`, `emulateExternalChecking?`): [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<`T`\>
 
 provides the current useful value for the property defintion without doing
 any external checking, pass the id still as a cache of previously external
@@ -1265,13 +1269,13 @@ checked results might apply
 
 #### Returns
 
-[`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>
+[`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<`T`\>
 
 the current value state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1256](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1256)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1166](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1166)
 
 ___
 
@@ -1289,7 +1293,7 @@ the subtype string or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2276](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2276)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2186](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2186)
 
 ___
 
@@ -1307,7 +1311,7 @@ the type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1125](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1125)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1039](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1039)
 
 ___
 
@@ -1333,7 +1337,7 @@ a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2162](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2162)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2072](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2072)
 
 ___
 
@@ -1351,7 +1355,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2252](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2252)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2162](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2162)
 
 ___
 
@@ -1369,7 +1373,7 @@ a booean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2403](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2403)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2313](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2313)
 
 ___
 
@@ -1394,7 +1398,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1107](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1107)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1021](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1021)
 
 ___
 
@@ -1413,7 +1417,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2395](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2395)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2305](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2305)
 
 ___
 
@@ -1431,7 +1435,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2209](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2209)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2119](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2119)
 
 ___
 
@@ -1449,7 +1453,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2260](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2260)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2170](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2170)
 
 ___
 
@@ -1467,7 +1471,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2201](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2201)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2111](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2111)
 
 ___
 
@@ -1485,7 +1489,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2185](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2185)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2095](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2095)
 
 ___
 
@@ -1499,7 +1503,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2292](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2292)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2202](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2202)
 
 ___
 
@@ -1513,7 +1517,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2296](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2296)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2206](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2206)
 
 ___
 
@@ -1531,7 +1535,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2153](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2153)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2063](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2063)
 
 ___
 
@@ -1549,7 +1553,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2225](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2225)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2135](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2135)
 
 ___
 
@@ -1567,7 +1571,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2217](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2217)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2127](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2127)
 
 ___
 
@@ -1585,7 +1589,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2284](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2284)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2194](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2194)
 
 ___
 
@@ -1603,7 +1607,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2411](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2411)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2321](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2321)
 
 ___
 
@@ -1622,7 +1626,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2234](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2234)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2144](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2144)
 
 ___
 
@@ -1636,7 +1640,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2288](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2288)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2198](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2198)
 
 ___
 
@@ -1654,13 +1658,13 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2193](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2193)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2103](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2103)
 
 ___
 
 ### isValidValue
 
-▸ **isValidValue**(`id`, `version`, `value`): `Promise`<`string`\>
+▸ **isValidValue**(`id`, `version`, `value`): `Promise`\<`string`\>
 
 Externally checks a valid value for this input using all
 its guns, this function is context aware
@@ -1675,13 +1679,13 @@ its guns, this function is context aware
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 the invalid reason as a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2077](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2077)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1987](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1987)
 
 ___
 
@@ -1710,7 +1714,7 @@ the invalid reason as a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2016](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2016)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1926](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1926)
 
 ___
 
@@ -1733,7 +1737,7 @@ Marks a property definition as a policy type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2124](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2124)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2034](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2034)
 
 ___
 
@@ -1756,7 +1760,7 @@ of the same kind (only its language data)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2647](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2647)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2557](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2557)
 
 ___
 
@@ -1778,7 +1782,7 @@ Removes an added listener
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1143](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1143)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1057](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1057)
 
 ___
 
@@ -1802,7 +1806,7 @@ applied value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1985](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1985)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1895](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1895)
 
 ___
 
@@ -1817,8 +1821,6 @@ The resulting value set might not be the same, if the item
 has a default null value, that is, if the value is set to that
 value it will be converted to null
 
-**`throws`** an error if the value is invalid by definition
-
 #### Parameters
 
 | Name | Type | Description |
@@ -1832,9 +1834,13 @@ value it will be converted to null
 
 `void`
 
+**`Throws`**
+
+an error if the value is invalid by definition
+
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1710](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1710)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1620](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1620)
 
 ___
 
@@ -1850,7 +1856,7 @@ the value from
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `value` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) | the value to default to it can be a property |
+| `value` | [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the value to default to it can be a property |
 
 #### Returns
 
@@ -1858,7 +1864,7 @@ the value from
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1672](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1672)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1582](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1582)
 
 ___
 
@@ -1870,21 +1876,23 @@ Sets a super enforced value that superseeds any enforced value or
 values and makes the field enforced, the value might
 be another property definition to extract the value from
 
-**`throws`** an error if the value is invalid
-
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `value` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) | the value to enforce it can be a property |
+| `value` | [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the value to enforce it can be a property |
 
 #### Returns
 
 `void`
 
+**`Throws`**
+
+an error if the value is invalid
+
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1504](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1504)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1414](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1414)
 
 ___
 
@@ -1910,7 +1918,7 @@ slot id, note a super enforced value won't override the global
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1538](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1538)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1448](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1448)
 
 ___
 
@@ -1928,13 +1936,13 @@ the json form
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2628](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2628)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2538](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2538)
 
 ___
 
-### checkAgainstJSONDefinition
+### checkAgainstRQDefinition
 
-▸ `Static` **checkAgainstJSONDefinition**(`properyDefinitionRaw`, `v`): `boolean`
+▸ **checkAgainstRQDefinition**(`properyDefinitionRaw`, `v`): `boolean`
 
 Performs a check agains the json definition value for a property definition
 
@@ -1951,13 +1959,13 @@ Performs a check agains the json definition value for a property definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:534](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L534)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:535](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L535)
 
 ___
 
 ### createFileForProperty
 
-▸ `Static` **createFileForProperty**(`id`, `name`, `metadata`, `src`): [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
+▸ **createFileForProperty**(`id`, `name`, `metadata`, `src`): [`IRQFile`](../interfaces/rq_querier.IRQFile.md)
 
 #### Parameters
 
@@ -1970,17 +1978,17 @@ ___
 
 #### Returns
 
-[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
+[`IRQFile`](../interfaces/rq_querier.IRQFile.md)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:499](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L499)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:500](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L500)
 
 ___
 
 ### getQualifiedPolicyPrefix
 
-▸ `Static` **getQualifiedPolicyPrefix**(`policyType`, `policyName`): `string`
+▸ **getQualifiedPolicyPrefix**(`policyType`, `policyName`): `string`
 
 A static method that provides the policy prefix for a given policy name and type
 
@@ -1999,13 +2007,13 @@ a prefixed string that represents the qualified policy
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:522](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L522)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:523](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L523)
 
 ___
 
 ### isValidValue
 
-▸ `Static` **isValidValue**(`propertyDefinitionRaw`, `value`, `checkAgainstValues`): [`PropertyInvalidReason`](../enums/base_Root_Module_ItemDefinition_PropertyDefinition.PropertyInvalidReason.md)
+▸ **isValidValue**(`propertyDefinitionRaw`, `value`, `checkAgainstValues`): [`PropertyInvalidReason`](../enums/base_Root_Module_ItemDefinition_PropertyDefinition.PropertyInvalidReason.md)
 
 Checks whether a value is valid or not using
 the raw data.
@@ -2033,19 +2041,19 @@ a boolean on whether the value is valid
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:572](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L572)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:565](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L565)
 
 ___
 
 ### revokeFileForProperty
 
-▸ `Static` **revokeFileForProperty**(`file`): `void`
+▸ **revokeFileForProperty**(`file`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `file` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) |
+| `file` | [`IRQFile`](../interfaces/rq_querier.IRQFile.md) |
 
 #### Returns
 
@@ -2053,4 +2061,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:512](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L512)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:513](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L513)

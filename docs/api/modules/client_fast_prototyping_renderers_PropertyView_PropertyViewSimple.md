@@ -39,4 +39,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx#L25)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx#L25)

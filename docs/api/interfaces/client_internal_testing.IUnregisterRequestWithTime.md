@@ -4,6 +4,8 @@
 
 [client/internal/testing](../modules/client_internal_testing.md).IUnregisterRequestWithTime
 
+This mirrors [[IRegisterRequest]]
+
 ## Hierarchy
 
 - [`IUnregisterRequest`](base_remote_protocol.IUnregisterRequest.md)
@@ -31,7 +33,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:260](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L260)
+[base/remote-protocol.ts:260](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L260)
 
 ___
 
@@ -45,7 +47,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:259](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L259)
+[base/remote-protocol.ts:259](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L259)
 
 ___
 
@@ -55,7 +57,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:79](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L79)
+[client/internal/testing.ts:79](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L79)
 
 ___
 
@@ -69,4 +71,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:261](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L261)
+[base/remote-protocol.ts:261](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L261)

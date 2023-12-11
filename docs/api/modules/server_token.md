@@ -21,7 +21,7 @@ can be able to communicate with an itemize server easily
 
 ### jwtDecode
 
-▸ **jwtDecode**<`T`\>(`token`, `options?`): `T`
+▸ **jwtDecode**\<`T`\>(`token`, `options?`): `T`
 
 Decode a JWT token and does not verify whether it's valid
 
@@ -44,13 +44,13 @@ Decode a JWT token and does not verify whether it's valid
 
 #### Defined in
 
-[server/token.ts:96](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L96)
+[server/token.ts:96](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L96)
 
 ___
 
 ### jwtSign
 
-▸ **jwtSign**(`payload`, `secretOrPrivateKey`, `options?`): `Promise`<`string`\>
+▸ **jwtSign**(`payload`, `secretOrPrivateKey`, `options?`): `Promise`\<`string`\>
 
 Sign a payload
 
@@ -64,17 +64,17 @@ Sign a payload
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Defined in
 
-[server/token.ts:18](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L18)
+[server/token.ts:18](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L18)
 
 ___
 
 ### jwtVerify
 
-▸ **jwtVerify**<`T`\>(`token`, `secretOrPublicKey`, `options?`): `Promise`<`T`\>
+▸ **jwtVerify**\<`T`\>(`token`, `secretOrPublicKey`, `options?`): `Promise`\<`T`\>
 
 Verify and decode a key
 
@@ -94,17 +94,17 @@ Verify and decode a key
 
 #### Returns
 
-`Promise`<`T`\>
+`Promise`\<`T`\>
 
 #### Defined in
 
-[server/token.ts:40](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L40)
+[server/token.ts:40](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L40)
 
 ___
 
 ### jwtVerifyWithAlt
 
-▸ **jwtVerifyWithAlt**<`T`\>(`token`, `secretOrPublicKey`, `secretOrPublicKeyAlt`, `options?`): `Promise`<`T`\>
+▸ **jwtVerifyWithAlt**\<`T`\>(`token`, `secretOrPublicKey`, `secretOrPublicKeyAlt`, `options?`): `Promise`\<`T`\>
 
 Verify and decode a key using two keys
 
@@ -125,8 +125,8 @@ Verify and decode a key using two keys
 
 #### Returns
 
-`Promise`<`T`\>
+`Promise`\<`T`\>
 
 #### Defined in
 
-[server/token.ts:63](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L63)
+[server/token.ts:63](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L63)

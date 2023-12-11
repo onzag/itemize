@@ -9,7 +9,7 @@ the exported one because it needs to be withStyles for stylization
 
 ## Hierarchy
 
-- `PureComponent`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md), [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>
+- `PureComponent`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md), [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>
 
   ↳ **`MaterialUISlateWrapper`**
 
@@ -73,7 +73,7 @@ the exported one because it needs to be withStyles for stylization
 
 ### constructor
 
-• **new MaterialUISlateWrapper**(`props`)
+• **new MaterialUISlateWrapper**(`props`): [`MaterialUISlateWrapper`](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md)
 
 Constructs a new material ui based wrapper for the slate editor
 
@@ -83,25 +83,29 @@ Constructs a new material ui based wrapper for the slate editor
 | :------ | :------ | :------ |
 | `props` | [`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md) | the base properties that every wrapper gets extended for this specific wrapper |
 
+#### Returns
+
+[`MaterialUISlateWrapper`](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md)
+
 #### Overrides
 
-React.PureComponent&lt;IMaterialUISlateWrapperProps, MaterialUISlateWrapperState\&gt;.constructor
+React.PureComponent\&lt;IMaterialUISlateWrapperProps, MaterialUISlateWrapperState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1537](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1537)
+[client/fast-prototyping/components/slate/wrapper.tsx:1537](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1537)
 
 ## Properties
 
 ### DrawerContainerRef
 
-• `Private` **DrawerContainerRef**: `RefObject`<`DrawerContainer`\>
+• `Private` **DrawerContainerRef**: `RefObject`\<`DrawerContainer`\>
 
 A ref to the container
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1499](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1499)
+[client/fast-prototyping/components/slate/wrapper.tsx:1499](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1499)
 
 ___
 
@@ -121,7 +125,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -129,43 +135,43 @@ React.PureComponent.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
 ### editorRef
 
-• `Private` **editorRef**: `RefObject`<`HTMLDivElement`\>
+• `Private` **editorRef**: `RefObject`\<`HTMLDivElement`\>
 
 a ref to the editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1504](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1504)
+[client/fast-prototyping/components/slate/wrapper.tsx:1504](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1504)
 
 ___
 
 ### inputFileRef
 
-• `Private` **inputFileRef**: `RefObject`<`HTMLInputElement`\>
+• `Private` **inputFileRef**: `RefObject`\<`HTMLInputElement`\>
 
 The ref object for the input object for any file input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1494](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1494)
+[client/fast-prototyping/components/slate/wrapper.tsx:1494](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1494)
 
 ___
 
 ### inputImageRef
 
-• `Private` **inputImageRef**: `RefObject`<`HTMLInputElement`\>
+• `Private` **inputImageRef**: `RefObject`\<`HTMLInputElement`\>
 
 The ref object for the input object for image input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1489](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1489)
+[client/fast-prototyping/components/slate/wrapper.tsx:1489](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1489)
 
 ___
 
@@ -175,7 +181,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1531](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1531)
+[client/fast-prototyping/components/slate/wrapper.tsx:1531](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1531)
 
 ___
 
@@ -189,7 +195,7 @@ selection range, but that is lost when losing focus, so we need to remember it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1516](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1516)
+[client/fast-prototyping/components/slate/wrapper.tsx:1516](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1516)
 
 ___
 
@@ -202,13 +208,13 @@ because we were workign in the range
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1521](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1521)
+[client/fast-prototyping/components/slate/wrapper.tsx:1521](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1521)
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -216,7 +222,7 @@ React.PureComponent.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -231,7 +237,7 @@ and the change event might not even trigger
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1529](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1529)
+[client/fast-prototyping/components/slate/wrapper.tsx:1529](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1529)
 
 ___
 
@@ -239,8 +245,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -252,13 +259,13 @@ React.PureComponent.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### state
 
-• **state**: `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>
+• **state**: `Readonly`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>
 
 #### Inherited from
 
@@ -266,25 +273,25 @@ React.PureComponent.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
 ### toolbarRef
 
-• `Private` **toolbarRef**: `RefObject`<`RichTextEditorToolbar`\>
+• `Private` **toolbarRef**: `RefObject`\<`RichTextEditorToolbar`\>
 
 A ref for the toolbar
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1509](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1509)
+[client/fast-prototyping/components/slate/wrapper.tsx:1509](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1509)
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -303,7 +310,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -311,13 +320,13 @@ React.PureComponent.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -327,15 +336,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -343,13 +355,13 @@ React.PureComponent.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -362,22 +374,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
+| `nextProps` | `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -385,13 +400,13 @@ React.PureComponent.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -402,23 +417,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
-| `nextState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
+| `nextProps` | `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
+| `nextState` | `Readonly`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -426,13 +444,13 @@ React.PureComponent.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -454,7 +472,7 @@ React.PureComponent.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
@@ -474,13 +492,13 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1596](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1596)
+[client/fast-prototyping/components/slate/wrapper.tsx:1596](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1596)
 
 ___
 
 ### componentDidUpdate
 
-▸ `Optional` **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
+▸ **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
 
 Called immediately after updating occurs. Not called for the initial render.
 
@@ -490,8 +508,8 @@ The snapshot is only present if getSnapshotBeforeUpdate is present and returns n
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
-| `prevState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
+| `prevProps` | `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
+| `prevState` | `Readonly`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `snapshot?` | `any` |
 
 #### Returns
@@ -504,13 +522,13 @@ React.PureComponent.componentDidUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:688
+node_modules/@types/react/index.d.ts:682
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -518,15 +536,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -534,13 +555,13 @@ React.PureComponent.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -551,22 +572,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
+| `nextProps` | `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -574,7 +598,7 @@ React.PureComponent.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
@@ -592,13 +616,13 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1627](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1627)
+[client/fast-prototyping/components/slate/wrapper.tsx:1627](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1627)
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -607,23 +631,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
-| `nextState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
+| `nextProps` | `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
+| `nextState` | `Readonly`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -631,7 +658,7 @@ React.PureComponent.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
@@ -655,13 +682,13 @@ React.PureComponent.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -674,8 +701,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
-| `prevState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
+| `prevProps` | `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
+| `prevState` | `Readonly`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 
 #### Returns
 
@@ -687,7 +714,7 @@ React.PureComponent.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
@@ -707,7 +734,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1675](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1675)
+[client/fast-prototyping/components/slate/wrapper.tsx:1675](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1675)
 
 ___
 
@@ -727,7 +754,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1659](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1659)
+[client/fast-prototyping/components/slate/wrapper.tsx:1659](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1659)
 
 ___
 
@@ -747,7 +774,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1634](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1634)
+[client/fast-prototyping/components/slate/wrapper.tsx:1634](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1634)
 
 ___
 
@@ -760,7 +787,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `tabNav` | `boolean` |
-| `action` | ``"click"`` \| ``"focus"`` \| ``"blur"`` |
+| `action` | ``"click"`` \| ``"blur"`` \| ``"focus"`` |
 
 #### Returns
 
@@ -768,7 +795,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1579](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1579)
+[client/fast-prototyping/components/slate/wrapper.tsx:1579](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1579)
 
 ___
 
@@ -785,13 +812,13 @@ dialog that is native for the file upload
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1797](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1797)
+[client/fast-prototyping/components/slate/wrapper.tsx:1797](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1797)
 
 ___
 
 ### onFileLoad
 
-▸ **onFileLoad**(`e`): `Promise`<`void`\>
+▸ **onFileLoad**(`e`): `Promise`\<`void`\>
 
 This function gets called once the file input calls the on change event
 which means it has been loaded by the input itself and it's available for
@@ -801,15 +828,15 @@ reading
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `e` | `ChangeEvent`<`HTMLInputElement`\> | the change event that contains the file |
+| `e` | `ChangeEvent`\<`HTMLInputElement`\> | the change event that contains the file |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1841](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1841)
+[client/fast-prototyping/components/slate/wrapper.tsx:1841](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1841)
 
 ___
 
@@ -829,13 +856,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1585](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1585)
+[client/fast-prototyping/components/slate/wrapper.tsx:1585](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1585)
 
 ___
 
 ### onImageLoad
 
-▸ **onImageLoad**(`e`): `Promise`<`void`\>
+▸ **onImageLoad**(`e`): `Promise`\<`void`\>
 
 This function gets called once the image input calls the on change event
 which means it has been loaded by the input itself and it's available for
@@ -845,15 +872,15 @@ reading
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `e` | `ChangeEvent`<`HTMLInputElement`\> | the change event that contains the file |
+| `e` | `ChangeEvent`\<`HTMLInputElement`\> | the change event that contains the file |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1820](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1820)
+[client/fast-prototyping/components/slate/wrapper.tsx:1820](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1820)
 
 ___
 
@@ -870,7 +897,7 @@ mainly used by dialogs once they haave closed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1781](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1781)
+[client/fast-prototyping/components/slate/wrapper.tsx:1781](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1781)
 
 ___
 
@@ -890,7 +917,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1859](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1859)
+[client/fast-prototyping/components/slate/wrapper.tsx:1859](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1859)
 
 ___
 
@@ -907,7 +934,7 @@ via this file upload dialog
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1740](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1740)
+[client/fast-prototyping/components/slate/wrapper.tsx:1740](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1740)
 
 ___
 
@@ -924,7 +951,7 @@ via this file upload dialog
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1719](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1719)
+[client/fast-prototyping/components/slate/wrapper.tsx:1719](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1719)
 
 ___
 
@@ -936,7 +963,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `e` | `MouseEvent` \| `KeyboardEvent` |
+| `e` | `KeyboardEvent` \| `MouseEvent` |
 | `altTarget?` | `HTMLElement` |
 
 #### Returns
@@ -945,13 +972,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1640](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1640)
+[client/fast-prototyping/components/slate/wrapper.tsx:1640](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1640)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -963,7 +990,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| (`prevState`: `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>, `props`: `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\>) => [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| `Pick`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> \| `Pick`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> |
+| `state` | [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| (`prevState`: `Readonly`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>, `props`: `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\>) => [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| `Pick`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> \| `Pick`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -976,7 +1003,7 @@ React.PureComponent.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
@@ -996,13 +1023,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1808](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1808)
+[client/fast-prototyping/components/slate/wrapper.tsx:1808](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1808)
 
 ___
 
 ### shouldComponentUpdate
 
-▸ `Optional` **shouldComponentUpdate**(`nextProps`, `nextState`, `nextContext`): `boolean`
+▸ **shouldComponentUpdate**(`nextProps`, `nextState`, `nextContext`): `boolean`
 
 Called to determine whether the change in props and state should trigger a re-render.
 
@@ -1017,8 +1044,8 @@ and `componentDidUpdate` will not be called.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
-| `nextState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
+| `nextProps` | `Readonly`\<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
+| `nextState` | `Readonly`\<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -1031,7 +1058,7 @@ React.PureComponent.shouldComponentUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:636
+node_modules/@types/react/index.d.ts:630
 
 ___
 
@@ -1049,7 +1076,7 @@ a boolean on this fact
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1698](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1698)
+[client/fast-prototyping/components/slate/wrapper.tsx:1698](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1698)
 
 ___
 
@@ -1065,4 +1092,4 @@ Opens/closes the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1760](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1760)
+[client/fast-prototyping/components/slate/wrapper.tsx:1760](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L1760)

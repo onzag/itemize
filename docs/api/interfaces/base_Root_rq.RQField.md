@@ -16,8 +16,8 @@
 
 - [array](base_Root_rq.RQField.md#array)
 - [description](base_Root_rq.RQField.md#description)
-- [extFields](base_Root_rq.RQField.md#extfields)
 - [ownFields](base_Root_rq.RQField.md#ownfields)
+- [recordsObj](base_Root_rq.RQField.md#recordsobj)
 - [required](base_Root_rq.RQField.md#required)
 - [stdFields](base_Root_rq.RQField.md#stdfields)
 - [type](base_Root_rq.RQField.md#type)
@@ -35,7 +35,7 @@ RQBase.array
 
 #### Defined in
 
-[base/Root/rq.ts:39](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L39)
+[base/Root/rq.ts:41](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L41)
 
 ___
 
@@ -49,26 +49,7 @@ RQBase.description
 
 #### Defined in
 
-[base/Root/rq.ts:58](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L58)
-
-___
-
-### extFields
-
-• `Optional` **extFields**: `Object`
-
-Signals the precense of a DATA layer that contains both
-std fields and own fields
-
-if not present then it's null
-
-#### Index signature
-
-▪ [id: `string`]: [`RQField`](base_Root_rq.RQField.md)
-
-#### Defined in
-
-[base/Root/rq.ts:52](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L52)
+[base/Root/rq.ts:51](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L51)
 
 ___
 
@@ -82,7 +63,21 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:55](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L55)
+[base/Root/rq.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L48)
+
+___
+
+### recordsObj
+
+• `Optional` **recordsObj**: `boolean`
+
+#### Inherited from
+
+RQBase.recordsObj
+
+#### Defined in
+
+[base/Root/rq.ts:31](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L31)
 
 ___
 
@@ -96,7 +91,7 @@ RQBase.required
 
 #### Defined in
 
-[base/Root/rq.ts:42](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L42)
+[base/Root/rq.ts:44](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L44)
 
 ___
 
@@ -110,13 +105,13 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:43](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L43)
+[base/Root/rq.ts:45](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L45)
 
 ___
 
 ### type
 
-• **type**: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"object"`` \| ``"integer"`` \| ``"any"`` \| ``"binary"`` \| ``"integer-positive"``
+• **type**: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"object"`` \| ``"binary"`` \| ``"integer"`` \| ``"integer-positive"`` \| ``"any"``
 
 #### Overrides
 
@@ -124,7 +119,7 @@ RQBase.type
 
 #### Defined in
 
-[base/Root/rq.ts:40](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L40)
+[base/Root/rq.ts:42](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L42)
 
 ___
 
@@ -138,4 +133,4 @@ RQBase.values
 
 #### Defined in
 
-[base/Root/rq.ts:41](https://github.com/onzag/itemize/blob/a24376ed/base/Root/rq.ts#L41)
+[base/Root/rq.ts:43](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L43)

@@ -13,7 +13,7 @@
 
 ### destroyDestructionMarkers
 
-▸ **destroyDestructionMarkers**(`unmount?`, `intialization?`): `Promise`<`boolean`\>
+▸ **destroyDestructionMarkers**(`unmount?`, `intialization?`): `Promise`\<`boolean`\>
 
 #### Parameters
 
@@ -24,17 +24,17 @@
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Defined in
 
-[client/internal/app/destruction-markers.ts:4](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/destruction-markers.ts#L4)
+[client/internal/app/destruction-markers.ts:4](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/destruction-markers.ts#L4)
 
 ___
 
 ### destroySearchDestructionMarkers
 
-▸ **destroySearchDestructionMarkers**(`unmount?`, `intialization?`): `Promise`<`boolean`\>
+▸ **destroySearchDestructionMarkers**(`unmount?`, `intialization?`): `Promise`\<`boolean`\>
 
 #### Parameters
 
@@ -45,8 +45,8 @@ ___
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Defined in
 
-[client/internal/app/destruction-markers.ts:53](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/destruction-markers.ts#L53)
+[client/internal/app/destruction-markers.ts:53](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/destruction-markers.ts#L53)

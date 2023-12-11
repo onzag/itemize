@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[client/components/ussd/USSDAction.tsx:83](https://github.com/onzag/itemize/blob/a24376ed/client/components/ussd/USSDAction.tsx#L83)
+[client/components/ussd/USSDAction.tsx:83](https://github.com/onzag/itemize/blob/59702dd5/client/components/ussd/USSDAction.tsx#L83)

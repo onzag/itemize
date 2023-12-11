@@ -19,7 +19,7 @@
 
 ### default
 
-▸ **default**<`T`\>(`props`): `ReactNode`
+▸ **default**\<`T`\>(`props`): `ReactNode`
 
 The local storage reader
 
@@ -33,7 +33,7 @@ The local storage reader
 
 | Name | Type |
 | :------ | :------ |
-| `props` | `ILocalStorageReaderProps`<`T`\> |
+| `props` | `ILocalStorageReaderProps`\<`T`\> |
 
 #### Returns
 
@@ -41,7 +41,7 @@ The local storage reader
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:108](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L108)
+[client/components/util/LocalStorageReader.tsx:108](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/LocalStorageReader.tsx#L108)
 
 ___
 
@@ -64,7 +64,7 @@ and JSON parses it
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:45](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L45)
+[client/components/util/LocalStorageReader.tsx:45](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/LocalStorageReader.tsx#L45)
 
 ___
 
@@ -88,13 +88,13 @@ it uses JSON stringify to store the value
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L26)
+[client/components/util/LocalStorageReader.tsx:26](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/LocalStorageReader.tsx#L26)
 
 ___
 
 ### useLocalStorageReader
 
-▸ **useLocalStorageReader**<`T`\>(`slot`): [`T`, (`v`: `T`) => `void`]
+▸ **useLocalStorageReader**\<`T`\>(`slot`): [`T`, (`v`: `T`) => `void`]
 
 Hooks version for the local storage reader
 
@@ -116,4 +116,4 @@ Hooks version for the local storage reader
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:68](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L68)
+[client/components/util/LocalStorageReader.tsx:68](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/LocalStorageReader.tsx#L68)

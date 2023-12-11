@@ -14,6 +14,10 @@
 
 ▸ **rqSystem**(`options`): `Router`
 
+The rq system is used to be a simplified version
+of a rq client with upload potential that doesn't need
+a custom format and is optimized for simplicity
+
 #### Parameters
 
 | Name | Type |
@@ -31,4 +35,4 @@
 
 #### Defined in
 
-[server/rq.ts:4](https://github.com/onzag/itemize/blob/a24376ed/server/rq.ts#L4)
+[server/rq.ts:333](https://github.com/onzag/itemize/blob/59702dd5/server/rq.ts#L333)

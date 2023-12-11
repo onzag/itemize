@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-- [`default`](server_services_base_UserLocalizationProvider.default.md)<``null``\>
+- [`default`](server_services_base_UserLocalizationProvider.default.md)\<``null``\>
 
   ↳ **`ElasticLocationService`**
 
@@ -57,19 +57,19 @@
 - [setInstanceName](server_services_elastic_location.ElasticLocationService.md#setinstancename)
 - [setupGlobalResources](server_services_elastic_location.ElasticLocationService.md#setupglobalresources)
 - [setupLocalResources](server_services_elastic_location.ElasticLocationService.md#setuplocalresources)
-- [expressRouter](server_services_elastic_location.ElasticLocationService.md#expressrouter)
-- [getRouter](server_services_elastic_location.ElasticLocationService.md#getrouter)
-- [getTriggerRegistry](server_services_elastic_location.ElasticLocationService.md#gettriggerregistry)
+- [expressRouter](server_services_elastic_location.ElasticLocationService.md#expressrouter-1)
+- [getRouter](server_services_elastic_location.ElasticLocationService.md#getrouter-1)
+- [getTriggerRegistry](server_services_elastic_location.ElasticLocationService.md#gettriggerregistry-1)
 - [getType](server_services_elastic_location.ElasticLocationService.md#gettype)
-- [logDebug](server_services_elastic_location.ElasticLocationService.md#logdebug)
-- [logError](server_services_elastic_location.ElasticLocationService.md#logerror)
-- [logInfo](server_services_elastic_location.ElasticLocationService.md#loginfo)
+- [logDebug](server_services_elastic_location.ElasticLocationService.md#logdebug-1)
+- [logError](server_services_elastic_location.ElasticLocationService.md#logerror-1)
+- [logInfo](server_services_elastic_location.ElasticLocationService.md#loginfo-1)
 
 ## Constructors
 
 ### constructor
 
-• **new ElasticLocationService**(`config`, `registry`, `configs`)
+• **new ElasticLocationService**(`config`, `registry`, `configs`): [`ElasticLocationService`](server_services_elastic_location.ElasticLocationService.md)
 
 #### Parameters
 
@@ -83,13 +83,17 @@
 | `configs.redisConfig` | [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md) |
 | `configs.sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
 
+#### Returns
+
+[`ElasticLocationService`](server_services_elastic_location.ElasticLocationService.md)
+
 #### Inherited from
 
 [default](server_services_base_UserLocalizationProvider.default.md).[constructor](server_services_base_UserLocalizationProvider.default.md#constructor)
 
 #### Defined in
 
-[server/services/index.ts:58](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L58)
+[server/services/index.ts:58](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L58)
 
 ## Properties
 
@@ -103,7 +107,7 @@
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L35)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L35)
 
 ___
 
@@ -117,7 +121,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L37)
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L37)
 
 ___
 
@@ -131,7 +135,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L38)
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L38)
 
 ___
 
@@ -145,7 +149,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L36)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L36)
 
 ___
 
@@ -159,7 +163,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L33)
+[server/services/index.ts:33](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L33)
 
 ___
 
@@ -169,7 +173,7 @@ ___
 
 #### Index signature
 
-▪ [name: `string`]: [`ServiceProvider`](server_services.ServiceProvider.md)<`any`\>
+▪ [name: `string`]: [`ServiceProvider`](server_services.ServiceProvider.md)\<`any`\>
 
 #### Inherited from
 
@@ -177,7 +181,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L48)
 
 ___
 
@@ -191,7 +195,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L40)
 
 ___
 
@@ -205,13 +209,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L55)
 
 ___
 
 ### globalMailProvider
 
-• **globalMailProvider**: [`default`](server_services_base_MailProvider.default.md)<`any`\>
+• **globalMailProvider**: [`default`](server_services_base_MailProvider.default.md)\<`any`\>
 
 #### Inherited from
 
@@ -219,13 +223,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L46)
 
 ___
 
 ### globalPhoneProvider
 
-• **globalPhoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)<`any`\>
+• **globalPhoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)\<`any`\>
 
 #### Inherited from
 
@@ -233,7 +237,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L47)
 
 ___
 
@@ -247,7 +251,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L44)
 
 ___
 
@@ -261,7 +265,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L43)
 
 ___
 
@@ -275,7 +279,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L41)
 
 ___
 
@@ -289,7 +293,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L42)
 
 ___
 
@@ -303,7 +307,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L45)
 
 ___
 
@@ -317,7 +321,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L54)
 
 ___
 
@@ -331,7 +335,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L52)
 
 ___
 
@@ -345,7 +349,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L56)
 
 ___
 
@@ -359,7 +363,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:34](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L34)
+[server/services/index.ts:34](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L34)
 
 ## Methods
 
@@ -380,7 +384,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:170](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L170)
+[server/services/index.ts:170](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L170)
 
 ___
 
@@ -404,7 +408,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:116](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L116)
+[server/services/index.ts:116](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L116)
 
 ___
 
@@ -422,26 +426,26 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L80)
+[server/services/index.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L80)
 
 ___
 
 ### getLocalizationFor
 
-▸ **getLocalizationFor**(`ip`, `fallback`): `Promise`<[`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md)\>
+▸ **getLocalizationFor**(`ip`, `fallback`): `Promise`\<[`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md)\>
 
 Should provide the localization for the user
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `ip` | `string` |
-| `fallback` | [`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ip` | `string` | the ip address |
+| `fallback` | [`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md) | - |
 
 #### Returns
 
-`Promise`<[`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md)\>
+`Promise`\<[`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md)\>
 
 #### Overrides
 
@@ -449,13 +453,13 @@ Should provide the localization for the user
 
 #### Defined in
 
-[server/services/elastic-location.ts:9](https://github.com/onzag/itemize/blob/a24376ed/server/services/elastic-location.ts#L9)
+[server/services/elastic-location.ts:9](https://github.com/onzag/itemize/blob/59702dd5/server/services/elastic-location.ts#L9)
 
 ___
 
 ### getRouter
 
-▸ **getRouter**(`appData`): `Router` \| `Promise`<`Router`\>
+▸ **getRouter**(`appData`): `Router` \| `Promise`\<`Router`\>
 
 Provides a router endpoint, the router endpoint
 will exist directly under the rest services
@@ -469,8 +473,6 @@ for the global manager
 
 The router gets attached to /rest/service
 
-**`override`**
-
 #### Parameters
 
 | Name | Type |
@@ -479,7 +481,7 @@ The router gets attached to /rest/service
 
 #### Returns
 
-`Router` \| `Promise`<`Router`\>
+`Router` \| `Promise`\<`Router`\>
 
 #### Inherited from
 
@@ -487,7 +489,7 @@ The router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:266](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L266)
+[server/services/index.ts:266](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L266)
 
 ___
 
@@ -497,8 +499,6 @@ ___
 
 Determines whether the run function
 should run over again
-
-**`override`**
 
 #### Returns
 
@@ -510,22 +510,20 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:239](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L239)
+[server/services/index.ts:239](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L239)
 
 ___
 
 ### getTriggerRegistry
 
-▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 Allows to setup trigger registries via the service
 so that they trigger just as normal trigger will do
 
-**`override`**
-
 #### Returns
 
-[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 #### Inherited from
 
@@ -533,13 +531,13 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/index.ts:293](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L293)
+[server/services/index.ts:293](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L293)
 
 ___
 
 ### initialize
 
-▸ **initialize**(): `void` \| `Promise`<`void`\>
+▸ **initialize**(): `void` \| `Promise`\<`void`\>
 
 This function is executed during
 the initialization of the service
@@ -548,11 +546,9 @@ If your service is a global service you will
 have access to the global resources while
 this function executes
 
-**`override`**
-
 #### Returns
 
-`void` \| `Promise`<`void`\>
+`void` \| `Promise`\<`void`\>
 
 #### Inherited from
 
@@ -560,7 +556,7 @@ this function executes
 
 #### Defined in
 
-[server/services/index.ts:230](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L230)
+[server/services/index.ts:230](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L230)
 
 ___
 
@@ -578,7 +574,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:84](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L84)
+[server/services/index.ts:84](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L84)
 
 ___
 
@@ -596,13 +592,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L88)
+[server/services/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L88)
 
 ___
 
 ### logDebug
 
-▸ **logDebug**<`T`\>(`data`): `void`
+▸ **logDebug**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -614,7 +610,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -626,13 +622,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:96](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L96)
+[server/services/index.ts:96](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L96)
 
 ___
 
 ### logError
 
-▸ **logError**<`T`\>(`data`): `void`
+▸ **logError**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -644,7 +640,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -656,13 +652,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:100](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L100)
+[server/services/index.ts:100](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L100)
 
 ___
 
 ### logInfo
 
-▸ **logInfo**<`T`\>(`data`): `void`
+▸ **logInfo**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -674,7 +670,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -686,21 +682,19 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:92](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L92)
+[server/services/index.ts:92](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L92)
 
 ___
 
 ### run
 
-▸ **run**(): `void` \| `Promise`<`void`\>
+▸ **run**(): `void` \| `Promise`\<`void`\>
 
 Executes some code
 
-**`override`**
-
 #### Returns
 
-`void` \| `Promise`<`void`\>
+`void` \| `Promise`\<`void`\>
 
 #### Inherited from
 
@@ -708,7 +702,7 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:247](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L247)
+[server/services/index.ts:247](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L247)
 
 ___
 
@@ -732,7 +726,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L76)
+[server/services/index.ts:76](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L76)
 
 ___
 
@@ -748,8 +742,8 @@ ___
 | `globalClient` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `globalPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `globalSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
-| `globalMailProvider` | [`default`](server_services_base_MailProvider.default.md)<`any`\> |
-| `globalPhoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)<`any`\> |
+| `globalMailProvider` | [`default`](server_services_base_MailProvider.default.md)\<`any`\> |
+| `globalPhoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)\<`any`\> |
 | `globalCustomServices` | `Object` |
 | `root` | [`default`](base_Root.default.md) |
 
@@ -763,7 +757,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:124](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L124)
+[server/services/index.ts:124](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L124)
 
 ___
 
@@ -787,13 +781,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:148](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L148)
+[server/services/index.ts:148](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L148)
 
 ___
 
 ### expressRouter
 
-▸ `Static` **expressRouter**(`options?`): `Router`
+▸ **expressRouter**(`options?`): `Router`
 
 #### Parameters
 
@@ -807,17 +801,17 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_UserLocalizationProvider.default.md).[expressRouter](server_services_base_UserLocalizationProvider.default.md#expressrouter)
+[default](server_services_base_UserLocalizationProvider.default.md).[expressRouter](server_services_base_UserLocalizationProvider.default.md#expressrouter-1)
 
 #### Defined in
 
-[server/services/index.ts:120](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L120)
+[server/services/index.ts:120](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L120)
 
 ___
 
 ### getRouter
 
-▸ `Static` **getRouter**(`appData`): `Router` \| `Promise`<`Router`\>
+▸ **getRouter**(`appData`): `Router` \| `Promise`\<`Router`\>
 
 Provides a router endpoint, but this method
 is static, which means it only gets added once
@@ -829,8 +823,6 @@ for the global manager
 
 the router gets attached to /rest/service
 
-**`override`**
-
 #### Parameters
 
 | Name | Type |
@@ -839,46 +831,44 @@ the router gets attached to /rest/service
 
 #### Returns
 
-`Router` \| `Promise`<`Router`\>
+`Router` \| `Promise`\<`Router`\>
 
 #### Inherited from
 
-[default](server_services_base_UserLocalizationProvider.default.md).[getRouter](server_services_base_UserLocalizationProvider.default.md#getrouter)
+[default](server_services_base_UserLocalizationProvider.default.md).[getRouter](server_services_base_UserLocalizationProvider.default.md#getrouter-1)
 
 #### Defined in
 
-[server/services/index.ts:283](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L283)
+[server/services/index.ts:283](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L283)
 
 ___
 
 ### getTriggerRegistry
 
-▸ `Static` **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 Allows to setup trigger registries via the service
 so that they trigger just as normal trigger will do
 
 This gets attached if a class is used rather than per instance
 
-**`override`**
-
 #### Returns
 
-[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 #### Inherited from
 
-[default](server_services_base_UserLocalizationProvider.default.md).[getTriggerRegistry](server_services_base_UserLocalizationProvider.default.md#gettriggerregistry)
+[default](server_services_base_UserLocalizationProvider.default.md).[getTriggerRegistry](server_services_base_UserLocalizationProvider.default.md#gettriggerregistry-1)
 
 #### Defined in
 
-[server/services/index.ts:305](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L305)
+[server/services/index.ts:305](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L305)
 
 ___
 
 ### getType
 
-▸ `Static` **getType**(): [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
+▸ **getType**(): [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
 
 Specifies whether the current service is a global service
 if true global services will only execute initialize and a router
@@ -896,13 +886,13 @@ it will instead have access to the global resources
 
 #### Defined in
 
-[server/services/elastic-location.ts:6](https://github.com/onzag/itemize/blob/a24376ed/server/services/elastic-location.ts#L6)
+[server/services/elastic-location.ts:6](https://github.com/onzag/itemize/blob/59702dd5/server/services/elastic-location.ts#L6)
 
 ___
 
 ### logDebug
 
-▸ `Static` **logDebug**<`T`\>(`data`): `void`
+▸ **logDebug**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -914,7 +904,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -922,17 +912,17 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_UserLocalizationProvider.default.md).[logDebug](server_services_base_UserLocalizationProvider.default.md#logdebug)
+[default](server_services_base_UserLocalizationProvider.default.md).[logDebug](server_services_base_UserLocalizationProvider.default.md#logdebug-1)
 
 #### Defined in
 
-[server/services/index.ts:108](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L108)
+[server/services/index.ts:108](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L108)
 
 ___
 
 ### logError
 
-▸ `Static` **logError**<`T`\>(`data`): `void`
+▸ **logError**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -944,7 +934,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -952,17 +942,17 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_UserLocalizationProvider.default.md).[logError](server_services_base_UserLocalizationProvider.default.md#logerror)
+[default](server_services_base_UserLocalizationProvider.default.md).[logError](server_services_base_UserLocalizationProvider.default.md#logerror-1)
 
 #### Defined in
 
-[server/services/index.ts:112](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L112)
+[server/services/index.ts:112](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L112)
 
 ___
 
 ### logInfo
 
-▸ `Static` **logInfo**<`T`\>(`data`): `void`
+▸ **logInfo**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -974,7 +964,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -982,8 +972,8 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_UserLocalizationProvider.default.md).[logInfo](server_services_base_UserLocalizationProvider.default.md#loginfo)
+[default](server_services_base_UserLocalizationProvider.default.md).[logInfo](server_services_base_UserLocalizationProvider.default.md#loginfo-1)
 
 #### Defined in
 
-[server/services/index.ts:104](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L104)
+[server/services/index.ts:104](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L104)

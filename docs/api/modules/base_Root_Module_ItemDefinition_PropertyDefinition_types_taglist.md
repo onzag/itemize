@@ -8,7 +8,7 @@ types that allows for tagging
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedTagListType](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)
 
@@ -16,7 +16,7 @@ types that allows for tagging
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedTagListType
 
@@ -26,16 +26,16 @@ The string type is described, by, you guessed it, a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:34](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L34)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:33](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L33)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>
 
 The behaviour of strings is described by this type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:39](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L39)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:38](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L38)

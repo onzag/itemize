@@ -15,20 +15,20 @@ that does a lot of the heavy lifting
 
 ### ssrGenerator
 
-▸ **ssrGenerator**(`appData`, `mode`, `info`): `Promise`<`void` \| [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)\>
+▸ **ssrGenerator**(`appData`, `mode`, `info`): `Promise`\<`void` \| [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `mode` | ``"production"`` \| ``"development"`` |
+| `mode` | ``"development"`` \| ``"production"`` |
 | `info` | `ISSRGeneratorHTMLResponse` \| `ISSRGeneratorUSSDResponse` |
 
 #### Returns
 
-`Promise`<`void` \| [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)\>
+`Promise`\<`void` \| [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)\>
 
 #### Defined in
 
-[server/ssr/generator.tsx:52](https://github.com/onzag/itemize/blob/a24376ed/server/ssr/generator.tsx#L52)
+[server/ssr/generator.tsx:52](https://github.com/onzag/itemize/blob/59702dd5/server/ssr/generator.tsx#L52)

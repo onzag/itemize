@@ -15,11 +15,11 @@ in SSR
 
 ### styleCollector
 
-• **styleCollector**: [`ICollectorType`](../interfaces/client.ICollectorType.md)
+• `Const` **styleCollector**: [`ICollectorType`](../interfaces/client.ICollectorType.md)
 
 This collector is a valid collector type for usage with the
 style collector for the initialization of the app in the server side
 
 #### Defined in
 
-[client/fast-prototyping/collectors.tsx:24](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/collectors.tsx#L24)
+[client/fast-prototyping/collectors.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/collectors.tsx#L24)

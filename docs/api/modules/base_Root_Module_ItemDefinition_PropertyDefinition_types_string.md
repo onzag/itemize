@@ -6,7 +6,7 @@ Contains the string type description
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedStringType](base_Root_Module_ItemDefinition_PropertyDefinition_types_string.md#propertydefinitionsupportedstringtype)
 
@@ -15,7 +15,7 @@ Contains the string type description
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_string.md#default)
 - [exactStringSearchSubtypes](base_Root_Module_ItemDefinition_PropertyDefinition_types_string.md#exactstringsearchsubtypes)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedStringType
 
@@ -25,26 +25,26 @@ The string type is described, by, you guessed it, a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:59](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L59)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:58](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L58)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedStringType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_string.md#propertydefinitionsupportedstringtype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedStringType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_string.md#propertydefinitionsupportedstringtype)\>
 
 The behaviour of strings is described by this type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:82](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L82)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:81](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L81)
 
 ___
 
 ### exactStringSearchSubtypes
 
-• **exactStringSearchSubtypes**: `string`[]
+• `Const` **exactStringSearchSubtypes**: `string`[]
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:61](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L61)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:60](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L60)

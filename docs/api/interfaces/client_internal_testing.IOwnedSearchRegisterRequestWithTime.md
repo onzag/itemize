@@ -4,6 +4,9 @@
 
 [client/internal/testing](../modules/client_internal_testing.md).IOwnedSearchRegisterRequestWithTime
 
+The owned serach register request to register owned searches by adding a created by field
+check [[IOwnedSearchRecordsEvent]]
+
 ## Hierarchy
 
 - [`IOwnedSearchRegisterRequest`](base_remote_protocol.IOwnedSearchRegisterRequest.md)
@@ -30,7 +33,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:340](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L340)
+[base/remote-protocol.ts:340](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L340)
 
 ___
 
@@ -44,7 +47,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L327)
+[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L327)
 
 ___
 
@@ -54,4 +57,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:83](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L83)
+[client/internal/testing.ts:83](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L83)

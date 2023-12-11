@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/components/property/base](../modules/client_components_property_base.md) / IPropertyEntryProps
 
-# Interface: IPropertyEntryProps<RendererPropsType\>
+# Interface: IPropertyEntryProps\<RendererPropsType\>
 
 [client/components/property/base](../modules/client_components_property_base.md).IPropertyEntryProps
 
@@ -14,7 +14,7 @@ The entry props for all read, view, and entry
 
 ## Hierarchy
 
-- [`IPropertyBaseWithRendererProps`](client_components_property_base.IPropertyBaseWithRendererProps.md)<`RendererPropsType`\>
+- [`IPropertyBaseWithRendererProps`](client_components_property_base.IPropertyBaseWithRendererProps.md)\<`RendererPropsType`\>
 
   ↳ **`IPropertyEntryProps`**
 
@@ -36,6 +36,7 @@ The entry props for all read, view, and entry
 - [id](client_components_property_base.IPropertyEntryProps.md#id)
 - [ignoreErrors](client_components_property_base.IPropertyEntryProps.md#ignoreerrors)
 - [languageOverride](client_components_property_base.IPropertyEntryProps.md#languageoverride)
+- [onEntryDrivenChange](client_components_property_base.IPropertyEntryProps.md#onentrydrivenchange)
 - [policyName](client_components_property_base.IPropertyEntryProps.md#policyname)
 - [policyType](client_components_property_base.IPropertyEntryProps.md#policytype)
 - [prefillWith](client_components_property_base.IPropertyEntryProps.md#prefillwith)
@@ -45,10 +46,6 @@ The entry props for all read, view, and entry
 - [showAsInvalid](client_components_property_base.IPropertyEntryProps.md#showasinvalid)
 - [suppressWarnings](client_components_property_base.IPropertyEntryProps.md#suppresswarnings)
 - [useAppliedValue](client_components_property_base.IPropertyEntryProps.md#useappliedvalue)
-
-### Methods
-
-- [onEntryDrivenChange](client_components_property_base.IPropertyEntryProps.md#onentrydrivenchange)
 
 ## Properties
 
@@ -60,7 +57,7 @@ An alternative description
 
 #### Defined in
 
-[client/components/property/base.tsx:85](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L85)
+[client/components/property/base.tsx:85](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L85)
 
 ___
 
@@ -72,7 +69,7 @@ An alternative label
 
 #### Defined in
 
-[client/components/property/base.tsx:89](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L89)
+[client/components/property/base.tsx:89](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L89)
 
 ___
 
@@ -84,7 +81,7 @@ An alternative placeholder
 
 #### Defined in
 
-[client/components/property/base.tsx:101](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L101)
+[client/components/property/base.tsx:101](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L101)
 
 ___
 
@@ -96,7 +93,7 @@ Focus on mount
 
 #### Defined in
 
-[client/components/property/base.tsx:110](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L110)
+[client/components/property/base.tsx:110](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L110)
 
 ___
 
@@ -112,7 +109,7 @@ caching
 
 #### Defined in
 
-[client/components/property/base.tsx:122](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L122)
+[client/components/property/base.tsx:122](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L122)
 
 ___
 
@@ -124,7 +121,7 @@ force to be disabled
 
 #### Defined in
 
-[client/components/property/base.tsx:126](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L126)
+[client/components/property/base.tsx:126](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L126)
 
 ___
 
@@ -136,7 +133,7 @@ Will display even if it's hidden
 
 #### Defined in
 
-[client/components/property/base.tsx:130](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L130)
+[client/components/property/base.tsx:130](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L130)
 
 ___
 
@@ -156,7 +153,7 @@ the default
 
 #### Defined in
 
-[client/components/property/base.tsx:147](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L147)
+[client/components/property/base.tsx:147](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L147)
 
 ___
 
@@ -168,7 +165,7 @@ Whether to hide the description that is hidden in language data
 
 #### Defined in
 
-[client/components/property/base.tsx:81](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L81)
+[client/components/property/base.tsx:81](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L81)
 
 ___
 
@@ -180,7 +177,7 @@ Hide the label
 
 #### Defined in
 
-[client/components/property/base.tsx:93](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L93)
+[client/components/property/base.tsx:93](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L93)
 
 ___
 
@@ -192,7 +189,7 @@ Hide the placeholder
 
 #### Defined in
 
-[client/components/property/base.tsx:97](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L97)
+[client/components/property/base.tsx:97](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L97)
 
 ___
 
@@ -209,7 +206,7 @@ provider
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L28)
 
 ___
 
@@ -222,7 +219,7 @@ that are given
 
 #### Defined in
 
-[client/components/property/base.tsx:106](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L106)
+[client/components/property/base.tsx:106](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L106)
 
 ___
 
@@ -235,7 +232,35 @@ of a property for a new value
 
 #### Defined in
 
-[client/components/property/base.tsx:136](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L136)
+[client/components/property/base.tsx:136](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L136)
+
+___
+
+### onEntryDrivenChange
+
+• `Optional` **onEntryDrivenChange**: (`value`: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)) => `void`
+
+#### Type declaration
+
+▸ (`value`): `void`
+
+an optional function to get the value as the property changes
+these changes are given by the entry and do not come when
+the property change due to an external force
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/property/base.tsx:73](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L73)
 
 ___
 
@@ -251,7 +276,7 @@ the policy name, should be provided with a policy type
 
 #### Defined in
 
-[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L47)
+[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L47)
 
 ___
 
@@ -267,7 +292,7 @@ the policy type, should be provided with a policy name
 
 #### Defined in
 
-[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L43)
+[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L43)
 
 ___
 
@@ -279,13 +304,13 @@ The value to prefill with on mount
 
 #### Defined in
 
-[client/components/property/base.tsx:114](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L114)
+[client/components/property/base.tsx:114](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L114)
 
 ___
 
 ### renderer
 
-• `Optional` **renderer**: `ComponentType`<`RendererPropsType`\>
+• `Optional` **renderer**: `ComponentType`\<`RendererPropsType`\>
 
 the renderer in charge of rendering the output
 
@@ -295,7 +320,7 @@ the renderer in charge of rendering the output
 
 #### Defined in
 
-[client/components/property/base.tsx:57](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L57)
+[client/components/property/base.tsx:57](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L57)
 
 ___
 
@@ -311,7 +336,7 @@ Extra renderer args
 
 #### Defined in
 
-[client/components/property/base.tsx:61](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L61)
+[client/components/property/base.tsx:61](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L61)
 
 ___
 
@@ -328,7 +353,7 @@ only truly available in search mode
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L33)
 
 ___
 
@@ -340,7 +365,7 @@ make it seem as invalid, allows displaying an entry property as invalid
 
 #### Defined in
 
-[client/components/property/base.tsx:77](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L77)
+[client/components/property/base.tsx:77](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L77)
 
 ___
 
@@ -352,7 +377,7 @@ Suppress hidden warning
 
 #### Defined in
 
-[client/components/property/base.tsx:141](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L141)
+[client/components/property/base.tsx:141](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L141)
 
 ___
 
@@ -367,28 +392,4 @@ in disabled entries
 
 #### Defined in
 
-[client/components/property/base.tsx:158](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L158)
-
-## Methods
-
-### onEntryDrivenChange
-
-▸ `Optional` **onEntryDrivenChange**(`value`): `void`
-
-an optional function to get the value as the property changes
-these changes are given by the entry and do not come when
-the property change due to an external force
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `value` | [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/components/property/base.tsx:73](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L73)
+[client/components/property/base.tsx:158](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L158)

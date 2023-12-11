@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L47)
+[server/services/base/MailProvider.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L47)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L48)
+[server/services/base/MailProvider.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L48)

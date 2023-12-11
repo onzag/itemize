@@ -4,9 +4,12 @@
 
 [base/Root/Module/ItemDefinition/PropertyDefinition/types/files](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md).IPropertyDefinitionSupportedSingleFilesType
 
+This is how a rq file is meant
+to be and send
+
 ## Hierarchy
 
-- [`IGQLFile`](gql_querier.IGQLFile.md)
+- [`IRQFile`](rq_querier.IRQFile.md)
 
   ↳ **`IPropertyDefinitionSupportedSingleFilesType`**
 
@@ -32,11 +35,11 @@ an unique id
 
 #### Inherited from
 
-[IGQLFile](gql_querier.IGQLFile.md).[id](gql_querier.IGQLFile.md#id)
+[IRQFile](rq_querier.IRQFile.md).[id](rq_querier.IRQFile.md#id)
 
 #### Defined in
 
-[gql-querier.ts:87](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L87)
+[rq-querier.ts:87](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L87)
 
 ___
 
@@ -52,11 +55,11 @@ dimensions, large, small and medium do not count
 
 #### Inherited from
 
-[IGQLFile](gql_querier.IGQLFile.md).[metadata](gql_querier.IGQLFile.md#metadata)
+[IRQFile](rq_querier.IRQFile.md).[metadata](rq_querier.IRQFile.md#metadata)
 
 #### Defined in
 
-[gql-querier.ts:103](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L103)
+[rq-querier.ts:103](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L103)
 
 ___
 
@@ -68,11 +71,11 @@ the name of the file
 
 #### Inherited from
 
-[IGQLFile](gql_querier.IGQLFile.md).[name](gql_querier.IGQLFile.md#name)
+[IRQFile](rq_querier.IRQFile.md).[name](rq_querier.IRQFile.md#name)
 
 #### Defined in
 
-[gql-querier.ts:79](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L79)
+[rq-querier.ts:79](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L79)
 
 ___
 
@@ -84,27 +87,27 @@ The size of the file in bytes
 
 #### Inherited from
 
-[IGQLFile](gql_querier.IGQLFile.md).[size](gql_querier.IGQLFile.md#size)
+[IRQFile](rq_querier.IRQFile.md).[size](rq_querier.IRQFile.md#size)
 
 #### Defined in
 
-[gql-querier.ts:95](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L95)
+[rq-querier.ts:95](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L95)
 
 ___
 
 ### src
 
-• `Optional` **src**: `Blob` \| `ReadStream` \| `File` \| `Promise`<{ `createReadStream`: () => `ReadStream`  }\>
+• `Optional` **src**: `File` \| `Blob` \| `ReadStream` \| `Promise`\<\{ `createReadStream`: () => `ReadStream`  }\>
 
 A source, either a File, Blob or a read stream
 
 #### Inherited from
 
-[IGQLFile](gql_querier.IGQLFile.md).[src](gql_querier.IGQLFile.md#src)
+[IRQFile](rq_querier.IRQFile.md).[src](rq_querier.IRQFile.md#src)
 
 #### Defined in
 
-[gql-querier.ts:107](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L107)
+[rq-querier.ts:107](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L107)
 
 ___
 
@@ -116,11 +119,11 @@ The mime type
 
 #### Inherited from
 
-[IGQLFile](gql_querier.IGQLFile.md).[type](gql_querier.IGQLFile.md#type)
+[IRQFile](rq_querier.IRQFile.md).[type](rq_querier.IRQFile.md#type)
 
 #### Defined in
 
-[gql-querier.ts:83](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L83)
+[rq-querier.ts:83](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L83)
 
 ___
 
@@ -132,8 +135,8 @@ the url where it is stored
 
 #### Inherited from
 
-[IGQLFile](gql_querier.IGQLFile.md).[url](gql_querier.IGQLFile.md#url)
+[IRQFile](rq_querier.IRQFile.md).[url](rq_querier.IRQFile.md#url)
 
 #### Defined in
 
-[gql-querier.ts:91](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L91)
+[rq-querier.ts:91](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L91)

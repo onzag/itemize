@@ -8,7 +8,7 @@ Allows to create a component that will only display after a given delay
 
 ## Hierarchy
 
-- `PureComponent`<`DelayDisplayProps`, `DelayDisplayState`\>
+- `PureComponent`\<`DelayDisplayProps`, `DelayDisplayState`\>
 
   ↳ **`DelayDisplay`**
 
@@ -49,7 +49,7 @@ Allows to create a component that will only display after a given delay
 
 ### constructor
 
-• **new DelayDisplay**(`props`)
+• **new DelayDisplay**(`props`): [`DelayDisplay`](client_components_util.DelayDisplay.md)
 
 #### Parameters
 
@@ -57,13 +57,17 @@ Allows to create a component that will only display after a given delay
 | :------ | :------ |
 | `props` | `DelayDisplayProps` |
 
+#### Returns
+
+[`DelayDisplay`](client_components_util.DelayDisplay.md)
+
 #### Overrides
 
-React.PureComponent&lt;DelayDisplayProps, DelayDisplayState\&gt;.constructor
+React.PureComponent\&lt;DelayDisplayProps, DelayDisplayState\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/index.tsx:323](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L323)
+[client/components/util/index.tsx:323](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L323)
 
 ## Properties
 
@@ -83,7 +87,9 @@ context!: React.ContextType<typeof MyContext>
 declare context: React.ContextType<typeof MyContext>
 ```
 
-**`see`** https://reactjs.org/docs/context.html
+**`See`**
+
+https://react.dev/reference/react/Component#context
 
 #### Inherited from
 
@@ -91,13 +97,13 @@ React.PureComponent.context
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:479
+node_modules/@types/react/index.d.ts:473
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<`DelayDisplayProps`\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`\<`DelayDisplayProps`\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -105,7 +111,7 @@ React.PureComponent.props
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:504
+node_modules/@types/react/index.d.ts:498
 
 ___
 
@@ -113,8 +119,9 @@ ___
 
 • **refs**: `Object`
 
-**`deprecated`**
-https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
+**`Deprecated`**
+
+https://legacy.reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
 #### Index signature
 
@@ -126,13 +133,13 @@ React.PureComponent.refs
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:510
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### state
 
-• **state**: `Readonly`<`DelayDisplayState`\>
+• **state**: `Readonly`\<`DelayDisplayState`\>
 
 #### Inherited from
 
@@ -140,7 +147,7 @@ React.PureComponent.state
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:505
+node_modules/@types/react/index.d.ts:499
 
 ___
 
@@ -150,13 +157,13 @@ ___
 
 #### Defined in
 
-[client/components/util/index.tsx:322](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L322)
+[client/components/util/index.tsx:322](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L322)
 
 ___
 
 ### contextType
 
-▪ `Static` `Optional` **contextType**: `Context`<`any`\>
+▪ `Static` `Optional` **contextType**: `Context`\<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -175,7 +182,9 @@ class Foo extends React.Component {
 }
 ```
 
-**`see`** https://reactjs.org/docs/context.html#classcontexttype
+**`See`**
+
+https://react.dev/reference/react/Component#static-contexttype
 
 #### Inherited from
 
@@ -183,13 +192,13 @@ React.PureComponent.contextType
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:461
+node_modules/@types/react/index.d.ts:455
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional` **UNSAFE_componentWillMount**(): `void`
+▸ **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -199,15 +208,18 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -215,13 +227,13 @@ React.PureComponent.UNSAFE\_componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:717
+node_modules/@types/react/index.d.ts:711
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -234,22 +246,25 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`DelayDisplayProps`\> |
+| `nextProps` | `Readonly`\<`DelayDisplayProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -257,13 +272,13 @@ React.PureComponent.UNSAFE\_componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:749
+node_modules/@types/react/index.d.ts:743
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -274,23 +289,26 @@ This method will not stop working in React 17.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`DelayDisplayProps`\> |
-| `nextState` | `Readonly`<`DelayDisplayState`\> |
+| `nextProps` | `Readonly`\<`DelayDisplayProps`\> |
+| `nextState` | `Readonly`\<`DelayDisplayState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -298,13 +316,13 @@ React.PureComponent.UNSAFE\_componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:777
+node_modules/@types/react/index.d.ts:771
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
+▸ **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -326,7 +344,7 @@ React.PureComponent.componentDidCatch
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:646
+node_modules/@types/react/index.d.ts:640
 
 ___
 
@@ -344,13 +362,13 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/components/util/index.tsx:330](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L330)
+[client/components/util/index.tsx:330](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L330)
 
 ___
 
 ### componentDidUpdate
 
-▸ `Optional` **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
+▸ **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
 
 Called immediately after updating occurs. Not called for the initial render.
 
@@ -360,8 +378,8 @@ The snapshot is only present if getSnapshotBeforeUpdate is present and returns n
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<`DelayDisplayProps`\> |
-| `prevState` | `Readonly`<`DelayDisplayState`\> |
+| `prevProps` | `Readonly`\<`DelayDisplayProps`\> |
+| `prevState` | `Readonly`\<`DelayDisplayState`\> |
 | `snapshot?` | `any` |
 
 #### Returns
@@ -374,13 +392,13 @@ React.PureComponent.componentDidUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:688
+node_modules/@types/react/index.d.ts:682
 
 ___
 
 ### componentWillMount
 
-▸ `Optional` **componentWillMount**(): `void`
+▸ **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -388,15 +406,18 @@ Avoid introducing any side-effects or subscriptions in this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use componentDidMount or the constructor instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use componentDidMount or the constructor instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -404,13 +425,13 @@ React.PureComponent.componentWillMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:703
+node_modules/@types/react/index.d.ts:697
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
+▸ **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -421,22 +442,25 @@ Calling `Component#setState` generally does not trigger this method.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use static getDerivedStateFromProps instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`DelayDisplayProps`\> |
+| `nextProps` | `Readonly`\<`DelayDisplayProps`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use static getDerivedStateFromProps instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -444,7 +468,7 @@ React.PureComponent.componentWillReceiveProps
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:732
+node_modules/@types/react/index.d.ts:726
 
 ___
 
@@ -462,13 +486,13 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/index.tsx:337](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L337)
+[client/components/util/index.tsx:337](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L337)
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
+▸ **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -477,23 +501,26 @@ Note: You cannot call `Component#setState` here.
 Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps
 prevents this from being invoked.
 
-**`deprecated`** 16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
-
-**`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
-
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`DelayDisplayProps`\> |
-| `nextState` | `Readonly`<`DelayDisplayState`\> |
+| `nextProps` | `Readonly`\<`DelayDisplayProps`\> |
+| `nextState` | `Readonly`\<`DelayDisplayState`\> |
 | `nextContext` | `any` |
 
 #### Returns
 
 `void`
+
+**`Deprecated`**
+
+16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17
+
+**`See`**
+
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update
+ - https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
 #### Inherited from
 
@@ -501,7 +528,7 @@ React.PureComponent.componentWillUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:762
+node_modules/@types/react/index.d.ts:756
 
 ___
 
@@ -525,13 +552,13 @@ React.PureComponent.forceUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:496
+node_modules/@types/react/index.d.ts:490
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
+▸ **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -544,8 +571,8 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<`DelayDisplayProps`\> |
-| `prevState` | `Readonly`<`DelayDisplayState`\> |
+| `prevProps` | `Readonly`\<`DelayDisplayProps`\> |
+| `prevState` | `Readonly`\<`DelayDisplayState`\> |
 
 #### Returns
 
@@ -557,7 +584,7 @@ React.PureComponent.getSnapshotBeforeUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:682
+node_modules/@types/react/index.d.ts:676
 
 ___
 
@@ -575,13 +602,13 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/util/index.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/index.tsx#L340)
+[client/components/util/index.tsx:340](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/index.tsx#L340)
 
 ___
 
 ### setState
 
-▸ **setState**<`K`\>(`state`, `callback?`): `void`
+▸ **setState**\<`K`\>(`state`, `callback?`): `void`
 
 #### Type parameters
 
@@ -593,7 +620,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `DelayDisplayState` \| (`prevState`: `Readonly`<`DelayDisplayState`\>, `props`: `Readonly`<`DelayDisplayProps`\>) => `DelayDisplayState` \| `Pick`<`DelayDisplayState`, `K`\> \| `Pick`<`DelayDisplayState`, `K`\> |
+| `state` | `DelayDisplayState` \| (`prevState`: `Readonly`\<`DelayDisplayState`\>, `props`: `Readonly`\<`DelayDisplayProps`\>) => `DelayDisplayState` \| `Pick`\<`DelayDisplayState`, `K`\> \| `Pick`\<`DelayDisplayState`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -606,13 +633,13 @@ React.PureComponent.setState
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:491
+node_modules/@types/react/index.d.ts:485
 
 ___
 
 ### shouldComponentUpdate
 
-▸ `Optional` **shouldComponentUpdate**(`nextProps`, `nextState`, `nextContext`): `boolean`
+▸ **shouldComponentUpdate**(`nextProps`, `nextState`, `nextContext`): `boolean`
 
 Called to determine whether the change in props and state should trigger a re-render.
 
@@ -627,8 +654,8 @@ and `componentDidUpdate` will not be called.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<`DelayDisplayProps`\> |
-| `nextState` | `Readonly`<`DelayDisplayState`\> |
+| `nextProps` | `Readonly`\<`DelayDisplayProps`\> |
+| `nextState` | `Readonly`\<`DelayDisplayState`\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -641,4 +668,4 @@ React.PureComponent.shouldComponentUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:636
+node_modules/@types/react/index.d.ts:630

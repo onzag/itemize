@@ -85,7 +85,7 @@
 
 ### constructor
 
-• **new Listener**(`buildnumber`, `redisGlobalSub`, `redisGlobalPub`, `redisLocalSub`, `redisLocalPub`, `registry`, `root`, `cache`, `rawDB`, `server`, `customRoles`, `sensitiveConfig`)
+• **new Listener**(`buildnumber`, `redisGlobalSub`, `redisGlobalPub`, `redisLocalSub`, `redisLocalPub`, `registry`, `root`, `cache`, `rawDB`, `server`, `customRoles`, `sensitiveConfig`): [`Listener`](server_listener.Listener.md)
 
 #### Parameters
 
@@ -104,9 +104,13 @@
 | `customRoles` | [`ICustomRoleType`](../interfaces/server_resolvers_roles.ICustomRoleType.md)[] |
 | `sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
 
+#### Returns
+
+[`Listener`](server_listener.Listener.md)
+
 #### Defined in
 
-[server/listener.ts:203](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L203)
+[server/listener.ts:203](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L203)
 
 ## Properties
 
@@ -120,7 +124,7 @@
 
 #### Defined in
 
-[server/listener.ts:190](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L190)
+[server/listener.ts:190](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L190)
 
 ___
 
@@ -134,7 +138,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:196](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L196)
+[server/listener.ts:196](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L196)
 
 ___
 
@@ -148,7 +152,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:192](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L192)
+[server/listener.ts:192](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L192)
 
 ___
 
@@ -162,7 +166,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:198](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L198)
+[server/listener.ts:198](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L198)
 
 ___
 
@@ -176,7 +180,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:191](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L191)
+[server/listener.ts:191](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L191)
 
 ___
 
@@ -190,7 +194,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:197](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L197)
+[server/listener.ts:197](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L197)
 
 ___
 
@@ -204,7 +208,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:193](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L193)
+[server/listener.ts:193](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L193)
 
 ___
 
@@ -218,7 +222,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:199](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L199)
+[server/listener.ts:199](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L199)
 
 ___
 
@@ -232,7 +236,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:194](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L194)
+[server/listener.ts:194](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L194)
 
 ___
 
@@ -246,7 +250,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:200](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L200)
+[server/listener.ts:200](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L200)
 
 ___
 
@@ -256,7 +260,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:181](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L181)
+[server/listener.ts:181](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L181)
 
 ___
 
@@ -266,7 +270,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:184](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L184)
+[server/listener.ts:184](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L184)
 
 ___
 
@@ -276,7 +280,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:188](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L188)
+[server/listener.ts:188](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L188)
 
 ___
 
@@ -286,7 +290,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:172](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L172)
+[server/listener.ts:172](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L172)
 
 ___
 
@@ -296,7 +300,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:174](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L174)
+[server/listener.ts:174](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L174)
 
 ___
 
@@ -306,7 +310,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:175](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L175)
+[server/listener.ts:175](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L175)
 
 ___
 
@@ -316,7 +320,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:183](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L183)
+[server/listener.ts:183](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L183)
 
 ___
 
@@ -326,7 +330,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:178](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L178)
+[server/listener.ts:178](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L178)
 
 ___
 
@@ -336,7 +340,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:177](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L177)
+[server/listener.ts:177](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L177)
 
 ___
 
@@ -346,7 +350,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:180](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L180)
+[server/listener.ts:180](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L180)
 
 ___
 
@@ -356,7 +360,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:179](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L179)
+[server/listener.ts:179](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L179)
 
 ___
 
@@ -366,7 +370,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:186](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L186)
+[server/listener.ts:186](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L186)
 
 ___
 
@@ -376,7 +380,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:182](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L182)
+[server/listener.ts:182](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L182)
 
 ___
 
@@ -386,7 +390,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:185](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L185)
+[server/listener.ts:185](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L185)
 
 ___
 
@@ -396,7 +400,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:187](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L187)
+[server/listener.ts:187](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L187)
 
 ## Methods
 
@@ -416,7 +420,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:335](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L335)
+[server/listener.ts:335](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L335)
 
 ___
 
@@ -430,7 +434,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:255](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L255)
+[server/listener.ts:255](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L255)
 
 ___
 
@@ -452,13 +456,13 @@ ___
 
 #### Defined in
 
-[server/listener.ts:345](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L345)
+[server/listener.ts:345](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L345)
 
 ___
 
 ### feedback
 
-▸ **feedback**(`socket`, `request`): `Promise`<`void`\>
+▸ **feedback**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -469,17 +473,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:2653](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L2653)
+[server/listener.ts:2653](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2653)
 
 ___
 
 ### globalRedisListener
 
-▸ **globalRedisListener**(`channel`, `message`): `Promise`<`void`\>
+▸ **globalRedisListener**(`channel`, `message`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -490,17 +494,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:3411](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3411)
+[server/listener.ts:3411](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3411)
 
 ___
 
 ### identify
 
-▸ **identify**(`socket`, `request`): `Promise`<`void`\>
+▸ **identify**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -511,11 +515,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:400](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L400)
+[server/listener.ts:400](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L400)
 
 ___
 
@@ -529,7 +533,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3644](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3644)
+[server/listener.ts:3644](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3644)
 
 ___
 
@@ -543,7 +547,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:236](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L236)
+[server/listener.ts:236](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L236)
 
 ___
 
@@ -563,7 +567,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:385](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L385)
+[server/listener.ts:385](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L385)
 
 ___
 
@@ -584,7 +588,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3539](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3539)
+[server/listener.ts:3539](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3539)
 
 ___
 
@@ -598,7 +602,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3616](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3616)
+[server/listener.ts:3616](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3616)
 
 ___
 
@@ -618,13 +622,13 @@ ___
 
 #### Defined in
 
-[server/listener.ts:374](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L374)
+[server/listener.ts:374](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L374)
 
 ___
 
 ### ownedParentedSearchFeedback
 
-▸ **ownedParentedSearchFeedback**(`socket`, `request`): `Promise`<`void`\>
+▸ **ownedParentedSearchFeedback**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -635,17 +639,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:2321](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L2321)
+[server/listener.ts:2321](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2321)
 
 ___
 
 ### ownedParentedSearchRegister
 
-▸ **ownedParentedSearchRegister**(`socket`, `request`): `Promise`<`void`\>
+▸ **ownedParentedSearchRegister**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -656,11 +660,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:1213](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L1213)
+[server/listener.ts:1213](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1213)
 
 ___
 
@@ -681,13 +685,13 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3087](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3087)
+[server/listener.ts:3087](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3087)
 
 ___
 
 ### ownedSearchFeedback
 
-▸ **ownedSearchFeedback**(`socket`, `request`): `Promise`<`void`\>
+▸ **ownedSearchFeedback**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -698,17 +702,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:1356](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L1356)
+[server/listener.ts:1356](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1356)
 
 ___
 
 ### ownedSearchRegister
 
-▸ **ownedSearchRegister**(`socket`, `request`): `Promise`<`void`\>
+▸ **ownedSearchRegister**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -719,11 +723,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:752](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L752)
+[server/listener.ts:752](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L752)
 
 ___
 
@@ -744,13 +748,13 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2970](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L2970)
+[server/listener.ts:2970](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2970)
 
 ___
 
 ### parentedSearchFeedback
 
-▸ **parentedSearchFeedback**(`socket`, `request`): `Promise`<`void`\>
+▸ **parentedSearchFeedback**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -761,17 +765,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:1994](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L1994)
+[server/listener.ts:1994](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1994)
 
 ___
 
 ### parentedSearchRegister
 
-▸ **parentedSearchRegister**(`socket`, `request`): `Promise`<`void`\>
+▸ **parentedSearchRegister**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -782,11 +786,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:1070](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L1070)
+[server/listener.ts:1070](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1070)
 
 ___
 
@@ -807,13 +811,13 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3047](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3047)
+[server/listener.ts:3047](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3047)
 
 ___
 
 ### patchAwaitingSearchEvent
 
-▸ `Private` **patchAwaitingSearchEvent**(`src`, `patch`): `void`
+▸ **patchAwaitingSearchEvent**(`src`, `patch`): `void`
 
 #### Parameters
 
@@ -828,13 +832,13 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3366](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3366)
+[server/listener.ts:3366](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3366)
 
 ___
 
 ### propertySearchFeedback
 
-▸ **propertySearchFeedback**(`socket`, `request`): `Promise`<`void`\>
+▸ **propertySearchFeedback**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -845,17 +849,17 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:1630](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L1630)
+[server/listener.ts:1630](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1630)
 
 ___
 
 ### propertySearchRegister
 
-▸ **propertySearchRegister**(`socket`, `request`): `Promise`<`void`\>
+▸ **propertySearchRegister**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -866,11 +870,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:890](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L890)
+[server/listener.ts:890](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L890)
 
 ___
 
@@ -891,13 +895,13 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3008](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3008)
+[server/listener.ts:3008](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3008)
 
 ___
 
 ### register
 
-▸ **register**(`socket`, `request`): `Promise`<`void`\>
+▸ **register**(`socket`, `request`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -908,11 +912,11 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:588](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L588)
+[server/listener.ts:588](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L588)
 
 ___
 
@@ -932,7 +936,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:525](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L525)
+[server/listener.ts:525](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L525)
 
 ___
 
@@ -953,7 +957,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2895](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L2895)
+[server/listener.ts:2895](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2895)
 
 ___
 
@@ -973,7 +977,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2878](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L2878)
+[server/listener.ts:2878](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2878)
 
 ___
 
@@ -993,21 +997,21 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3576](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3576)
+[server/listener.ts:3576](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3576)
 
 ___
 
 ### revive
 
-▸ **revive**(): `Promise`<`void`\>
+▸ **revive**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/listener.ts:258](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L258)
+[server/listener.ts:258](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L258)
 
 ___
 
@@ -1027,7 +1031,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:359](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L359)
+[server/listener.ts:359](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L359)
 
 ___
 
@@ -1041,7 +1045,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:274](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L274)
+[server/listener.ts:274](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L274)
 
 ___
 
@@ -1065,7 +1069,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3128](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3128)
+[server/listener.ts:3128](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3128)
 
 ___
 
@@ -1088,7 +1092,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3319](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3319)
+[server/listener.ts:3319](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3319)
 
 ___
 
@@ -1111,7 +1115,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3183](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3183)
+[server/listener.ts:3183](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3183)
 
 ___
 
@@ -1134,7 +1138,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3273](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3273)
+[server/listener.ts:3273](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3273)
 
 ___
 
@@ -1157,7 +1161,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3228](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L3228)
+[server/listener.ts:3228](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3228)
 
 ___
 
@@ -1178,7 +1182,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2931](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L2931)
+[server/listener.ts:2931](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2931)
 
 ___
 
@@ -1200,4 +1204,4 @@ This method only reasonable gets called by the CLUSTER_MANAGER or in absolute mo
 
 #### Defined in
 
-[server/listener.ts:2918](https://github.com/onzag/itemize/blob/a24376ed/server/listener.ts#L2918)
+[server/listener.ts:2918](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2918)

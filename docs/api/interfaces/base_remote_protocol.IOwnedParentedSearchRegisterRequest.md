@@ -5,7 +5,7 @@
 [base/remote-protocol](../modules/base_remote_protocol.md).IOwnedParentedSearchRegisterRequest
 
 The owned parented search register request adds the parent type and parent id
-check [IOwnedParentedSearchRecordsEvent](base_remote_protocol.IOwnedParentedSearchRecordsEvent.md)
+check [[IOwnedParentedSearchRecordsEvent]]
 
 ## Hierarchy
 
@@ -37,7 +37,7 @@ check [IOwnedParentedSearchRecordsEvent](base_remote_protocol.IOwnedParentedSear
 
 #### Defined in
 
-[base/remote-protocol.ts:340](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L340)
+[base/remote-protocol.ts:340](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L340)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:377](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L377)
+[base/remote-protocol.ts:377](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L377)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:376](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L376)
+[base/remote-protocol.ts:376](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L376)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:378](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L378)
+[base/remote-protocol.ts:378](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L378)
 
 ___
 
@@ -93,4 +93,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L327)
+[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L327)

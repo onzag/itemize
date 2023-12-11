@@ -33,12 +33,12 @@ by returning a router that holds them inside the
 
 | Name | Type |
 | :------ | :------ |
-| `reprocessedCache` | `Object` |
+| `reprocessedCache` | {} |
 | `router` | `Router` |
 
 #### Defined in
 
-[server/rest.ts:63](https://github.com/onzag/itemize/blob/a24376ed/server/rest.ts#L63)
+[server/rest.ts:62](https://github.com/onzag/itemize/blob/59702dd5/server/rest.ts#L62)
 
 ___
 
@@ -51,8 +51,8 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `req` | `Request`<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`<`string`, `any`\>\> |
-| `res` | `Response`<`any`, `Record`<`string`, `any`\>\> |
+| `req` | `Request`\<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`\<`string`, `any`\>\> |
+| `res` | `Response`\<`any`, `Record`\<`string`, `any`\>\> |
 | `next` | () => `void` |
 
 #### Returns
@@ -61,4 +61,4 @@ ___
 
 #### Defined in
 
-[server/rest.ts:22](https://github.com/onzag/itemize/blob/a24376ed/server/rest.ts#L22)
+[server/rest.ts:21](https://github.com/onzag/itemize/blob/59702dd5/server/rest.ts#L21)

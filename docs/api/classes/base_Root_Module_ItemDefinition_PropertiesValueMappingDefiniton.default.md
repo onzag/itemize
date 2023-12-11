@@ -47,7 +47,7 @@ wheelset, this is a PropertiesValueMappingDefiniton
 
 ### constructor
 
-• **new default**(`rawJSON`, `parentItemDefinition`, `referredItemDefinition`)
+• **new default**(`rawJSON`, `parentItemDefinition`, `referredItemDefinition`): [`default`](base_Root_Module_ItemDefinition_PropertiesValueMappingDefiniton.default.md)
 
 Contructor for the class
 
@@ -59,9 +59,13 @@ Contructor for the class
 | `parentItemDefinition` | [`default`](base_Root_Module_ItemDefinition.default.md) | the item definition that this node is located, its root; for the example above that would be the vehicle item definition |
 | `referredItemDefinition` | [`default`](base_Root_Module_ItemDefinition.default.md) | the item definition that these properties are attempted to be set against, for the example above that would be the wheelset item definition |
 
+#### Returns
+
+[`default`](base_Root_Module_ItemDefinition_PropertiesValueMappingDefiniton.default.md)
+
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:65](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L65)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:65](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L65)
 
 ## Properties
 
@@ -71,7 +75,7 @@ Contructor for the class
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
 
 ___
 
@@ -81,7 +85,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:51](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L51)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:51](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L51)
 
 ___
 
@@ -91,31 +95,31 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L52)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:52](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L52)
 
 ## Methods
 
 ### getPropertyMap
 
-▸ **getPropertyMap**(): { `id`: `string` ; `value`: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)  }[]
+▸ **getPropertyMap**(): \{ `id`: `string` ; `value`: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)  }[]
 
 Gives a property map in the form id and value for properties
 
 #### Returns
 
-{ `id`: `string` ; `value`: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)  }[]
+\{ `id`: `string` ; `value`: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)  }[]
 
 the property map with property values
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:79](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L79)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:79](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L79)
 
 ___
 
 ### getPropertyValue
 
-▸ **getPropertyValue**(`key`): [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)
+▸ **getPropertyValue**(`key`): [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
 
 Retrieves a property value for a given property id
 
@@ -127,14 +131,14 @@ Retrieves a property value for a given property id
 
 #### Returns
 
-[`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)
+[`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
 
 either a peroperty supported value or a property
 definition itself for referred properties
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:108](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L108)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:108](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L108)
 
 ___
 
@@ -159,4 +163,4 @@ a boolean on whether it has such a property value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:97](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L97)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:97](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L97)

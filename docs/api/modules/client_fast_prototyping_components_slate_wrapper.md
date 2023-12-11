@@ -28,14 +28,14 @@ can be added as replacement, you can also design your own wrapper based on this 
 - [MaterialUISlateWrapperState](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)
 - [RichTextEditorToolbarProps](../interfaces/client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md)
 
-### Type aliases
+### Type Aliases
 
 - [SlateEditorWrapperCustomToolbarElement](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelement)
 - [SlateEditorWrapperCustomToolbarElementBaseForm](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
 - [SlateEditorWrapperCustomToolbarElementFnForm](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementfnform)
 - [SlateEditorWrapperCustomToolbarIdentifiedElement](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbaridentifiedelement)
 
-## Type aliases
+## Type Aliases
 
 ### SlateEditorWrapperCustomToolbarElement
 
@@ -43,7 +43,7 @@ can be added as replacement, you can also design your own wrapper based on this 
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:415](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L415)
+[client/fast-prototyping/components/slate/wrapper.tsx:415](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L415)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:408](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L408)
+[client/fast-prototyping/components/slate/wrapper.tsx:408](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L408)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:412](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L412)
+[client/fast-prototyping/components/slate/wrapper.tsx:412](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L412)
 
 ___
 
@@ -87,4 +87,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:387](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L387)
+[client/fast-prototyping/components/slate/wrapper.tsx:387](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L387)

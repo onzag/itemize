@@ -36,7 +36,7 @@ stream in order for them to work properly
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:120](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L120)
+[server/services/base/MailProvider.ts:120](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L120)
 
 ___
 
@@ -53,7 +53,7 @@ to the id of the attachment id
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:125](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L125)
+[server/services/base/MailProvider.ts:125](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L125)
 
 ___
 
@@ -67,7 +67,7 @@ as the user
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:86](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L86)
+[server/services/base/MailProvider.ts:86](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L86)
 
 ___
 
@@ -83,7 +83,7 @@ you may use this field to set the reply-to header
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:94](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L94)
+[server/services/base/MailProvider.ts:94](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L94)
 
 ___
 
@@ -95,7 +95,7 @@ The html content
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:113](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L113)
+[server/services/base/MailProvider.ts:113](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L113)
 
 ___
 
@@ -112,7 +112,7 @@ somevaliduuid@yoursite.com
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:79](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L79)
+[server/services/base/MailProvider.ts:79](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L79)
 
 ___
 
@@ -124,7 +124,7 @@ The message that it was a reply for
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:144](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L144)
+[server/services/base/MailProvider.ts:144](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L144)
 
 ___
 
@@ -136,7 +136,7 @@ The subject attribute
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:105](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L105)
+[server/services/base/MailProvider.ts:105](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L105)
 
 ___
 
@@ -148,7 +148,7 @@ The plain text content
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:109](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L109)
+[server/services/base/MailProvider.ts:109](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L109)
 
 ___
 
@@ -163,7 +163,7 @@ also allows the form username <name@domain.com>
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:101](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L101)
+[server/services/base/MailProvider.ts:101](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L101)
 
 ___
 
@@ -177,7 +177,7 @@ and it is fairly generic
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:131](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L131)
+[server/services/base/MailProvider.ts:131](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L131)
 
 ___
 
@@ -196,4 +196,4 @@ over this one
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:138](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L138)
+[server/services/base/MailProvider.ts:138](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L138)

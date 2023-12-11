@@ -20,11 +20,11 @@
 
 ### ModuleContext
 
-• **ModuleContext**: `Context`<[`IModuleContextType`](../interfaces/client_providers_module.IModuleContextType.md)\>
+• `Const` **ModuleContext**: `Context`\<[`IModuleContextType`](../interfaces/client_providers_module.IModuleContextType.md)\>
 
 #### Defined in
 
-[client/providers/module.tsx:14](https://github.com/onzag/itemize/blob/a24376ed/client/providers/module.tsx#L14)
+[client/providers/module.tsx:14](https://github.com/onzag/itemize/blob/59702dd5/client/providers/module.tsx#L14)
 
 ## Functions
 
@@ -44,4 +44,4 @@
 
 #### Defined in
 
-[client/providers/module.tsx:100](https://github.com/onzag/itemize/blob/a24376ed/client/providers/module.tsx#L100)
+[client/providers/module.tsx:100](https://github.com/onzag/itemize/blob/59702dd5/client/providers/module.tsx#L100)

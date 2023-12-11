@@ -18,7 +18,7 @@ The property entry date time for fast prototyping
 
 ### style
 
-• **style**: `Object`
+• `Const` **style**: `Object`
 
 The styles for the date time entry
 
@@ -26,27 +26,27 @@ The styles for the date time entry
 
 | Name | Type |
 | :------ | :------ |
-| `container` | `Object` |
+| `container` | \{ `width`: `string` = "100%" } |
 | `container.width` | `string` |
-| `description` | `Object` |
+| `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
-| `entry` | `Object` |
+| `entry` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `entry.alignItems` | `string` |
 | `entry.display` | `string` |
 | `entry.flexDirection` | `string` |
 | `entry.justifyContent` | `string` |
 | `entry.width` | `string` |
-| `errorMessage` | `Object` |
+| `errorMessage` | \{ `color`: `string` = "#f44336"; `fontSize`: `string` = "0.85rem"; `height`: `string` = "1.3rem" } |
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `iconButton` | `Object` |
+| `iconButton` | \{ `color`: `string` = "#424242" } |
 | `iconButton.color` | `string` |
-| `label` | (`invalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
+| `label` | (`invalid`: `boolean`) => \{ `&.focused`: \{ `color`: `string`  } ; `color`: `string`  } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L33)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L33)
 
 ## Functions
 
@@ -74,4 +74,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:102](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L102)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:102](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L102)

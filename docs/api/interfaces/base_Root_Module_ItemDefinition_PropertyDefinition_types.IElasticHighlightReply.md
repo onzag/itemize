@@ -6,6 +6,6 @@
 
 ## Indexable
 
-▪ [fieldName: `string`]: { `match`: `string` ; `name`: `string`  }
+▪ [fieldName: `string`]: \{ `match`: `string` ; `name`: `string`  }
 
 The eleasticsearch field that will be highlighted

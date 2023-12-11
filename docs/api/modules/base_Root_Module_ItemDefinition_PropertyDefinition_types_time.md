@@ -6,7 +6,7 @@ Contains the time type description
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedTimeType](base_Root_Module_ItemDefinition_PropertyDefinition_types_time.md#propertydefinitionsupportedtimetype)
 
@@ -14,7 +14,7 @@ Contains the time type description
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_time.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedTimeType
 
@@ -24,16 +24,16 @@ Time is defined as a string, it's clock time
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:44](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L44)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:43](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L43)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedTimeType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_time.md#propertydefinitionsupportedtimetype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedTimeType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_time.md#propertydefinitionsupportedtimetype)\>
 
 The behaviour of the time is described by this type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:49](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L49)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L48)

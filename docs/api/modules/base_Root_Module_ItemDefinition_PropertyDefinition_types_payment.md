@@ -26,19 +26,19 @@ by a payment provider resource
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>
 
 The type of a curreny type specifies how it behaves in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:67](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L67)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:66](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L66)
 
 ___
 
 ### paymentAllowedStatuses
 
-• **paymentAllowedStatuses**: `Object`
+• `Const` **paymentAllowedStatuses**: `Object`
 
 #### Type declaration
 
@@ -50,24 +50,24 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:34](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L34)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:33](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L33)
 
 ___
 
 ### paymentStatusesArr
 
-• **paymentStatusesArr**: `string`[]
+• `Const` **paymentStatusesArr**: `string`[]
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:32](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L32)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:31](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L31)
 
 ___
 
 ### paymentTypesArr
 
-• **paymentTypesArr**: `string`[]
+• `Const` **paymentTypesArr**: `string`[]
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:33](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L33)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:32](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L32)

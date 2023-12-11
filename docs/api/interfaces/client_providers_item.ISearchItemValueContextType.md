@@ -19,34 +19,34 @@ it from loading itself so it's aware that elements are being searched
 
 ### currentlySearching
 
-• **currentlySearching**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **currentlySearching**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 Records being searched that will eventually have an applied value
 
 #### Defined in
 
-[client/providers/item.tsx:1475](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1475)
+[client/providers/item.tsx:1475](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1475)
 
 ___
 
 ### searchFields
 
-• **searchFields**: [`IGQLRequestFields`](gql_querier.IGQLRequestFields.md)
+• **searchFields**: [`IRQRequestFields`](rq_querier.IRQRequestFields.md)
 
 Fields that are being searched
 
 #### Defined in
 
-[client/providers/item.tsx:1479](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1479)
+[client/providers/item.tsx:1479](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1479)
 
 ___
 
 ### searchRecords
 
-• **searchRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **searchRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 Records that are overall in the search that is active avobe
 
 #### Defined in
 
-[client/providers/item.tsx:1483](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1483)
+[client/providers/item.tsx:1483](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1483)

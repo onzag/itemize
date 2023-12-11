@@ -21,48 +21,48 @@ by the callback
 
 ### createdRecords
 
-• **createdRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **createdRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:82](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L82)
+[client/internal/app/remote-listener.ts:82](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/remote-listener.ts#L82)
 
 ___
 
 ### deletedRecords
 
-• **deletedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **deletedRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:83](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L83)
+[client/internal/app/remote-listener.ts:83](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/remote-listener.ts#L83)
 
 ___
 
 ### lostRecords
 
-• **lostRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **lostRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:81](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L81)
+[client/internal/app/remote-listener.ts:81](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/remote-listener.ts#L81)
 
 ___
 
 ### modifiedRecords
 
-• **modifiedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **modifiedRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:80](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L80)
+[client/internal/app/remote-listener.ts:80](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/remote-listener.ts#L80)
 
 ___
 
 ### newRecords
 
-• **newRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **newRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:79](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L79)
+[client/internal/app/remote-listener.ts:79](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/remote-listener.ts#L79)

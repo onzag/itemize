@@ -18,6 +18,7 @@
 - [createdBy](server_cache.ICreationOptions.md#createdby)
 - [dictionary](server_cache.ICreationOptions.md#dictionary)
 - [forId](server_cache.ICreationOptions.md#forid)
+- [ifAlreadyExistsCall](server_cache.ICreationOptions.md#ifalreadyexistscall)
 - [ifAlreadyExistsReturn](server_cache.ICreationOptions.md#ifalreadyexistsreturn)
 - [ignoreAlreadyExists](server_cache.ICreationOptions.md#ignorealreadyexists)
 - [ignorePreSideEffects](server_cache.ICreationOptions.md#ignorepresideeffects)
@@ -28,10 +29,6 @@
 - [parent](server_cache.ICreationOptions.md#parent)
 - [version](server_cache.ICreationOptions.md#version)
 
-### Methods
-
-- [ifAlreadyExistsCall](server_cache.ICreationOptions.md#ifalreadyexistscall)
-
 ## Properties
 
 ### containerId
@@ -40,7 +37,7 @@
 
 #### Defined in
 
-[server/cache.ts:90](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L90)
+[server/cache.ts:90](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L90)
 
 ___
 
@@ -50,7 +47,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:87](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L87)
+[server/cache.ts:87](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L87)
 
 ___
 
@@ -60,7 +57,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:89](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L89)
+[server/cache.ts:89](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L89)
 
 ___
 
@@ -70,7 +67,35 @@ ___
 
 #### Defined in
 
-[server/cache.ts:85](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L85)
+[server/cache.ts:85](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L85)
+
+___
+
+### ifAlreadyExistsCall
+
+• `Optional` **ifAlreadyExistsCall**: (`v`: [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md)) => `void`
+
+#### Type declaration
+
+▸ (`v`): `void`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `v` | [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md) |
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[IWritingOptions](server_cache.IWritingOptions.md).[ifAlreadyExistsCall](server_cache.IWritingOptions.md#ifalreadyexistscall)
+
+#### Defined in
+
+[server/cache.ts:81](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L81)
 
 ___
 
@@ -84,7 +109,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L80)
+[server/cache.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L80)
 
 ___
 
@@ -98,7 +123,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:79](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L79)
+[server/cache.ts:79](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L79)
 
 ___
 
@@ -112,7 +137,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L68)
+[server/cache.ts:68](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L68)
 
 ___
 
@@ -126,7 +151,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:69](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L69)
+[server/cache.ts:69](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L69)
 
 ___
 
@@ -140,7 +165,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:66](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L66)
+[server/cache.ts:66](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L66)
 
 ___
 
@@ -150,7 +175,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L88)
+[server/cache.ts:88](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L88)
 
 ___
 
@@ -164,7 +189,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:67](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L67)
+[server/cache.ts:67](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L67)
 
 ___
 
@@ -182,7 +207,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:91](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L91)
+[server/cache.ts:91](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L91)
 
 ___
 
@@ -192,28 +217,4 @@ ___
 
 #### Defined in
 
-[server/cache.ts:86](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L86)
-
-## Methods
-
-### ifAlreadyExistsCall
-
-▸ `Optional` **ifAlreadyExistsCall**(`v`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `v` | [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md) |
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[IWritingOptions](server_cache.IWritingOptions.md).[ifAlreadyExistsCall](server_cache.IWritingOptions.md#ifalreadyexistscall)
-
-#### Defined in
-
-[server/cache.ts:81](https://github.com/onzag/itemize/blob/a24376ed/server/cache.ts#L81)
+[server/cache.ts:86](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L86)

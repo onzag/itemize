@@ -2,7 +2,7 @@
 
 # Module: base/Root/Module/ItemDefinition/Include/rq
 
-This file contains the graphql utility functions for managing
+This file contains the rq utility functions for managing
 Includes that exist within item definitions, it doesn't contain
 the conversion function sql.ts does
 
@@ -18,7 +18,7 @@ the conversion function sql.ts does
 
 ▸ **getRQDefinitionForInclude**(`include`, `options`): `Object`
 
-Provides the graphql definition that will be required to store
+Provides the rq definition that will be required to store
 this include bit
 
 #### Parameters
@@ -28,14 +28,15 @@ this include bit
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include |
 | `options` | `Object` | - |
 | `options.optionalForm` | `boolean` | makes all the field of the include optional so they can be decided |
+| `options.retrievalMode` | `boolean` | - |
 
 #### Returns
 
 `Object`
 
-a list of field definitions that represent the include in graphql form
-for use within the graphql description
+a list of field definitions that represent the include in rq form
+for use within the rq description
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/rq.ts:24](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/rq.ts#L24)
+[base/Root/Module/ItemDefinition/Include/rq.ts:24](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/rq.ts#L24)

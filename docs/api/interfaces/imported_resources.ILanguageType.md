@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[imported-resources/index.ts:50](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L50)
+[imported-resources/index.ts:50](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L50)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:51](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L51)
+[imported-resources/index.ts:51](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L51)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/imported-resources/index.ts#L52)
+[imported-resources/index.ts:52](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L52)

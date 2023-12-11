@@ -17,20 +17,37 @@ but with a couple of functions
 
 ### Properties
 
+- [dismissError](client_internal_providers_token_provider.ITokenContextType.md#dismisserror)
 - [error](client_internal_providers_token_provider.ITokenContextType.md#error)
 - [id](client_internal_providers_token_provider.ITokenContextType.md#id)
 - [isLoggingIn](client_internal_providers_token_provider.ITokenContextType.md#isloggingin)
 - [isReady](client_internal_providers_token_provider.ITokenContextType.md#isready)
+- [login](client_internal_providers_token_provider.ITokenContextType.md#login)
+- [logout](client_internal_providers_token_provider.ITokenContextType.md#logout)
 - [role](client_internal_providers_token_provider.ITokenContextType.md#role)
 - [token](client_internal_providers_token_provider.ITokenContextType.md#token)
 
-### Methods
-
-- [dismissError](client_internal_providers_token_provider.ITokenContextType.md#dismisserror)
-- [login](client_internal_providers_token_provider.ITokenContextType.md#login)
-- [logout](client_internal_providers_token_provider.ITokenContextType.md#logout)
-
 ## Properties
+
+### dismissError
+
+• **dismissError**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Dismiss the current login error
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/providers/token-provider.tsx:111](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L111)
+
+___
 
 ### error
 
@@ -44,7 +61,7 @@ An error that occured during login
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:37](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L37)
+[client/internal/providers/token-provider.tsx:37](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L37)
 
 ___
 
@@ -60,7 +77,7 @@ The user id
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L29)
+[client/internal/providers/token-provider.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L29)
 
 ___
 
@@ -76,7 +93,7 @@ Whether it's currently logging in
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L41)
+[client/internal/providers/token-provider.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L41)
 
 ___
 
@@ -98,7 +115,58 @@ the token
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:51](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L51)
+[client/internal/providers/token-provider.tsx:51](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L51)
+
+___
+
+### login
+
+• **login**: (`username`: `string`, `password`: `string`, `token`: `string`) => `Promise`\<\{ `error`: [`EndpointErrorType`](../modules/base_errors.md#endpointerrortype) ; `id`: `string` ; `role`: `string`  }\>
+
+#### Type declaration
+
+▸ (`username`, `password`, `token`): `Promise`\<\{ `error`: [`EndpointErrorType`](../modules/base_errors.md#endpointerrortype) ; `id`: `string` ; `role`: `string`  }\>
+
+the login function
+
+##### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `username` | `string` | the username to login with (can also be an email) |
+| `password` | `string` | the password to login with |
+| `token` | `string` | you can leave username and passwor as null, and provide a token instead, so you are login in by token rather than by anything else, this is used in the initial login |
+
+##### Returns
+
+`Promise`\<\{ `error`: [`EndpointErrorType`](../modules/base_errors.md#endpointerrortype) ; `id`: `string` ; `role`: `string`  }\>
+
+a promise with the id, role and a possible error
+
+#### Defined in
+
+[client/internal/providers/token-provider.tsx:102](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L102)
+
+___
+
+### logout
+
+• **logout**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+logout function, for the logoutAll functionality check the LogActioner as it's a complex function
+the token provider only manages simple functionality about the current app state
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/providers/token-provider.tsx:107](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L107)
 
 ___
 
@@ -114,7 +182,7 @@ The user role
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L33)
+[client/internal/providers/token-provider.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L33)
 
 ___
 
@@ -130,63 +198,4 @@ The token we have got now
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L25)
-
-## Methods
-
-### dismissError
-
-▸ **dismissError**(): `void`
-
-Dismiss the current login error
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/providers/token-provider.tsx:111](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L111)
-
-___
-
-### login
-
-▸ **login**(`username`, `password`, `token`): `Promise`<{ `error`: [`EndpointErrorType`](../modules/base_errors.md#endpointerrortype) ; `id`: `string` ; `role`: `string`  }\>
-
-the login function
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `username` | `string` | the username to login with (can also be an email) |
-| `password` | `string` | the password to login with |
-| `token` | `string` | you can leave username and passwor as null, and provide a token instead, so you are login in by token rather than by anything else, this is used in the initial login |
-
-#### Returns
-
-`Promise`<{ `error`: [`EndpointErrorType`](../modules/base_errors.md#endpointerrortype) ; `id`: `string` ; `role`: `string`  }\>
-
-a promise with the id, role and a possible error
-
-#### Defined in
-
-[client/internal/providers/token-provider.tsx:102](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L102)
-
-___
-
-### logout
-
-▸ **logout**(): `void`
-
-logout function, for the logoutAll functionality check the LogActioner as it's a complex function
-the token provider only manages simple functionality about the current app state
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/providers/token-provider.tsx:107](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L107)
+[client/internal/providers/token-provider.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L25)

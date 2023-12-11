@@ -36,7 +36,7 @@ IBaseTemplateArg.editorArgs
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L196)
+[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L196)
 
 ___
 
@@ -50,7 +50,7 @@ IBaseTemplateArg.label
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L189)
+[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L189)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:303](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L303)
+[client/internal/text/serializer/template-args.ts:303](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L303)
 
 ___
 
@@ -74,7 +74,7 @@ IBaseTemplateArg.nonRootInheritable
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L190)
+[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L190)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:304](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L304)
+[client/internal/text/serializer/template-args.ts:304](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L304)
 
 ___
 
@@ -94,4 +94,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:302](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L302)
+[client/internal/text/serializer/template-args.ts:302](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L302)

@@ -33,4 +33,4 @@ a react node
 
 #### Defined in
 
-[client/components/item/DifferingPropertiesRetriever.tsx:61](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DifferingPropertiesRetriever.tsx#L61)
+[client/components/item/DifferingPropertiesRetriever.tsx:61](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DifferingPropertiesRetriever.tsx#L61)

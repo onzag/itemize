@@ -25,7 +25,7 @@ of type select
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:322](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L322)
+[client/fast-prototyping/components/slate/wrapper.tsx:322](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L322)
 
 ___
 
@@ -35,17 +35,17 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:321](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L321)
+[client/fast-prototyping/components/slate/wrapper.tsx:321](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L321)
 
 ___
 
 ### options
 
-• **options**: { `label`: `ReactNode` ; `value`: `string`  }[]
+• **options**: \{ `label`: `ReactNode` ; `value`: `string`  }[]
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:331](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L331)
+[client/fast-prototyping/components/slate/wrapper.tsx:331](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L331)
 
 ___
 
@@ -60,7 +60,7 @@ eg. the i18nRead element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:330](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L330)
+[client/fast-prototyping/components/slate/wrapper.tsx:330](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L330)
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:320](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L320)
+[client/fast-prototyping/components/slate/wrapper.tsx:320](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L320)

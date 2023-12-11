@@ -18,7 +18,7 @@ Contains the filtering and ordering function to perform actual searches
 
 ### search
 
-▸ **search**(`rootProxy`, `db`, `searchRecords`, `searchArgs`, `returnSourceResults`, `cacheNoLimitOffset`): `Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMatchType.md)[]  }\>
+▸ **search**(`rootProxy`, `db`, `searchRecords`, `searchArgs`, `returnSourceResults`, `cacheNoLimitOffset`): `Promise`\<\{ `count`: `number` ; `filteredRecords`: [`IRQSearchRecord`](../interfaces/rq_querier.IRQSearchRecord.md)[] ; `filteredResults`: [`IRQValue`](../interfaces/rq_querier.IRQValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMatchType.md)[]  }\>
 
 Given a bunch of search records it will perform
 the ordering and filtering of such records to return
@@ -30,16 +30,16 @@ cache, this is a heavy process
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `rootProxy` | [`default`](../classes/base_Root.default.md) | the root proxy we need to extract the functionality for ordering and checking equality |
-| `db` | `IDBPDatabase`<[`ICacheDB`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheDB.md)\> | the database object |
-| `searchRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | the search records we got |
-| `searchArgs` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the search arguments (that would be sent to the server) an we need to emulate for |
+| `db` | `IDBPDatabase`\<[`ICacheDB`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheDB.md)\> | the database object |
+| `searchRecords` | [`IRQSearchRecord`](../interfaces/rq_querier.IRQSearchRecord.md)[] | the search records we got |
+| `searchArgs` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) | the search arguments (that would be sent to the server) an we need to emulate for |
 | `returnSourceResults` | `boolean` | - |
 | `cacheNoLimitOffset` | `boolean` | - |
 
 #### Returns
 
-`Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMatchType.md)[]  }\>
+`Promise`\<\{ `count`: `number` ; `filteredRecords`: [`IRQSearchRecord`](../interfaces/rq_querier.IRQSearchRecord.md)[] ; `filteredResults`: [`IRQValue`](../interfaces/rq_querier.IRQValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMatchType.md)[]  }\>
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.search.ts#L66)
+[client/internal/workers/cache/cache.worker.search.ts:39](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.search.ts#L39)

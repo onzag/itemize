@@ -23,7 +23,7 @@ The plain text content
 
 #### Defined in
 
-[server/services/base/PhoneProvider.ts:31](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PhoneProvider.ts#L31)
+[server/services/base/PhoneProvider.ts:31](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PhoneProvider.ts#L31)
 
 ___
 
@@ -36,4 +36,4 @@ to be sent to
 
 #### Defined in
 
-[server/services/base/PhoneProvider.ts:27](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PhoneProvider.ts#L27)
+[server/services/base/PhoneProvider.ts:27](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PhoneProvider.ts#L27)

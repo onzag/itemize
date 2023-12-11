@@ -32,4 +32,4 @@ Compares renderer args
 
 #### Defined in
 
-[client/internal/components/general-fn.ts:13](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/general-fn.ts#L13)
+[client/internal/components/general-fn.ts:13](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/general-fn.ts#L13)

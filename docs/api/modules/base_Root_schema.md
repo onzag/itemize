@@ -8,30 +8,36 @@ root json files
 
 ## Table of contents
 
-### Properties
+### Variables
 
 - [default](base_Root_schema.md#default)
 
-## Properties
+## Variables
 
 ### default
 
 • **default**: `Object`
+
+The root schema unprocessed and unbuilt
 
 #### Type declaration
 
 | Name | Type |
 | :------ | :------ |
 | `additionalProperties` | `boolean` |
-| `properties` | `Object` |
-| `properties.children` | `Object` |
-| `properties.children.items` | `Object` |
+| `properties` | \{ `children`: \{ `items`: \{ `type`: `string` = "string" } ; `minItems`: `number` = 1; `type`: `string` = "array" } ; `i18n`: \{ `type`: `string` = "string" } ; `type`: \{ `const`: `string` = "root" }  } |
+| `properties.children` | \{ `items`: \{ `type`: `string` = "string" } ; `minItems`: `number` = 1; `type`: `string` = "array" } |
+| `properties.children.items` | \{ `type`: `string` = "string" } |
 | `properties.children.items.type` | `string` |
 | `properties.children.minItems` | `number` |
 | `properties.children.type` | `string` |
-| `properties.i18n` | `Object` |
+| `properties.i18n` | \{ `type`: `string` = "string" } |
 | `properties.i18n.type` | `string` |
-| `properties.type` | `Object` |
+| `properties.type` | \{ `const`: `string` = "root" } |
 | `properties.type.const` | `string` |
 | `required` | `string`[] |
 | `type` | `string` |
+
+#### Defined in
+
+[base/Root/schema.ts:12](https://github.com/onzag/itemize/blob/59702dd5/base/Root/schema.ts#L12)

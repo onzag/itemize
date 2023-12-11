@@ -24,7 +24,7 @@ and considers the root to be the language source
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | `RouteProps`<`string`, {}\> | the RouterProps |
+| `props` | `RouteProps`\<`string`, {}\> | the RouterProps |
 
 #### Returns
 
@@ -32,4 +32,4 @@ and considers the root to be the language source
 
 #### Defined in
 
-[client/components/navigation/Route.tsx:16](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/Route.tsx#L16)
+[client/components/navigation/Route.tsx:16](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Route.tsx#L16)

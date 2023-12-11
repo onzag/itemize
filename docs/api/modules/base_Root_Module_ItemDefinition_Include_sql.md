@@ -12,9 +12,9 @@ as how to build the definition for the tables
 
 - [buildElasticQueryForInclude](base_Root_Module_ItemDefinition_Include_sql.md#buildelasticqueryforinclude)
 - [buildSQLQueryForInclude](base_Root_Module_ItemDefinition_Include_sql.md#buildsqlqueryforinclude)
-- [convertGQLValueToSQLValueForInclude](base_Root_Module_ItemDefinition_Include_sql.md#convertgqlvaluetosqlvalueforinclude)
+- [convertRQValueToSQLValueForInclude](base_Root_Module_ItemDefinition_Include_sql.md#convertrqvaluetosqlvalueforinclude)
 - [convertSQLValueToElasticSQLValueForInclude](base_Root_Module_ItemDefinition_Include_sql.md#convertsqlvaluetoelasticsqlvalueforinclude)
-- [convertSQLValueToGQLValueForInclude](base_Root_Module_ItemDefinition_Include_sql.md#convertsqlvaluetogqlvalueforinclude)
+- [convertSQLValueToRQValueForInclude](base_Root_Module_ItemDefinition_Include_sql.md#convertsqlvaluetorqvalueforinclude)
 - [getElasticSchemaForInclude](base_Root_Module_ItemDefinition_Include_sql.md#getelasticschemaforinclude)
 - [getSQLTableDefinitionForInclude](base_Root_Module_ItemDefinition_Include_sql.md#getsqltabledefinitionforinclude)
 
@@ -34,7 +34,7 @@ Builds a sql query for an include
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the include |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include in question |
-| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args as they come from the search module, specific for this item (not nested) |
+| `args` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) | the args as they come from the search module, specific for this item (not nested) |
 | `elasticQueryBuilder` | [`ElasticQueryBuilder`](../classes/server_elastic.ElasticQueryBuilder.md) | - |
 | `language` | `string` | - |
 | `dictionary` | `string` | the dictionary to use to build the search |
@@ -45,7 +45,7 @@ Builds a sql query for an include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:369](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L369)
+[base/Root/Module/ItemDefinition/Include/sql.ts:369](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/sql.ts#L369)
 
 ___
 
@@ -63,7 +63,7 @@ Builds a sql query for an include
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the include |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include in question |
-| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args as they come from the search module, specific for this item (not nested) |
+| `args` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) | the args as they come from the search module, specific for this item (not nested) |
 | `whereBuilder` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) | - |
 | `language` | `string` | - |
 | `dictionary` | `string` | the dictionary to use to build the search |
@@ -74,16 +74,16 @@ Builds a sql query for an include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:302](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L302)
+[base/Root/Module/ItemDefinition/Include/sql.ts:302](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/sql.ts#L302)
 
 ___
 
-### convertGQLValueToSQLValueForInclude
+### convertRQValueToSQLValueForInclude
 
-▸ **convertGQLValueToSQLValueForInclude**(`serverData`, `appData`, `itemDefinition`, `include`, `data`, `oldData`, `uploadsClient`, `domain`, `language`, `dictionary`, `partialFields?`): [`ISQLStreamComposedTableRowValue`](../interfaces/base_Root_sql.ISQLStreamComposedTableRowValue.md)
+▸ **convertRQValueToSQLValueForInclude**(`serverData`, `appData`, `itemDefinition`, `include`, `data`, `oldData`, `uploadsClient`, `domain`, `language`, `dictionary`, `partialFields?`): [`ISQLStreamComposedTableRowValue`](../interfaces/base_Root_sql.ISQLStreamComposedTableRowValue.md)
 
-Converts a GraphQL value into a SQL row data, it takes apart a complex
-graphql value and converts it into a serializable sql form
+Converts a rq value into a SQL row data, it takes apart a complex
+rq value and converts it into a serializable sql form
 
 #### Parameters
 
@@ -93,9 +93,9 @@ graphql value and converts it into a serializable sql form
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition in question |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include in question |
-| `data` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the graphql data value |
-| `oldData` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) | the old graphql data value that used to be stored for that include |
-| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\> | the uploads client |
+| `data` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) | the rq data value |
+| `oldData` | [`IRQValue`](../interfaces/rq_querier.IRQValue.md) | the old rq data value that used to be stored for that include |
+| `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\> | the uploads client |
 | `domain` | `string` | - |
 | `language` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
 | `dictionary` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the dictionary to use in full text search mode |
@@ -109,13 +109,13 @@ the partial sql result to be added into the table
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:222](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L222)
+[base/Root/Module/ItemDefinition/Include/sql.ts:222](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/sql.ts#L222)
 
 ___
 
 ### convertSQLValueToElasticSQLValueForInclude
 
-▸ **convertSQLValueToElasticSQLValueForInclude**(`serverData`, `appData`, `itemDefinition`, `include`, `row`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+▸ **convertSQLValueToElasticSQLValueForInclude**(`serverData`, `appData`, `itemDefinition`, `include`, `row`): [`IRQValue`](../interfaces/rq_querier.IRQValue.md)
 
 #### Parameters
 
@@ -129,20 +129,20 @@ ___
 
 #### Returns
 
-[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+[`IRQValue`](../interfaces/rq_querier.IRQValue.md)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:172](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L172)
+[base/Root/Module/ItemDefinition/Include/sql.ts:172](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/sql.ts#L172)
 
 ___
 
-### convertSQLValueToGQLValueForInclude
+### convertSQLValueToRQValueForInclude
 
-▸ **convertSQLValueToGQLValueForInclude**(`serverData`, `appData`, `itemDefinition`, `include`, `row`, `graphqlFields?`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+▸ **convertSQLValueToRQValueForInclude**(`serverData`, `appData`, `itemDefinition`, `include`, `row`, `rqFields?`): [`IRQValue`](../interfaces/rq_querier.IRQValue.md)
 
 Given a SQL row it converts the value of the data contained
-within that row into the valid graphql output
+within that row into the valid rq output
 
 #### Parameters
 
@@ -153,17 +153,17 @@ within that row into the valid graphql output
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | - |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include in question |
 | `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the row sql data |
-| `graphqlFields?` | `any` | (optional) contains the only properties that are required in the request provided by grapql fields, eg {id: {}, name: {}} |
+| `rqFields?` | `any` | (optional) contains the only properties that are required in the request provided by grapql fields, eg {id: {}, name: {}} |
 
 #### Returns
 
-[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+[`IRQValue`](../interfaces/rq_querier.IRQValue.md)
 
-a partial graphql value
+a partial rq value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:127](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L127)
+[base/Root/Module/ItemDefinition/Include/sql.ts:127](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/sql.ts#L127)
 
 ___
 
@@ -186,7 +186,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:28](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L28)
+[base/Root/Module/ItemDefinition/Include/sql.ts:28](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/sql.ts#L28)
 
 ___
 
@@ -212,4 +212,4 @@ the partial table definition schema for the include, prefixed and with the exclu
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:82](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L82)
+[base/Root/Module/ItemDefinition/Include/sql.ts:82](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/sql.ts#L82)

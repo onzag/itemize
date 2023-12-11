@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-- [`IItemizeLoggingStructure`](server_logger.IItemizeLoggingStructure.md)<`any`\>
+- [`IItemizeLoggingStructure`](server_logger.IItemizeLoggingStructure.md)\<`any`\>
 
   ↳ **`IItemizeFinalLoggingObject`**
 
@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[server/logger.ts:28](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L28)
+[server/logger.ts:28](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L28)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:32](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L32)
+[server/logger.ts:32](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L32)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:31](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L31)
+[server/logger.ts:31](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L31)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L43)
+[server/logger.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L43)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L44)
+[server/logger.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L44)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:30](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L30)
+[server/logger.ts:30](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L30)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:26](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L26)
+[server/logger.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L26)
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:29](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L29)
+[server/logger.ts:29](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L29)
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L45)
+[server/logger.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L45)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L42)
+[server/logger.ts:42](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L42)
 
 ___
 
@@ -158,4 +158,4 @@ ___
 
 #### Defined in
 
-[server/logger.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/logger.ts#L46)
+[server/logger.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L46)

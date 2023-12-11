@@ -18,4 +18,4 @@
 
 #### Defined in
 
-[server/index.ts:170](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L170)
+[server/index.ts:168](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L168)

@@ -35,7 +35,7 @@ IBaseTemplateArg.editorArgs
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L196)
+[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L196)
 
 ___
 
@@ -48,7 +48,7 @@ what should be displayed in that piece of html content
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:222](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L222)
+[client/internal/text/serializer/template-args.ts:222](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L222)
 
 ___
 
@@ -62,7 +62,7 @@ IBaseTemplateArg.label
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L189)
+[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L189)
 
 ___
 
@@ -76,7 +76,7 @@ IBaseTemplateArg.nonRootInheritable
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L190)
+[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L190)
 
 ___
 
@@ -86,4 +86,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:216](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L216)
+[client/internal/text/serializer/template-args.ts:216](https://github.com/onzag/itemize/blob/59702dd5/client/internal/text/serializer/template-args.ts#L216)

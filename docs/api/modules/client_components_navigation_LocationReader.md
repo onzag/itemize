@@ -9,12 +9,16 @@ as strings
 
 ## Table of contents
 
-### Properties
+### Variables
 
 - [default](client_components_navigation_LocationReader.md#default)
 
-## Properties
+## Variables
 
 ### default
 
-• **default**: `ComponentType`<`ILocationReaderProps`\>
+• **default**: `ComponentType`\<`ILocationReaderProps`\>
+
+#### Defined in
+
+[client/components/navigation/LocationReader.tsx:89](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationReader.tsx#L89)

@@ -18,7 +18,7 @@ database for the itemize project should be described
 - [ISQLTableIndexType](../interfaces/base_Root_sql.ISQLTableIndexType.md)
 - [ISQLTableRowValue](../interfaces/base_Root_sql.ISQLTableRowValue.md)
 
-### Type aliases
+### Type Aliases
 
 - [ConsumeStreamsFnType](base_Root_sql.md#consumestreamsfntype)
 
@@ -27,15 +27,15 @@ database for the itemize project should be described
 - [getElasticSchemaForRoot](base_Root_sql.md#getelasticschemaforroot)
 - [getSQLTablesSchemaForRoot](base_Root_sql.md#getsqltablesschemaforroot)
 
-## Type aliases
+## Type Aliases
 
 ### ConsumeStreamsFnType
 
-Ƭ **ConsumeStreamsFnType**: (`propertyLocationId`: `string`) => `Promise`<`void`\>
+Ƭ **ConsumeStreamsFnType**: (`propertyLocationId`: `string`) => `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`propertyLocationId`): `Promise`<`void`\>
+▸ (`propertyLocationId`): `Promise`\<`void`\>
 
 ##### Parameters
 
@@ -45,11 +45,11 @@ database for the itemize project should be described
 
 ##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L128)
+[base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L128)
 
 ## Functions
 
@@ -71,7 +71,7 @@ database for the itemize project should be described
 
 #### Defined in
 
-[base/Root/sql.ts:138](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L138)
+[base/Root/sql.ts:138](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L138)
 
 ___
 
@@ -97,4 +97,4 @@ a total database schema
 
 #### Defined in
 
-[base/Root/sql.ts:156](https://github.com/onzag/itemize/blob/a24376ed/base/Root/sql.ts#L156)
+[base/Root/sql.ts:156](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L156)

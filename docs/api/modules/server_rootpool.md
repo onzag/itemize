@@ -16,7 +16,7 @@ as the root registires are modified during SSR rendering
 
 ### retrieveRootPool
 
-▸ **retrieveRootPool**(`rawData`): `Pool`<[`default`](../classes/base_Root.default.md)\>
+▸ **retrieveRootPool**(`rawData`): `Pool`\<[`default`](../classes/base_Root.default.md)\>
 
 Provides a pool of root
 
@@ -28,8 +28,8 @@ Provides a pool of root
 
 #### Returns
 
-`Pool`<[`default`](../classes/base_Root.default.md)\>
+`Pool`\<[`default`](../classes/base_Root.default.md)\>
 
 #### Defined in
 
-[server/rootpool.ts:19](https://github.com/onzag/itemize/blob/a24376ed/server/rootpool.ts#L19)
+[server/rootpool.ts:19](https://github.com/onzag/itemize/blob/59702dd5/server/rootpool.ts#L19)

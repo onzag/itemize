@@ -9,7 +9,7 @@ is too complex for it and this handler will handle internal states for you
 
 ## Hierarchy
 
-- [`IPropertyEntryRendererProps`](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md)<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>
+- [`IPropertyEntryRendererProps`](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md)\<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>
 
   ↳ **`IPropertyEntryLocationRendererProps`**
 
@@ -21,6 +21,8 @@ is too complex for it and this handler will handle internal states for you
 - [args](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#args)
 - [autoFocus](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#autofocus)
 - [canRestore](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#canrestore)
+- [clearSearchResults](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#clearsearchresults)
+- [clearSuggestions](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#clearsuggestions)
 - [currentAppliedValue](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#currentappliedvalue)
 - [currentInternalValue](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#currentinternalvalue)
 - [currentInvalidReason](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#currentinvalidreason)
@@ -28,12 +30,21 @@ is too complex for it and this handler will handle internal states for you
 - [currentValue](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#currentvalue)
 - [description](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#description)
 - [disabled](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#disabled)
+- [enableUserSetErrors](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#enableuserseterrors)
 - [label](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#label)
 - [language](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#language)
 - [languageOverride](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#languageoverride)
 - [nextSearchResult](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#nextsearchresult)
 - [nextSearchResultCircular](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#nextsearchresultcircular)
 - [noResultsLabel](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#noresultslabel)
+- [onChange](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onchange)
+- [onChangeBySearchResult](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onchangebysearchresult)
+- [onChangeBySuggestion](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onchangebysuggestion)
+- [onManualPick](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onmanualpick)
+- [onRestore](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onrestore)
+- [onSearch](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onsearch)
+- [onSearchQueryChange](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onsearchquerychange)
+- [onViewportChange](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onviewportchange)
 - [placeholder](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#placeholder)
 - [prevSearchResult](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#prevsearchresult)
 - [prevSearchResultCircular](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#prevsearchresultcircular)
@@ -46,20 +57,6 @@ is too complex for it and this handler will handle internal states for you
 - [uniqueId](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#uniqueid)
 - [viewport](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#viewport)
 
-### Methods
-
-- [clearSearchResults](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#clearsearchresults)
-- [clearSuggestions](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#clearsuggestions)
-- [enableUserSetErrors](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#enableuserseterrors)
-- [onChange](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onchange)
-- [onChangeBySearchResult](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onchangebysearchresult)
-- [onChangeBySuggestion](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onchangebysuggestion)
-- [onManualPick](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onmanualpick)
-- [onRestore](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onrestore)
-- [onSearch](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onsearch)
-- [onSearchQueryChange](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onsearchquerychange)
-- [onViewportChange](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#onviewportchange)
-
 ## Properties
 
 ### activeSearchResults
@@ -71,7 +68,7 @@ is not taking place, the value is null
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:171](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L171)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:171](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L171)
 
 ___
 
@@ -91,7 +88,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -107,7 +104,7 @@ Whether the entry should autofocus
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:107](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L107)
+[client/internal/components/PropertyEntry/index.tsx:107](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L107)
 
 ___
 
@@ -124,7 +121,47 @@ current value, this check is exceptional as it uses the local equal function
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:79](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L79)
+[client/internal/components/PropertyEntry/index.tsx:79](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L79)
+
+___
+
+### clearSearchResults
+
+• **clearSearchResults**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Clear all the suggestions
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:121](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L121)
+
+___
+
+### clearSuggestions
+
+• **clearSuggestions**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Clear all the suggestions
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:116](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L116)
 
 ___
 
@@ -140,7 +177,7 @@ The currently applied value that is in sync with the server side
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:74](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L74)
+[client/internal/components/PropertyEntry/index.tsx:74](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L74)
 
 ___
 
@@ -156,7 +193,7 @@ The current internal value, if any given
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:102](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L102)
+[client/internal/components/PropertyEntry/index.tsx:102](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L102)
 
 ___
 
@@ -176,7 +213,7 @@ of a flag
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:98](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L98)
+[client/internal/components/PropertyEntry/index.tsx:98](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L98)
 
 ___
 
@@ -195,7 +232,7 @@ a value for this play a role as well
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:90](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L90)
+[client/internal/components/PropertyEntry/index.tsx:90](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L90)
 
 ___
 
@@ -211,7 +248,7 @@ The current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:83](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L83)
+[client/internal/components/PropertyEntry/index.tsx:83](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L83)
 
 ___
 
@@ -228,7 +265,7 @@ this is locale specific; the description might not be passed if specified by the
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:69](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L69)
+[client/internal/components/PropertyEntry/index.tsx:69](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L69)
 
 ___
 
@@ -246,7 +283,33 @@ and attempts are futile to modify
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:113](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L113)
+[client/internal/components/PropertyEntry/index.tsx:113](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L113)
+
+___
+
+### enableUserSetErrors
+
+• **enableUserSetErrors**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Allows for the display of user set error statuses, normally you
+will call this function when your field has been blurred so that
+currentInvalidReason gets populated even if the field is not poked
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[enableUserSetErrors](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#enableuserseterrors)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:120](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L120)
 
 ___
 
@@ -263,7 +326,7 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:59](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L59)
+[client/internal/components/PropertyEntry/index.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L59)
 
 ___
 
@@ -279,7 +342,7 @@ The current language being used by the client overall in the app
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:138](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L138)
+[client/internal/components/PropertyEntry/index.tsx:138](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L138)
 
 ___
 
@@ -299,7 +362,7 @@ value if it has its own
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:147](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L147)
+[client/internal/components/PropertyEntry/index.tsx:147](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L147)
 
 ___
 
@@ -312,7 +375,7 @@ null if no next
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:176](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L176)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:176](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L176)
 
 ___
 
@@ -325,7 +388,7 @@ loop back to the first one; null if search results is empty
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:181](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L181)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:181](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L181)
 
 ___
 
@@ -337,7 +400,235 @@ A label to show when the search yielded no results
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:148](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L148)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:148](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L148)
+
+___
+
+### onChange
+
+• **onChange**: (`value`: [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), `internalValue`: `any`) => `void`
+
+#### Type declaration
+
+▸ (`value`, `internalValue`): `void`
+
+Standard on change function, every renderer will recieve this function
+to trigger a change, however sometimes handlers will pass their own
+change function that is supposed to be used instead of this one so
+caution is advised which one to use
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) |
+| `internalValue` | `any` |
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[onChange](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#onchange)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:128](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L128)
+
+___
+
+### onChangeBySearchResult
+
+• **onChangeBySearchResult**: (`searchResult`: [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), `mantainViewport?`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`searchResult`, `mantainViewport?`): `void`
+
+Picks a search result and assigns it as the current value
+
+##### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `searchResult` | [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) | the search result to use |
+| `mantainViewport?` | `boolean` | by default choosing a search result will move the viewport to that search location, by passing this as true you will prevent that |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:93](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L93)
+
+___
+
+### onChangeBySuggestion
+
+• **onChangeBySuggestion**: (`searchSuggestion`: [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), `mantainViewport?`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`searchSuggestion`, `mantainViewport?`): `void`
+
+Picks a suggestion and assigns it as the current value, choosing
+a suggestion is similar from a search result, so do not mix them
+up; if a search result is beng used, use the search change function
+as that will update the list of search results and marked locations
+
+##### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `searchSuggestion` | [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) | the search suggestion |
+| `mantainViewport?` | `boolean` | by default choosing a suggestion will move the viewport to that search location, by passing this as true you will prevent that |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:108](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L108)
+
+___
+
+### onManualPick
+
+• **onManualPick**: (`value`: [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), `mantainViewport?`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`value`, `mantainViewport?`): `void`
+
+Manually choose a value, this function is rather special
+on the mechanism that it uses, given that it will try to autocomplete
+incomplete picks
+
+##### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) | the value of that we want to manually pick |
+| `mantainViewport?` | `boolean` | by default doing a manual pick will fly to that location, pass true to this to prevent that |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:140](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L140)
+
+___
+
+### onRestore
+
+• **onRestore**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Call in order to trigger restoration, ensure that canRestore is true
+when doing this
+
+##### Returns
+
+`void`
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[onRestore](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#onrestore)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:133](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L133)
+
+___
+
+### onSearch
+
+• **onSearch**: (`mantainViewport?`: `boolean`) => `Promise`\<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)[]\>
+
+#### Type declaration
+
+▸ (`mantainViewport?`): `Promise`\<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)[]\>
+
+Trigger when the search button or the sorts is pressed
+search will use the search query but will perform a deep search instead
+suggestions are not the same as search results
+
+##### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `mantainViewport?` | `boolean` | by default the search will move the viewport to the first search result, with mantainViewport the viewport won't move |
+
+##### Returns
+
+`Promise`\<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)[]\>
+
+a promise with the results
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:82](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L82)
+
+___
+
+### onSearchQueryChange
+
+• **onSearchQueryChange**: (`searchQuery`: `string`, `dontAutoloadSuggestions?`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`searchQuery`, `dontAutoloadSuggestions?`): `void`
+
+Trigger when the search query changes
+
+##### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `searchQuery` | `string` | the search query that is specified |
+| `dontAutoloadSuggestions?` | `boolean` | avoid automatically loading suggestions for this change, if your implementation has an specific time when to load suggestions, call this function again with false for this value then |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:69](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L69)
+
+___
+
+### onViewportChange
+
+• **onViewportChange**: (`viewport`: [`IViewport`](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewport.md)) => `void`
+
+#### Type declaration
+
+▸ (`viewport`): `void`
+
+Trigger when the viewport changes, so a new viewport is provided
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `viewport` | [`IViewport`](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewport.md) |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:60](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L60)
 
 ___
 
@@ -354,7 +645,7 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:64](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L64)
+[client/internal/components/PropertyEntry/index.tsx:64](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L64)
 
 ___
 
@@ -367,7 +658,7 @@ null if no prev
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:186](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L186)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:186](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L186)
 
 ___
 
@@ -380,7 +671,7 @@ loop back to the first one; null if search results is empty
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:191](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L191)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:191](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L191)
 
 ___
 
@@ -396,7 +687,7 @@ The property id in question
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L47)
+[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L47)
 
 ___
 
@@ -408,7 +699,7 @@ The current localized label for the total amount of results
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:157](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L157)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:157](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L157)
 
 ___
 
@@ -421,7 +712,7 @@ say something like, "result 1 out of 29"; in the user's language
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:153](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L153)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:153](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L153)
 
 ___
 
@@ -437,7 +728,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
 
 ___
 
@@ -451,7 +742,7 @@ field, ignore currentValue
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:197](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L197)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:197](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L197)
 
 ___
 
@@ -463,7 +754,7 @@ The current search suggestions, an array and always an array
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:166](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L166)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:166](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L166)
 
 ___
 
@@ -480,7 +771,7 @@ with the id and the version they are related to
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L53)
+[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L53)
 
 ___
 
@@ -492,254 +783,4 @@ The current viewport
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:162](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L162)
-
-## Methods
-
-### clearSearchResults
-
-▸ **clearSearchResults**(): `void`
-
-Clear all the suggestions
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:121](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L121)
-
-___
-
-### clearSuggestions
-
-▸ **clearSuggestions**(): `void`
-
-Clear all the suggestions
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:116](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L116)
-
-___
-
-### enableUserSetErrors
-
-▸ **enableUserSetErrors**(): `void`
-
-Allows for the display of user set error statuses, normally you
-will call this function when your field has been blurred so that
-currentInvalidReason gets populated even if the field is not poked
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[enableUserSetErrors](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#enableuserseterrors)
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:120](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L120)
-
-___
-
-### onChange
-
-▸ **onChange**(`value`, `internalValue`): `void`
-
-Standard on change function, every renderer will recieve this function
-to trigger a change, however sometimes handlers will pass their own
-change function that is supposed to be used instead of this one so
-caution is advised which one to use
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `value` | `ValueType` |
-| `internalValue` | `any` |
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[onChange](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#onchange)
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:128](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L128)
-
-___
-
-### onChangeBySearchResult
-
-▸ **onChangeBySearchResult**(`searchResult`, `mantainViewport?`): `void`
-
-Picks a search result and assigns it as the current value
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `searchResult` | [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) | the search result to use |
-| `mantainViewport?` | `boolean` | by default choosing a search result will move the viewport to that search location, by passing this as true you will prevent that |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:93](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L93)
-
-___
-
-### onChangeBySuggestion
-
-▸ **onChangeBySuggestion**(`searchSuggestion`, `mantainViewport?`): `void`
-
-Picks a suggestion and assigns it as the current value, choosing
-a suggestion is similar from a search result, so do not mix them
-up; if a search result is beng used, use the search change function
-as that will update the list of search results and marked locations
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `searchSuggestion` | [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) | the search suggestion |
-| `mantainViewport?` | `boolean` | by default choosing a suggestion will move the viewport to that search location, by passing this as true you will prevent that |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:108](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L108)
-
-___
-
-### onManualPick
-
-▸ **onManualPick**(`value`, `mantainViewport?`): `void`
-
-Manually choose a value, this function is rather special
-on the mechanism that it uses, given that it will try to autocomplete
-incomplete picks
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `value` | [`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) | the value of that we want to manually pick |
-| `mantainViewport?` | `boolean` | by default doing a manual pick will fly to that location, pass true to this to prevent that |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:140](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L140)
-
-___
-
-### onRestore
-
-▸ **onRestore**(): `void`
-
-Call in order to trigger restoration, ensure that canRestore is true
-when doing this
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[onRestore](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#onrestore)
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:133](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L133)
-
-___
-
-### onSearch
-
-▸ **onSearch**(`mantainViewport?`): `Promise`<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)[]\>
-
-Trigger when the search button or the sorts is pressed
-search will use the search query but will perform a deep search instead
-suggestions are not the same as search results
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `mantainViewport?` | `boolean` | by default the search will move the viewport to the first search result, with mantainViewport the viewport won't move |
-
-#### Returns
-
-`Promise`<[`IPropertyDefinitionSupportedLocationType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)[]\>
-
-a promise with the results
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:82](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L82)
-
-___
-
-### onSearchQueryChange
-
-▸ **onSearchQueryChange**(`searchQuery`, `dontAutoloadSuggestions?`): `void`
-
-Trigger when the search query changes
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `searchQuery` | `string` | the search query that is specified |
-| `dontAutoloadSuggestions?` | `boolean` | avoid automatically loading suggestions for this change, if your implementation has an specific time when to load suggestions, call this function again with false for this value then |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:69](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L69)
-
-___
-
-### onViewportChange
-
-▸ **onViewportChange**(`viewport`): `void`
-
-Trigger when the viewport changes, so a new viewport is provided
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `viewport` | [`IViewport`](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewport.md) |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:60](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L60)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:162](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L162)

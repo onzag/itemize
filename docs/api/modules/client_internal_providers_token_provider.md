@@ -23,7 +23,7 @@ The token provider component
 
 ### TokenContext
 
-• **TokenContext**: `Context`<[`ITokenContextType`](../interfaces/client_internal_providers_token_provider.ITokenContextType.md)\>
+• `Const` **TokenContext**: `Context`\<[`ITokenContextType`](../interfaces/client_internal_providers_token_provider.ITokenContextType.md)\>
 
 The token context contains the current token state as well as several
 functions, it should sit inside the application and over the main
@@ -31,7 +31,7 @@ component
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:119](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L119)
+[client/internal/providers/token-provider.tsx:119](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L119)
 
 ## Functions
 
@@ -55,4 +55,4 @@ a react element
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:126](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/token-provider.tsx#L126)
+[client/internal/providers/token-provider.tsx:126](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L126)

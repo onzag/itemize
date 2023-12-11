@@ -4,6 +4,9 @@
 
 [testing/client/explorer](../modules/testing_client_explorer.md).ExplorerText
 
+Defines a test, and it should be used as an entry
+for all subtests
+
 ## Hierarchy
 
 - [`Test`](testing.Test.md)
@@ -52,7 +55,7 @@
 
 ### constructor
 
-• **new ExplorerText**(`host`, `fullHost`, `testingInfo`, `puppet`, `initialPath`)
+• **new ExplorerText**(`host`, `fullHost`, `testingInfo`, `puppet`, `initialPath`): [`ExplorerText`](testing_client_explorer.ExplorerText.md)
 
 #### Parameters
 
@@ -64,13 +67,17 @@
 | `puppet` | `Browser` |
 | `initialPath` | `string` |
 
+#### Returns
+
+[`ExplorerText`](testing_client_explorer.ExplorerText.md)
+
 #### Overrides
 
 [Test](testing.Test.md).[constructor](testing.Test.md#constructor)
 
 #### Defined in
 
-[testing/client/explorer.ts:21](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L21)
+[testing/client/explorer.ts:21](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L21)
 
 ## Properties
 
@@ -80,7 +87,7 @@
 
 #### Defined in
 
-[testing/client/explorer.ts:16](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L16)
+[testing/client/explorer.ts:16](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L16)
 
 ___
 
@@ -90,7 +97,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:18](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L18)
+[testing/client/explorer.ts:18](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L18)
 
 ___
 
@@ -100,7 +107,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:17](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L17)
+[testing/client/explorer.ts:17](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L17)
 
 ___
 
@@ -110,7 +117,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:19](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L19)
+[testing/client/explorer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L19)
 
 ___
 
@@ -120,7 +127,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:12](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L12)
+[testing/client/explorer.ts:12](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L12)
 
 ___
 
@@ -130,7 +137,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:9](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L9)
+[testing/client/explorer.ts:9](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L9)
 
 ___
 
@@ -140,7 +147,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:13](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L13)
+[testing/client/explorer.ts:13](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L13)
 
 ___
 
@@ -150,7 +157,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:15](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L15)
+[testing/client/explorer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L15)
 
 ___
 
@@ -160,7 +167,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:11](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L11)
+[testing/client/explorer.ts:11](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L11)
 
 ___
 
@@ -170,20 +177,20 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:10](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L10)
+[testing/client/explorer.ts:10](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L10)
 
 ## Methods
 
 ### after
 
-▸ **after**(): `Promise`<`void`\>
+▸ **after**(): `Promise`\<`void`\>
 
 Executes after everything is done
 use for cleanup
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Overrides
 
@@ -191,13 +198,13 @@ use for cleanup
 
 #### Defined in
 
-[testing/client/explorer.ts:241](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L241)
+[testing/client/explorer.ts:241](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L241)
 
 ___
 
 ### before
 
-▸ **before**(): `Promise`<`void`\>
+▸ **before**(): `Promise`\<`void`\>
 
 Executes before, override this function
 it allows you to dinamically add tests as
@@ -205,7 +212,7 @@ well
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Overrides
 
@@ -213,7 +220,7 @@ well
 
 #### Defined in
 
-[testing/client/explorer.ts:36](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L36)
+[testing/client/explorer.ts:36](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L36)
 
 ___
 
@@ -233,7 +240,7 @@ Build a brand new instance
 
 #### Defined in
 
-[testing/index.ts:71](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L71)
+[testing/index.ts:71](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L71)
 
 ___
 
@@ -260,19 +267,19 @@ Define a new test
 
 #### Defined in
 
-[testing/index.ts:114](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L114)
+[testing/index.ts:114](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L114)
 
 ___
 
 ### describe
 
-▸ **describe**(): `Promise`<`void`\>
+▸ **describe**(): `Promise`\<`void`\>
 
 Executes during just after before has been executed
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Overrides
 
@@ -280,7 +287,7 @@ Executes during just after before has been executed
 
 #### Defined in
 
-[testing/client/explorer.ts:75](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L75)
+[testing/client/explorer.ts:75](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L75)
 
 ___
 
@@ -304,7 +311,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:162](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L162)
+[testing/index.ts:162](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L162)
 
 ___
 
@@ -319,7 +326,7 @@ Define a new assertion
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
 | `label` | `string` | `undefined` | the label for the assertion |
-| `fn` | () => `void` \| `PromiseLike`<`void`\> | `null` | the assetion to execute |
+| `fn` | () => `void` \| `PromiseLike`\<`void`\> | `null` | the assetion to execute |
 
 #### Returns
 
@@ -331,7 +338,7 @@ Define a new assertion
 
 #### Defined in
 
-[testing/index.ts:129](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L129)
+[testing/index.ts:129](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L129)
 
 ___
 
@@ -351,35 +358,35 @@ Quits this test
 
 #### Defined in
 
-[testing/index.ts:220](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L220)
+[testing/index.ts:220](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L220)
 
 ___
 
 ### retrieveTestingInfo
 
-▸ **retrieveTestingInfo**(): `Promise`<`void`\>
+▸ **retrieveTestingInfo**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[testing/client/explorer.ts:63](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L63)
+[testing/client/explorer.ts:63](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L63)
 
 ___
 
 ### runStep
 
-▸ **runStep**(): `Promise`<`void`\>
+▸ **runStep**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[testing/client/explorer.ts:70](https://github.com/onzag/itemize/blob/a24376ed/testing/client/explorer.ts#L70)
+[testing/client/explorer.ts:70](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L70)
 
 ___
 
@@ -400,7 +407,7 @@ and by all it means all of them
 
 #### Defined in
 
-[testing/index.ts:186](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L186)
+[testing/index.ts:186](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L186)
 
 ___
 
@@ -422,7 +429,7 @@ this
 
 #### Defined in
 
-[testing/index.ts:201](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L201)
+[testing/index.ts:201](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L201)
 
 ___
 
@@ -443,7 +450,7 @@ they should be on the same layer
 
 #### Defined in
 
-[testing/index.ts:172](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L172)
+[testing/index.ts:172](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L172)
 
 ___
 
@@ -455,7 +462,7 @@ ___
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `fn` | () => `void` \| `PromiseLike`<`void`\> | `null` |
+| `fn` | () => `void` \| `PromiseLike`\<`void`\> | `null` |
 
 #### Returns
 
@@ -467,13 +474,13 @@ ___
 
 #### Defined in
 
-[testing/index.ts:141](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L141)
+[testing/index.ts:141](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L141)
 
 ___
 
 ### wait
 
-▸ **wait**(`ms`): `Promise`<`void`\>
+▸ **wait**(`ms`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -483,7 +490,7 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -491,7 +498,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:211](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L211)
+[testing/index.ts:211](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L211)
 
 ___
 
@@ -515,4 +522,4 @@ ___
 
 #### Defined in
 
-[testing/index.ts:152](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L152)
+[testing/index.ts:152](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L152)

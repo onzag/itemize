@@ -19,7 +19,7 @@ Contains the entry for the location type
 
 ### ZOOMS
 
-• **ZOOMS**: `Object`
+• `Const` **ZOOMS**: `Object`
 
 #### Type declaration
 
@@ -31,13 +31,13 @@ Contains the entry for the location type
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:68](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L68)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:68](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L68)
 
 ___
 
 ### style
 
-• **style**: `Object`
+• `Const` **style**: `Object`
 
 The styles for the location entry
 
@@ -45,69 +45,69 @@ The styles for the location entry
 
 | Name | Type |
 | :------ | :------ |
-| `autosuggestContainer` | `Object` |
+| `autosuggestContainer` | \{ `display`: `string` = "block"; `position`: `string` = "relative"; `width`: `string` = "100%" } |
 | `autosuggestContainer.display` | `string` |
 | `autosuggestContainer.position` | `string` |
 | `autosuggestContainer.width` | `string` |
-| `autosuggestContainerOpen` | `Object` |
-| `autosuggestFirstSectionContainer` | `Object` |
-| `autosuggestFirstSuggestion` | `Object` |
-| `autosuggestInput` | `Object` |
-| `autosuggestInputOpen` | `Object` |
-| `autosuggestMenuItem` | `Object` |
+| `autosuggestContainerOpen` | {} |
+| `autosuggestFirstSectionContainer` | {} |
+| `autosuggestFirstSuggestion` | {} |
+| `autosuggestInput` | {} |
+| `autosuggestInputOpen` | {} |
+| `autosuggestMenuItem` | \{ `height`: `string` = "auto"; `paddingBottom`: `string` = "16px !important"; `paddingTop`: `string` = "8px !important" } |
 | `autosuggestMenuItem.height` | `string` |
 | `autosuggestMenuItem.paddingBottom` | `string` |
 | `autosuggestMenuItem.paddingTop` | `string` |
-| `autosuggestMenuItemMainText` | `Object` |
+| `autosuggestMenuItemMainText` | \{ `fontSize`: `string` = "1rem"; `lineHeight`: `string` = "1rem" } |
 | `autosuggestMenuItemMainText.fontSize` | `string` |
 | `autosuggestMenuItemMainText.lineHeight` | `string` |
-| `autosuggestMenuItemSubText` | `Object` |
+| `autosuggestMenuItemSubText` | \{ `fontSize`: `string` = "0.9rem"; `lineHeight`: `string` = "0.9rem" } |
 | `autosuggestMenuItemSubText.fontSize` | `string` |
 | `autosuggestMenuItemSubText.lineHeight` | `string` |
-| `autosuggestSectionContainer` | `Object` |
-| `autosuggestSectionTitle` | `Object` |
-| `autosuggestSuggestion` | `Object` |
-| `autosuggestSuggestionHighlighted` | `Object` |
-| `autosuggestSuggestionsContainer` | `Object` |
+| `autosuggestSectionContainer` | {} |
+| `autosuggestSectionTitle` | {} |
+| `autosuggestSuggestion` | {} |
+| `autosuggestSuggestionHighlighted` | {} |
+| `autosuggestSuggestionsContainer` | \{ `display`: `string` = "block"; `position`: ``"absolute"`` ; `top`: `string` ; `width`: `string` = "100%"; `zIndex`: `number` = 1000 } |
 | `autosuggestSuggestionsContainer.display` | `string` |
 | `autosuggestSuggestionsContainer.position` | ``"absolute"`` |
 | `autosuggestSuggestionsContainer.top` | `string` |
 | `autosuggestSuggestionsContainer.width` | `string` |
 | `autosuggestSuggestionsContainer.zIndex` | `number` |
-| `autosuggestSuggestionsContainerOpen` | `Object` |
-| `autosuggestSuggestionsList` | `Object` |
-| `container` | `Object` |
+| `autosuggestSuggestionsContainerOpen` | {} |
+| `autosuggestSuggestionsList` | {} |
+| `container` | \{ `width`: `string` = "100%" } |
 | `container.width` | `string` |
-| `description` | `Object` |
+| `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
-| `entry` | `Object` |
+| `entry` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `entry.alignItems` | `string` |
 | `entry.display` | `string` |
 | `entry.flexDirection` | `string` |
 | `entry.justifyContent` | `string` |
 | `entry.width` | `string` |
-| `errorMessage` | `Object` |
+| `errorMessage` | \{ `color`: `string` = "#f44336"; `fontSize`: `string` = "0.85rem"; `height`: `string` = "1.3rem" } |
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `icon` | `Object` |
+| `icon` | \{ `color`: `string` = "#424242"; `position`: `string` = "absolute"; `right`: `string` = "16px" } |
 | `icon.color` | `string` |
 | `icon.position` | `string` |
 | `icon.right` | `string` |
-| `iconButton` | `Object` |
-| `iconButton.&:hover` | `Object` |
+| `iconButton` | \{ `&:hover`: \{ `backgroundColor`: `string` = "#1976d2" } ; `backgroundColor`: `string` = "#2196f3"; `color`: `string` = "#fff" } |
+| `iconButton.&:hover` | \{ `backgroundColor`: `string` = "#1976d2" } |
 | `iconButton.&:hover.backgroundColor` | `string` |
 | `iconButton.backgroundColor` | `string` |
 | `iconButton.color` | `string` |
-| `iconButtonOriginal` | `Object` |
+| `iconButtonOriginal` | \{ `color`: `string` = "#424242" } |
 | `iconButtonOriginal.color` | `string` |
-| `label` | (`isInvalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
-| `labelSingleLine` | `Object` |
+| `label` | (`isInvalid`: `boolean`) => \{ `&.focused`: \{ `color`: `string`  } ; `color`: `string`  } |
+| `labelSingleLine` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `labelSingleLine.alignItems` | `string` |
 | `labelSingleLine.display` | `string` |
 | `labelSingleLine.justifyContent` | `string` |
 | `labelSingleLine.width` | `string` |
-| `locationAlternativeTextHeader` | `Object` |
+| `locationAlternativeTextHeader` | \{ `alignItems`: `string` = "center"; `borderLeft`: `string` = "solid 1px #ccc"; `borderRadius`: `string` = "4px 4px 0 0"; `borderRight`: `string` = "solid 1px #ccc"; `borderTop`: `string` = "solid 1px #ccc"; `display`: `string` = "flex"; `fontSize`: `string` = "0.9rem"; `height`: `string` = "3rem"; `justifyContent`: `string` = "flex-start"; `padding`: `string` = "0 16px" } |
 | `locationAlternativeTextHeader.alignItems` | `string` |
 | `locationAlternativeTextHeader.borderLeft` | `string` |
 | `locationAlternativeTextHeader.borderRadius` | `string` |
@@ -118,14 +118,14 @@ The styles for the location entry
 | `locationAlternativeTextHeader.height` | `string` |
 | `locationAlternativeTextHeader.justifyContent` | `string` |
 | `locationAlternativeTextHeader.padding` | `string` |
-| `locationMapBase` | `Object` |
+| `locationMapBase` | \{ `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `marginBottom`: `string` = "24px" } |
 | `locationMapBase.display` | `string` |
 | `locationMapBase.flexDirection` | `string` |
 | `locationMapBase.marginBottom` | `string` |
-| `locationMapCard` | `Object` |
-| `locationMapCard.&:focus, &:active` | `Object` |
+| `locationMapCard` | \{ `&:focus, &:active`: \{ `backgroundColor`: `string` = "rgba(0,0,0,0.03)" } ; `&:hover`: \{ `border`: `string` = "solid 1px rgba(0, 0, 0, 0.87)" } ; `border`: `string` = "solid 1px #ccc"; `borderRadius`: `string` = "4px"; `cursor`: `string` = "pointer"; `marginBottom`: `string` = "1rem"; `padding`: `string` = "0.5rem 1rem"; `width`: `string` = "100%" } |
+| `locationMapCard.&:focus, &:active` | \{ `backgroundColor`: `string` = "rgba(0,0,0,0.03)" } |
 | `locationMapCard.&:focus, &:active.backgroundColor` | `string` |
-| `locationMapCard.&:hover` | `Object` |
+| `locationMapCard.&:hover` | \{ `border`: `string` = "solid 1px rgba(0, 0, 0, 0.87)" } |
 | `locationMapCard.&:hover.border` | `string` |
 | `locationMapCard.border` | `string` |
 | `locationMapCard.borderRadius` | `string` |
@@ -133,24 +133,24 @@ The styles for the location entry
 | `locationMapCard.marginBottom` | `string` |
 | `locationMapCard.padding` | `string` |
 | `locationMapCard.width` | `string` |
-| `locationMapCardSelected` | `Object` |
-| `locationMapCardSelected.&:focus, &:active` | `Object` |
+| `locationMapCardSelected` | \{ `&:focus, &:active`: \{ `backgroundColor`: `string` = "#005CE6" } ; `&:hover`: \{ `border`: `string` = "solid 1px #005CE6" } ; `backgroundColor`: `string` = "#005CE6"; `border`: `string` = "solid 1px #005CE6"; `color`: `string` = "#fff"; `cursor`: `string` = "default" } |
+| `locationMapCardSelected.&:focus, &:active` | \{ `backgroundColor`: `string` = "#005CE6" } |
 | `locationMapCardSelected.&:focus, &:active.backgroundColor` | `string` |
-| `locationMapCardSelected.&:hover` | `Object` |
+| `locationMapCardSelected.&:hover` | \{ `border`: `string` = "solid 1px #005CE6" } |
 | `locationMapCardSelected.&:hover.border` | `string` |
 | `locationMapCardSelected.backgroundColor` | `string` |
 | `locationMapCardSelected.border` | `string` |
 | `locationMapCardSelected.color` | `string` |
 | `locationMapCardSelected.cursor` | `string` |
-| `locationMapCardSubTitle` | `Object` |
+| `locationMapCardSubTitle` | \{ `fontSize`: `string` = "0.9rem"; `fontWeight`: `number` = 300 } |
 | `locationMapCardSubTitle.fontSize` | `string` |
 | `locationMapCardSubTitle.fontWeight` | `number` |
-| `locationMapCardTitle` | `Object` |
+| `locationMapCardTitle` | \{ `fontSize`: `string` = "1rem" } |
 | `locationMapCardTitle.fontSize` | `string` |
-| `locationMapContainer` | `Object` |
+| `locationMapContainer` | \{ `flex`: `string` = "1 1 50%"; `height`: `string` = "200px" } |
 | `locationMapContainer.flex` | `string` |
 | `locationMapContainer.height` | `string` |
-| `locationMapMenuContainer` | `Object` |
+| `locationMapMenuContainer` | \{ `backgroundColor`: `string` = "white"; `border`: `string` = "solid 1px #ccc"; `flex`: `string` = "1 1 50%"; `height`: `string` = "200px"; `overflowX`: `string` = "hidden"; `overflowY`: `string` = "auto"; `padding`: `string` = "1rem" } |
 | `locationMapMenuContainer.backgroundColor` | `string` |
 | `locationMapMenuContainer.border` | `string` |
 | `locationMapMenuContainer.flex` | `string` |
@@ -158,19 +158,19 @@ The styles for the location entry
 | `locationMapMenuContainer.overflowX` | `string` |
 | `locationMapMenuContainer.overflowY` | `string` |
 | `locationMapMenuContainer.padding` | `string` |
-| `locationMapMenuContainerDropdownMode` | `Object` |
+| `locationMapMenuContainerDropdownMode` | \{ `height`: `string` = "auto"; `position`: `string` = "absolute"; `width`: `string` = "50%"; `zIndex`: `number` = 1000 } |
 | `locationMapMenuContainerDropdownMode.height` | `string` |
 | `locationMapMenuContainerDropdownMode.position` | `string` |
 | `locationMapMenuContainerDropdownMode.width` | `string` |
 | `locationMapMenuContainerDropdownMode.zIndex` | `number` |
-| `locationPlaceholder` | `Object` |
+| `locationPlaceholder` | \{ `fontWeight`: `number` = 300; `opacity`: `number` = 0.5 } |
 | `locationPlaceholder.fontWeight` | `number` |
 | `locationPlaceholder.opacity` | `number` |
-| `resultListLabel` | `Object` |
+| `resultListLabel` | \{ `fontWeight`: `number` = 300; `padding`: `string` = "0 1rem 1rem 1rem" } |
 | `resultListLabel.fontWeight` | `number` |
 | `resultListLabel.padding` | `string` |
-| `smallAddornment` | (`isInvalid`: `boolean`) => { `color`: `string`  } |
+| `smallAddornment` | (`isInvalid`: `boolean`) => \{ `color`: `string`  } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:86](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L86)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:86](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L86)

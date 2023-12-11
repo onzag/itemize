@@ -6,7 +6,7 @@ Contains the boolean type description
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedBooleanType](base_Root_Module_ItemDefinition_PropertyDefinition_types_boolean.md#propertydefinitionsupportedbooleantype)
 
@@ -14,7 +14,7 @@ Contains the boolean type description
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types_boolean.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedBooleanType
 
@@ -24,16 +24,16 @@ The representation of a boolean type is equal to a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:32](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L32)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:31](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L31)
 
 ## Variables
 
 ### default
 
-• **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedBooleanType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_boolean.md#propertydefinitionsupportedbooleantype)\>
+• `Const` **default**: [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedBooleanType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_boolean.md#propertydefinitionsupportedbooleantype)\>
 
 The that specifies how a boolean behaves in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:36](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L36)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:35](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L35)

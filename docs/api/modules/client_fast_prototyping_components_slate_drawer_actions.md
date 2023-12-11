@@ -32,4 +32,4 @@ based on the context
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/actions.tsx:270](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/drawer/actions.tsx#L270)
+[client/fast-prototyping/components/slate/drawer/actions.tsx:270](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/drawer/actions.tsx#L270)

@@ -4,6 +4,10 @@
 
 [database/UpdateBuilder](../modules/database_UpdateBuilder.md).UpdateBuilder
 
+Reprents the basic query builder to build a bit of a query
+or the entire query itself and this class is supposed to
+be extended by other builders
+
 ## Hierarchy
 
 - [`QueryBuilder`](database_base.QueryBuilder.md)
@@ -46,9 +50,13 @@
 
 ### constructor
 
-• **new UpdateBuilder**()
+• **new UpdateBuilder**(): [`UpdateBuilder`](database_UpdateBuilder.UpdateBuilder.md)
 
 Builds a new update query builder
+
+#### Returns
+
+[`UpdateBuilder`](database_UpdateBuilder.UpdateBuilder.md)
 
 #### Overrides
 
@@ -56,7 +64,7 @@ Builds a new update query builder
 
 #### Defined in
 
-[database/UpdateBuilder.ts:35](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L35)
+[database/UpdateBuilder.ts:35](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L35)
 
 ## Properties
 
@@ -66,7 +74,7 @@ Builds a new update query builder
 
 #### Defined in
 
-[database/UpdateBuilder.ts:28](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L28)
+[database/UpdateBuilder.ts:28](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L28)
 
 ___
 
@@ -78,7 +86,7 @@ Whether it's an update only query
 
 #### Defined in
 
-[database/UpdateBuilder.ts:25](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L25)
+[database/UpdateBuilder.ts:25](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L25)
 
 ___
 
@@ -88,7 +96,7 @@ ___
 
 #### Defined in
 
-[database/UpdateBuilder.ts:30](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L30)
+[database/UpdateBuilder.ts:30](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L30)
 
 ___
 
@@ -98,7 +106,7 @@ ___
 
 #### Defined in
 
-[database/UpdateBuilder.ts:27](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L27)
+[database/UpdateBuilder.ts:27](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L27)
 
 ___
 
@@ -108,7 +116,7 @@ ___
 
 #### Defined in
 
-[database/UpdateBuilder.ts:21](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L21)
+[database/UpdateBuilder.ts:21](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L21)
 
 ___
 
@@ -120,7 +128,7 @@ Table name in question we are updating against
 
 #### Defined in
 
-[database/UpdateBuilder.ts:20](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L20)
+[database/UpdateBuilder.ts:20](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L20)
 
 ___
 
@@ -130,7 +138,7 @@ ___
 
 #### Defined in
 
-[database/UpdateBuilder.ts:29](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L29)
+[database/UpdateBuilder.ts:29](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L29)
 
 ## Methods
 
@@ -156,7 +164,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
 
 ___
 
@@ -182,7 +190,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
 
 ___
 
@@ -206,7 +214,7 @@ itself
 
 #### Defined in
 
-[database/UpdateBuilder.ts:66](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L66)
+[database/UpdateBuilder.ts:66](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L66)
 
 ___
 
@@ -224,7 +232,7 @@ itself
 
 #### Defined in
 
-[database/UpdateBuilder.ts:84](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L84)
+[database/UpdateBuilder.ts:84](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L84)
 
 ___
 
@@ -244,7 +252,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
 
 ___
 
@@ -266,7 +274,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/UpdateBuilder.ts:95](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L95)
+[database/UpdateBuilder.ts:95](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L95)
 
 ___
 
@@ -289,7 +297,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
 
 ___
 
@@ -307,7 +315,7 @@ itself
 
 #### Defined in
 
-[database/UpdateBuilder.ts:75](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L75)
+[database/UpdateBuilder.ts:75](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L75)
 
 ___
 
@@ -327,7 +335,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
 
 ___
 
@@ -354,7 +362,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
 
 ___
 
@@ -381,7 +389,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
 
 ___
 
@@ -405,7 +413,7 @@ itself
 
 #### Defined in
 
-[database/UpdateBuilder.ts:56](https://github.com/onzag/itemize/blob/a24376ed/database/UpdateBuilder.ts#L56)
+[database/UpdateBuilder.ts:56](https://github.com/onzag/itemize/blob/59702dd5/database/UpdateBuilder.ts#L56)
 
 ___
 
@@ -427,4 +435,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)

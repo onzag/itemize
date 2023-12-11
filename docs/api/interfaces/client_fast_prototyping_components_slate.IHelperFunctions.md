@@ -18,15 +18,12 @@ around the editor
 - [Range](client_fast_prototyping_components_slate.IHelperFunctions.md#range)
 - [ReactEditor](client_fast_prototyping_components_slate.IHelperFunctions.md#reacteditor)
 - [Transforms](client_fast_prototyping_components_slate.IHelperFunctions.md#transforms)
-- [editor](client_fast_prototyping_components_slate.IHelperFunctions.md#editor)
-
-### Methods
-
 - [canToggleTable](client_fast_prototyping_components_slate.IHelperFunctions.md#cantoggletable)
 - [deletePath](client_fast_prototyping_components_slate.IHelperFunctions.md#deletepath)
 - [deleteSelectedNode](client_fast_prototyping_components_slate.IHelperFunctions.md#deleteselectednode)
 - [deleteTableColumn](client_fast_prototyping_components_slate.IHelperFunctions.md#deletetablecolumn)
 - [deleteTableRow](client_fast_prototyping_components_slate.IHelperFunctions.md#deletetablerow)
+- [editor](client_fast_prototyping_components_slate.IHelperFunctions.md#editor)
 - [focus](client_fast_prototyping_components_slate.IHelperFunctions.md#focus)
 - [focusAt](client_fast_prototyping_components_slate.IHelperFunctions.md#focusat)
 - [formatToggle](client_fast_prototyping_components_slate.IHelperFunctions.md#formattoggle)
@@ -95,7 +92,7 @@ provided by slate
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:369](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L369)
+[client/fast-prototyping/components/slate/index.tsx:369](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L369)
 
 ___
 
@@ -107,7 +104,7 @@ This is the node class itself
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:383](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L383)
+[client/fast-prototyping/components/slate/index.tsx:383](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L383)
 
 ___
 
@@ -119,7 +116,7 @@ The path type
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:387](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L387)
+[client/fast-prototyping/components/slate/index.tsx:387](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L387)
 
 ___
 
@@ -132,7 +129,7 @@ provided by slate
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:379](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L379)
+[client/fast-prototyping/components/slate/index.tsx:379](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L379)
 
 ___
 
@@ -157,7 +154,7 @@ provided by slate
 | `findPath` | (`editor`: `ReactEditor`, `node`: `Node`) => `Path` |
 | `focus` | (`editor`: `ReactEditor`) => `void` |
 | `getWindow` | (`editor`: `ReactEditor`) => `Window` |
-| `hasDOMNode` | (`editor`: `ReactEditor`, `target`: `Node`, `options?`: { `editable?`: `boolean`  }) => `boolean` |
+| `hasDOMNode` | (`editor`: `ReactEditor`, `target`: `Node`, `options?`: \{ `editable?`: `boolean`  }) => `boolean` |
 | `hasEditableTarget` | (`editor`: `ReactEditor`, `target`: `EventTarget`) => target is Node |
 | `hasRange` | (`editor`: `ReactEditor`, `range`: `BaseRange`) => `boolean` |
 | `hasSelectableTarget` | (`editor`: `ReactEditor`, `target`: `EventTarget`) => `boolean` |
@@ -169,17 +166,17 @@ provided by slate
 | `isFocused` | (`editor`: `ReactEditor`) => `boolean` |
 | `isReadOnly` | (`editor`: `ReactEditor`) => `boolean` |
 | `isTargetInsideNonReadonlyVoid` | (`editor`: `ReactEditor`, `target`: `EventTarget`) => `boolean` |
-| `setFragmentData` | (`editor`: `ReactEditor`, `data`: `DataTransfer`, `originEvent?`: ``"drag"`` \| ``"copy"`` \| ``"cut"``) => `void` |
+| `setFragmentData` | (`editor`: `ReactEditor`, `data`: `DataTransfer`, `originEvent?`: ``"copy"`` \| ``"drag"`` \| ``"cut"``) => `void` |
 | `toDOMNode` | (`editor`: `ReactEditor`, `node`: `Node`) => `HTMLElement` |
 | `toDOMPoint` | (`editor`: `ReactEditor`, `point`: `BasePoint`) => `DOMPoint` |
 | `toDOMRange` | (`editor`: `ReactEditor`, `range`: `BaseRange`) => `Range` |
 | `toSlateNode` | (`editor`: `ReactEditor`, `domNode`: `Node`) => `Node` |
-| `toSlatePoint` | <T\>(`editor`: `ReactEditor`, `domPoint`: `DOMPoint`, `options`: { `exactMatch`: `boolean` ; `suppressThrow`: `T`  }) => `T` extends ``true`` ? `BasePoint` : `BasePoint` |
-| `toSlateRange` | <T_1\>(`editor`: `ReactEditor`, `domRange`: `Range` \| `StaticRange` \| `Selection`, `options`: { `exactMatch`: `boolean` ; `suppressThrow`: `T_1`  }) => `T_1` extends ``true`` ? `BaseRange` : `BaseRange` & { `placeholder?`: `string`  } |
+| `toSlatePoint` | \<T\>(`editor`: `ReactEditor`, `domPoint`: `DOMPoint`, `options`: \{ `exactMatch`: `boolean` ; `suppressThrow`: `T`  }) => `T` extends ``true`` ? `BasePoint` : `BasePoint` |
+| `toSlateRange` | \<T_1\>(`editor`: `ReactEditor`, `domRange`: `Selection` \| `Range` \| `StaticRange`, `options`: \{ `exactMatch`: `boolean` ; `suppressThrow`: `T_1`  }) => `T_1` extends ``true`` ? `BaseRange` : `BaseRange` & \{ `placeholder?`: `string`  } |
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:364](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L364)
+[client/fast-prototyping/components/slate/index.tsx:364](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L364)
 
 ___
 
@@ -192,7 +189,113 @@ provided by slate
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:374](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L374)
+[client/fast-prototyping/components/slate/index.tsx:374](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L374)
+
+___
+
+### canToggleTable
+
+• **canToggleTable**: (`element`: ``"tfoot"`` \| ``"thead"``) => `boolean`
+
+#### Type declaration
+
+▸ (`element`): `boolean`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `element` | ``"tfoot"`` \| ``"thead"`` |
+
+##### Returns
+
+`boolean`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:524](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L524)
+
+___
+
+### deletePath
+
+• **deletePath**: (`path`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`path`): `void`
+
+Deletes given a path
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `path` | `Path` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:413](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L413)
+
+___
+
+### deleteSelectedNode
+
+• **deleteSelectedNode**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+Deletes the node at the selected path
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:418](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L418)
+
+___
+
+### deleteTableColumn
+
+• **deleteTableColumn**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:521](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L521)
+
+___
+
+### deleteTableRow
+
+• **deleteTableRow**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:522](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L522)
 
 ___
 
@@ -205,536 +308,538 @@ editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:359](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L359)
-
-## Methods
-
-### canToggleTable
-
-▸ **canToggleTable**(`element`): `boolean`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `element` | ``"tfoot"`` \| ``"thead"`` |
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:524](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L524)
-
-___
-
-### deletePath
-
-▸ **deletePath**(`path`): `void`
-
-Deletes given a path
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `path` | `Path` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:413](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L413)
-
-___
-
-### deleteSelectedNode
-
-▸ **deleteSelectedNode**(): `void`
-
-Deletes the node at the selected path
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:418](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L418)
-
-___
-
-### deleteTableColumn
-
-▸ **deleteTableColumn**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:521](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L521)
-
-___
-
-### deleteTableRow
-
-▸ **deleteTableRow**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:522](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L522)
+[client/fast-prototyping/components/slate/index.tsx:359](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L359)
 
 ___
 
 ### focus
 
-▸ **focus**(): `void`
+• **focus**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
 
 focuses the text editor
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:434](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L434)
+[client/fast-prototyping/components/slate/index.tsx:434](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L434)
 
 ___
 
 ### focusAt
 
-▸ **focusAt**(`at`): `Promise`<`void`\>
+• **focusAt**: (`at`: `Path` \| `BaseRange`) => `Promise`\<`void`\>
+
+#### Type declaration
+
+▸ (`at`): `Promise`\<`void`\>
 
 Focuses at the desired location
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `at` | `Path` \| `BaseRange` | the range to insert at |
 
-#### Returns
+##### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:439](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L439)
+[client/fast-prototyping/components/slate/index.tsx:439](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L439)
 
 ___
 
 ### formatToggle
 
-▸ **formatToggle**(`type`): `void`
+• **formatToggle**: (`type`: ``"bold"`` \| ``"italic"`` \| ``"underline"``) => `void`
+
+#### Type declaration
+
+▸ (`type`): `void`
 
 Formats the current text as bold
 this is always caret based and does not allow for custom
 ranges
 It will refocus once done
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `type` | ``"bold"`` \| ``"italic"`` \| ``"underline"`` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:560](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L560)
+[client/fast-prototyping/components/slate/index.tsx:560](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L560)
 
 ___
 
 ### getContextFor
 
-▸ **getContextFor**(`element`, `level?`, `onlySwichingContext?`): [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
+• **getContextFor**: (`element`: [`IText`](client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| `Path`, `level?`: ``"final"`` \| ``"select-context"`` \| ``"select-loop"``, `onlySwichingContext?`: `boolean`) => [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
+
+#### Type declaration
+
+▸ (`element`, `level?`, `onlySwichingContext?`): [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
 
 Provies the context for the given path
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `element` | [`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IText`](client_internal_text_serializer_types_text.IText.md) \| `Path` |
+| `element` | [`IText`](client_internal_text_serializer_types_text.IText.md) \| [`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| `Path` |
 | `level?` | ``"final"`` \| ``"select-context"`` \| ``"select-loop"`` |
 | `onlySwichingContext?` | `boolean` |
 
-#### Returns
+##### Returns
 
 [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:392](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L392)
+[client/fast-prototyping/components/slate/index.tsx:392](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L392)
 
 ___
 
 ### getPreviousSelectedElementAnchor
 
-▸ **getPreviousSelectedElementAnchor**(): `Path`
+• **getPreviousSelectedElementAnchor**: () => `Path`
+
+#### Type declaration
+
+▸ (): `Path`
 
 Allows to kno what the previous selected element was
 before this one was selected
 
-#### Returns
+##### Returns
 
 `Path`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:424](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L424)
+[client/fast-prototyping/components/slate/index.tsx:424](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L424)
 
 ___
 
 ### getPreviousTextAnchor
 
-▸ **getPreviousTextAnchor**(): `Path`
+• **getPreviousTextAnchor**: () => `Path`
+
+#### Type declaration
+
+▸ (): `Path`
 
 Allows to kno what the previous selected element was
 before this one was selected
 
-#### Returns
+##### Returns
 
 `Path`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:429](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L429)
+[client/fast-prototyping/components/slate/index.tsx:429](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L429)
 
 ___
 
 ### getRootContext
 
-▸ **getRootContext**(): [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
+• **getRootContext**: () => [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
 
-#### Returns
+#### Type declaration
+
+▸ (): [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
+
+##### Returns
 
 [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:393](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L393)
+[client/fast-prototyping/components/slate/index.tsx:393](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L393)
 
 ___
 
 ### getState
 
-▸ **getState**(): [`ISlateEditorInternalStateType`](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
+• **getState**: () => [`ISlateEditorInternalStateType`](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
 
-#### Returns
+#### Type declaration
+
+▸ (): [`ISlateEditorInternalStateType`](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
+
+##### Returns
 
 [`ISlateEditorInternalStateType`](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:394](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L394)
+[client/fast-prototyping/components/slate/index.tsx:394](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L394)
 
 ___
 
 ### hardBlur
 
-▸ **hardBlur**(): `void`
+• **hardBlur**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
 
 Performs a hard blur, and even the selected paths are lost
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:633](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L633)
+[client/fast-prototyping/components/slate/index.tsx:633](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L633)
 
 ___
 
 ### insertContainer
 
-▸ **insertContainer**(`type?`): `void`
+• **insertContainer**: (`type?`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`type?`): `void`
 
 Will insert a container at the given location
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `type?` | `string` | optional, the container type, otherwise will insert a standard container this is caret based unless you specify your own custom range note that calling this function will cause a refocus |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:478](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L478)
+[client/fast-prototyping/components/slate/index.tsx:478](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L478)
 
 ___
 
 ### insertCustom
 
-▸ **insertCustom**(`type`): `void`
+• **insertCustom**: (`type`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`type`): `void`
 
 Inserts a custom element
 this is caret based unless you specify your own custom range
 note that calling this function will cause a refocus
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `type` | `string` | the custom type |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:486](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L486)
+[client/fast-prototyping/components/slate/index.tsx:486](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L486)
 
 ___
 
 ### insertElement
 
-▸ **insertElement**(`element`): `void`
+• **insertElement**: (`element`: [`RichElement`](../modules/client_internal_text_serializer.md#richelement)) => `void`
+
+#### Type declaration
+
+▸ (`element`): `void`
 
 Inserts an element at the given position
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `element` | [`RichElement`](../modules/client_internal_text_serializer.md#richelement) | the element to insert |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:513](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L513)
+[client/fast-prototyping/components/slate/index.tsx:513](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L513)
 
 ___
 
 ### insertFile
 
-▸ **insertFile**(`file`): `void`
+• **insertFile**: (`file`: `File`) => `void`
+
+#### Type declaration
+
+▸ (`file`): `void`
 
 Will insert a file based on the information given
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `file` | `File` | the file to insert |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:468](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L468)
+[client/fast-prototyping/components/slate/index.tsx:468](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L468)
 
 ___
 
 ### insertImage
 
-▸ **insertImage**(`file`, `standalone`): `void`
+• **insertImage**: (`file`: `File`, `standalone`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`file`, `standalone`): `void`
 
 Will insert an image based on a given file that has
 been taken as an input
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `file` | `File` | the file |
 | `standalone` | `boolean` | whether to make it a standalone image |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:454](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L454)
+[client/fast-prototyping/components/slate/index.tsx:454](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L454)
 
 ___
 
 ### insertList
 
-▸ **insertList**(`type`): `void`
+• **insertList**: (`type`: ``"numbered"`` \| ``"bulleted"``) => `void`
+
+#### Type declaration
+
+▸ (`type`): `void`
 
 Makes a list out of the current element
 this is caret based unless you specify your own custom range
 note that calling this function will cause a refocus
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `type` | ``"bulleted"`` \| ``"numbered"`` |
+| `type` | ``"numbered"`` \| ``"bulleted"`` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:543](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L543)
+[client/fast-prototyping/components/slate/index.tsx:543](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L543)
 
 ___
 
 ### insertSuperbreak
 
-▸ **insertSuperbreak**(`at?`, `reverse?`): `void`
+• **insertSuperbreak**: (`at?`: `Path`, `reverse?`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`at?`, `reverse?`): `void`
 
 inserts a super break at the given position in order
 to add a paragraph
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `at?` | `Path` |
 | `reverse?` | `boolean` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:445](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L445)
+[client/fast-prototyping/components/slate/index.tsx:445](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L445)
 
 ___
 
 ### insertTable
 
-▸ **insertTable**(`tableType`): `void`
+• **insertTable**: (`tableType`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`tableType`): `void`
 
 Inserts a table at the given location
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `tableType` | `string` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:518](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L518)
+[client/fast-prototyping/components/slate/index.tsx:518](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L518)
 
 ___
 
 ### insertTableColumn
 
-▸ **insertTableColumn**(): `void`
+• **insertTableColumn**: () => `void`
 
-#### Returns
+#### Type declaration
+
+▸ (): `void`
+
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:519](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L519)
+[client/fast-prototyping/components/slate/index.tsx:519](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L519)
 
 ___
 
 ### insertTableRow
 
-▸ **insertTableRow**(): `void`
+• **insertTableRow**: () => `void`
 
-#### Returns
+#### Type declaration
+
+▸ (): `void`
+
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:520](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L520)
+[client/fast-prototyping/components/slate/index.tsx:520](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L520)
 
 ___
 
 ### insertTemplateHTML
 
-▸ **insertTemplateHTML**(`label`, `value`): `void`
+• **insertTemplateHTML**: (`label`: `string`, `value`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`label`, `value`): `void`
 
 Inserts a template html fragment
 this is caret based unless you specify your own custom range
 note that calling this function will cause a refocus
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `label` | `string` | the label to use for the template html |
 | `value` | `string` | the actual value for the template html to be used off the context |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:505](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L505)
+[client/fast-prototyping/components/slate/index.tsx:505](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L505)
 
 ___
 
 ### insertTemplateText
 
-▸ **insertTemplateText**(`label`, `value`): `void`
+• **insertTemplateText**: (`label`: `string`, `value`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`label`, `value`): `void`
 
 Inserts a template text
 this is caret based unless you specify your own custom range
 note that calling this function will cause a refocus
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `label` | `string` | the label to use for the template text |
 | `value` | `string` | the actual value for the template text to be used off the context |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:495](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L495)
+[client/fast-prototyping/components/slate/index.tsx:495](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L495)
 
 ___
 
 ### insertVideo
 
-▸ **insertVideo**(`url`): `boolean`
+• **insertVideo**: (`url`: `string`) => `boolean`
+
+#### Type declaration
+
+▸ (`url`): `boolean`
 
 Will insert a video given the information
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `url` | `string` | the url of the video, only youtube and vimeo supported as origin |
 
-#### Returns
+##### Returns
 
 `boolean`
 
@@ -742,92 +847,108 @@ a boolean true if the video was properly inserted, false if the video url was in
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:461](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L461)
+[client/fast-prototyping/components/slate/index.tsx:461](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L461)
 
 ___
 
 ### movePaths
 
-▸ **movePaths**(`from`, `to`): `void`
+• **movePaths**: (`from`: `Path`, `to`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`from`, `to`): `void`
 
 Switches a path from one place to another
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `from` | `Path` |
 | `to` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:408](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L408)
+[client/fast-prototyping/components/slate/index.tsx:408](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L408)
 
 ___
 
 ### selectPath
 
-▸ **selectPath**(`path`): `void`
+• **selectPath**: (`path`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`path`): `void`
 
 performs a pseudo selection at a given path
 this selection is silent and does not affect other than the current
 selected path based on the information, it does not cause a caret
 change or anything of the sorts
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `path` | `Path` | the path to select |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:403](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L403)
+[client/fast-prototyping/components/slate/index.tsx:403](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L403)
 
 ___
 
 ### set
 
-▸ **set**(`args`, `anchor`): `void`
+• **set**: (`args`: `Partial`\<[`RichElement`](../modules/client_internal_text_serializer.md#richelement)\> \| `Partial`\<[`IText`](client_internal_text_serializer_types_text.IText.md)\>, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`args`, `anchor`): `void`
 
 does an arbitrary update of arbitrary arguments off the current
 element value, this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `args` | `Partial`<[`RichElement`](../modules/client_internal_text_serializer.md#richelement)\> \| `Partial`<[`IText`](client_internal_text_serializer_types_text.IText.md)\> | the arbitrary arguments (partial value) |
+| `args` | `Partial`\<[`RichElement`](../modules/client_internal_text_serializer.md#richelement)\> \| `Partial`\<[`IText`](client_internal_text_serializer_types_text.IText.md)\> | the arbitrary arguments (partial value) |
 | `anchor` | `Path` | the anchor where the update should take place (should point at an element) |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:569](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L569)
+[client/fast-prototyping/components/slate/index.tsx:569](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L569)
 
 ___
 
 ### setAction
 
-▸ **setAction**(`key`, `value`, `anchor`): `void`
+• **setAction**: (`key`: `string`, `value`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`key`, `value`, `anchor`): `void`
 
 Sets an action key
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
@@ -835,200 +956,232 @@ for indirect usage
 | `value` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:628](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L628)
+[client/fast-prototyping/components/slate/index.tsx:628](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L628)
 
 ___
 
 ### setActiveStyle
 
-▸ **setActiveStyle**(`style`, `anchor`): `void`
+• **setActiveStyle**: (`style`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`style`, `anchor`): `void`
 
 Sets the active style for the element
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `style` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:588](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L588)
+[client/fast-prototyping/components/slate/index.tsx:588](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L588)
 
 ___
 
 ### setContext
 
-▸ **setContext**(`key`, `anchor`): `void`
+• **setContext**: (`key`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`key`, `anchor`): `void`
 
 Sets the context key
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `key` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:594](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L594)
+[client/fast-prototyping/components/slate/index.tsx:594](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L594)
 
 ___
 
 ### setForEach
 
-▸ **setForEach**(`key`, `anchor`): `void`
+• **setForEach**: (`key`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`key`, `anchor`): `void`
 
 Sets the for-each loop key
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `key` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:616](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L616)
+[client/fast-prototyping/components/slate/index.tsx:616](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L616)
 
 ___
 
 ### setHoverStyle
 
-▸ **setHoverStyle**(`style`, `anchor`): `void`
+• **setHoverStyle**: (`style`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`style`, `anchor`): `void`
 
 Sets the template hover style for the element
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `style` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:582](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L582)
+[client/fast-prototyping/components/slate/index.tsx:582](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L582)
 
 ___
 
 ### setIfCondition
 
-▸ **setIfCondition**(`key`, `anchor`): `void`
+• **setIfCondition**: (`key`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`key`, `anchor`): `void`
 
 Sets the if render condition
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `key` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:600](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L600)
+[client/fast-prototyping/components/slate/index.tsx:600](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L600)
 
 ___
 
 ### setRichClasses
 
-▸ **setRichClasses**(`list`, `anchor`): `void`
+• **setRichClasses**: (`list`: `string`[], `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`list`, `anchor`): `void`
 
 Sets all the rich classes
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `list` | `string`[] |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:622](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L622)
+[client/fast-prototyping/components/slate/index.tsx:622](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L622)
 
 ___
 
 ### setStyle
 
-▸ **setStyle**(`style`, `anchor`): `void`
+• **setStyle**: (`style`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`style`, `anchor`): `void`
 
 Sets the current style for the element
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `style` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:576](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L576)
+[client/fast-prototyping/components/slate/index.tsx:576](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L576)
 
 ___
 
 ### setUIHandler
 
-▸ **setUIHandler**(`key`, `args`, `anchor`): `void`
+• **setUIHandler**: (`key`: `string`, `args`: \{ `[key: string]`: `string`;  }, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`key`, `args`, `anchor`): `void`
 
 Sets an UI handler in the given anchor with the given args
 this function does not refocus and it's silent and meant
 for indirect usage
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
@@ -1036,23 +1189,27 @@ for indirect usage
 | `args` | `Object` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:606](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L606)
+[client/fast-prototyping/components/slate/index.tsx:606](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L606)
 
 ___
 
 ### setUIHandlerArg
 
-▸ **setUIHandlerArg**(`key`, `value`, `anchor`): `void`
+• **setUIHandlerArg**: (`key`: `string`, `value`: `string`, `anchor`: `Path`) => `void`
+
+#### Type declaration
+
+▸ (`key`, `value`, `anchor`): `void`
 
 Allows to set UI handler args in the ui handler
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
@@ -1060,48 +1217,56 @@ Allows to set UI handler args in the ui handler
 | `value` | `string` |
 | `anchor` | `Path` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:610](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L610)
+[client/fast-prototyping/components/slate/index.tsx:610](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L610)
 
 ___
 
 ### softBlur
 
-▸ **softBlur**(): `void`
+• **softBlur**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
 
 Performs a soft blur event
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:637](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L637)
+[client/fast-prototyping/components/slate/index.tsx:637](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L637)
 
 ___
 
 ### toggleLink
 
-▸ **toggleLink**(`url`, `templateValue`): `boolean`
+• **toggleLink**: (`url`: `string`, `templateValue`: `string`) => `boolean`
+
+#### Type declaration
+
+▸ (`url`, `templateValue`): `boolean`
 
 Makes a link out of the current element
 this is caret based unless you specify your own custom range
 note that calling this function will cause a refocus
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `url` | `string` |
 | `templateValue` | `string` |
 
-#### Returns
+##### Returns
 
 `boolean`
 
@@ -1110,149 +1275,177 @@ for some reason, eg. invalid link, links are not supported
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:551](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L551)
+[client/fast-prototyping/components/slate/index.tsx:551](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L551)
 
 ___
 
 ### toggleQuote
 
-▸ **toggleQuote**(): `void`
+• **toggleQuote**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
 
 Makes a quote out of the current element
 this is caret based unless you specify your own custom range
 note that calling this function will cause a refocus
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:531](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L531)
+[client/fast-prototyping/components/slate/index.tsx:531](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L531)
 
 ___
 
 ### toggleTable
 
-▸ **toggleTable**(`element`): `void`
+• **toggleTable**: (`element`: ``"tfoot"`` \| ``"thead"``) => `void`
 
-#### Parameters
+#### Type declaration
+
+▸ (`element`): `void`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `element` | ``"tfoot"`` \| ``"thead"`` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:523](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L523)
+[client/fast-prototyping/components/slate/index.tsx:523](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L523)
 
 ___
 
 ### toggleTitle
 
-▸ **toggleTitle**(`type`): `void`
+• **toggleTitle**: (`type`: ``"h1"`` \| ``"h2"`` \| ``"h3"`` \| ``"h4"`` \| ``"h5"`` \| ``"h6"``) => `void`
+
+#### Type declaration
+
+▸ (`type`): `void`
 
 Makes a title out of the current element
 this is caret based unless you specify your own custom range
 note that calling this function will cause a refocus
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `type` | ``"h1"`` \| ``"h2"`` \| ``"h3"`` \| ``"h4"`` \| ``"h5"`` \| ``"h6"`` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:537](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L537)
+[client/fast-prototyping/components/slate/index.tsx:537](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L537)
 
 ___
 
 ### updateLink
 
-▸ **updateLink**(`url`, `templateValue`): `boolean`
+• **updateLink**: (`url`: `string`, `templateValue`: `string`) => `boolean`
 
-#### Parameters
+#### Type declaration
+
+▸ (`url`, `templateValue`): `boolean`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `url` | `string` |
 | `templateValue` | `string` |
 
-#### Returns
+##### Returns
 
 `boolean`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:552](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L552)
+[client/fast-prototyping/components/slate/index.tsx:552](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L552)
 
 ___
 
 ### updateTemplateHTML
 
-▸ **updateTemplateHTML**(`label`, `value`): `void`
+• **updateTemplateHTML**: (`label`: `string`, `value`: `string`) => `void`
 
-#### Parameters
+#### Type declaration
+
+▸ (`label`, `value`): `void`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `label` | `string` |
 | `value` | `string` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:506](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L506)
+[client/fast-prototyping/components/slate/index.tsx:506](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L506)
 
 ___
 
 ### updateTemplateText
 
-▸ **updateTemplateText**(`label`, `value`): `void`
+• **updateTemplateText**: (`label`: `string`, `value`: `string`) => `void`
 
-#### Parameters
+#### Type declaration
+
+▸ (`label`, `value`): `void`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `label` | `string` |
 | `value` | `string` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:496](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L496)
+[client/fast-prototyping/components/slate/index.tsx:496](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L496)
 
 ___
 
 ### updateVideo
 
-▸ **updateVideo**(`url`): `boolean`
+• **updateVideo**: (`url`: `string`) => `boolean`
 
-#### Parameters
+#### Type declaration
+
+▸ (`url`): `boolean`
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `url` | `string` |
 
-#### Returns
+##### Returns
 
 `boolean`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:462](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L462)
+[client/fast-prototyping/components/slate/index.tsx:462](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L462)

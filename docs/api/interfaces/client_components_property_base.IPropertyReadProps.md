@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/components/property/base](../modules/client_components_property_base.md) / IPropertyReadProps
 
-# Interface: IPropertyReadProps<T\>
+# Interface: IPropertyReadProps\<T\>
 
 [client/components/property/base](../modules/client_components_property_base.md).IPropertyReadProps
 
@@ -23,15 +23,12 @@ The reader props
 ### Properties
 
 - [cacheFiles](client_components_property_base.IPropertyReadProps.md#cachefiles)
+- [children](client_components_property_base.IPropertyReadProps.md#children)
 - [id](client_components_property_base.IPropertyReadProps.md#id)
 - [policyName](client_components_property_base.IPropertyReadProps.md#policyname)
 - [policyType](client_components_property_base.IPropertyReadProps.md#policytype)
 - [searchVariant](client_components_property_base.IPropertyReadProps.md#searchvariant)
 - [useAppliedValue](client_components_property_base.IPropertyReadProps.md#useappliedvalue)
-
-### Methods
-
-- [children](client_components_property_base.IPropertyReadProps.md#children)
 
 ## Properties
 
@@ -47,7 +44,35 @@ whether to cache files when running the url absoluter
 
 #### Defined in
 
-[client/components/property/base.tsx:185](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L185)
+[client/components/property/base.tsx:185](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L185)
+
+___
+
+### children
+
+• `Optional` **children**: (`value`: `T`, `state`: [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<`T`\>, `setter`: `ReadSetterCallback`\<`T`\>) => `ReactNode`
+
+#### Type declaration
+
+▸ (`value`, `state`, `setter`): `ReactNode`
+
+The reader callback
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `T` |
+| `state` | [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<`T`\> |
+| `setter` | `ReadSetterCallback`\<`T`\> |
+
+##### Returns
+
+`ReactNode`
+
+#### Defined in
+
+[client/components/property/base.tsx:200](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L200)
 
 ___
 
@@ -64,7 +89,7 @@ provider
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L28)
 
 ___
 
@@ -80,7 +105,7 @@ the policy name, should be provided with a policy type
 
 #### Defined in
 
-[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L47)
+[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L47)
 
 ___
 
@@ -96,7 +121,7 @@ the policy type, should be provided with a policy name
 
 #### Defined in
 
-[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L43)
+[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L43)
 
 ___
 
@@ -113,7 +138,7 @@ only truly available in search mode
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L33)
 
 ___
 
@@ -131,28 +156,4 @@ with the server
 
 #### Defined in
 
-[client/components/property/base.tsx:181](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L181)
-
-## Methods
-
-### children
-
-▸ `Optional` **children**(`value`, `state`, `setter`): `ReactNode`
-
-The reader callback
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `value` | `T` |
-| `state` | [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\> |
-| `setter` | `ReadSetterCallback`<`T`\> |
-
-#### Returns
-
-`ReactNode`
-
-#### Defined in
-
-[client/components/property/base.tsx:200](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L200)
+[client/components/property/base.tsx:181](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L181)

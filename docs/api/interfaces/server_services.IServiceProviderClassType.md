@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [server/services](../modules/server_services.md) / IServiceProviderClassType
 
-# Interface: IServiceProviderClassType<T\>
+# Interface: IServiceProviderClassType\<T\>
 
 [server/services](../modules/server_services.md).IServiceProviderClassType
 
@@ -16,7 +16,7 @@
 
 - [constructor](server_services.IServiceProviderClassType.md#constructor)
 
-### Methods
+### Properties
 
 - [getRouter](server_services.IServiceProviderClassType.md#getrouter)
 - [getTriggerRegistry](server_services.IServiceProviderClassType.md#gettriggerregistry)
@@ -26,7 +26,7 @@
 
 ### constructor
 
-• **new IServiceProviderClassType**(`config`, `registry`, `configs`)
+• **new IServiceProviderClassType**(`config`, `registry`, `configs`): [`ServiceProvider`](../classes/server_services.ServiceProvider.md)\<`T`\>
 
 #### Parameters
 
@@ -40,54 +40,70 @@
 | `configs.redisConfig` | [`IRedisConfigRawJSONDataType`](config.IRedisConfigRawJSONDataType.md) |
 | `configs.sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](config.ISensitiveConfigRawJSONDataType.md) |
 
+#### Returns
+
+[`ServiceProvider`](../classes/server_services.ServiceProvider.md)\<`T`\>
+
 #### Defined in
 
-[server/services/index.ts:311](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L311)
+[server/services/index.ts:311](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L311)
 
-## Methods
+## Properties
 
 ### getRouter
 
-▸ **getRouter**(`appData`): `Router` \| `Promise`<`Router`\>
+• **getRouter**: (`appData`: [`IAppDataType`](server.IAppDataType.md)) => `Router` \| `Promise`\<`Router`\>
 
-#### Parameters
+#### Type declaration
+
+▸ (`appData`): `Router` \| `Promise`\<`Router`\>
+
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](server.IAppDataType.md) |
 
-#### Returns
+##### Returns
 
-`Router` \| `Promise`<`Router`\>
+`Router` \| `Promise`\<`Router`\>
 
 #### Defined in
 
-[server/services/index.ts:321](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L321)
+[server/services/index.ts:321](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L321)
 
 ___
 
 ### getTriggerRegistry
 
-▸ **getTriggerRegistry**(): [`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md)\>
+• **getTriggerRegistry**: () => [`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md)\>
 
-#### Returns
+#### Type declaration
 
-[`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md)\>
+▸ (): [`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md)\>
+
+##### Returns
+
+[`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](server_resolvers_triggers.ITriggerRegistry.md)\>
 
 #### Defined in
 
-[server/services/index.ts:322](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L322)
+[server/services/index.ts:322](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L322)
 
 ___
 
 ### getType
 
-▸ **getType**(): [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
+• **getType**: () => [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
 
-#### Returns
+#### Type declaration
+
+▸ (): [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
+
+##### Returns
 
 [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
 
 #### Defined in
 
-[server/services/index.ts:323](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L323)
+[server/services/index.ts:323](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L323)

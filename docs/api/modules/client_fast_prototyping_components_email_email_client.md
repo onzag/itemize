@@ -33,7 +33,7 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:181](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L181)
+[client/fast-prototyping/components/email/email-client.tsx:181](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L181)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:1146](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L1146)
+[client/fast-prototyping/components/email/email-client.tsx:1146](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L1146)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:544](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L544)
+[client/fast-prototyping/components/email/email-client.tsx:544](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L544)
 
 ___
 
@@ -93,4 +93,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:481](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L481)
+[client/fast-prototyping/components/email/email-client.tsx:481](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L481)

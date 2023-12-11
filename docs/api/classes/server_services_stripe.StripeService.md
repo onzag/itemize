@@ -4,9 +4,13 @@
 
 [server/services/stripe](../modules/server_services_stripe.md).StripeService
 
+Represents the base payment provider and every payment provider
+to be implemented should extend this one to ensure compatibility
+with whatever code is generated
+
 ## Hierarchy
 
-- [`default`](server_services_base_PaymentProvider.default.md)<`IStripeConfig`\>
+- [`default`](server_services_base_PaymentProvider.default.md)\<`IStripeConfig`\>
 
   ↳ **`StripeService`**
 
@@ -69,19 +73,19 @@
 - [setupLocalResources](server_services_stripe.StripeService.md#setuplocalresources)
 - [triggerEvent](server_services_stripe.StripeService.md#triggerevent)
 - [unwrapUUIDFor](server_services_stripe.StripeService.md#unwrapuuidfor)
-- [expressRouter](server_services_stripe.StripeService.md#expressrouter)
-- [getRouter](server_services_stripe.StripeService.md#getrouter)
-- [getTriggerRegistry](server_services_stripe.StripeService.md#gettriggerregistry)
+- [expressRouter](server_services_stripe.StripeService.md#expressrouter-1)
+- [getRouter](server_services_stripe.StripeService.md#getrouter-1)
+- [getTriggerRegistry](server_services_stripe.StripeService.md#gettriggerregistry-1)
 - [getType](server_services_stripe.StripeService.md#gettype)
-- [logDebug](server_services_stripe.StripeService.md#logdebug)
-- [logError](server_services_stripe.StripeService.md#logerror)
-- [logInfo](server_services_stripe.StripeService.md#loginfo)
+- [logDebug](server_services_stripe.StripeService.md#logdebug-1)
+- [logError](server_services_stripe.StripeService.md#logerror-1)
+- [logInfo](server_services_stripe.StripeService.md#loginfo-1)
 
 ## Constructors
 
 ### constructor
 
-• **new StripeService**(`config`, `registry`, `configs`)
+• **new StripeService**(`config`, `registry`, `configs`): [`StripeService`](server_services_stripe.StripeService.md)
 
 #### Parameters
 
@@ -95,13 +99,17 @@
 | `configs.redisConfig` | [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md) |
 | `configs.sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
 
+#### Returns
+
+[`StripeService`](server_services_stripe.StripeService.md)
+
 #### Inherited from
 
 [default](server_services_base_PaymentProvider.default.md).[constructor](server_services_base_PaymentProvider.default.md#constructor)
 
 #### Defined in
 
-[server/services/index.ts:58](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L58)
+[server/services/index.ts:58](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L58)
 
 ## Properties
 
@@ -115,7 +123,7 @@
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L35)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L35)
 
 ___
 
@@ -129,7 +137,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L37)
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L37)
 
 ___
 
@@ -143,7 +151,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L38)
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L38)
 
 ___
 
@@ -157,7 +165,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L36)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L36)
 
 ___
 
@@ -171,7 +179,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L33)
+[server/services/index.ts:33](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L33)
 
 ___
 
@@ -181,7 +189,7 @@ ___
 
 #### Index signature
 
-▪ [name: `string`]: [`ServiceProvider`](server_services.ServiceProvider.md)<`any`\>
+▪ [name: `string`]: [`ServiceProvider`](server_services.ServiceProvider.md)\<`any`\>
 
 #### Inherited from
 
@@ -189,7 +197,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L48)
 
 ___
 
@@ -203,7 +211,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L40)
 
 ___
 
@@ -217,13 +225,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L55)
 
 ___
 
 ### globalMailProvider
 
-• **globalMailProvider**: [`default`](server_services_base_MailProvider.default.md)<`any`\>
+• **globalMailProvider**: [`default`](server_services_base_MailProvider.default.md)\<`any`\>
 
 #### Inherited from
 
@@ -231,13 +239,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L46)
 
 ___
 
 ### globalPhoneProvider
 
-• **globalPhoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)<`any`\>
+• **globalPhoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)\<`any`\>
 
 #### Inherited from
 
@@ -245,7 +253,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L47)
 
 ___
 
@@ -259,7 +267,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L44)
 
 ___
 
@@ -273,7 +281,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L43)
 
 ___
 
@@ -287,7 +295,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L41)
 
 ___
 
@@ -301,7 +309,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L42)
 
 ___
 
@@ -315,7 +323,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L45)
 
 ___
 
@@ -329,7 +337,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L54)
 
 ___
 
@@ -343,7 +351,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L52)
 
 ___
 
@@ -357,7 +365,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L56)
 
 ___
 
@@ -371,7 +379,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:34](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L34)
+[server/services/index.ts:34](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L34)
 
 ___
 
@@ -381,13 +389,13 @@ ___
 
 #### Defined in
 
-[server/services/stripe.ts:32](https://github.com/onzag/itemize/blob/a24376ed/server/services/stripe.ts#L32)
+[server/services/stripe.ts:32](https://github.com/onzag/itemize/blob/59702dd5/server/services/stripe.ts#L32)
 
 ## Methods
 
 ### activateSubscription
 
-▸ **activateSubscription**(`uuidOrLocation`, `extras?`): `Promise`<`void`\>
+▸ **activateSubscription**(`uuidOrLocation`, `extras?`): `Promise`\<`void`\>
 
 Basically the same as changePaymentStatus but
 changes it to status active
@@ -403,7 +411,7 @@ changes it to status active
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise
 
@@ -413,7 +421,7 @@ a void promise
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:559](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L559)
+[server/services/base/PaymentProvider.ts:559](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L559)
 
 ___
 
@@ -440,13 +448,13 @@ Adds an event listener to execute when a payment event has occurred
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:697](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L697)
+[server/services/base/PaymentProvider.ts:697](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L697)
 
 ___
 
 ### cancelSubscription
 
-▸ **cancelSubscription**(`uuidOrLocation`, `extras?`): `Promise`<`void`\>
+▸ **cancelSubscription**(`uuidOrLocation`, `extras?`): `Promise`\<`void`\>
 
 Basically the same as changePaymentStatus but
 changes it to status inactive
@@ -462,7 +470,7 @@ changes it to status inactive
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 a void promise
 
@@ -472,13 +480,13 @@ a void promise
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:538](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L538)
+[server/services/base/PaymentProvider.ts:538](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L538)
 
 ___
 
 ### changePaymentStatus
 
-▸ **changePaymentStatus**(`status`, `uuidOrLocation`, `extras?`): `Promise`<`void`\>
+▸ **changePaymentStatus**(`status`, `uuidOrLocation`, `extras?`): `Promise`\<`void`\>
 
 Allows to pick and find a payment object in the database and change its status
 from one to another, the change is realtime and affects the client side
@@ -491,13 +499,13 @@ as well as whatever listeners are around
 | `status` | [`PaymentStatusType`](../enums/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.PaymentStatusType.md) | the new status to assign to the payment |
 | `uuidOrLocation` | `string` \| [`IPaymentUniqueLocation`](../interfaces/server_services_base_PaymentProvider.IPaymentUniqueLocation.md) | the uuid of the payment or the unwrapped unique location |
 | `extras` | `Object` | - |
-| `extras.knownValue?` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | if the value of the row is already known provide it, it will help speed up |
+| `extras.knownValue?` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) \| [`IRQValue`](../interfaces/rq_querier.IRQValue.md) | if the value of the row is already known provide it, it will help speed up |
 | `extras.metadata?` | `string` | change the metadata during this event |
 | `extras.rometadata?` | `string` | - |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -505,7 +513,7 @@ as well as whatever listeners are around
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:632](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L632)
+[server/services/base/PaymentProvider.ts:632](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L632)
 
 ___
 
@@ -514,8 +522,6 @@ ___
 ▸ **custom**(`fn`, `arg`): `void`
 
 A simple function for custom functionality
-
-**`override`**
 
 #### Parameters
 
@@ -534,7 +540,7 @@ A simple function for custom functionality
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:746](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L746)
+[server/services/base/PaymentProvider.ts:746](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L746)
 
 ___
 
@@ -555,7 +561,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:170](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L170)
+[server/services/index.ts:170](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L170)
 
 ___
 
@@ -566,8 +572,6 @@ ___
 When defining a payment you should specify how to issue a refund based on this event
 this allows the developer to issue a refund based on an invoice payment and a refund
 payment
-
-**`override`**
 
 #### Parameters
 
@@ -589,7 +593,7 @@ payment
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:728](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L728)
+[server/services/base/PaymentProvider.ts:728](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L728)
 
 ___
 
@@ -613,7 +617,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:116](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L116)
+[server/services/index.ts:116](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L116)
 
 ___
 
@@ -631,7 +635,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L80)
+[server/services/index.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L80)
 
 ___
 
@@ -667,7 +671,7 @@ The router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/stripe.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/services/stripe.ts#L38)
+[server/services/stripe.ts:38](https://github.com/onzag/itemize/blob/59702dd5/server/services/stripe.ts#L38)
 
 ___
 
@@ -677,8 +681,6 @@ ___
 
 Determines whether the run function
 should run over again
-
-**`override`**
 
 #### Returns
 
@@ -690,22 +692,20 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:239](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L239)
+[server/services/index.ts:239](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L239)
 
 ___
 
 ### getTriggerRegistry
 
-▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 Allows to setup trigger registries via the service
 so that they trigger just as normal trigger will do
 
-**`override`**
-
 #### Returns
 
-[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 #### Inherited from
 
@@ -713,7 +713,7 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/index.ts:293](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L293)
+[server/services/index.ts:293](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L293)
 
 ___
 
@@ -741,7 +741,7 @@ the row of the database and it's unique for that payment object
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:410](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L410)
+[server/services/base/PaymentProvider.ts:410](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L410)
 
 ___
 
@@ -766,7 +766,7 @@ this function executes
 
 #### Defined in
 
-[server/services/stripe.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/services/stripe.ts#L33)
+[server/services/stripe.ts:33](https://github.com/onzag/itemize/blob/59702dd5/server/services/stripe.ts#L33)
 
 ___
 
@@ -784,7 +784,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:84](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L84)
+[server/services/index.ts:84](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L84)
 
 ___
 
@@ -802,13 +802,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L88)
+[server/services/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L88)
 
 ___
 
 ### logDebug
 
-▸ **logDebug**<`T`\>(`data`): `void`
+▸ **logDebug**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -820,7 +820,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -832,13 +832,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:96](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L96)
+[server/services/index.ts:96](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L96)
 
 ___
 
 ### logError
 
-▸ **logError**<`T`\>(`data`): `void`
+▸ **logError**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -850,7 +850,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -862,13 +862,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:100](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L100)
+[server/services/index.ts:100](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L100)
 
 ___
 
 ### logInfo
 
-▸ **logInfo**<`T`\>(`data`): `void`
+▸ **logInfo**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -880,7 +880,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -892,7 +892,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:92](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L92)
+[server/services/index.ts:92](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L92)
 
 ___
 
@@ -919,13 +919,13 @@ removes an event listener to execute when a payment event has occurred
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:707](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L707)
+[server/services/base/PaymentProvider.ts:707](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L707)
 
 ___
 
 ### retrievePaymentObject
 
-▸ **retrievePaymentObject**(`uuidOrLocation`, `knownValue?`): `Promise`<{ `hiddenMetadata`: `string` ; `include`: [`default`](base_Root_Module_ItemDefinition_Include.default.md) ; `item`: [`default`](base_Root_Module_ItemDefinition.default.md) = itemDef; `location`: [`IPaymentUniqueLocation`](../interfaces/server_services_base_PaymentProvider.IPaymentUniqueLocation.md) ; `property`: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) = propDef; `rowValue`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) = value; `value`: [`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md) = currentValue }\>
+▸ **retrievePaymentObject**(`uuidOrLocation`, `knownValue?`): `Promise`\<\{ `hiddenMetadata`: `string` ; `include`: [`default`](base_Root_Module_ItemDefinition_Include.default.md) ; `item`: [`default`](base_Root_Module_ItemDefinition.default.md) = itemDef; `location`: [`IPaymentUniqueLocation`](../interfaces/server_services_base_PaymentProvider.IPaymentUniqueLocation.md) ; `property`: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) = propDef; `rowValue`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) = value; `value`: [`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md) = currentValue }\>
 
 #### Parameters
 
@@ -936,7 +936,7 @@ ___
 
 #### Returns
 
-`Promise`<{ `hiddenMetadata`: `string` ; `include`: [`default`](base_Root_Module_ItemDefinition_Include.default.md) ; `item`: [`default`](base_Root_Module_ItemDefinition.default.md) = itemDef; `location`: [`IPaymentUniqueLocation`](../interfaces/server_services_base_PaymentProvider.IPaymentUniqueLocation.md) ; `property`: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) = propDef; `rowValue`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) = value; `value`: [`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md) = currentValue }\>
+`Promise`\<\{ `hiddenMetadata`: `string` ; `include`: [`default`](base_Root_Module_ItemDefinition_Include.default.md) ; `item`: [`default`](base_Root_Module_ItemDefinition.default.md) = itemDef; `location`: [`IPaymentUniqueLocation`](../interfaces/server_services_base_PaymentProvider.IPaymentUniqueLocation.md) ; `property`: [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) = propDef; `rowValue`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) = value; `value`: [`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md) = currentValue }\>
 
 #### Inherited from
 
@@ -944,21 +944,19 @@ ___
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:573](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L573)
+[server/services/base/PaymentProvider.ts:573](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L573)
 
 ___
 
 ### run
 
-▸ **run**(): `void` \| `Promise`<`void`\>
+▸ **run**(): `void` \| `Promise`\<`void`\>
 
 Executes some code
 
-**`override`**
-
 #### Returns
 
-`void` \| `Promise`<`void`\>
+`void` \| `Promise`\<`void`\>
 
 #### Inherited from
 
@@ -966,13 +964,13 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:247](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L247)
+[server/services/index.ts:247](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L247)
 
 ___
 
 ### setHiddenMetadataAt
 
-▸ **setHiddenMetadataAt**(`uuid`, `hiddenMetadata`): `Promise`<`string`\>
+▸ **setHiddenMetadataAt**(`uuid`, `hiddenMetadata`): `Promise`\<`string`\>
 
 Sets the hidden metadata at a given payment uuid
 
@@ -985,7 +983,7 @@ Sets the hidden metadata at a given payment uuid
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 the hidden metadata value that was stored
 
@@ -995,7 +993,7 @@ the hidden metadata value that was stored
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:399](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L399)
+[server/services/base/PaymentProvider.ts:399](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L399)
 
 ___
 
@@ -1019,7 +1017,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L76)
+[server/services/index.ts:76](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L76)
 
 ___
 
@@ -1035,8 +1033,8 @@ ___
 | `globalClient` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `globalPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `globalSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
-| `globalMailProvider` | [`default`](server_services_base_MailProvider.default.md)<`any`\> |
-| `globalPhoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)<`any`\> |
+| `globalMailProvider` | [`default`](server_services_base_MailProvider.default.md)\<`any`\> |
+| `globalPhoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)\<`any`\> |
 | `globalCustomServices` | `Object` |
 | `root` | [`default`](base_Root.default.md) |
 
@@ -1050,7 +1048,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:124](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L124)
+[server/services/index.ts:124](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L124)
 
 ___
 
@@ -1074,13 +1072,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:148](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L148)
+[server/services/index.ts:148](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L148)
 
 ___
 
 ### triggerEvent
 
-▸ **triggerEvent**(`ev`, `payment`, `hiddenMetadata`, `info`): `Promise`<`string`\>
+▸ **triggerEvent**(`ev`, `payment`, `hiddenMetadata`, `info`): `Promise`\<`string`\>
 
 This function is intended to be used by the itemize server itself
 in order to internally trigger the events when it finds payment
@@ -1100,7 +1098,7 @@ internally when things happen
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 the end value of the hidden metadata row as stored
 
@@ -1110,7 +1108,7 @@ the end value of the hidden metadata row as stored
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:497](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L497)
+[server/services/base/PaymentProvider.ts:497](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L497)
 
 ___
 
@@ -1139,13 +1137,13 @@ the payment object location
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:441](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L441)
+[server/services/base/PaymentProvider.ts:441](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L441)
 
 ___
 
 ### expressRouter
 
-▸ `Static` **expressRouter**(`options?`): `Router`
+▸ **expressRouter**(`options?`): `Router`
 
 #### Parameters
 
@@ -1159,17 +1157,17 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_PaymentProvider.default.md).[expressRouter](server_services_base_PaymentProvider.default.md#expressrouter)
+[default](server_services_base_PaymentProvider.default.md).[expressRouter](server_services_base_PaymentProvider.default.md#expressrouter-1)
 
 #### Defined in
 
-[server/services/index.ts:120](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L120)
+[server/services/index.ts:120](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L120)
 
 ___
 
 ### getRouter
 
-▸ `Static` **getRouter**(`appData`): `Router` \| `Promise`<`Router`\>
+▸ **getRouter**(`appData`): `Router` \| `Promise`\<`Router`\>
 
 Provides a router endpoint, but this method
 is static, which means it only gets added once
@@ -1181,8 +1179,6 @@ for the global manager
 
 the router gets attached to /rest/service
 
-**`override`**
-
 #### Parameters
 
 | Name | Type |
@@ -1191,46 +1187,44 @@ the router gets attached to /rest/service
 
 #### Returns
 
-`Router` \| `Promise`<`Router`\>
+`Router` \| `Promise`\<`Router`\>
 
 #### Inherited from
 
-[default](server_services_base_PaymentProvider.default.md).[getRouter](server_services_base_PaymentProvider.default.md#getrouter)
+[default](server_services_base_PaymentProvider.default.md).[getRouter](server_services_base_PaymentProvider.default.md#getrouter-1)
 
 #### Defined in
 
-[server/services/index.ts:283](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L283)
+[server/services/index.ts:283](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L283)
 
 ___
 
 ### getTriggerRegistry
 
-▸ `Static` **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 Allows to setup trigger registries via the service
 so that they trigger just as normal trigger will do
 
 This gets attached if a class is used rather than per instance
 
-**`override`**
-
 #### Returns
 
-[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`\<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
 
 #### Inherited from
 
-[default](server_services_base_PaymentProvider.default.md).[getTriggerRegistry](server_services_base_PaymentProvider.default.md#gettriggerregistry)
+[default](server_services_base_PaymentProvider.default.md).[getTriggerRegistry](server_services_base_PaymentProvider.default.md#gettriggerregistry-1)
 
 #### Defined in
 
-[server/services/index.ts:305](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L305)
+[server/services/index.ts:305](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L305)
 
 ___
 
 ### getType
 
-▸ `Static` **getType**(): [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
+▸ **getType**(): [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
 
 Provides the type of the service provider, for the payment
 provider this is a local type as it runs locally in every
@@ -1248,13 +1242,13 @@ LOCAL
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:247](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L247)
+[server/services/base/PaymentProvider.ts:247](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L247)
 
 ___
 
 ### logDebug
 
-▸ `Static` **logDebug**<`T`\>(`data`): `void`
+▸ **logDebug**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -1266,7 +1260,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -1274,17 +1268,17 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_PaymentProvider.default.md).[logDebug](server_services_base_PaymentProvider.default.md#logdebug)
+[default](server_services_base_PaymentProvider.default.md).[logDebug](server_services_base_PaymentProvider.default.md#logdebug-1)
 
 #### Defined in
 
-[server/services/index.ts:108](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L108)
+[server/services/index.ts:108](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L108)
 
 ___
 
 ### logError
 
-▸ `Static` **logError**<`T`\>(`data`): `void`
+▸ **logError**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -1296,7 +1290,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -1304,17 +1298,17 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_PaymentProvider.default.md).[logError](server_services_base_PaymentProvider.default.md#logerror)
+[default](server_services_base_PaymentProvider.default.md).[logError](server_services_base_PaymentProvider.default.md#logerror-1)
 
 #### Defined in
 
-[server/services/index.ts:112](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L112)
+[server/services/index.ts:112](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L112)
 
 ___
 
 ### logInfo
 
-▸ `Static` **logInfo**<`T`\>(`data`): `void`
+▸ **logInfo**\<`T`\>(`data`): `void`
 
 #### Type parameters
 
@@ -1326,7 +1320,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)\<`T`\> |
 
 #### Returns
 
@@ -1334,8 +1328,8 @@ ___
 
 #### Inherited from
 
-[default](server_services_base_PaymentProvider.default.md).[logInfo](server_services_base_PaymentProvider.default.md#loginfo)
+[default](server_services_base_PaymentProvider.default.md).[logInfo](server_services_base_PaymentProvider.default.md#loginfo-1)
 
 #### Defined in
 
-[server/services/index.ts:104](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L104)
+[server/services/index.ts:104](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L104)

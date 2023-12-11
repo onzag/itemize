@@ -13,9 +13,9 @@ in the server side; the cache worker creates this
 ### Properties
 
 - [dataMightBeStale](client_internal_workers_cache_cache_worker_class.ICachedSearchResult.md#datamightbestale)
-- [gqlValue](client_internal_workers_cache_cache_worker_class.ICachedSearchResult.md#gqlvalue)
 - [lastModified](client_internal_workers_cache_cache_worker_class.ICachedSearchResult.md#lastmodified)
 - [polyfilled](client_internal_workers_cache_cache_worker_class.ICachedSearchResult.md#polyfilled)
+- [rqValue](client_internal_workers_cache_cache_worker_class.ICachedSearchResult.md#rqvalue)
 - [sourceRecords](client_internal_workers_cache_cache_worker_class.ICachedSearchResult.md#sourcerecords)
 - [sourceResults](client_internal_workers_cache_cache_worker_class.ICachedSearchResult.md#sourceresults)
 
@@ -30,19 +30,7 @@ to be rechecked an update
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:119](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L119)
-
-___
-
-### gqlValue
-
-• **gqlValue**: [`IGQLEndpointValue`](gql_querier.IGQLEndpointValue.md)
-
-The graphql value that it emulates from the server side
-
-#### Defined in
-
-[client/internal/workers/cache/cache.worker.class.ts:114](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L114)
+[client/internal/workers/cache/cache.worker.class.ts:119](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L119)
 
 ___
 
@@ -54,7 +42,7 @@ When was this last search modified
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:123](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L123)
+[client/internal/workers/cache/cache.worker.class.ts:123](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L123)
 
 ___
 
@@ -68,13 +56,25 @@ to polyfill was allowed
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:141](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L141)
+[client/internal/workers/cache/cache.worker.class.ts:141](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L141)
+
+___
+
+### rqValue
+
+• **rqValue**: [`IRQEndpointValue`](rq_querier.IRQEndpointValue.md)
+
+The rq value that it emulates from the server side
+
+#### Defined in
+
+[client/internal/workers/cache/cache.worker.class.ts:114](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L114)
 
 ___
 
 ### sourceRecords
 
-• **sourceRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+• **sourceRecords**: [`IRQSearchRecord`](rq_querier.IRQSearchRecord.md)[]
 
 The source records that were used in the search, aka all the records that
 were searched for in the search, not just the matching ones that were
@@ -82,7 +82,7 @@ requested, this list may be very large
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:129](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L129)
+[client/internal/workers/cache/cache.worker.class.ts:129](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L129)
 
 ___
 
@@ -96,4 +96,4 @@ and matching data that was available
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:135](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.class.ts#L135)
+[client/internal/workers/cache/cache.worker.class.ts:135](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L135)

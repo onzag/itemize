@@ -4,6 +4,9 @@
 
 [testing/server/robots](../modules/testing_server_robots.md).RobotsTest
 
+Defines a test, and it should be used as an entry
+for all subtests
+
 ## Hierarchy
 
 - [`Test`](testing.Test.md)
@@ -35,12 +38,10 @@
 - [info](testing_server_robots.RobotsTest.md#info)
 - [it](testing_server_robots.RobotsTest.md#it)
 - [quit](testing_server_robots.RobotsTest.md#quit)
-- [sitemapChecker](testing_server_robots.RobotsTest.md#sitemapchecker)
 - [skipAll](testing_server_robots.RobotsTest.md#skipall)
 - [skipLayer](testing_server_robots.RobotsTest.md#skiplayer)
 - [skipNext](testing_server_robots.RobotsTest.md#skipnext)
 - [step](testing_server_robots.RobotsTest.md#step)
-- [urlChecker](testing_server_robots.RobotsTest.md#urlchecker)
 - [wait](testing_server_robots.RobotsTest.md#wait)
 - [warn](testing_server_robots.RobotsTest.md#warn)
 
@@ -48,7 +49,7 @@
 
 ### constructor
 
-• **new RobotsTest**(`https`, `host`, `port`, `fullHost`, `testingInfo`)
+• **new RobotsTest**(`https`, `host`, `port`, `fullHost`, `testingInfo`): [`RobotsTest`](testing_server_robots.RobotsTest.md)
 
 #### Parameters
 
@@ -60,13 +61,17 @@
 | `fullHost` | `string` |
 | `testingInfo` | [`ITestingInfoType`](../interfaces/testing_itemize.ITestingInfoType.md) |
 
+#### Returns
+
+[`RobotsTest`](testing_server_robots.RobotsTest.md)
+
 #### Overrides
 
 [Test](testing.Test.md).[constructor](testing.Test.md#constructor)
 
 #### Defined in
 
-[testing/server/robots.ts:15](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L15)
+[testing/server/robots.ts:14](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L14)
 
 ## Properties
 
@@ -76,7 +81,7 @@
 
 #### Defined in
 
-[testing/server/robots.ts:8](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L8)
+[testing/server/robots.ts:7](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L7)
 
 ___
 
@@ -86,7 +91,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:10](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L10)
+[testing/server/robots.ts:9](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L9)
 
 ___
 
@@ -96,7 +101,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:12](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L12)
+[testing/server/robots.ts:11](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L11)
 
 ___
 
@@ -106,7 +111,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:13](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L13)
+[testing/server/robots.ts:12](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L12)
 
 ___
 
@@ -116,7 +121,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:11](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L11)
+[testing/server/robots.ts:10](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L10)
 
 ___
 
@@ -126,7 +131,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:9](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L9)
+[testing/server/robots.ts:8](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L8)
 
 ## Methods
 
@@ -136,8 +141,6 @@ ___
 
 Executes after everything is done
 use for cleanup
-
-**`override`**
 
 #### Returns
 
@@ -149,7 +152,7 @@ use for cleanup
 
 #### Defined in
 
-[testing/index.ts:105](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L105)
+[testing/index.ts:105](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L105)
 
 ___
 
@@ -161,8 +164,6 @@ Executes before, override this function
 it allows you to dinamically add tests as
 well
 
-**`override`**
-
 #### Returns
 
 `any`
@@ -173,7 +174,7 @@ well
 
 #### Defined in
 
-[testing/index.ts:88](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L88)
+[testing/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L88)
 
 ___
 
@@ -193,7 +194,7 @@ Build a brand new instance
 
 #### Defined in
 
-[testing/index.ts:71](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L71)
+[testing/index.ts:71](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L71)
 
 ___
 
@@ -220,7 +221,7 @@ Define a new test
 
 #### Defined in
 
-[testing/index.ts:114](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L114)
+[testing/index.ts:114](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L114)
 
 ___
 
@@ -240,7 +241,7 @@ Executes during just after before has been executed
 
 #### Defined in
 
-[testing/server/robots.ts:115](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L115)
+[testing/server/robots.ts:114](https://github.com/onzag/itemize/blob/59702dd5/testing/server/robots.ts#L114)
 
 ___
 
@@ -264,7 +265,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:162](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L162)
+[testing/index.ts:162](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L162)
 
 ___
 
@@ -279,7 +280,7 @@ Define a new assertion
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
 | `label` | `string` | `undefined` | the label for the assertion |
-| `fn` | () => `void` \| `PromiseLike`<`void`\> | `null` | the assetion to execute |
+| `fn` | () => `void` \| `PromiseLike`\<`void`\> | `null` | the assetion to execute |
 
 #### Returns
 
@@ -291,7 +292,7 @@ Define a new assertion
 
 #### Defined in
 
-[testing/index.ts:129](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L129)
+[testing/index.ts:129](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L129)
 
 ___
 
@@ -311,27 +312,7 @@ Quits this test
 
 #### Defined in
 
-[testing/index.ts:220](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L220)
-
-___
-
-### sitemapChecker
-
-▸ **sitemapChecker**(`sitemapURL`): `Promise`<`void`\>
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `sitemapURL` | `string` |
-
-#### Returns
-
-`Promise`<`void`\>
-
-#### Defined in
-
-[testing/server/robots.ts:57](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L57)
+[testing/index.ts:220](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L220)
 
 ___
 
@@ -352,7 +333,7 @@ and by all it means all of them
 
 #### Defined in
 
-[testing/index.ts:186](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L186)
+[testing/index.ts:186](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L186)
 
 ___
 
@@ -374,7 +355,7 @@ this
 
 #### Defined in
 
-[testing/index.ts:201](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L201)
+[testing/index.ts:201](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L201)
 
 ___
 
@@ -395,7 +376,7 @@ they should be on the same layer
 
 #### Defined in
 
-[testing/index.ts:172](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L172)
+[testing/index.ts:172](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L172)
 
 ___
 
@@ -407,7 +388,7 @@ ___
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `fn` | () => `void` \| `PromiseLike`<`void`\> | `null` |
+| `fn` | () => `void` \| `PromiseLike`\<`void`\> | `null` |
 
 #### Returns
 
@@ -419,33 +400,13 @@ ___
 
 #### Defined in
 
-[testing/index.ts:141](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L141)
-
-___
-
-### urlChecker
-
-▸ **urlChecker**(`url`): `Promise`<`void`\>
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `url` | `string` |
-
-#### Returns
-
-`Promise`<`void`\>
-
-#### Defined in
-
-[testing/server/robots.ts:30](https://github.com/onzag/itemize/blob/a24376ed/testing/server/robots.ts#L30)
+[testing/index.ts:141](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L141)
 
 ___
 
 ### wait
 
-▸ **wait**(`ms`): `Promise`<`void`\>
+▸ **wait**(`ms`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -455,7 +416,7 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -463,7 +424,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:211](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L211)
+[testing/index.ts:211](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L211)
 
 ___
 
@@ -487,4 +448,4 @@ ___
 
 #### Defined in
 
-[testing/index.ts:152](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L152)
+[testing/index.ts:152](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L152)

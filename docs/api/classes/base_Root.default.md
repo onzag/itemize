@@ -22,6 +22,7 @@ of the itemize schema structure
 - [requestManagerResource](base_Root.default.md#requestmanagerresource)
 - [requestManagerSearch](base_Root.default.md#requestmanagersearch)
 - [rootState](base_Root.default.md#rootstate)
+- [rqSchema](base_Root.default.md#rqschema)
 - [serverFlags](base_Root.default.md#serverflags)
 
 ### Methods
@@ -34,6 +35,7 @@ of the itemize schema structure
 - [getI18nData](base_Root.default.md#geti18ndata)
 - [getI18nDataFor](base_Root.default.md#geti18ndatafor)
 - [getModuleFor](base_Root.default.md#getmodulefor)
+- [getRQSchema](base_Root.default.md#getrqschema)
 - [getServerFlags](base_Root.default.md#getserverflags)
 - [getStateKey](base_Root.default.md#getstatekey)
 - [listModuleNames](base_Root.default.md#listmodulenames)
@@ -49,7 +51,7 @@ of the itemize schema structure
 
 ### constructor
 
-• **new default**(`rawJSON`)
+• **new default**(`rawJSON`): [`default`](base_Root.default.md)
 
 Builds a root from raw data
 
@@ -59,9 +61,13 @@ Builds a root from raw data
 | :------ | :------ | :------ |
 | `rawJSON` | [`IRootRawJSONDataType`](../interfaces/base_Root.IRootRawJSONDataType.md) | the raw json data |
 
+#### Returns
+
+[`default`](base_Root.default.md)
+
 #### Defined in
 
-[base/Root/index.ts:259](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L259)
+[base/Root/index.ts:265](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L265)
 
 ## Properties
 
@@ -71,11 +77,9 @@ Builds a root from raw data
 
 The child modules
 
-**`internal`**
-
 #### Defined in
 
-[base/Root/index.ts:214](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L214)
+[base/Root/index.ts:215](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L215)
 
 ___
 
@@ -85,11 +89,9 @@ ___
 
 The raw data this root was generated from
 
-**`internal`**
-
 #### Defined in
 
-[base/Root/index.ts:183](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L183)
+[base/Root/index.ts:184](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L184)
 
 ___
 
@@ -123,7 +125,7 @@ The registry is a quick utility that can be used to access these values
 
 #### Defined in
 
-[base/Root/index.ts:206](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L206)
+[base/Root/index.ts:207](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L207)
 
 ___
 
@@ -135,11 +137,9 @@ This is used for SSR and lives in the root
 allows the root to request for data, this is what is used
 by the getDerivedServerSideStateFromProps functionality
 
-**`internal`**
-
 #### Defined in
 
-[base/Root/index.ts:229](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L229)
+[base/Root/index.ts:230](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L230)
 
 ___
 
@@ -151,11 +151,9 @@ This is used for SSR and lives in the root
 allows the root to request for resources, this is what is used
 by the getDerivedServerSideStateFromProps functionality
 
-**`internal`**
-
 #### Defined in
 
-[base/Root/index.ts:245](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L245)
+[base/Root/index.ts:246](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L246)
 
 ___
 
@@ -167,11 +165,9 @@ This is used for SSR and lives in the root
 allows the root to request for data, this is what is used
 by the getDerivedServerSideStateFromProps functionality
 
-**`internal`**
-
 #### Defined in
 
-[base/Root/index.ts:237](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L237)
+[base/Root/index.ts:238](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L238)
 
 ___
 
@@ -185,7 +181,19 @@ in the root about execution
 
 #### Defined in
 
-[base/Root/index.ts:221](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L221)
+[base/Root/index.ts:222](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L222)
+
+___
+
+### rqSchema
+
+• `Private` **rqSchema**: [`RQRootSchema`](../interfaces/base_Root_rq.RQRootSchema.md)
+
+Root rq schema
+
+#### Defined in
+
+[base/Root/index.ts:259](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L259)
 
 ___
 
@@ -197,23 +205,19 @@ Used by the server side to set server flags to flag
 other parts of the schema how to operate, mainly
 conditional rule set about what it should evaluate
 
-**`internal`**
-
 #### Defined in
 
-[base/Root/index.ts:253](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L253)
+[base/Root/index.ts:254](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L254)
 
 ## Methods
 
 ### callRequestManager
 
-▸ **callRequestManager**(`itemDefinition`, `id`, `version`, `requestFields`): `Promise`<`void`\>
+▸ **callRequestManager**(`itemDefinition`, `id`, `version`, `requestFields`): `Promise`\<`void`\>
 
 Calls the request manager to request it for a given value
 to be stored and be applied the state inside our
 root
-
-**`internal`**
 
 #### Parameters
 
@@ -222,52 +226,48 @@ root
 | `itemDefinition` | [`default`](base_Root_Module_ItemDefinition.default.md) | the item definition we need a value for |
 | `id` | `string` | the id |
 | `version` | `string` | the version |
-| `requestFields` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | - |
+| `requestFields` | [`IRQRequestFields`](../interfaces/rq_querier.IRQRequestFields.md) | - |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[base/Root/index.ts:360](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L360)
+[base/Root/index.ts:366](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L366)
 
 ___
 
 ### callRequestManagerResource
 
-▸ **callRequestManagerResource**(`finalPath`, `customResolver?`): `Promise`<`string`\>
+▸ **callRequestManagerResource**(`finalPath`, `customResolver?`): `Promise`\<`string`\>
 
 Calls the request manager to request for a given resource
-
-**`internal`**
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `finalPath` | `string` |
-| `customResolver?` | (`appData`: [`IAppDataType`](../interfaces/server.IAppDataType.md), `finalPath`: `string`) => [`IResourceCollectionResult`](../interfaces/server_ssr_collect.IResourceCollectionResult.md) \| `Promise`<[`IResourceCollectionResult`](../interfaces/server_ssr_collect.IResourceCollectionResult.md)\> |
+| `customResolver?` | (`appData`: [`IAppDataType`](../interfaces/server.IAppDataType.md), `finalPath`: `string`) => [`IResourceCollectionResult`](../interfaces/server_ssr_collect.IResourceCollectionResult.md) \| `Promise`\<[`IResourceCollectionResult`](../interfaces/server_ssr_collect.IResourceCollectionResult.md)\> |
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Defined in
 
-[base/Root/index.ts:370](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L370)
+[base/Root/index.ts:376](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L376)
 
 ___
 
 ### callRequestManagerSearch
 
-▸ **callRequestManagerSearch**(`itemDefinition`, `id`, `version`, `args`): `Promise`<`void`\>
+▸ **callRequestManagerSearch**(`itemDefinition`, `id`, `version`, `args`): `Promise`\<`void`\>
 
 Calls the request manager to request it for a given value
 to be stored and be applied the state inside our
 root
-
-**`internal`**
 
 #### Parameters
 
@@ -280,11 +280,11 @@ root
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[base/Root/index.ts:347](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L347)
+[base/Root/index.ts:353](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L353)
 
 ___
 
@@ -296,15 +296,13 @@ Cleans the state of the root as well as all its children
 this is used internally during SSR rendering in order to restore
 the root to a clean pristine state
 
-**`internal`**
-
 #### Returns
 
 `void`
 
 #### Defined in
 
-[base/Root/index.ts:277](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L277)
+[base/Root/index.ts:283](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L283)
 
 ___
 
@@ -332,7 +330,7 @@ an array of Module
 
 #### Defined in
 
-[base/Root/index.ts:405](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L405)
+[base/Root/index.ts:411](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L411)
 
 ___
 
@@ -368,7 +366,7 @@ the whole i18n data object
 
 #### Defined in
 
-[base/Root/index.ts:504](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L504)
+[base/Root/index.ts:510](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L510)
 
 ___
 
@@ -407,7 +405,7 @@ an object or null (if locale does not exist)
 
 #### Defined in
 
-[base/Root/index.ts:529](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L529)
+[base/Root/index.ts:535](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L535)
 
 ___
 
@@ -452,7 +450,21 @@ an specific module
 
 #### Defined in
 
-[base/Root/index.ts:436](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L436)
+[base/Root/index.ts:442](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L442)
+
+___
+
+### getRQSchema
+
+▸ **getRQSchema**(): [`RQRootSchema`](../interfaces/base_Root_rq.RQRootSchema.md)
+
+#### Returns
+
+[`RQRootSchema`](../interfaces/base_Root_rq.RQRootSchema.md)
+
+#### Defined in
+
+[base/Root/index.ts:566](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L566)
 
 ___
 
@@ -474,7 +486,7 @@ an array of string that represents the server flags
 
 #### Defined in
 
-[base/Root/index.ts:556](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L556)
+[base/Root/index.ts:562](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L562)
 
 ___
 
@@ -484,8 +496,6 @@ ___
 
 Returns a given set state key that was previously set with the
 setStateKey function
-
-**`internal`**
 
 #### Parameters
 
@@ -501,7 +511,7 @@ the previously stored value or null
 
 #### Defined in
 
-[base/Root/index.ts:303](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L303)
+[base/Root/index.ts:309](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L309)
 
 ___
 
@@ -526,7 +536,7 @@ an array of string with the module names
 
 #### Defined in
 
-[base/Root/index.ts:386](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L386)
+[base/Root/index.ts:392](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L392)
 
 ___
 
@@ -541,8 +551,6 @@ but we want to ensure that the state is kept and not replace our root
 or destroy the other root, so we just merge the i18n data that we
 are trying to fetch as that's the only important bit
 
-**`internal`**
-
 #### Parameters
 
 | Name | Type | Description |
@@ -555,7 +563,7 @@ are trying to fetch as that's the only important bit
 
 #### Defined in
 
-[base/Root/index.ts:468](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L468)
+[base/Root/index.ts:474](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L474)
 
 ___
 
@@ -566,8 +574,6 @@ ___
 Sets the request manager that is used to resolve requests
 during the SSR renders to resolve values for the item
 definitions in id and version
-
-**`internal`**
 
 #### Parameters
 
@@ -581,7 +587,7 @@ definitions in id and version
 
 #### Defined in
 
-[base/Root/index.ts:325](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L325)
+[base/Root/index.ts:331](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L331)
 
 ___
 
@@ -591,8 +597,6 @@ ___
 
 Sets the request manager that is used to resolve resources
 during the SSR renders
-
-**`internal`**
 
 #### Parameters
 
@@ -606,7 +610,7 @@ during the SSR renders
 
 #### Defined in
 
-[base/Root/index.ts:335](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L335)
+[base/Root/index.ts:341](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L341)
 
 ___
 
@@ -617,8 +621,6 @@ ___
 Sets the request manager that is used to resolve search requests
 during the SSR renders to resolve values for the item
 definitions in id and version
-
-**`internal`**
 
 #### Parameters
 
@@ -632,7 +634,7 @@ definitions in id and version
 
 #### Defined in
 
-[base/Root/index.ts:314](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L314)
+[base/Root/index.ts:320](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L320)
 
 ___
 
@@ -646,8 +648,6 @@ are used during conditions on the server side in order
 to evaluate situations specifically on the server side
 during a specific action
 
-**`internal`**
-
 #### Parameters
 
 | Name | Type | Description |
@@ -660,7 +660,7 @@ during a specific action
 
 #### Defined in
 
-[base/Root/index.ts:543](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L543)
+[base/Root/index.ts:549](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L549)
 
 ___
 
@@ -671,8 +671,6 @@ ___
 Stores a key in the root state this is used internally by SSR
 in order to store the values for the components to be rendered
 during the SSR functionality, keys such as title, ogTitle etc...
-
-**`internal`**
 
 #### Parameters
 
@@ -687,19 +685,17 @@ during the SSR functionality, keys such as title, ogTitle etc...
 
 #### Defined in
 
-[base/Root/index.ts:292](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L292)
+[base/Root/index.ts:298](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L298)
 
 ___
 
 ### getModuleRawFor
 
-▸ `Static` **getModuleRawFor**(`root`, `name`): [`IModuleRawJSONDataType`](../interfaces/base_Root_Module.IModuleRawJSONDataType.md)
+▸ **getModuleRawFor**(`root`, `name`): [`IModuleRawJSONDataType`](../interfaces/base_Root_Module.IModuleRawJSONDataType.md)
 
 Provides a raw module for the given raw json root, this function
 is used during the build process when the root is not quite parsed
 so it uses raw processing and it's a static function
-
-**`internal`**
 
 #### Parameters
 
@@ -716,4 +712,4 @@ a raw module or null
 
 #### Defined in
 
-[base/Root/index.ts:143](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L143)
+[base/Root/index.ts:144](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L144)

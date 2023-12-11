@@ -4,6 +4,9 @@
 
 [testing/server/database](../modules/testing_server_database.md).DatabaseTest
 
+Defines a test, and it should be used as an entry
+for all subtests
+
 ## Hierarchy
 
 - [`Test`](testing.Test.md)
@@ -43,7 +46,7 @@
 
 ### constructor
 
-• **new DatabaseTest**(`databaseConnection`, `testingInfo`)
+• **new DatabaseTest**(`databaseConnection`, `testingInfo`): [`DatabaseTest`](testing_server_database.DatabaseTest.md)
 
 #### Parameters
 
@@ -52,13 +55,17 @@
 | `databaseConnection` | [`DatabaseConnection`](database.DatabaseConnection.md) |
 | `testingInfo` | [`ITestingInfoType`](../interfaces/testing_itemize.ITestingInfoType.md) |
 
+#### Returns
+
+[`DatabaseTest`](testing_server_database.DatabaseTest.md)
+
 #### Overrides
 
 [Test](testing.Test.md).[constructor](testing.Test.md#constructor)
 
 #### Defined in
 
-[testing/server/database.ts:59](https://github.com/onzag/itemize/blob/a24376ed/testing/server/database.ts#L59)
+[testing/server/database.ts:59](https://github.com/onzag/itemize/blob/59702dd5/testing/server/database.ts#L59)
 
 ## Properties
 
@@ -68,7 +75,7 @@
 
 #### Defined in
 
-[testing/server/database.ts:57](https://github.com/onzag/itemize/blob/a24376ed/testing/server/database.ts#L57)
+[testing/server/database.ts:57](https://github.com/onzag/itemize/blob/59702dd5/testing/server/database.ts#L57)
 
 ___
 
@@ -78,7 +85,7 @@ ___
 
 #### Defined in
 
-[testing/server/database.ts:56](https://github.com/onzag/itemize/blob/a24376ed/testing/server/database.ts#L56)
+[testing/server/database.ts:56](https://github.com/onzag/itemize/blob/59702dd5/testing/server/database.ts#L56)
 
 ___
 
@@ -88,7 +95,7 @@ ___
 
 #### Defined in
 
-[testing/server/database.ts:55](https://github.com/onzag/itemize/blob/a24376ed/testing/server/database.ts#L55)
+[testing/server/database.ts:55](https://github.com/onzag/itemize/blob/59702dd5/testing/server/database.ts#L55)
 
 ## Methods
 
@@ -98,8 +105,6 @@ ___
 
 Executes after everything is done
 use for cleanup
-
-**`override`**
 
 #### Returns
 
@@ -111,13 +116,13 @@ use for cleanup
 
 #### Defined in
 
-[testing/index.ts:105](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L105)
+[testing/index.ts:105](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L105)
 
 ___
 
 ### before
 
-▸ **before**(): `Promise`<`void`\>
+▸ **before**(): `Promise`\<`void`\>
 
 Executes before, override this function
 it allows you to dinamically add tests as
@@ -125,7 +130,7 @@ well
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Overrides
 
@@ -133,7 +138,7 @@ well
 
 #### Defined in
 
-[testing/server/database.ts:65](https://github.com/onzag/itemize/blob/a24376ed/testing/server/database.ts#L65)
+[testing/server/database.ts:65](https://github.com/onzag/itemize/blob/59702dd5/testing/server/database.ts#L65)
 
 ___
 
@@ -153,7 +158,7 @@ Build a brand new instance
 
 #### Defined in
 
-[testing/index.ts:71](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L71)
+[testing/index.ts:71](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L71)
 
 ___
 
@@ -180,7 +185,7 @@ Define a new test
 
 #### Defined in
 
-[testing/index.ts:114](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L114)
+[testing/index.ts:114](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L114)
 
 ___
 
@@ -200,7 +205,7 @@ Executes during just after before has been executed
 
 #### Defined in
 
-[testing/server/database.ts:71](https://github.com/onzag/itemize/blob/a24376ed/testing/server/database.ts#L71)
+[testing/server/database.ts:71](https://github.com/onzag/itemize/blob/59702dd5/testing/server/database.ts#L71)
 
 ___
 
@@ -224,7 +229,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:162](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L162)
+[testing/index.ts:162](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L162)
 
 ___
 
@@ -239,7 +244,7 @@ Define a new assertion
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
 | `label` | `string` | `undefined` | the label for the assertion |
-| `fn` | () => `void` \| `PromiseLike`<`void`\> | `null` | the assetion to execute |
+| `fn` | () => `void` \| `PromiseLike`\<`void`\> | `null` | the assetion to execute |
 
 #### Returns
 
@@ -251,7 +256,7 @@ Define a new assertion
 
 #### Defined in
 
-[testing/index.ts:129](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L129)
+[testing/index.ts:129](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L129)
 
 ___
 
@@ -271,7 +276,7 @@ Quits this test
 
 #### Defined in
 
-[testing/index.ts:220](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L220)
+[testing/index.ts:220](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L220)
 
 ___
 
@@ -292,7 +297,7 @@ and by all it means all of them
 
 #### Defined in
 
-[testing/index.ts:186](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L186)
+[testing/index.ts:186](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L186)
 
 ___
 
@@ -314,7 +319,7 @@ this
 
 #### Defined in
 
-[testing/index.ts:201](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L201)
+[testing/index.ts:201](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L201)
 
 ___
 
@@ -335,7 +340,7 @@ they should be on the same layer
 
 #### Defined in
 
-[testing/index.ts:172](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L172)
+[testing/index.ts:172](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L172)
 
 ___
 
@@ -347,7 +352,7 @@ ___
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `fn` | () => `void` \| `PromiseLike`<`void`\> | `null` |
+| `fn` | () => `void` \| `PromiseLike`\<`void`\> | `null` |
 
 #### Returns
 
@@ -359,13 +364,13 @@ ___
 
 #### Defined in
 
-[testing/index.ts:141](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L141)
+[testing/index.ts:141](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L141)
 
 ___
 
 ### wait
 
-▸ **wait**(`ms`): `Promise`<`void`\>
+▸ **wait**(`ms`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -375,7 +380,7 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -383,7 +388,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:211](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L211)
+[testing/index.ts:211](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L211)
 
 ___
 
@@ -407,4 +412,4 @@ ___
 
 #### Defined in
 
-[testing/index.ts:152](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L152)
+[testing/index.ts:152](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L152)

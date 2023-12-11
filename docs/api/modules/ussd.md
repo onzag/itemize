@@ -33,4 +33,4 @@
 
 #### Defined in
 
-[ussd/index.ts:50](https://github.com/onzag/itemize/blob/a24376ed/ussd/index.ts#L50)
+[ussd/index.ts:50](https://github.com/onzag/itemize/blob/59702dd5/ussd/index.ts#L50)

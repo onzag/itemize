@@ -28,7 +28,7 @@ the build
 
 #### Defined in
 
-[base/Root/index.ts:116](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L116)
+[base/Root/index.ts:117](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L117)
 
 ___
 
@@ -40,7 +40,7 @@ The i18n information that comes from the properties file
 
 #### Defined in
 
-[base/Root/index.ts:110](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L110)
+[base/Root/index.ts:111](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L111)
 
 ___
 
@@ -53,7 +53,7 @@ it is stripped after processing
 
 #### Defined in
 
-[base/Root/index.ts:95](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L95)
+[base/Root/index.ts:96](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L96)
 
 ___
 
@@ -66,7 +66,7 @@ that are used for tracebacks
 
 #### Defined in
 
-[base/Root/index.ts:100](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L100)
+[base/Root/index.ts:101](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L101)
 
 ___
 
@@ -79,7 +79,7 @@ after processing
 
 #### Defined in
 
-[base/Root/index.ts:105](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L105)
+[base/Root/index.ts:106](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L106)
 
 ___
 
@@ -91,4 +91,4 @@ The type is always root
 
 #### Defined in
 
-[base/Root/index.ts:89](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L89)
+[base/Root/index.ts:90](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L90)

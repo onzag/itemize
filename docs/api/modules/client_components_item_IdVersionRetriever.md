@@ -41,7 +41,7 @@ a react component
 
 #### Defined in
 
-[client/components/item/IdVersionRetriever.tsx:65](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/IdVersionRetriever.tsx#L65)
+[client/components/item/IdVersionRetriever.tsx:65](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/IdVersionRetriever.tsx#L65)
 
 ___
 
@@ -60,4 +60,4 @@ ___
 
 #### Defined in
 
-[client/components/item/IdVersionRetriever.tsx:75](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/IdVersionRetriever.tsx#L75)
+[client/components/item/IdVersionRetriever.tsx:75](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/IdVersionRetriever.tsx#L75)

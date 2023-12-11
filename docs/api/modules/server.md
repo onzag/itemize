@@ -7,6 +7,10 @@ of the server side of things
 
 ## Table of contents
 
+### Namespaces
+
+- [app](server.app.md)
+
 ### Interfaces
 
 - [IAppDataType](../interfaces/server.IAppDataType.md)
@@ -17,30 +21,59 @@ of the server side of things
 - [IServiceCustomizationType](../interfaces/server.IServiceCustomizationType.md)
 - [IStorageProviders](../interfaces/server.IStorageProviders.md)
 
-### Variables
-
-- [app](server.md#app)
-
 ### Functions
 
+- [app](server.md#app)
 - [getStorageProviders](server.md#getstorageproviders)
 - [initializeServer](server.md#initializeserver)
 
-## Variables
+## Functions
 
 ### app
 
-• **app**: `Express`
+▸ **app**(`req`, `res`): `any`
+
+Express instance itself is a request handler, which could be invoked without
+third argument.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `req` | `Request`\<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`\<`string`, `any`\>\> \| `IncomingMessage` |
+| `res` | `ServerResponse` \| `Response`\<`any`, `Record`\<`string`, `any`\>, `number`\> |
+
+#### Returns
+
+`any`
 
 #### Defined in
 
-[server/index.ts:147](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L147)
+node_modules/@types/express-serve-static-core/index.d.ts:1061
 
-## Functions
+▸ **app**(`req`, `res`, `next`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `req` | `Request`\<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`\<`string`, `any`\>\> |
+| `res` | `Response`\<`any`, `Record`\<`string`, `any`\>, `number`\> |
+| `next` | `NextFunction` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+node_modules/@types/express-serve-static-core/index.d.ts:60
+
+___
 
 ### getStorageProviders
 
-▸ **getStorageProviders**(`config`, `sensitiveConfig`, `dbConfig`, `redisConfig`, `storageServiceProviders`, `registry`): `Promise`<{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\>[]  }\>
+▸ **getStorageProviders**(`config`, `sensitiveConfig`, `dbConfig`, `redisConfig`, `storageServiceProviders`, `registry`): `Promise`\<\{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)\<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\>[]  }\>
 
 #### Parameters
 
@@ -55,17 +88,17 @@ of the server side of things
 
 #### Returns
 
-`Promise`<{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\>[]  }\>
+`Promise`\<\{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)\<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\>[]  }\>
 
 #### Defined in
 
-[server/index.ts:286](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L286)
+[server/index.ts:281](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L281)
 
 ___
 
 ### initializeServer
 
-▸ **initializeServer**(`ssrConfig`, `seoConfig`, `custom?`): `Promise`<`void`\>
+▸ **initializeServer**(`ssrConfig`, `seoConfig`, `custom?`): `Promise`\<`void`\>
 
 Initializes the itemize server with its custom configuration
 
@@ -79,8 +112,8 @@ Initializes the itemize server with its custom configuration
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/index.ts:393](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L393)
+[server/index.ts:384](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L384)

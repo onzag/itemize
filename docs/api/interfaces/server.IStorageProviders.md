@@ -6,4 +6,4 @@
 
 ## Indexable
 
-▪ [type: `string`]: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+▪ [type: `string`]: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>

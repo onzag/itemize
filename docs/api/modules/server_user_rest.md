@@ -7,6 +7,8 @@
 ### Interfaces
 
 - [IUnsubscribeUserTokenDataType](../interfaces/server_user_rest.IUnsubscribeUserTokenDataType.md)
+- [IValidateUserTokenDataType](../interfaces/server_user_rest.IValidateUserTokenDataType.md)
+- [RecoverPasswordTokenType](../interfaces/server_user_rest.RecoverPasswordTokenType.md)
 
 ### Functions
 
@@ -30,4 +32,4 @@
 
 #### Defined in
 
-[server/user/rest.ts:16](https://github.com/onzag/itemize/blob/a24376ed/server/user/rest.ts#L16)
+[server/user/rest.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/user/rest.ts#L48)

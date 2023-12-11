@@ -2,7 +2,7 @@
 
 # Module: base/Root/Module/ItemDefinition/PropertyDefinition/rq
 
-This file contains all the graphql related helper functions that are used in order to
+This file contains all the rq related helper functions that are used in order to
 retrieve and set the values of properties, it doesn't contain the conversion functions
 sql.ts does
 
@@ -11,6 +11,7 @@ sql.ts does
 ### Functions
 
 - [getRQDefinitionForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_rq.md#getrqdefinitionforproperty)
+- [validateRQShape](base_Root_Module_ItemDefinition_PropertyDefinition_rq.md#validaterqshape)
 
 ## Functions
 
@@ -29,13 +30,37 @@ this property alone, that is a schema bit
 | `options` | `Object` | - |
 | `options.optionalForm` | `boolean` | makes all the properties optional, nullable |
 | `options.prefix` | `string` | a prefix to prefix the fields by, usually the include prefix if exists |
+| `options.retrievalMode` | `boolean` | - |
 
 #### Returns
 
 `Object`
 
-the partial graphql fields definition for the property
+the partial rq fields definition for the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts:22](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts:89](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts#L89)
+
+___
+
+### validateRQShape
+
+▸ **validateRQShape**(`schema`, `value`, `options?`): `boolean`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `schema` | [`RQField`](../interfaces/base_Root_rq.RQField.md) |
+| `value` | `any` |
+| `options` | `Object` |
+| `options.ignoreArray?` | `boolean` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts:13](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts#L13)

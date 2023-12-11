@@ -9,44 +9,44 @@ are considered and should be handled by your implementation
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [LARGE](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewportZoomEnumType.md#large)
 - [MEDIUM](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewportZoomEnumType.md#medium)
 - [SMALL](client_internal_components_PropertyEntry_PropertyEntryLocation.IViewportZoomEnumType.md#small)
 
-## Enumeration members
+## Enumeration Members
 
 ### LARGE
 
-• **LARGE** = `"LARGE"`
+• **LARGE** = ``"LARGE"``
 
 Zoomed in the most, show an address
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L30)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L30)
 
 ___
 
 ### MEDIUM
 
-• **MEDIUM** = `"MEDIUM"`
+• **MEDIUM** = ``"MEDIUM"``
 
 A default zoom status
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L26)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:26](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L26)
 
 ___
 
 ### SMALL
 
-• **SMALL** = `"SMALL"`
+• **SMALL** = ``"SMALL"``
 
 Should mean the most zoomed out, show an country
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L22)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L22)

@@ -55,7 +55,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L323)
+[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L323)
 
 ___
 
@@ -70,7 +70,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:330](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L330)
+[client/providers/item.tsx:330](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L330)
 
 ___
 
@@ -85,7 +85,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:316](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L316)
+[client/providers/item.tsx:316](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L316)
 
 ___
 
@@ -105,7 +105,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:381](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L381)
+[client/providers/item.tsx:381](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L381)
 
 ___
 
@@ -125,7 +125,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L369)
+[client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L369)
 
 ___
 
@@ -145,7 +145,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L357)
+[client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L357)
 
 ___
 
@@ -162,7 +162,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:273](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L273)
+[client/providers/item.tsx:273](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L273)
 
 ___
 
@@ -179,7 +179,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:282](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L282)
+[client/providers/item.tsx:282](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L282)
 
 ___
 
@@ -196,7 +196,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:264](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L264)
+[client/providers/item.tsx:264](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L264)
 
 ___
 
@@ -208,7 +208,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:224](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L224)
+[client/providers/item.tsx:224](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L224)
 
 ___
 
@@ -220,7 +220,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:228](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L228)
+[client/providers/item.tsx:228](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L228)
 
 ___
 
@@ -232,7 +232,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L220)
+[client/providers/item.tsx:220](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L220)
 
 ___
 
@@ -249,7 +249,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:246](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L246)
+[client/providers/item.tsx:246](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L246)
 
 ___
 
@@ -266,7 +266,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L255)
+[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L255)
 
 ___
 
@@ -283,7 +283,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:237](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L237)
+[client/providers/item.tsx:237](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L237)
 
 ___
 
@@ -296,7 +296,7 @@ given action completes
 
 #### Defined in
 
-[client/providers/item.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L340)
+[client/providers/item.tsx:340](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L340)
 
 ___
 
@@ -309,7 +309,7 @@ given action, completes and FAILED
 
 #### Defined in
 
-[client/providers/item.tsx:345](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L345)
+[client/providers/item.tsx:345](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L345)
 
 ___
 
@@ -322,7 +322,7 @@ given action, completes and SUCCEEDS
 
 #### Defined in
 
-[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L335)
+[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L335)
 
 ___
 
@@ -339,7 +339,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:300](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L300)
+[client/providers/item.tsx:300](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L300)
 
 ___
 
@@ -356,7 +356,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L309)
+[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L309)
 
 ___
 
@@ -373,4 +373,4 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L291)
+[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L291)

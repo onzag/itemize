@@ -19,7 +19,7 @@ an entry for a boolean value
 
 ### style
 
-• **style**: `Object`
+• `Const` **style**: `Object`
 
 The styles of the renderer
 
@@ -27,28 +27,28 @@ The styles of the renderer
 
 | Name | Type |
 | :------ | :------ |
-| `container` | `Object` |
+| `container` | \{ `paddingBottom`: `string` = "1.3rem"; `width`: `string` = "100%" } |
 | `container.paddingBottom` | `string` |
 | `container.width` | `string` |
-| `description` | `Object` |
+| `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
-| `entry` | `Object` |
+| `entry` | \{ `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexDirection`: `string` = "row"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 | `entry.alignItems` | `string` |
 | `entry.display` | `string` |
 | `entry.flexDirection` | `string` |
 | `entry.justifyContent` | `string` |
 | `entry.width` | `string` |
-| `errorMessage` | `Object` |
+| `errorMessage` | \{ `color`: `string` = "#f44336"; `fontSize`: `string` = "0.85rem"; `height`: `string` = "1.3rem" } |
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `icon` | `Object` |
+| `icon` | \{ `color`: `string` = "#424242" } |
 | `icon.color` | `string` |
-| `label` | (`isInvalid`: `boolean`) => { `alignItems`: `string` = "center"; `color`: `string` ; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
+| `label` | (`isInvalid`: `boolean`) => \{ `alignItems`: `string` = "center"; `color`: `string` ; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx:34](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx#L34)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx:34](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx#L34)
 
 ## Functions
 
@@ -75,4 +75,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx:82](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx#L82)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx:82](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryPayment.tsx#L82)

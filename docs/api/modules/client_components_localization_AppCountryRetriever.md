@@ -38,7 +38,7 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:59](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L59)
+[client/components/localization/AppCountryRetriever.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppCountryRetriever.tsx#L59)
 
 ___
 
@@ -53,9 +53,9 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `availableCountries` | [`ICountryType`](../interfaces/imported_resources.ICountryType.md)[] |
-| `changeCountryTo` | () => `any` \| [`ChangeCountryToFn`](client_internal_providers_locale_provider.md#changecountrytofn) |
+| `changeCountryTo` | [`ChangeCountryToFn`](client_internal_providers_locale_provider.md#changecountrytofn) \| () => `any` |
 | `currentCountry` | [`ICountryType`](../interfaces/imported_resources.ICountryType.md) |
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:95](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L95)
+[client/components/localization/AppCountryRetriever.tsx:95](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppCountryRetriever.tsx#L95)

@@ -15,11 +15,11 @@
 
 ### component
 
-• **component**: `ComponentType`<[`IDrawerUIHandlerElementConfigCustomProps`](client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md)\>
+• **component**: `ComponentType`\<[`IDrawerUIHandlerElementConfigCustomProps`](client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md)\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:376](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L376)
+[client/fast-prototyping/components/slate/wrapper.tsx:376](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L376)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:375](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L375)
+[client/fast-prototyping/components/slate/wrapper.tsx:375](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L375)

@@ -35,7 +35,7 @@ typescript, this file acts as a registry of sorts
 - [ISQLSideEffectType](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSideEffectType.md)
 - [ISQLStrSearchInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLStrSearchInfo.md)
 
-### Type aliases
+### Type Aliases
 
 - [PropertyDefinitionSupportedType](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)
 - [PropertyDefinitionSupportedTypeName](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtypename)
@@ -45,7 +45,7 @@ typescript, this file acts as a registry of sorts
 
 - [default](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#default)
 
-## Type aliases
+## Type Aliases
 
 ### PropertyDefinitionSupportedType
 
@@ -55,7 +55,7 @@ All the supported types combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:568](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L568)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:561](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L561)
 
 ___
 
@@ -67,29 +67,29 @@ All the supported property types
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:42](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L42)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:40](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L40)
 
 ___
 
 ### PropertyDefinitionSupportedTypesStandardType
 
-Ƭ **PropertyDefinitionSupportedTypesStandardType**: `Record`<[`PropertyDefinitionSupportedTypeName`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtypename), [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\>
+Ƭ **PropertyDefinitionSupportedTypesStandardType**: `Record`\<[`PropertyDefinitionSupportedTypeName`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtypename), [`IPropertyDefinitionSupportedType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md)\<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\>
 
 So this is how properties are defined to give an overview on
 how they are supposed to be managed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:514](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L514)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:507](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L507)
 
 ## Variables
 
 ### default
 
-• **default**: [`PropertyDefinitionSupportedTypesStandardType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtypesstandardtype)
+• `Const` **default**: [`PropertyDefinitionSupportedTypesStandardType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtypesstandardtype)
 
 The standard definition and registry of all types in itemize
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:520](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L520)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:513](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L513)

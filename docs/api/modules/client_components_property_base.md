@@ -35,8 +35,8 @@ to the proper handler
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `originalProps` | `string` \| `IPropertyEntryViewReadSetProps`<`any`, `any`\> | - |
-| `type` | ``"entry"`` \| ``"view"`` \| ``"read"`` \| ``"set"`` | the type, entry, view, read, or set |
+| `originalProps` | `string` \| `IPropertyEntryViewReadSetProps`\<`any`, `any`\> | - |
+| `type` | ``"entry"`` \| ``"read"`` \| ``"view"`` \| ``"set"`` | the type, entry, view, read, or set |
 | `use?` | `boolean` | - |
 
 #### Returns
@@ -47,4 +47,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/base.tsx:248](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L248)
+[client/components/property/base.tsx:248](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L248)

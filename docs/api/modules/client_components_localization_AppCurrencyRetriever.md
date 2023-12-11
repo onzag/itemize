@@ -39,7 +39,7 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCurrencyRetriever.tsx:60](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCurrencyRetriever.tsx#L60)
+[client/components/localization/AppCurrencyRetriever.tsx:60](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppCurrencyRetriever.tsx#L60)
 
 ___
 
@@ -54,9 +54,9 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `availableCurrencies` | [`ICurrencyType`](../interfaces/imported_resources.ICurrencyType.md)[] |
-| `changeCurrencyTo` | () => `any` \| [`ChangeCurrencyToFn`](client_internal_providers_locale_provider.md#changecurrencytofn) |
+| `changeCurrencyTo` | [`ChangeCurrencyToFn`](client_internal_providers_locale_provider.md#changecurrencytofn) \| () => `any` |
 | `currentCurrency` | [`ICurrencyType`](../interfaces/imported_resources.ICurrencyType.md) |
 
 #### Defined in
 
-[client/components/localization/AppCurrencyRetriever.tsx:83](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCurrencyRetriever.tsx#L83)
+[client/components/localization/AppCurrencyRetriever.tsx:83](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppCurrencyRetriever.tsx#L83)

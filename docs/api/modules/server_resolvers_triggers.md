@@ -17,7 +17,7 @@
 - [ISearchTriggerArgType](../interfaces/server_resolvers_triggers.ISearchTriggerArgType.md)
 - [ITriggerRegistry](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
 
-### Type aliases
+### Type Aliases
 
 - [IOConflictTriggerType](server_resolvers_triggers.md#ioconflicttriggertype)
 - [IOTriggerType](server_resolvers_triggers.md#iotriggertype)
@@ -27,15 +27,15 @@
 
 - [mergeTriggerRegistries](server_resolvers_triggers.md#mergetriggerregistries)
 
-## Type aliases
+## Type Aliases
 
 ### IOConflictTriggerType
 
-Ƭ **IOConflictTriggerType**: (`arg`: [`IOConflictTriggerArgType`](../interfaces/server_resolvers_triggers.IOConflictTriggerArgType.md)) => `void` \| `boolean` \| `Promise`<`void` \| `boolean`\>
+Ƭ **IOConflictTriggerType**: (`arg`: [`IOConflictTriggerArgType`](../interfaces/server_resolvers_triggers.IOConflictTriggerArgType.md)) => `void` \| `boolean` \| `Promise`\<`void` \| `boolean`\>
 
 #### Type declaration
 
-▸ (`arg`): `void` \| `boolean` \| `Promise`<`void` \| `boolean`\>
+▸ (`arg`): `void` \| `boolean` \| `Promise`\<`void` \| `boolean`\>
 
 return true to overwrite
 false to throw the error
@@ -48,21 +48,21 @@ false to throw the error
 
 ##### Returns
 
-`void` \| `boolean` \| `Promise`<`void` \| `boolean`\>
+`void` \| `boolean` \| `Promise`\<`void` \| `boolean`\>
 
 #### Defined in
 
-[server/resolvers/triggers.ts:211](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L211)
+[server/resolvers/triggers.ts:211](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L211)
 
 ___
 
 ### IOTriggerType
 
-Ƭ **IOTriggerType**: (`arg`: [`IOTriggerArgType`](../interfaces/server_resolvers_triggers.IOTriggerArgType.md)) => [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| `Promise`<[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)\> \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) \| `Promise`<[`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md)\>
+Ƭ **IOTriggerType**: (`arg`: [`IOTriggerArgType`](../interfaces/server_resolvers_triggers.IOTriggerArgType.md)) => [`IRQValue`](../interfaces/rq_querier.IRQValue.md) \| `Promise`\<[`IRQValue`](../interfaces/rq_querier.IRQValue.md)\> \| [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) \| `Promise`\<[`IRQArgs`](../interfaces/rq_querier.IRQArgs.md)\>
 
 #### Type declaration
 
-▸ (`arg`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| `Promise`<[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)\> \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) \| `Promise`<[`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md)\>
+▸ (`arg`): [`IRQValue`](../interfaces/rq_querier.IRQValue.md) \| `Promise`\<[`IRQValue`](../interfaces/rq_querier.IRQValue.md)\> \| [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) \| `Promise`\<[`IRQArgs`](../interfaces/rq_querier.IRQArgs.md)\>
 
 ##### Parameters
 
@@ -72,21 +72,21 @@ ___
 
 ##### Returns
 
-[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| `Promise`<[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)\> \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) \| `Promise`<[`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md)\>
+[`IRQValue`](../interfaces/rq_querier.IRQValue.md) \| `Promise`\<[`IRQValue`](../interfaces/rq_querier.IRQValue.md)\> \| [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) \| `Promise`\<[`IRQArgs`](../interfaces/rq_querier.IRQArgs.md)\>
 
 #### Defined in
 
-[server/resolvers/triggers.ts:204](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L204)
+[server/resolvers/triggers.ts:204](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L204)
 
 ___
 
 ### SearchTriggerType
 
-Ƭ **SearchTriggerType**: (`arg`: [`ISearchTriggerArgType`](../interfaces/server_resolvers_triggers.ISearchTriggerArgType.md)) => `void` \| `Promise`<`void`\>
+Ƭ **SearchTriggerType**: (`arg`: [`ISearchTriggerArgType`](../interfaces/server_resolvers_triggers.ISearchTriggerArgType.md)) => `void` \| `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`arg`): `void` \| `Promise`<`void`\>
+▸ (`arg`): `void` \| `Promise`\<`void`\>
 
 ##### Parameters
 
@@ -96,17 +96,17 @@ ___
 
 ##### Returns
 
-`void` \| `Promise`<`void`\>
+`void` \| `Promise`\<`void`\>
 
 #### Defined in
 
-[server/resolvers/triggers.ts:205](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L205)
+[server/resolvers/triggers.ts:205](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L205)
 
 ## Functions
 
 ### mergeTriggerRegistries
 
-▸ **mergeTriggerRegistries**(...`triggers`): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
+▸ **mergeTriggerRegistries**(`...triggers`): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
 
 #### Parameters
 
@@ -120,4 +120,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:315](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L315)
+[server/resolvers/triggers.ts:315](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L315)

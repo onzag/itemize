@@ -12,6 +12,7 @@ now
 
 ### Properties
 
+- [allowsInsertElement](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md#allowsinsertelement)
 - [allowsText](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md#allowstext)
 - [blockIsVoid](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md#blockisvoid)
 - [blockUIHandler](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md#blockuihandler)
@@ -49,11 +50,38 @@ now
 - [superBlockUIHandler](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md#superblockuihandler)
 - [topmostSuperblockIsVoid](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md#topmostsuperblockisvoid)
 
-### Methods
-
-- [allowsInsertElement](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md#allowsinsertelement)
-
 ## Properties
+
+### allowsInsertElement
+
+• **allowsInsertElement**: (`element`: [`RichElement`](../modules/client_internal_text_serializer.md#richelement), `opts?`: \{ `collapsed?`: `boolean` ; `extended?`: `boolean` ; `selected?`: `boolean`  }) => `boolean`
+
+#### Type declaration
+
+▸ (`element`, `opts?`): `boolean`
+
+Contextual, very specific to the current context
+where the cursor is located
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `element` | [`RichElement`](../modules/client_internal_text_serializer.md#richelement) |
+| `opts?` | `Object` |
+| `opts.collapsed?` | `boolean` |
+| `opts.extended?` | `boolean` |
+| `opts.selected?` | `boolean` |
+
+##### Returns
+
+`boolean`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:728](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L728)
+
+___
 
 ### allowsText
 
@@ -61,7 +89,7 @@ now
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:729](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L729)
+[client/fast-prototyping/components/slate/index.tsx:729](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L729)
 
 ___
 
@@ -71,7 +99,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:731](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L731)
+[client/fast-prototyping/components/slate/index.tsx:731](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L731)
 
 ___
 
@@ -81,7 +109,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:734](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L734)
+[client/fast-prototyping/components/slate/index.tsx:734](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L734)
 
 ___
 
@@ -91,7 +119,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:681](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L681)
+[client/fast-prototyping/components/slate/index.tsx:681](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L681)
 
 ___
 
@@ -101,7 +129,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:689](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L689)
+[client/fast-prototyping/components/slate/index.tsx:689](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L689)
 
 ___
 
@@ -111,7 +139,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:680](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L680)
+[client/fast-prototyping/components/slate/index.tsx:680](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L680)
 
 ___
 
@@ -121,7 +149,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:688](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L688)
+[client/fast-prototyping/components/slate/index.tsx:688](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L688)
 
 ___
 
@@ -131,7 +159,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:712](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L712)
+[client/fast-prototyping/components/slate/index.tsx:712](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L712)
 
 ___
 
@@ -141,7 +169,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:714](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L714)
+[client/fast-prototyping/components/slate/index.tsx:714](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L714)
 
 ___
 
@@ -151,7 +179,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:699](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L699)
+[client/fast-prototyping/components/slate/index.tsx:699](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L699)
 
 ___
 
@@ -161,7 +189,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:705](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L705)
+[client/fast-prototyping/components/slate/index.tsx:705](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L705)
 
 ___
 
@@ -171,7 +199,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:701](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L701)
+[client/fast-prototyping/components/slate/index.tsx:701](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L701)
 
 ___
 
@@ -181,7 +209,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:708](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L708)
+[client/fast-prototyping/components/slate/index.tsx:708](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L708)
 
 ___
 
@@ -191,7 +219,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:716](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L716)
+[client/fast-prototyping/components/slate/index.tsx:716](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L716)
 
 ___
 
@@ -201,7 +229,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:715](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L715)
+[client/fast-prototyping/components/slate/index.tsx:715](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L715)
 
 ___
 
@@ -211,7 +239,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:698](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L698)
+[client/fast-prototyping/components/slate/index.tsx:698](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L698)
 
 ___
 
@@ -221,7 +249,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:704](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L704)
+[client/fast-prototyping/components/slate/index.tsx:704](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L704)
 
 ___
 
@@ -231,7 +259,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:706](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L706)
+[client/fast-prototyping/components/slate/index.tsx:706](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L706)
 
 ___
 
@@ -241,7 +269,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:700](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L700)
+[client/fast-prototyping/components/slate/index.tsx:700](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L700)
 
 ___
 
@@ -255,7 +283,7 @@ current element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:697](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L697)
+[client/fast-prototyping/components/slate/index.tsx:697](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L697)
 
 ___
 
@@ -265,7 +293,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:703](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L703)
+[client/fast-prototyping/components/slate/index.tsx:703](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L703)
 
 ___
 
@@ -275,7 +303,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:713](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L713)
+[client/fast-prototyping/components/slate/index.tsx:713](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L713)
 
 ___
 
@@ -285,7 +313,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:690](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L690)
+[client/fast-prototyping/components/slate/index.tsx:690](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L690)
 
 ___
 
@@ -295,7 +323,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:682](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L682)
+[client/fast-prototyping/components/slate/index.tsx:682](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L682)
 
 ___
 
@@ -308,7 +336,7 @@ a text node where the caret is currently placed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:679](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L679)
+[client/fast-prototyping/components/slate/index.tsx:679](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L679)
 
 ___
 
@@ -320,7 +348,7 @@ The current path followed, text path for the current text
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:687](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L687)
+[client/fast-prototyping/components/slate/index.tsx:687](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L687)
 
 ___
 
@@ -334,7 +362,7 @@ and it's used for stylistic purposes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:673](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L673)
+[client/fast-prototyping/components/slate/index.tsx:673](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L673)
 
 ___
 
@@ -347,7 +375,7 @@ in the slate rich text editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:722](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L722)
+[client/fast-prototyping/components/slate/index.tsx:722](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L722)
 
 ___
 
@@ -361,7 +389,7 @@ state of the editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:651](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L651)
+[client/fast-prototyping/components/slate/index.tsx:651](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L651)
 
 ___
 
@@ -371,7 +399,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:730](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L730)
+[client/fast-prototyping/components/slate/index.tsx:730](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L730)
 
 ___
 
@@ -381,7 +409,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:735](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L735)
+[client/fast-prototyping/components/slate/index.tsx:735](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L735)
 
 ___
 
@@ -403,7 +431,7 @@ the props of the editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:666](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L666)
+[client/fast-prototyping/components/slate/index.tsx:666](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L666)
 
 ___
 
@@ -413,7 +441,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:709](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L709)
+[client/fast-prototyping/components/slate/index.tsx:709](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L709)
 
 ___
 
@@ -423,7 +451,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:710](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L710)
+[client/fast-prototyping/components/slate/index.tsx:710](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L710)
 
 ___
 
@@ -433,7 +461,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:733](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L733)
+[client/fast-prototyping/components/slate/index.tsx:733](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L733)
 
 ___
 
@@ -443,31 +471,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:732](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L732)
-
-## Methods
-
-### allowsInsertElement
-
-▸ **allowsInsertElement**(`element`, `opts?`): `boolean`
-
-Contextual, very specific to the current context
-where the cursor is located
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `element` | [`RichElement`](../modules/client_internal_text_serializer.md#richelement) |
-| `opts?` | `Object` |
-| `opts.collapsed?` | `boolean` |
-| `opts.extended?` | `boolean` |
-| `opts.selected?` | `boolean` |
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:728](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L728)
+[client/fast-prototyping/components/slate/index.tsx:732](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L732)

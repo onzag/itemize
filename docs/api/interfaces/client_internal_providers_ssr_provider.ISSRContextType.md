@@ -24,7 +24,7 @@ The SSR context itself on all its might
 • **currencyFactors**: `Object`
 
 Currency factors as they are used in the SSR mode,
-this will become the initial currency factors, if
+this will become the initial currency factors, if 
 there's no SSR context then it should fetch
 
 #### Index signature
@@ -33,7 +33,7 @@ there's no SSR context then it should fetch
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:77](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L77)
+[client/internal/providers/ssr-provider.tsx:77](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L77)
 
 ___
 
@@ -45,7 +45,7 @@ Collected queries
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:83](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L83)
+[client/internal/providers/ssr-provider.tsx:83](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L83)
 
 ___
 
@@ -57,7 +57,7 @@ Collected resources map
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:87](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L87)
+[client/internal/providers/ssr-provider.tsx:87](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L87)
 
 ___
 
@@ -69,7 +69,7 @@ Collected searches
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:91](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L91)
+[client/internal/providers/ssr-provider.tsx:91](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L91)
 
 ___
 
@@ -82,7 +82,7 @@ but the server has no access to the dom, so to keep things consistent it's here
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:117](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L117)
+[client/internal/providers/ssr-provider.tsx:117](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L117)
 
 ___
 
@@ -102,4 +102,4 @@ The user we refer about
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:95](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/ssr-provider.tsx#L95)
+[client/internal/providers/ssr-provider.tsx:95](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/ssr-provider.tsx#L95)

@@ -24,7 +24,7 @@ with all the possible types involved
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:508](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L508)
+[base/Root/Module/ItemDefinition/index.ts:507](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L507)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:507](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L507)
+[base/Root/Module/ItemDefinition/index.ts:506](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L506)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:510](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L510)
+[base/Root/Module/ItemDefinition/index.ts:509](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L509)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:509](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L509)
+[base/Root/Module/ItemDefinition/index.ts:508](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L508)

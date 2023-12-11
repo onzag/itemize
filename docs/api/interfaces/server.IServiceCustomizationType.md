@@ -23,11 +23,11 @@
 
 ### currencyFactorsProvider
 
-• `Optional` **currencyFactorsProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **currencyFactorsProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:234](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L234)
+[server/index.ts:232](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L232)
 
 ___
 
@@ -37,61 +37,61 @@ ___
 
 #### Index signature
 
-▪ [name: `string`]: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+▪ [name: `string`]: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:238](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L238)
+[server/index.ts:236](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L236)
 
 ___
 
 ### locationSearchProvider
 
-• `Optional` **locationSearchProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **locationSearchProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:235](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L235)
+[server/index.ts:233](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L233)
 
 ___
 
 ### loggingServiceProvider
 
-• `Optional` **loggingServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **loggingServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:237](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L237)
+[server/index.ts:235](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L235)
 
 ___
 
 ### mailServiceProvider
 
-• `Optional` **mailServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **mailServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:230](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L230)
+[server/index.ts:228](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L228)
 
 ___
 
 ### paymentProvider
 
-• `Optional` **paymentProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **paymentProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:236](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L236)
+[server/index.ts:234](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L234)
 
 ___
 
 ### phoneServiceProvider
 
-• `Optional` **phoneServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **phoneServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:231](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L231)
+[server/index.ts:229](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L229)
 
 ___
 
@@ -101,24 +101,24 @@ ___
 
 #### Defined in
 
-[server/index.ts:229](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L229)
+[server/index.ts:227](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L227)
 
 ___
 
 ### userLocalizationProvider
 
-• `Optional` **userLocalizationProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **userLocalizationProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:233](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L233)
+[server/index.ts:231](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L231)
 
 ___
 
 ### ussdServiceProvider
 
-• `Optional` **ussdServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+• `Optional` **ussdServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)\<`any`\>
 
 #### Defined in
 
-[server/index.ts:232](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L232)
+[server/index.ts:230](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L230)

@@ -32,4 +32,4 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/outdated-dialog.tsx:51](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/outdated-dialog.tsx#L51)
+[client/fast-prototyping/components/navbar/outdated-dialog.tsx:51](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/navbar/outdated-dialog.tsx#L51)

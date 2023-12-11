@@ -44,7 +44,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`boolean`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`boolean`\> | the props for the entry |
 
 #### Returns
 
@@ -54,7 +54,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:72](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L72)
+[client/components/property/Setter.tsx:72](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L72)
 
 ___
 
@@ -74,7 +74,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\> | the props for the entry |
 
 #### Returns
 
@@ -84,7 +84,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:137](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L137)
+[client/components/property/Setter.tsx:137](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L137)
 
 ___
 
@@ -104,7 +104,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`string`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`string`\> | the props for the entry |
 
 #### Returns
 
@@ -114,7 +114,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:201](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L201)
+[client/components/property/Setter.tsx:201](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L201)
 
 ___
 
@@ -134,7 +134,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`string`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`string`\> | the props for the entry |
 
 #### Returns
 
@@ -144,7 +144,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:217](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L217)
+[client/components/property/Setter.tsx:217](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L217)
 
 ___
 
@@ -164,7 +164,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`IRQFile`](../interfaces/rq_querier.IRQFile.md)\> | the props for the entry |
 
 #### Returns
 
@@ -174,7 +174,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:265](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L265)
+[client/components/property/Setter.tsx:265](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L265)
 
 ___
 
@@ -194,7 +194,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\> | the props for the entry |
 
 #### Returns
 
@@ -204,7 +204,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:281](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L281)
+[client/components/property/Setter.tsx:281](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L281)
 
 ___
 
@@ -224,7 +224,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`number`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`number`\> | the props for the entry |
 
 #### Returns
 
@@ -234,7 +234,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:105](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L105)
+[client/components/property/Setter.tsx:105](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L105)
 
 ___
 
@@ -254,7 +254,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`number`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`number`\> | the props for the entry |
 
 #### Returns
 
@@ -264,7 +264,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:121](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L121)
+[client/components/property/Setter.tsx:121](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L121)
 
 ___
 
@@ -284,7 +284,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\> | the props for the entry |
 
 #### Returns
 
@@ -294,7 +294,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:233](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L233)
+[client/components/property/Setter.tsx:233](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L233)
 
 ___
 
@@ -314,7 +314,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`string`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`string`\> | the props for the entry |
 
 #### Returns
 
@@ -324,7 +324,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:88](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L88)
+[client/components/property/Setter.tsx:88](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L88)
 
 ___
 
@@ -344,7 +344,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\> | the props for the entry |
 
 #### Returns
 
@@ -354,7 +354,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:249](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L249)
+[client/components/property/Setter.tsx:249](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L249)
 
 ___
 
@@ -374,7 +374,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\> | the props for the entry |
 
 #### Returns
 
@@ -384,7 +384,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:169](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L169)
+[client/components/property/Setter.tsx:169](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L169)
 
 ___
 
@@ -404,7 +404,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`string`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`string`\> | the props for the entry |
 
 #### Returns
 
@@ -414,7 +414,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:297](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L297)
+[client/components/property/Setter.tsx:297](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L297)
 
 ___
 
@@ -434,7 +434,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\> | the props for the entry |
 
 #### Returns
 
@@ -444,7 +444,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:153](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L153)
+[client/components/property/Setter.tsx:153](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L153)
 
 ___
 
@@ -464,7 +464,7 @@ the elements inside it mount, making this setter not execute but after automatic
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<`number`\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<`number`\> | the props for the entry |
 
 #### Returns
 
@@ -474,7 +474,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:185](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L185)
+[client/components/property/Setter.tsx:185](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L185)
 
 ___
 
@@ -511,7 +511,7 @@ TimeSetter
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\> | the props for the entry |
+| `props` | [`IPropertySetterProps`](../interfaces/client_components_property_base.IPropertySetterProps.md)\<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\> | the props for the entry |
 
 #### Returns
 
@@ -521,4 +521,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:56](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L56)
+[client/components/property/Setter.tsx:56](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Setter.tsx#L56)

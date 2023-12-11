@@ -16,8 +16,8 @@
 
 ### materialUIElementWrappers
 
-• **materialUIElementWrappers**: [`ISlateEditorElementWrappers`](../interfaces/client_fast_prototyping_components_slate.ISlateEditorElementWrappers.md)
+• `Const` **materialUIElementWrappers**: [`ISlateEditorElementWrappers`](../interfaces/client_fast_prototyping_components_slate.ISlateEditorElementWrappers.md)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/element-wrappers.tsx:587](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/element-wrappers.tsx#L587)
+[client/fast-prototyping/components/slate/element-wrappers.tsx:587](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/element-wrappers.tsx#L587)

@@ -46,7 +46,7 @@ The select query builder that allows to create SELECT queries
 
 ### constructor
 
-• **new DeclareCursorBuilder**(`name`, `forQuery`)
+• **new DeclareCursorBuilder**(`name`, `forQuery`): [`DeclareCursorBuilder`](database_DeclareCursorBuilder.DeclareCursorBuilder.md)
 
 Builds a new declare query builder
 
@@ -57,13 +57,17 @@ Builds a new declare query builder
 | `name` | `string` | the name |
 | `forQuery` | [`QueryBuilder`](database_base.QueryBuilder.md) | the query it is done for |
 
+#### Returns
+
+[`DeclareCursorBuilder`](database_DeclareCursorBuilder.DeclareCursorBuilder.md)
+
 #### Overrides
 
 [QueryBuilder](database_base.QueryBuilder.md).[constructor](database_base.QueryBuilder.md#constructor)
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:22](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L22)
+[database/DeclareCursorBuilder.ts:22](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L22)
 
 ## Properties
 
@@ -73,7 +77,7 @@ Builds a new declare query builder
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:12](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L12)
+[database/DeclareCursorBuilder.ts:12](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L12)
 
 ___
 
@@ -83,7 +87,7 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:14](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L14)
+[database/DeclareCursorBuilder.ts:14](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L14)
 
 ___
 
@@ -93,7 +97,7 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:13](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L13)
+[database/DeclareCursorBuilder.ts:13](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L13)
 
 ___
 
@@ -103,7 +107,7 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:15](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L15)
+[database/DeclareCursorBuilder.ts:15](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L15)
 
 ## Methods
 
@@ -129,7 +133,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
 
 ___
 
@@ -155,7 +159,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
 
 ___
 
@@ -175,7 +179,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
 
 ___
 
@@ -189,7 +193,7 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:56](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L56)
+[database/DeclareCursorBuilder.ts:56](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L56)
 
 ___
 
@@ -211,7 +215,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:66](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L66)
+[database/DeclareCursorBuilder.ts:66](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L66)
 
 ___
 
@@ -234,7 +238,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
 
 ___
 
@@ -248,7 +252,7 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:50](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L50)
+[database/DeclareCursorBuilder.ts:50](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L50)
 
 ___
 
@@ -268,7 +272,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
 
 ___
 
@@ -282,7 +286,7 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:44](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L44)
+[database/DeclareCursorBuilder.ts:44](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L44)
 
 ___
 
@@ -309,7 +313,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
 
 ___
 
@@ -336,7 +340,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
 
 ___
 
@@ -358,7 +362,7 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)
 
 ___
 
@@ -372,7 +376,7 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:32](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L32)
+[database/DeclareCursorBuilder.ts:32](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L32)
 
 ___
 
@@ -386,4 +390,4 @@ ___
 
 #### Defined in
 
-[database/DeclareCursorBuilder.ts:38](https://github.com/onzag/itemize/blob/a24376ed/database/DeclareCursorBuilder.ts#L38)
+[database/DeclareCursorBuilder.ts:38](https://github.com/onzag/itemize/blob/59702dd5/database/DeclareCursorBuilder.ts#L38)

@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [server/elastic](../modules/server_elastic.md) / IPingEvent
 
-# Interface: IPingEvent<N, T\>
+# Interface: IPingEvent\<N, T\>
 
 [server/elastic](../modules/server_elastic.md).IPingEvent
 
@@ -13,7 +13,7 @@
 
 ## Hierarchy
 
-- [`IElasticPing`](server_elastic.IElasticPing.md)<`N`\>
+- [`IElasticPing`](server_elastic.IElasticPing.md)\<`N`\>
 
   ↳ **`IPingEvent`**
 
@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[server/elastic.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L38)
+[server/elastic.ts:38](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L38)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:37](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L37)
+[server/elastic.ts:37](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L37)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L46)
+[server/elastic.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L46)
 
 ___
 
@@ -76,4 +76,4 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L36)
+[server/elastic.ts:36](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L36)

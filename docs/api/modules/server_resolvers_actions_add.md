@@ -10,50 +10,29 @@ is added
 ### Functions
 
 - [addItemDefinition](server_resolvers_actions_add.md#additemdefinition)
-- [addItemDefinitionFn](server_resolvers_actions_add.md#additemdefinitionfn)
 - [addItemDefinitionFnRQ](server_resolvers_actions_add.md#additemdefinitionfnrq)
 
 ## Functions
 
 ### addItemDefinition
 
-▸ **addItemDefinition**(`appData`, `resolverArgs`, `resolverItemDefinition`): `Promise`<{ `DATA`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) = gqlValue }\>
+▸ **addItemDefinition**(`appData`, `resolverItemDefinition`, `resolverArgs`): `Promise`\<\{ `DATA`: [`IRQValue`](../interfaces/rq_querier.IRQValue.md) = value }\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
 | `resolverItemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `resolverArgs` | [`IRQResolverArgs`](../interfaces/base_Root_rq.IRQResolverArgs.md) |
 
 #### Returns
 
-`Promise`<{ `DATA`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) = gqlValue }\>
+`Promise`\<\{ `DATA`: [`IRQValue`](../interfaces/rq_querier.IRQValue.md) = value }\>
 
 #### Defined in
 
-[server/resolvers/actions/add.ts:49](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/add.ts#L49)
-
-___
-
-### addItemDefinitionFn
-
-▸ **addItemDefinitionFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-
-#### Returns
-
-[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
-
-#### Defined in
-
-[server/resolvers/actions/add.ts:731](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/add.ts#L731)
+[server/resolvers/actions/add.ts:49](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/add.ts#L49)
 
 ___
 
@@ -73,4 +52,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/add.ts:735](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/add.ts#L735)
+[server/resolvers/actions/add.ts:728](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/add.ts#L728)

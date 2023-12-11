@@ -1,6 +1,6 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/internal/components/PropertyEntry](../modules/client_internal_components_PropertyEntry.md) / IPropertyEntryMainHandlerProps
 
-# Interface: IPropertyEntryMainHandlerProps<ValueType, RendererPropsType\>
+# Interface: IPropertyEntryMainHandlerProps\<ValueType, RendererPropsType\>
 
 [client/internal/components/PropertyEntry](../modules/client_internal_components_PropertyEntry.md).IPropertyEntryMainHandlerProps
 
@@ -43,8 +43,11 @@ the values are distributed
 - [hidePlaceholder](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#hideplaceholder)
 - [ignoreErrors](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#ignoreerrors)
 - [include](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#include)
+- [injectSubmitBlockPromise](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#injectsubmitblockpromise)
 - [itemDefinition](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#itemdefinition)
 - [languageOverride](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#languageoverride)
+- [onChange](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#onchange)
+- [onRestore](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#onrestore)
 - [poked](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#poked)
 - [prefillWith](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#prefillwith)
 - [property](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#property)
@@ -52,12 +55,6 @@ the values are distributed
 - [rendererArgs](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#rendererargs)
 - [state](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#state)
 - [useAppliedValue](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#useappliedvalue)
-
-### Methods
-
-- [injectSubmitBlockPromise](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#injectsubmitblockpromise)
-- [onChange](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#onchange)
-- [onRestore](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#onrestore)
 
 ## Properties
 
@@ -71,7 +68,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:261](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L261)
+[client/internal/components/PropertyEntry/index.tsx:261](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L261)
 
 ___
 
@@ -85,7 +82,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:267](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L267)
+[client/internal/components/PropertyEntry/index.tsx:267](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L267)
 
 ___
 
@@ -99,7 +96,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:285](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L285)
+[client/internal/components/PropertyEntry/index.tsx:285](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L285)
 
 ___
 
@@ -113,7 +110,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:291](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L291)
+[client/internal/components/PropertyEntry/index.tsx:291](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L291)
 
 ___
 
@@ -126,7 +123,7 @@ via the url
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:324](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L324)
+[client/internal/components/PropertyEntry/index.tsx:324](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L324)
 
 ___
 
@@ -143,7 +140,7 @@ retrieved from the applied value from the item-definition.tsx context in the giv
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:195](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L195)
+[client/internal/components/PropertyEntry/index.tsx:195](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L195)
 
 ___
 
@@ -155,7 +152,7 @@ Developer provider check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:328](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L328)
+[client/internal/components/PropertyEntry/index.tsx:328](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L328)
 
 ___
 
@@ -167,7 +164,7 @@ Will display even if it's hidden
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:332](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L332)
+[client/internal/components/PropertyEntry/index.tsx:332](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L332)
 
 ___
 
@@ -182,7 +179,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:227](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L227)
+[client/internal/components/PropertyEntry/index.tsx:227](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L227)
 
 ___
 
@@ -197,7 +194,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:234](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L234)
+[client/internal/components/PropertyEntry/index.tsx:234](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L234)
 
 ___
 
@@ -212,7 +209,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:249](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L249)
+[client/internal/components/PropertyEntry/index.tsx:249](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L249)
 
 ___
 
@@ -232,7 +229,7 @@ of the basic form
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:345](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L345)
+[client/internal/components/PropertyEntry/index.tsx:345](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L345)
 
 ___
 
@@ -246,7 +243,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:255](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L255)
+[client/internal/components/PropertyEntry/index.tsx:255](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L255)
 
 ___
 
@@ -260,7 +257,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:273](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L273)
+[client/internal/components/PropertyEntry/index.tsx:273](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L273)
 
 ___
 
@@ -274,7 +271,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:279](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L279)
+[client/internal/components/PropertyEntry/index.tsx:279](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L279)
 
 ___
 
@@ -290,7 +287,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:299](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L299)
+[client/internal/components/PropertyEntry/index.tsx:299](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L299)
 
 ___
 
@@ -305,7 +302,36 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:179](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L179)
+[client/internal/components/PropertyEntry/index.tsx:179](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L179)
+
+___
+
+### injectSubmitBlockPromise
+
+• **injectSubmitBlockPromise**: (`arg`: `Promise`\<`any`\>) => `void`
+
+#### Type declaration
+
+▸ (`arg`): `void`
+
+Injects a promise that will prevent submitting until the promise is completed
+
+Automatically Provided check base.tsx
+same as the item-definition.tsx context function
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | `Promise`\<`any`\> |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:172](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L172)
 
 ___
 
@@ -321,7 +347,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:165](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L165)
+[client/internal/components/PropertyEntry/index.tsx:165](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L165)
 
 ___
 
@@ -337,7 +363,63 @@ value if it has its own
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L340)
+[client/internal/components/PropertyEntry/index.tsx:340](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L340)
+
+___
+
+### onChange
+
+• **onChange**: (`newValue`: `ValueType`, `internalValue`: `any`) => `void`
+
+#### Type declaration
+
+▸ (`newValue`, `internalValue`): `void`
+
+The on change event, this is similar to the property.setCurrentValue but takes cares of things
+like slotting and does the necessary calls to the UI in order to keep the UI updated with these
+changes, you will receive a new state in this case if the new state differs
+
+Automatically Provided check base.tsx
+based on the change function from the item-definition.tsx context
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `newValue` | `ValueType` |
+| `internalValue` | `any` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:212](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L212)
+
+___
+
+### onRestore
+
+• **onRestore**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
+
+The restore event, similar to property.restoreValueFor but takes cares of the slot and does
+the necessary calls for the UI
+
+Automatically Provided check base.tsx
+based on the restore function from the item-definition.tsx context
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:220](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L220)
 
 ___
 
@@ -352,7 +434,7 @@ calculated from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:241](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L241)
+[client/internal/components/PropertyEntry/index.tsx:241](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L241)
 
 ___
 
@@ -367,7 +449,7 @@ Developer provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:319](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L319)
+[client/internal/components/PropertyEntry/index.tsx:319](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L319)
 
 ___
 
@@ -382,13 +464,13 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:186](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L186)
+[client/internal/components/PropertyEntry/index.tsx:186](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L186)
 
 ___
 
 ### renderer
 
-• `Optional` **renderer**: `ComponentType`<`RendererPropsType`\>
+• `Optional` **renderer**: `ComponentType`\<`RendererPropsType`\>
 
 An alernative renderer chosen for this
 
@@ -396,7 +478,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:305](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L305)
+[client/internal/components/PropertyEntry/index.tsx:305](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L305)
 
 ___
 
@@ -411,13 +493,13 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:312](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L312)
+[client/internal/components/PropertyEntry/index.tsx:312](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L312)
 
 ___
 
 ### state
 
-• **state**: [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`ValueType`\>
+• **state**: [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)\<`ValueType`\>
 
 The state of the property definition, same as property.getState or property.getStateNoExternalChecking
 but this value is more efficient to access
@@ -427,7 +509,7 @@ filtered for this specific property from the item-definition.tsx context state v
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:203](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L203)
+[client/internal/components/PropertyEntry/index.tsx:203](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L203)
 
 ___
 
@@ -440,77 +522,4 @@ NOTE: this makes the field virtually readonly
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:354](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L354)
-
-## Methods
-
-### injectSubmitBlockPromise
-
-▸ **injectSubmitBlockPromise**(`arg`): `void`
-
-Injects a promise that will prevent submitting until the promise is completed
-
-Automatically Provided check base.tsx
-same as the item-definition.tsx context function
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `arg` | `Promise`<`any`\> |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:172](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L172)
-
-___
-
-### onChange
-
-▸ **onChange**(`newValue`, `internalValue`): `void`
-
-The on change event, this is similar to the property.setCurrentValue but takes cares of things
-like slotting and does the necessary calls to the UI in order to keep the UI updated with these
-changes, you will receive a new state in this case if the new state differs
-
-Automatically Provided check base.tsx
-based on the change function from the item-definition.tsx context
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `newValue` | `ValueType` |
-| `internalValue` | `any` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:212](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L212)
-
-___
-
-### onRestore
-
-▸ **onRestore**(): `void`
-
-The restore event, similar to property.restoreValueFor but takes cares of the slot and does
-the necessary calls for the UI
-
-Automatically Provided check base.tsx
-based on the restore function from the item-definition.tsx context
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L220)
+[client/internal/components/PropertyEntry/index.tsx:354](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L354)

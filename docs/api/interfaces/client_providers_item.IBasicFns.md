@@ -12,7 +12,7 @@
 
 ## Table of contents
 
-### Methods
+### Properties
 
 - [clean](client_providers_item.IBasicFns.md#clean)
 - [delete](client_providers_item.IBasicFns.md#delete)
@@ -22,15 +22,19 @@
 - [submit](client_providers_item.IBasicFns.md#submit)
 - [unpoke](client_providers_item.IBasicFns.md#unpoke)
 
-## Methods
+## Properties
 
 ### clean
 
-▸ **clean**(`options`, `state`, `avoidTriggeringUpdate?`): `void`
+• **clean**: (`options`: [`IActionCleanOptions`](client_providers_item.IActionCleanOptions.md), `state`: ``"success"`` \| ``"fail"``, `avoidTriggeringUpdate?`: `boolean`) => `void`
+
+#### Type declaration
+
+▸ (`options`, `state`, `avoidTriggeringUpdate?`): `void`
 
 cleans performs the cleanup of properties and policies
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
@@ -38,140 +42,164 @@ cleans performs the cleanup of properties and policies
 | `state` | ``"success"`` \| ``"fail"`` |
 | `avoidTriggeringUpdate?` | `boolean` |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/providers/item.tsx:1111](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1111)
+[client/providers/item.tsx:1111](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1111)
 
 ___
 
 ### delete
 
-▸ **delete**(): `Promise`<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
+• **delete**: () => `Promise`\<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
+
+#### Type declaration
+
+▸ (): `Promise`\<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
 
 Simply deletes
 
-#### Returns
+##### Returns
 
-`Promise`<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
+`Promise`\<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
 
 a response with the status
 
 #### Defined in
 
-[client/providers/item.tsx:1103](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1103)
+[client/providers/item.tsx:1103](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1103)
 
 ___
 
 ### poke
 
-▸ **poke**(`elements`): `void`
+• **poke**: (`elements`: [`IPokeElementsType`](client_providers_item.IPokeElementsType.md)) => `void`
+
+#### Type declaration
+
+▸ (`elements`): `void`
 
 Poke elements
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `elements` | [`IPokeElementsType`](client_providers_item.IPokeElementsType.md) |
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/providers/item.tsx:1078](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1078)
+[client/providers/item.tsx:1078](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1078)
 
 ___
 
 ### reload
 
-▸ **reload**(`denyCache?`): `Promise`<[`IActionResponseWithValue`](client_providers_item.IActionResponseWithValue.md)\>
+• **reload**: (`denyCache?`: `boolean`) => `Promise`\<[`IActionResponseWithValue`](client_providers_item.IActionResponseWithValue.md)\>
+
+#### Type declaration
+
+▸ (`denyCache?`): `Promise`\<[`IActionResponseWithValue`](client_providers_item.IActionResponseWithValue.md)\>
 
 makes it so that it reloads the value, the loadValue function
 usually is executed on componentDidMount, pass deny cache in order to
 do a hard refresh and bypass the cache
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `denyCache?` | `boolean` |
 
-#### Returns
+##### Returns
 
-`Promise`<[`IActionResponseWithValue`](client_providers_item.IActionResponseWithValue.md)\>
+`Promise`\<[`IActionResponseWithValue`](client_providers_item.IActionResponseWithValue.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:1091](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1091)
+[client/providers/item.tsx:1091](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1091)
 
 ___
 
 ### search
 
-▸ **search**(`options`): `Promise`<[`IActionResponseWithSearchResults`](client_providers_item.IActionResponseWithSearchResults.md)\>
+• **search**: (`options`: [`IActionSearchOptions`](client_providers_item.IActionSearchOptions.md)) => `Promise`\<[`IActionResponseWithSearchResults`](client_providers_item.IActionResponseWithSearchResults.md)\>
+
+#### Type declaration
+
+▸ (`options`): `Promise`\<[`IActionResponseWithSearchResults`](client_providers_item.IActionResponseWithSearchResults.md)\>
 
 performs a search, note that you should be in the searchMode however
 since all items are the same it's totally possible to launch a search
 in which case you'll just get a searchError you should be in search
 mode because there are no endpoints otherwise
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `options` | [`IActionSearchOptions`](client_providers_item.IActionSearchOptions.md) |
 
-#### Returns
+##### Returns
 
-`Promise`<[`IActionResponseWithSearchResults`](client_providers_item.IActionResponseWithSearchResults.md)\>
+`Promise`\<[`IActionResponseWithSearchResults`](client_providers_item.IActionResponseWithSearchResults.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:1120](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1120)
+[client/providers/item.tsx:1120](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1120)
 
 ___
 
 ### submit
 
-▸ **submit**(`options`): `Promise`<[`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)\>
+• **submit**: (`options`: [`IActionSubmitOptions`](client_providers_item.IActionSubmitOptions.md)) => `Promise`\<[`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)\>
+
+#### Type declaration
+
+▸ (`options`): `Promise`\<[`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)\>
 
 submits the current information, when there's no id, this triggers an
 add action, with an id however this trigger edition
 
-#### Parameters
+##### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `options` | [`IActionSubmitOptions`](client_providers_item.IActionSubmitOptions.md) |
 
-#### Returns
+##### Returns
 
-`Promise`<[`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)\>
+`Promise`\<[`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)\>
 
 a response with the status
 
 #### Defined in
 
-[client/providers/item.tsx:1098](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1098)
+[client/providers/item.tsx:1098](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1098)
 
 ___
 
 ### unpoke
 
-▸ **unpoke**(): `void`
+• **unpoke**: () => `void`
+
+#### Type declaration
+
+▸ (): `void`
 
 unpokes all elements
 
-#### Returns
+##### Returns
 
 `void`
 
 #### Defined in
 
-[client/providers/item.tsx:1083](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1083)
+[client/providers/item.tsx:1083](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1083)

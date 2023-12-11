@@ -14,7 +14,7 @@ Contains the locale provider that provides locale information
 
 - [ILocaleContextType](../interfaces/client_internal_providers_locale_provider.ILocaleContextType.md)
 
-### Type aliases
+### Type Aliases
 
 - [ChangeCountryToFn](client_internal_providers_locale_provider.md#changecountrytofn)
 - [ChangeCurrencyToFn](client_internal_providers_locale_provider.md#changecurrencytofn)
@@ -24,15 +24,15 @@ Contains the locale provider that provides locale information
 
 - [LocaleContext](client_internal_providers_locale_provider.md#localecontext)
 
-## Type aliases
+## Type Aliases
 
 ### ChangeCountryToFn
 
-Ƭ **ChangeCountryToFn**: (`code`: `string`, `avoidUpdatingCountry?`: `boolean`, `avoidChangingLanguageAndCurrency?`: `boolean`, `avoidUpdatingUser?`: `boolean`, `onPotentialChangesFoundFor?`: (`languageCode`: `string`, `currencyCode`: `string`) => `void`) => `Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+Ƭ **ChangeCountryToFn**: (`code`: `string`, `avoidUpdatingCountry?`: `boolean`, `avoidChangingLanguageAndCurrency?`: `boolean`, `avoidUpdatingUser?`: `boolean`, `onPotentialChangesFoundFor?`: (`languageCode`: `string`, `currencyCode`: `string`) => `void`) => `Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 #### Type declaration
 
-▸ (`code`, `avoidUpdatingCountry?`, `avoidChangingLanguageAndCurrency?`, `avoidUpdatingUser?`, `onPotentialChangesFoundFor?`): `Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+▸ (`code`, `avoidUpdatingCountry?`, `avoidChangingLanguageAndCurrency?`, `avoidUpdatingUser?`, `onPotentialChangesFoundFor?`): `Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 To change the country to a new code
 
@@ -48,23 +48,23 @@ To change the country to a new code
 
 ##### Returns
 
-`Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+`Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 a void promise, this is basically for the same reason of changeLanguageTo
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:39](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L39)
+[client/internal/providers/locale-provider.tsx:39](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/locale-provider.tsx#L39)
 
 ___
 
 ### ChangeCurrencyToFn
 
-Ƭ **ChangeCurrencyToFn**: (`code`: `string`, `avoidUpdatingUser?`: `boolean`) => `Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+Ƭ **ChangeCurrencyToFn**: (`code`: `string`, `avoidUpdatingUser?`: `boolean`) => `Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 #### Type declaration
 
-▸ (`code`, `avoidUpdatingUser?`): `Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+▸ (`code`, `avoidUpdatingUser?`): `Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 To change the currency to a new code
 
@@ -77,21 +77,21 @@ To change the currency to a new code
 
 ##### Returns
 
-`Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+`Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L25)
+[client/internal/providers/locale-provider.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/locale-provider.tsx#L25)
 
 ___
 
 ### ChangeLanguageToFn
 
-Ƭ **ChangeLanguageToFn**: (`code`: `string`, `avoidUpdatingUser?`: `boolean`) => `Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+Ƭ **ChangeLanguageToFn**: (`code`: `string`, `avoidUpdatingUser?`: `boolean`) => `Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 #### Type declaration
 
-▸ (`code`, `avoidUpdatingUser?`): `Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+▸ (`code`, `avoidUpdatingUser?`): `Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 to change the lanaguage to a new code
 
@@ -104,24 +104,24 @@ to change the lanaguage to a new code
 
 ##### Returns
 
-`Promise`<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
+`Promise`\<[`EndpointErrorType`](base_errors.md#endpointerrortype)\>
 
 a void promise, this promise is fullfilled once the language
 has been changed successfully and as such the app has updated
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:18](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L18)
+[client/internal/providers/locale-provider.tsx:18](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/locale-provider.tsx#L18)
 
 ## Variables
 
 ### LocaleContext
 
-• **LocaleContext**: `Context`<[`ILocaleContextType`](../interfaces/client_internal_providers_locale_provider.ILocaleContextType.md)\>
+• `Const` **LocaleContext**: `Context`\<[`ILocaleContextType`](../interfaces/client_internal_providers_locale_provider.ILocaleContextType.md)\>
 
 The locale context provides the locale information down all the way
 to any component that demands it
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:96](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L96)
+[client/internal/providers/locale-provider.tsx:96](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/locale-provider.tsx#L96)

@@ -16,17 +16,17 @@ the cache worker can be accessed easily as such
 
 ### default
 
-• **default**: `Object`
+• `Const` **default**: `Object`
 
 #### Type declaration
 
 | Name | Type |
 | :------ | :------ |
 | `getProxy` | (`obj`: `unknown`) => `ProxyMarked` |
-| `instance` | `Remote`<[`default`](../classes/client_internal_workers_cache_cache_worker_class.default.md)\> |
+| `instance` | `Remote`\<[`default`](../classes/client_internal_workers_cache_cache_worker_class.default.md)\> |
 | `isPolyfilled` | `boolean` |
 | `isSupportedAsWorker` | `boolean` |
 
 #### Defined in
 
-[client/internal/workers/cache/index.ts:77](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/index.ts#L77)
+[client/internal/workers/cache/index.ts:77](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/index.ts#L77)

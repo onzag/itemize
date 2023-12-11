@@ -6,4 +6,4 @@
 
 ## Indexable
 
-▪ [id: `string`]: [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\>
+▪ [id: `string`]: [`default`](../classes/server_services_base_StorageProvider.default.md)\<`any`\>

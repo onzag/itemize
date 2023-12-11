@@ -48,57 +48,57 @@
 
 ### CAN\_LOG\_DEBUG
 
-• **CAN\_LOG\_DEBUG**: `boolean`
+• `Const` **CAN\_LOG\_DEBUG**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:65](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L65)
+[server/environment.ts:65](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L65)
 
 ___
 
 ### ELASTIC\_EXECUTE\_CONSISTENCY\_CHECKS\_FROM\_SCRATCH\_AT
 
-• **ELASTIC\_EXECUTE\_CONSISTENCY\_CHECKS\_FROM\_SCRATCH\_AT**: `string`
+• `Const` **ELASTIC\_EXECUTE\_CONSISTENCY\_CHECKS\_FROM\_SCRATCH\_AT**: `string`
 
 #### Defined in
 
-[server/environment.ts:133](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L133)
+[server/environment.ts:133](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L133)
 
 ___
 
 ### EMULATE\_BAD\_REDIS\_WRITES
 
-• **EMULATE\_BAD\_REDIS\_WRITES**: `boolean`
+• `Const` **EMULATE\_BAD\_REDIS\_WRITES**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:134](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L134)
+[server/environment.ts:134](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L134)
 
 ___
 
 ### EMULATE\_ELASTIC\_SYNC\_FAILURE\_AT
 
-• **EMULATE\_ELASTIC\_SYNC\_FAILURE\_AT**: `string`
+• `Const` **EMULATE\_ELASTIC\_SYNC\_FAILURE\_AT**: `string`
 
 #### Defined in
 
-[server/environment.ts:131](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L131)
+[server/environment.ts:131](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L131)
 
 ___
 
 ### EMULATE\_SILENT\_ELASTIC\_SYNC\_FAILURE\_AT
 
-• **EMULATE\_SILENT\_ELASTIC\_SYNC\_FAILURE\_AT**: `string`
+• `Const` **EMULATE\_SILENT\_ELASTIC\_SYNC\_FAILURE\_AT**: `string`
 
 #### Defined in
 
-[server/environment.ts:132](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L132)
+[server/environment.ts:132](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L132)
 
 ___
 
 ### ENVIRONMENT\_DETAILS
 
-• **ENVIRONMENT\_DETAILS**: `Object`
+• `Const` **ENVIRONMENT\_DETAILS**: `Object`
 
 #### Type declaration
 
@@ -108,245 +108,245 @@ ___
 | `INSTANCE_GROUP_ID` | `string` |
 | `INSTANCE_MODE` | ``"CLUSTER_MANAGER"`` \| ``"GLOBAL_MANAGER"`` \| ``"ABSOLUTE"`` \| ``"EXTENDED"`` \| ``"BUILD_DATABASE"`` \| ``"LOAD_DATABASE_DUMP"`` \| ``"CLEAN_STORAGE"`` |
 | `INSTANCE_UUID` | `string` |
-| `LOG_LEVEL` | ``"error"`` \| ``"info"`` \| ``"debug"`` \| ``"silly"`` |
-| `NODE_ENV` | ``"production"`` \| ``"development"`` |
+| `LOG_LEVEL` | ``"debug"`` \| ``"silly"`` \| ``"info"`` \| ``"error"`` |
+| `NODE_ENV` | ``"development"`` \| ``"production"`` |
 | `NO_SEO` | `boolean` |
 | `NO_SSR` | `boolean` |
 | `USING_DOCKER` | `boolean` |
 
 #### Defined in
 
-[server/environment.ts:73](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L73)
+[server/environment.ts:73](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L73)
 
 ___
 
 ### FAKE\_EMAILS
 
-• **FAKE\_EMAILS**: `boolean`
+• `Const` **FAKE\_EMAILS**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L47)
+[server/environment.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L47)
 
 ___
 
 ### FAKE\_SMS
 
-• **FAKE\_SMS**: `boolean`
+• `Const` **FAKE\_SMS**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L46)
+[server/environment.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L46)
 
 ___
 
 ### FAKE\_USSD
 
-• **FAKE\_USSD**: `boolean`
+• `Const` **FAKE\_USSD**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L48)
+[server/environment.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L48)
 
 ___
 
 ### FORCE\_ALL\_OUTBOUND\_MAIL\_TO
 
-• **FORCE\_ALL\_OUTBOUND\_MAIL\_TO**: `string`
+• `Const` **FORCE\_ALL\_OUTBOUND\_MAIL\_TO**: `string`
 
 #### Defined in
 
-[server/environment.ts:136](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L136)
+[server/environment.ts:136](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L136)
 
 ___
 
 ### FORCE\_ALL\_OUTBOUND\_SMS\_TO
 
-• **FORCE\_ALL\_OUTBOUND\_SMS\_TO**: `string`
+• `Const` **FORCE\_ALL\_OUTBOUND\_SMS\_TO**: `string`
 
 #### Defined in
 
-[server/environment.ts:137](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L137)
+[server/environment.ts:137](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L137)
 
 ___
 
 ### FORCE\_CONSOLE\_LOGS
 
-• **FORCE\_CONSOLE\_LOGS**: `boolean`
+• `Const` **FORCE\_CONSOLE\_LOGS**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:71](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L71)
+[server/environment.ts:71](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L71)
 
 ___
 
 ### FORCE\_ELASTIC\_REBUILD
 
-• **FORCE\_ELASTIC\_REBUILD**: `boolean`
+• `Const` **FORCE\_ELASTIC\_REBUILD**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:70](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L70)
+[server/environment.ts:70](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L70)
 
 ___
 
 ### GLOBAL\_MANAGER\_MODE
 
-• **GLOBAL\_MANAGER\_MODE**: ``"ABSOLUTE"`` \| ``"ELASTIC"`` \| ``"SERVER_DATA"`` \| ``"SERVICES"``
+• `Const` **GLOBAL\_MANAGER\_MODE**: ``"ABSOLUTE"`` \| ``"ELASTIC"`` \| ``"SERVER_DATA"`` \| ``"SERVICES"``
 
 #### Defined in
 
-[server/environment.ts:16](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L16)
+[server/environment.ts:16](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L16)
 
 ___
 
 ### GLOBAL\_MANAGER\_SERVICES
 
-• **GLOBAL\_MANAGER\_SERVICES**: `string`[]
+• `Const` **GLOBAL\_MANAGER\_SERVICES**: `string`[]
 
 #### Defined in
 
-[server/environment.ts:17](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L17)
+[server/environment.ts:17](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L17)
 
 ___
 
 ### INSTANCE\_CREATION\_TIME
 
-• **INSTANCE\_CREATION\_TIME**: `Date`
+• `Const` **INSTANCE\_CREATION\_TIME**: `Date`
 
 #### Defined in
 
-[server/environment.ts:23](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L23)
+[server/environment.ts:23](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L23)
 
 ___
 
 ### INSTANCE\_GROUP\_ID
 
-• **INSTANCE\_GROUP\_ID**: `string`
+• `Const` **INSTANCE\_GROUP\_ID**: `string`
 
 #### Defined in
 
-[server/environment.ts:14](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L14)
+[server/environment.ts:14](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L14)
 
 ___
 
 ### INSTANCE\_LOG\_ERROR\_FILE
 
-• **INSTANCE\_LOG\_ERROR\_FILE**: `string`
+• `Const` **INSTANCE\_LOG\_ERROR\_FILE**: `string`
 
 #### Defined in
 
-[server/environment.ts:25](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L25)
+[server/environment.ts:25](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L25)
 
 ___
 
 ### INSTANCE\_LOG\_FILE
 
-• **INSTANCE\_LOG\_FILE**: `string`
+• `Const` **INSTANCE\_LOG\_FILE**: `string`
 
 #### Defined in
 
-[server/environment.ts:24](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L24)
+[server/environment.ts:24](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L24)
 
 ___
 
 ### INSTANCE\_MODE
 
-• **INSTANCE\_MODE**: ``"CLUSTER_MANAGER"`` \| ``"GLOBAL_MANAGER"`` \| ``"ABSOLUTE"`` \| ``"EXTENDED"`` \| ``"BUILD_DATABASE"`` \| ``"LOAD_DATABASE_DUMP"`` \| ``"CLEAN_STORAGE"``
+• `Const` **INSTANCE\_MODE**: ``"CLUSTER_MANAGER"`` \| ``"GLOBAL_MANAGER"`` \| ``"ABSOLUTE"`` \| ``"EXTENDED"`` \| ``"BUILD_DATABASE"`` \| ``"LOAD_DATABASE_DUMP"`` \| ``"CLEAN_STORAGE"``
 
 #### Defined in
 
-[server/environment.ts:15](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L15)
+[server/environment.ts:15](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L15)
 
 ___
 
 ### INSTANCE\_UUID
 
-• **INSTANCE\_UUID**: `string`
+• `Const` **INSTANCE\_UUID**: `string`
 
 #### Defined in
 
-[server/environment.ts:18](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L18)
+[server/environment.ts:18](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L18)
 
 ___
 
 ### LOG\_LEVEL
 
-• **LOG\_LEVEL**: ``"debug"`` \| ``"silly"`` \| ``"info"`` \| ``"error"``
+• `Const` **LOG\_LEVEL**: ``"debug"`` \| ``"silly"`` \| ``"info"`` \| ``"error"``
 
 #### Defined in
 
-[server/environment.ts:49](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L49)
+[server/environment.ts:49](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L49)
 
 ___
 
 ### NODE\_ENV
 
-• **NODE\_ENV**: ``"development"`` \| ``"production"``
+• `Const` **NODE\_ENV**: ``"development"`` \| ``"production"``
 
 #### Defined in
 
-[server/environment.ts:8](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L8)
+[server/environment.ts:8](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L8)
 
 ___
 
 ### NO\_SEO
 
-• **NO\_SEO**: `boolean`
+• `Const` **NO\_SEO**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:66](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L66)
+[server/environment.ts:66](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L66)
 
 ___
 
 ### NO\_SSR
 
-• **NO\_SSR**: `boolean`
+• `Const` **NO\_SSR**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:67](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L67)
+[server/environment.ts:67](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L67)
 
 ___
 
 ### PORT
 
-• **PORT**: `number`
+• `Const` **PORT**: `number`
 
 #### Defined in
 
-[server/environment.ts:13](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L13)
+[server/environment.ts:13](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L13)
 
 ___
 
 ### REFRESH\_ADMIN\_PASSWORD
 
-• **REFRESH\_ADMIN\_PASSWORD**: `boolean`
+• `Const` **REFRESH\_ADMIN\_PASSWORD**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:26](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L26)
+[server/environment.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L26)
 
 ___
 
 ### TRUST\_ALL\_INBOUND\_CONNECTIONS
 
-• **TRUST\_ALL\_INBOUND\_CONNECTIONS**: `boolean`
+• `Const` **TRUST\_ALL\_INBOUND\_CONNECTIONS**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:5](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L5)
+[server/environment.ts:5](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L5)
 
 ___
 
 ### USING\_DOCKER
 
-• **USING\_DOCKER**: `boolean`
+• `Const` **USING\_DOCKER**: `boolean`
 
 #### Defined in
 
-[server/environment.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L45)
+[server/environment.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L45)
 
 ## Functions
 
@@ -368,4 +368,4 @@ ___
 
 #### Defined in
 
-[server/environment.ts:98](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L98)
+[server/environment.ts:98](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L98)

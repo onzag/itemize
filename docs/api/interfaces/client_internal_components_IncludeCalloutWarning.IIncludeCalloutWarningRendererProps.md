@@ -4,6 +4,9 @@
 
 [client/internal/components/IncludeCalloutWarning](../modules/client_internal_components_IncludeCalloutWarning.md).IIncludeCalloutWarningRendererProps
 
+The basic renderer prop structure that
+every renderer should have access to
+
 ## Hierarchy
 
 - [`IRendererProps`](client_internal_renderer.IRendererProps.md)
@@ -27,7 +30,7 @@
 
 #### Defined in
 
-[client/internal/components/IncludeCalloutWarning/index.tsx:58](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/IncludeCalloutWarning/index.tsx#L58)
+[client/internal/components/IncludeCalloutWarning/index.tsx:58](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/IncludeCalloutWarning/index.tsx#L58)
 
 ___
 
@@ -47,7 +50,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -63,7 +66,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
 
 ___
 
@@ -73,4 +76,4 @@ ___
 
 #### Defined in
 
-[client/internal/components/IncludeCalloutWarning/index.tsx:57](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/IncludeCalloutWarning/index.tsx#L57)
+[client/internal/components/IncludeCalloutWarning/index.tsx:57](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/IncludeCalloutWarning/index.tsx#L57)
