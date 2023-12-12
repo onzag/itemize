@@ -317,13 +317,11 @@ Then start a dev server via `npm run start-dev-server`
 
 ## Additional Steps
 
-### See the automatically generated graphql endpoints
+### See the automatically generated rq endpoints
 
-If running a development server, you should have a graphqliq client setup in your host, it should be running at `localhost:8000/graphql` it will provide some insight on how your application is structured, however it should be unecessary to understand these endpoints as you are not supposed to deal with them directly and rather let itemize components handle them.
+Previously graphql was being used in the development but it was found to cause issues with multiple dependencies and a the custom form data spec had to be used, which is why the rq system was developed to be a replacement for graphql that would create more compact and simpler endpoints.
 
-Despite its rather complex generated names documentation is automatically generated where possible, these endpoints can be rather complex but understanding them can help understanding how itemize works internally.
-
-Note that itemize supports and heavily uses the [Multipart Spec](https://github.com/jaydenseric/graphql-multipart-request-spec) for graphql, however the standard JSON form is also supported, but if you debug the network you will realize that the content type is `multipart/form-data` rather than `application/json`
+You may access the available options at the `/rq` endpoint
 
 ### Get the admin user
 

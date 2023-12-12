@@ -118,7 +118,7 @@ user-agent: *
 disallow: /rest/util/*
 disallow: /rest/index-check/*
 disallow: /rest/currency-factors
-disallow: /graphql
+disallow: /rq
 Sitemap: https://dev.catbnb.com/uploads/sitemaps/dev.catbnb.com/index.xml
 ```
 

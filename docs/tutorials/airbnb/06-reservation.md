@@ -88,9 +88,9 @@ properties.planned_check_out.error.NOT_NULLABLE = debe especificar una fecha
 properties.planned_check_out.error.INVALID_VALUE = la fecha es inválida
 ```
 
-If we rebuild this with `npm run build-data` and then explore our graphql endpoints at `/graphql` we should find out this request has changed shape.
+If we rebuild this with `npm run build-data` and then explore our rq endpoints at `/rq` we should find out this request has changed shape.
 
-![Added Search Properties Graphql](./images/added-search-properties-graphql.png)
+![Added Search Properties RQ](./images/added-search-properties-graphql.png)
 
 This means that the search arguments now have two extra properties that can be used for searching that correlate directly to the search properties that we have just added while not affecting the schema of the object itself.
 

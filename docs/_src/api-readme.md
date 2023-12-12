@@ -149,12 +149,6 @@ Any action related to modifying the server behaviour, custom rest endpoints, cre
     * [elastic-location](modules/server_services_elastic_location.md)
     * [elastic-logger](modules/server_services_elastic_logger.md)
 
-### Custom Graphql
-
-- [custom-graphql](modules/server_custom_graphql.md)
-    * [graphql-standard-reply-object](modules/server_custom_graphql_graphql_standard_reply_object.md)
-    * [custom-graphql/graphql-token-object](modules/server_custom_graphql_graphql_token_object.md)
-
 ### SEO
 
 - [seo](modules/server_seo.md)
@@ -469,7 +463,7 @@ Represents the modules and files that are using for testing and building tests
 - [itemize](modules/testing_itemize.md)
 - [server](modules/testing_server.md)
     * [database](modules/testing_server_database.md)
-    * [graphql](modules/testing_server_graphql.md)
+    * [rq](modules/testing_server_rq.md)
     * [redis](modules/testing_server_redis.md)
     * [robots](modules/testing_server_robots.md)
     * [token](modules/testing_server_token.md)

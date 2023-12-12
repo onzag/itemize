@@ -16,11 +16,11 @@ Go to your network tab, and filter by `graphql` you might notice one of the requ
 
 ![Graphql Unit Request](./images/graphql-unit-request.png)
 
-Now add the `longTermCaching={true}` to the item provider that renders that view, and on the first load you will notice the same, but on the second load, you will find that one graphql request is not done, but where did the data come from?...
+Now add the `longTermCaching={true}` to the item provider that renders that view, and on the first load you will notice the same, but on the second load, you will find that one rq request is not done, but where did the data come from?...
 
 We can check that by going over the Application tab and checking your indexed db, Itemize DB, queries; you will find something that looks like the following:
 
-![Catbnb IndexedDB graphql](./images/catbnb-indexeddb-graphql.png)
+![Catbnb IndexedDB rq](./images/catbnb-indexeddb-graphql.png)
 
 However you might be concerned about that "private data" being cached, and existing in there, this is not like those fragments that are virtually public, but for that, we can mark the item for destruction on logout for that we use `markForDestructionOnLogout={true}` in the same place we used long term caching.
 

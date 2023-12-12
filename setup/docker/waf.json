@@ -13,10 +13,6 @@
     ],
     "allowedLocations": [
         {
-            "location": "/graphql",
-            "rules": "client_max_body_size 100M; limit_except POST {deny all;}"
-        },
-        {
             "location": "/rq",
             "rules": "client_max_body_size 100M; limit_except POST {deny all;}"
         },

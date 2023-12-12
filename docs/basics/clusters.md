@@ -181,13 +181,13 @@ Itemize allows for a lot of control on how it works internally, every provider, 
 
  - The database should be postgreSQL.
  - The cache(s) should be redis.
- - The server side runs express and graphql.
+ - The server side runs express and rq.
  - The programming language is typescript.
  - The client side works with react only.
 
 Apart of that, you may integrate other things as you see fit; you may willingly use any service provider or integrate new rest endpoints; you may replace here maps with mapbox or another provider, even use a different one by country; you may use mailgun, mailchimp, protonmail, or your own custom mail server using pigeons.
 
-Users can get their own token and perform actions directly to graphql with POST requests, which means that each user has its own API key with limited functionality where everything they can do in app, they can do programatically, while the API isn't that human readable, because it is auto generated, it tries to be as much as it can.
+Users can get their own token and perform actions directly to rq with POST requests, which means that each user has its own API key with limited functionality where everything they can do in app, they can do programatically, while the API isn't that human readable, because it is auto generated, it tries to be as much as it can.
 
 Regarding payments this one is a big deal, because a Payment provider is probably one of the most complex pieces of code you may need to build, by default it is `manual-payment` which basically means every payment processed remains in an ongoing state until manually verified, basically a cash payment.
 

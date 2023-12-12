@@ -2,7 +2,7 @@
 
 # ItemizeJS
 
-Itemize is a fully featured end to end library powered by react, postgresql, elasticsearch, graphql, docker and redis to create fully featured internationalized scalable realtime offline first websites; Fast, very fast.
+Itemize is a fully featured end to end library powered by react, postgresql, elasticsearch, docker and redis to create fully featured internationalized scalable realtime offline first websites; Fast, very fast.
 
 The aim of itemize is to be a library that can produce and deliver results fast, reliably and cheaply; and that these results can also be the final product and not just a prototype; scale is key.
 
@@ -18,7 +18,7 @@ Itemize was made to create web software in a large range of needs, for the most 
 
 ### Ease of Development
 
-Itemize was made for fast and efficient development, the code that is generated is meant to work and do it well and simply; as such very little knowledge of databases, graphql endpoints, rest endpoints, etc... is necessary, you just write json schema files, build the app and write react code, itemize figures what to do based on that information.
+Itemize was made for fast and efficient development, the code that is generated is meant to work and do it well and simply; as such very little knowledge of databases, rest endpoints, etc... is necessary, you just write json schema files, build the app and write react code, itemize figures what to do based on that information.
 
 As such, even the most junior programmer should be able to write feature rich complex apps with itemize; itemize is also technical debt tolerant, and spagetthi code tolerant, it was designed that way.
 
@@ -58,7 +58,7 @@ By default itemize works with one single cluster and bundles the global manager 
 
 ### PWA Enabled
 
-Offline first websites, with service workers and locally copying graphql responses into an IndexedDB database (if avaliable) allows the application to work as if it was a native application.
+Offline first websites, with service workers and locally copying responses into an IndexedDB database (if avaliable) allows the application to work as if it was a native application.
 
 PWA logic comes out of the box with every itemize installation.
 
@@ -108,7 +108,7 @@ Documentation is available [here](./docs)
 
 Wordpress is a tool to create simple websites to give a web precense, while it is possible to modify and add a lot of functionality on top of it, such as ecommerce, itemize offers much more functionality and it's much more complex; for a simple web presence, wordpress will be the tool to use, itemize is to make much more complex apps with more needs.
 
-### Plain ReactJS + Graphql + PostgreSQL + ElasticSearch + NodeJS stack
+### Plain ReactJS + PostgreSQL + ElasticSearch + NodeJS stack
 
 A plain stack is very powerful and can morph into anything and make anything, after all, Itemize is this same stack with a lot of features on top of it, the issue is that you would have to create a custom infraestructure and spend a lot of time developing it, when itemize comes with these out of the box and hides all this configuration so that the developer can focus on making what is important for the user
 

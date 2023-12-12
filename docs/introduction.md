@@ -24,7 +24,7 @@ Itemize tries to be extremely simple, even if it comes out as unusual, it should
 
 Itemize takes a whole different approach regarding this, which is why it tries to be simple, and strict; even the most awful itemize code should be rather understandable (unless you have some form of special talent), there's also a huge focus on what the user sees, just get the thing shipped, make the users happy.
 
-Of course itemize is not a simple technology on itself, as a stack of stacks it requires understanding of all the underlying aspects of it, such as ReactJS, graphql, postgreSQL, redis, websockets, etc... but for a programmer that holds these skills; itemize should be easy to understand. Without having to worry about how things link together, the only bugs and issues that should concern the developer are those that the user can see.
+Of course itemize is not a simple technology on itself, as a stack of stacks it requires understanding of all the underlying aspects of it, such as ReactJS, postgreSQL, redis, websockets, etc... but for a programmer that holds these skills; itemize should be easy to understand. Without having to worry about how things link together, the only bugs and issues that should concern the developer are those that the user can see.
 
 And so we align the interests of management, programming and the user.
 
