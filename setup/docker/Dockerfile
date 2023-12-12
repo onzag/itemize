@@ -1,6 +1,6 @@
 ## FIRST STEP TO PREPARE NPM INSTALL
 
-FROM node:15-alpine
+FROM node:20-alpine
 
 USER node
 RUN mkdir -p /home/node/app
@@ -29,7 +29,7 @@ RUN rm -f .npmrc
 
 ## SECOND STEP TO ACTUALLY COPY THE FILES REQUIRED BY THE SERVER
 
-FROM node:15-alpine
+FROM node:20-alpine
 
 ENV NODE_ENV development
 # ENV NODE_ENV production

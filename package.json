@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.295",
+  "version": "0.0.296",
   "description": "Itemize",
   "bin": {
     "itemize": "index.js"
@@ -39,8 +39,6 @@
     "@types/read": "0.0.28",
     "@types/redis": "^2.8.30",
     "@types/slate": "^0.47.11",
-    "@types/slate-react": "^0.50.1",
-    "@types/stripe": "^8.0.417",
     "@types/stylis": "^4.0.2",
     "@types/uuid": "^3.4.9",
     "address-rfc2822": "^2.1.0",
