@@ -67,12 +67,30 @@ export default {
         parenting: {
           type: "boolean",
         },
-        custom: {
+        properties: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              id: {
+                type: "string",
+              },
+              values: {
+                type: "array",
+                items: {},
+              },
+            },
+            required: [
+              "id",
+            ],
+          },
+        },
+        ignoreRoleAccess: {
           type: "array",
           items: {
             type: "string",
-          }
-        }
+          },
+        },
       },
       additionalProperties: false,
       required: ["condition"],

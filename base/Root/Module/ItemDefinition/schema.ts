@@ -358,8 +358,14 @@ export default {
             required: [
               "id",
             ],
-          }
+          },
         },
+        ignoreRoleAccess: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+        }
       },
       additionalProperties: false,
       required: ["condition"],

@@ -27,7 +27,7 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIdsForCheckingAgainstLimiters, getValuesStrategyForLimiters } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "./roles";
-import Root from "../../base/Root";
+import Root, { ICustomRoleManager } from "../../base/Root";
 
 export interface IServerSideTokenDataType {
   // role always present
@@ -459,8 +459,22 @@ export function retrieveUntil(args: IRQArgs): string {
   return null;
 }
 
+async function checkCanIgnoreLimiter(
+  idefOrMod: Module | ItemDefinition,
+  rolesManager: ICustomRoleManager,
+  tokenData: IServerSideTokenDataType,
+  ownerToCheckAgainst: string,
+) {
+  return await idefOrMod.checkRoleAccessForIgnoreLimiters(tokenData.role, tokenData.id, ownerToCheckAgainst, rolesManager, false);
+}
 
-export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition) {
+export async function checkLimiters(
+  args: IRQArgs,
+  idefOrMod: Module | ItemDefinition,
+  rolesManager: ICustomRoleManager,
+  tokenData: IServerSideTokenDataType,
+  ownerToCheckAgainst: string,
+) {
   const mod = idefOrMod instanceof Module ? idefOrMod : idefOrMod.getParentModule();
   const modLimiters = mod.getSearchLimiters();
   const idefLimiters = idefOrMod instanceof ItemDefinition ? idefOrMod.getSearchLimiters() : null;
@@ -468,12 +482,12 @@ export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition)
     return;
   }
 
-  [modLimiters, idefLimiters].forEach((limiter, index) => {
+  for (let limiter of [modLimiters, idefLimiters]) {
     if (!limiter) {
-      return;
+      continue;
     }
 
-    const isModLimiter = index === 0;
+    const isModLimiter = modLimiters === limiter;
 
     if (limiter) {
       let allLimitedPropertiesSet: boolean = true;
@@ -569,6 +583,15 @@ export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition)
       }
 
       if (limiter.condition === "AND" && !allLimitedPropertiesSet) {
+        if (await checkCanIgnoreLimiter(idefOrMod, rolesManager, tokenData, ownerToCheckAgainst)) {
+          if (args.searchengine === true) {
+            throw new EndpointError({
+              message: "The usage of searchengine with an ignored AND limiter is not allowed, " + customError,
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+            });
+          }
+          continue;
+        }
         throw new EndpointError({
           message: customError,
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -601,6 +624,15 @@ export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition)
         limiter.condition === "AND" &&
         sinceError
       ) {
+        if (await checkCanIgnoreLimiter(idefOrMod, rolesManager, tokenData, ownerToCheckAgainst)) {
+          if (args.searchengine === true) {
+            throw new EndpointError({
+              message: "The usage of searchengine with an ignored AND limiter is not allowed, since was ignored",
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+            });
+          }
+          continue;
+        }
         throw new EndpointError({
           message: sinceError,
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -619,6 +651,15 @@ export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition)
         limiter.condition === "AND" &&
         !createdBySucceed
       ) {
+        if (await checkCanIgnoreLimiter(idefOrMod, rolesManager, tokenData, ownerToCheckAgainst)) {
+          if (args.searchengine === true) {
+            throw new EndpointError({
+              message: "The usage of searchengine with an ignored AND limiter is not allowed, created by was ignored",
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+            });
+          }
+          continue;
+        }
         throw new EndpointError({
           message: "Created by is required as a limiter, yet none was specified",
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -637,6 +678,15 @@ export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition)
         limiter.condition === "AND" &&
         !parentingSucceed
       ) {
+        if (await checkCanIgnoreLimiter(idefOrMod, rolesManager, tokenData, ownerToCheckAgainst)) {
+          if (args.searchengine === true) {
+            throw new EndpointError({
+              message: "The usage of searchengine with an ignored AND limiter is not allowed, parenting was ignored",
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+            });
+          }
+          continue;
+        }
         throw new EndpointError({
           message: "Parenting is required as a limiter, yet none was specified",
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -656,7 +706,11 @@ export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition)
           passedCreatedBy ||
           passedParenting
         ) {
-          return;
+          continue;
+        }
+
+        if (await checkCanIgnoreLimiter(idefOrMod, rolesManager, tokenData, ownerToCheckAgainst)) {
+          continue;
         }
 
         throw new EndpointError({
@@ -665,7 +719,7 @@ export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition)
         });
       }
     }
-  });
+  };
 }
 
 /**

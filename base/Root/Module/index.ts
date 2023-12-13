@@ -884,6 +884,46 @@ export default class Module {
     }
   }
 
+  public async checkRoleAccessForIgnoreLimiters(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    rolesManager: ICustomRoleManager,
+    throwError: boolean,
+  ) {
+    const limiters = this.getSearchLimiters();
+    const ignoreRoles = limiters?.ignoreRoleAccess;
+
+    if (!ignoreRoles) {
+      return false;
+    }
+    let canIgnore = ignoreRoles.includes(ANYONE_METAROLE) ||
+      (
+        ignoreRoles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        ignoreRoles.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || ignoreRoles.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+
+    if (!canIgnore) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(ignoreRoles);
+      canIgnore = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
+
+    if (!canIgnore && throwError) {
+      throw new EndpointError({
+        message: message || "Your role has no access to moderation",
+        code: code || ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    return canIgnore;
+  }
+
   public async checkRoleAccessForModeration(
     role: string,
     userId: string,

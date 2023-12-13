@@ -96,42 +96,8 @@ export async function searchModule(
   if (!opts.noLimitOffset) {
     checkLimit(resolverArgs.args.limit as number, mod, opts.traditional);
   }
-  checkLimiters(resolverArgs.args, mod);
 
-  // check language and region
-  checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.cache, tokenData);
-  checkUserCanSearch(resolverArgs.args, mod, tokenData);
-
-  // now build the fields we are searching
-  const searchingFields = {};
-  // the search mode counterpart module
-  const searchModeCounterpart = mod.getSearchModule();
-  // now we loop over the arguments
-  Object.keys(resolverArgs.args).forEach((arg) => {
-    // if the search mode module has a propextension for that argument
-    if (searchModeCounterpart.hasPropExtensionFor(arg)) {
-      // then it's one of the fields we are searching against
-      searchingFields[arg] = resolverArgs.args[arg];
-    }
-  });
-
-  const created_by = resolverArgs.args.created_by;
-  let ownerToCheckAgainst = UNSPECIFIED_OWNER;
-  if (created_by) {
-    ownerToCheckAgainst = created_by;
-  }
-
-  // check role access for those searching fields
-  // yes they are not being directly read but they can
-  // be brute forced this way, and we are paranoid as hell
-  CAN_LOG_DEBUG && logger.debug(
-    {
-      functionName: "searchModule",
-      message: "Checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
-    },
-  );
 
   const ownerId = resolverArgs.args.created_by || null;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
@@ -157,6 +123,49 @@ export async function searchModule(
     customId: null,
     environmentParent: null,
   });
+
+  const created_by = resolverArgs.args.created_by;
+  let ownerToCheckAgainst = UNSPECIFIED_OWNER;
+  if (created_by) {
+    ownerToCheckAgainst = created_by;
+  }
+
+  await checkLimiters(
+    resolverArgs.args,
+    mod,
+    rolesManager,
+    tokenData,
+    ownerToCheckAgainst,
+  );
+
+  // check language and region
+  checkLanguage(appData, resolverArgs.args);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
+  checkUserCanSearch(resolverArgs.args, mod, tokenData);
+
+  // now build the fields we are searching
+  const searchingFields = {};
+  // the search mode counterpart module
+  const searchModeCounterpart = mod.getSearchModule();
+  // now we loop over the arguments
+  Object.keys(resolverArgs.args).forEach((arg) => {
+    // if the search mode module has a propextension for that argument
+    if (searchModeCounterpart.hasPropExtensionFor(arg)) {
+      // then it's one of the fields we are searching against
+      searchingFields[arg] = resolverArgs.args[arg];
+    }
+  });
+
+  // check role access for those searching fields
+  // yes they are not being directly read but they can
+  // be brute forced this way, and we are paranoid as hell
+  CAN_LOG_DEBUG && logger.debug(
+    {
+      functionName: "searchModule",
+      message: "Checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
+    },
+  );
+
   await searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -1075,31 +1084,8 @@ export async function searchItemDefinition(
     if (!opts.noLimitOffset) {
       checkLimit(resolverArgs.args.limit as number, itemDefinition, opts.traditional);
     }
-    checkLimiters(resolverArgs.args, itemDefinition);
 
-    // check the language and region
-    checkLanguage(appData, resolverArgs.args);
     const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-    await validateTokenIsntBlocked(appData.cache, tokenData);
-    checkUserCanSearch(resolverArgs.args, itemDefinition, tokenData);
-
-    // now we need to get the fields that we are using to search
-    const searchingFields = {};
-    // for that we get the search mode counterpart of the item definition,
-    // this is another item definition which provides search information
-    const searchModeCounterpart = itemDefinition.getSearchModeCounterpart();
-    // now we loop into every argument we were given
-    Object.keys(resolverArgs.args).forEach((arg) => {
-      // and we check if they are part of the searching query
-      // for that they have to be part of the search query
-      if (
-        searchModeCounterpart.hasPropertyDefinitionFor(arg, true) ||
-        arg.startsWith(INCLUDE_PREFIX) && searchModeCounterpart.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
-      ) {
-        // add it and isolate it
-        searchingFields[arg] = resolverArgs.args[arg];
-      }
-    });
 
     const ownerId = resolverArgs.args.created_by || null;
     const rolesManager = new CustomRoleManager(appData.customRoles, {
@@ -1135,6 +1121,31 @@ export async function searchItemDefinition(
       await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, rolesManager, true);
       ownerToCheckAgainst = created_by;
     }
+
+    await checkLimiters(resolverArgs.args, itemDefinition, rolesManager, tokenData, ownerToCheckAgainst);
+
+    // check the language and region
+    checkLanguage(appData, resolverArgs.args);
+    await validateTokenIsntBlocked(appData.cache, tokenData);
+    checkUserCanSearch(resolverArgs.args, itemDefinition, tokenData);
+
+    // now we need to get the fields that we are using to search
+    const searchingFields = {};
+    // for that we get the search mode counterpart of the item definition,
+    // this is another item definition which provides search information
+    const searchModeCounterpart = itemDefinition.getSearchModeCounterpart();
+    // now we loop into every argument we were given
+    Object.keys(resolverArgs.args).forEach((arg) => {
+      // and we check if they are part of the searching query
+      // for that they have to be part of the search query
+      if (
+        searchModeCounterpart.hasPropertyDefinitionFor(arg, true) ||
+        arg.startsWith(INCLUDE_PREFIX) && searchModeCounterpart.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
+      ) {
+        // add it and isolate it
+        searchingFields[arg] = resolverArgs.args[arg];
+      }
+    });
 
     // We also check for the role access of the search fields
     // the reason is simple, if we can use the query to query

@@ -60,6 +60,7 @@ export interface ISearchLimitersType {
   createdBy?: boolean;
   parenting?: boolean;
   properties?: IPropertyRequestLimiter[];
+  ignoreRoleAccess?: string[];
 }
 
 export interface ICustomRoleManagerRoleStatus {
