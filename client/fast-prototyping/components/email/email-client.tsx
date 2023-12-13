@@ -47,6 +47,7 @@ import Setter from "../../../components/property/Setter";
 import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { styled } from "@mui/material";
+import { useAppLanguageRetriever } from "../../../components/localization/AppLanguageRetriever";
 
 const style = {
   flex: {
@@ -267,13 +268,6 @@ export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderP
    */
   forwardUrlResolver: (replyOf: string) => string;
   /**
-   * When a new email is sent and given an id this represents where
-   * the url of such a message is located
-   * @param id the id of the email
-   * @returns the url where it can be visualized
-   */
-  emailUrlResolver: (id: string) => string;
-  /**
    * If we are currently replying
    */
   replying?: "reply-all" | "reply" | "forward";
@@ -329,25 +323,13 @@ interface IEmailSenderPropsBase {
   objectsInvalidLabel?: {
     [qualifiedName: string]: React.ReactNode;
   };
-}
-
-/**
- * The props for the email sender where we are sending a first time email
- */
-export interface IEmailSenderProps extends IEmailSenderPropsBase {
   /**
-   * prefill for the subject field
+   * This should resolve for a given input what the value should resolve
+   * for, normally this only applies to internal usernames
+   * @param v the information regarding this user
+   * @returns a string, should be either a 
    */
-  subjectPrefill?: string;
-  /**
-   * prefill for the target field
-   * eg. ["admin@gmail.com", "admin", "USER_ID", "ID$MOD_something__IDEF_else"]
-   */
-  targetPrefill?: string[];
-  /**
-   * reply of something? if so give the id of the email that is being replied
-   */
-  replyOf?: string;
+  valueResolver?: (v: IInternalValueResolverOptions) => Promise<string>;
   /**
    * When a new email is sent and given an id this represents where
    * the url of such a message is located
@@ -361,6 +343,25 @@ export interface IEmailSenderProps extends IEmailSenderPropsBase {
    * @returns 
    */
   onFetchSuggestions?: (v: string) => Promise<ITagListSuggestion[]>;
+}
+
+/**
+ * The props for the email sender where we are sending a first time email
+ */
+export interface IEmailSenderProps extends IEmailSenderPropsBase {
+  /**
+   * prefill for the subject field
+   */
+  subjectPrefill?: IPropertyDefinitionSupportedTextType;
+  /**
+   * prefill for the target field
+   * eg. ["admin@gmail.com", "admin", "USER_ID", "ID$MOD_something__IDEF_else"]
+   */
+  targetPrefill?: string[];
+  /**
+   * reply of something? if so give the id of the email that is being replied
+   */
+  replyOf?: string;
 }
 
 interface IActualMailSenderPropsBase {
@@ -394,13 +395,6 @@ interface IActualMailSenderProps extends IEmailSenderProps, IActualMailSenderPro
    * Whether this user supports sending external emails
    */
   supportsExternal: boolean;
-  /**
-   * This should resolve for a given input what the value should resolve
-   * for, normally this only applies to internal usernames
-   * @param v the information regarding this user
-   * @returns a string, should be either a 
-   */
-  valueResolver?: (v: IInternalValueResolverOptions) => Promise<string>;
 }
 
 interface IInternalValueResolverOptions extends IActualMailSenderPropsBase {
@@ -415,6 +409,24 @@ interface IInternalValueResolverOptions extends IActualMailSenderPropsBase {
    */
   usedFullDomainSyntax: boolean;
 }
+
+/**
+ * Generates a function for custom resolving at a given endpoint
+ * the endpoint will be provided the username as a GET query parameter
+ * and expects to receive a status 200 with the given textual id
+ * @param endpoint 
+ * @returns 
+ */
+export function getValueResolverAtEndpoint(endpoint: string): (v: IInternalValueResolverOptions) => Promise<string> {
+  return async (v: IInternalValueResolverOptions) => {
+    const result = await fetch(endpoint + "?username=" + encodeURIComponent(v.username));
+    if (result.status === 200) {
+      return await result.text();
+    } else {
+      return UNSPECIFIED_OWNER;
+    }
+  }
+} 
 
 /**
  * This is the default resolver that will look over all the users and find one with the given
@@ -452,7 +464,11 @@ export async function defaultValueResolver(v: IInternalValueResolverOptions) {
     enableNulls: false,
   }, null);
 
-  if (!results || results.count === 0 || !results.records[0]) {
+  if (!results || results.error) {
+    console.warn("Could not determine an user for " + v.username + " because the request failed, you may want to use your own valueResolver");
+  }
+
+  if (!results || results.error || results.count === 0 || !results.records[0]) {
     return UNSPECIFIED_OWNER;
   } else {
     return results.records[0].id;
@@ -758,6 +774,7 @@ export function EmailSender(props: IEmailSenderProps) {
 }
 
 export function EmailReader(props: IEmailReaderProps) {
+  const appLanguage = useAppLanguageRetriever();
   return (
     <ModuleProvider module="mail">
       <ItemProvider
@@ -807,7 +824,7 @@ export function EmailReader(props: IEmailReaderProps) {
             } else if (source.includes("@")) {
               const splitted = source.split("<");
               const sourceUsername = splitted.length === 2 ? splitted[0].trim() : null;
-              const letterToUse = splitted[0].toUpperCase();
+              const letterToUse = splitted[0][0].toUpperCase() || "?";
               avatar = <Avatar>{letterToUse}</Avatar>;
               username = sourceUsername || source;
               if (username !== source) {
@@ -992,7 +1009,10 @@ export function EmailReader(props: IEmailReaderProps) {
                                 {(i18nReF: string) => (
                                   <EmailSender
                                     {...senderArgs}
-                                    subjectPrefill={i18nReF}
+                                    subjectPrefill={{
+                                      value: i18nReF,
+                                      language: appLanguage.currentLanguage.code,
+                                    }}
                                   />
                                 )}
                               </I18nRead>
@@ -1026,7 +1046,10 @@ export function EmailReader(props: IEmailReaderProps) {
                                               <EmailSender
                                                 {...senderArgs}
                                                 targetPrefill={[source]}
-                                                subjectPrefill={i18nRe}
+                                                subjectPrefill={{
+                                                  language: appLanguage.currentLanguage.code,
+                                                  value: i18nRe,
+                                                }}
                                               />
                                             );
                                           }
@@ -1044,7 +1067,10 @@ export function EmailReader(props: IEmailReaderProps) {
                                             <EmailSender
                                               {...senderArgs}
                                               targetPrefill={allTargets}
-                                              subjectPrefill={i18nRe}
+                                              subjectPrefill={{
+                                                language: appLanguage.currentLanguage.code,
+                                                value: i18nRe,
+                                              }}
                                             />
                                           )
                                         }}

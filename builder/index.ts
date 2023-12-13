@@ -41,7 +41,6 @@ import { extractConfigAndBuildNumber, IBuilderBasicConfigType } from "./config";
 
 import fs from "fs";
 import path from "path";
-import PropertiesReader from "properties-reader";
 import colors from "colors/safe";
 
 import jsonMap from "json-source-map";
@@ -65,6 +64,7 @@ import {
 import { evalRawJSON } from "./evaler";
 import { buildBuildNumber } from "./buildnumber";
 import { buildManifest } from "./manifest";
+import { propertiesReader } from "./properties-reader";
 
 // Refuse to run in production mode
 if (process.env.NODE_ENV === "production") {
@@ -907,7 +907,7 @@ async function getI18nData(
   );
 
   // and then we use the properties reader on it
-  const properties: any = PropertiesReader(languageFileLocation).path();
+  const properties = await propertiesReader(languageFileLocation);
   const i18nData: IRawJSONI18NDataType = {};
 
   // the traceback for such file
@@ -1058,7 +1058,7 @@ async function getI18nIncludeData(
   );
 
   // get the properties
-  const properties = PropertiesReader(languageFileLocation).path();
+  const properties = await propertiesReader(languageFileLocation);
   const i18nData: {
     [locale: string]: {
       [key: string]: string,
@@ -1173,7 +1173,7 @@ async function getI18nPropertyData(
   } = {};
 
   // get the properties and the definition
-  const properties = PropertiesReader(languageFileLocation).path();
+  const properties = await propertiesReader(languageFileLocation);
   const definition = PropertyDefinition.supportedTypesStandard[property.type];
 
   if (!definition) {

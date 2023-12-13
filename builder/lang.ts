@@ -9,12 +9,11 @@
 import Traceback from "./Traceback";
 import { checkExists, getActualFileLocation } from "./util";
 import { LOCALE_I18N, ROOT_REQUIRED_LOCALE_I18N } from "../constants";
-import PropertiesReader from "properties-reader";
 import CheckUpError from "./Error";
 import { Ii18NType, ILangLocalesType } from "../base/Root";
 import path from "path";
 import { IBuilderBasicConfigType } from "./config";
-import { type } from "os";
+import { propertiesReader } from "./properties-reader";
 
 /**
  * Given the properties information provides all the key names
@@ -92,8 +91,9 @@ export async function buildLang(
     traceback,
   );
 
-  const propertiesBase = PropertiesReader(baseFileLocation).path();
-  const propertiesRoot = PropertiesReader(languageFileLocation).path();
+  const propertiesBase = await propertiesReader(baseFileLocation);
+  const propertiesRoot = await propertiesReader(languageFileLocation);
+
   const result: Ii18NType = {};
 
   const internalTracebackBaseFile = traceback.newTraceToLocation(i18nBaseFileLocation);
