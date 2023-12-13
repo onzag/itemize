@@ -232,6 +232,9 @@ export interface IReceiveEmailData {
   replyOf?: string;
 }
 
+/**
+ * symbols used to escape usernames
+ */
 const symbols = "+,|-?<>=!";
 
 export interface IEmailRenderedMessage {
@@ -524,6 +527,11 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     return args;
   }
 
+  /**
+   * escape username for usage in the email subject user
+   * @param name 
+   * @returns 
+   */
   public escapeUserName(name: string) {
     return Array.from(name).map((v) => symbols.includes(v) ? " " : v).join("");
   }
@@ -1549,23 +1557,60 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * triggers when an user is trying to send an email to another, when the target is a sql value
    * it means that its using internal solving, as in two users that are in the same system, if the value
    * is a plain string, it means it's trying to solve 
+   * @param user the user SQL value
+   * @param target if a string it refers to an external email, if a SQL row value it refers to an internal user
+   * @param data the SQL value for the email itself
    * @returns SPAM only works for internal usage and the message will be marked as spam for the recepient
    * REJECT will not send the message on its entirety, and ACCEPT will send the message
    */
-  public async allowUserToSendEmail(user: ISQLTableRowValue, target: string | ISQLTableRowValue): Promise<"SPAM" | "REJECT" | "ACCEPT"> {
+  public async allowUserToSendEmail(
+    user: ISQLTableRowValue,
+    target: string | ISQLTableRowValue,
+    value: ISQLTableRowValue,
+  ): Promise<"SPAM" | "REJECT" | "ACCEPT"> {
     return "ACCEPT";
   }
 
-  public async allowUserToSendEmailToItemType(user: ISQLTableRowValue, target: ItemDefinition): Promise<boolean> {
+  /**
+   * When using the syntax id$QUALIFIED_NAME to send an email it will validate to an object type
+   * to send to a target object rather than an user as id$MOD_users__IDEF_user is the default
+   * 
+   * This is useful to create mailing lists or groups of many users, create an object and say allow users
+   * to join by adding some sort of reference then resolve them via the resolveUsersForEmailToItem function
+   * so that such users get the emails internally routed
+   * 
+   * @param user the user trying to send
+   * @param id the id the user is trying to set as target
+   * @param target the target item
+   * @returns false by default
+   */
+  public async allowUserToSendEmailToItemType(
+    user: ISQLTableRowValue,
+    id: string,
+    target: ItemDefinition,
+  ): Promise<boolean> {
     return false;
   }
 
-  public async allowUserToSendEmailToItem(user: ISQLTableRowValue, target: ISQLTableRowValue, targetType: ItemDefinition): Promise<"SPAM" | "REJECT" | "ACCEPT"> {
+  /**
+   * @override to filter unwatned emails to objects
+   * @param user 
+   * @param target 
+   * @param targetType 
+   * @param value 
+   * @returns 
+   */
+  public async allowUserToSendEmailToItem(
+    user: ISQLTableRowValue,
+    target: ISQLTableRowValue,
+    targetType: ItemDefinition,
+    value: ISQLTableRowValue,
+  ): Promise<"SPAM" | "REJECT" | "ACCEPT"> {
     return "REJECT";
   }
 
   /**
-   * @override
+   * @override to resolve messages aimed to object types
    * @param user 
    * @param target 
    * @param targetType 
@@ -1695,7 +1740,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         cidAttachments: null,
       }
     }
-
 
     const cidAttachments: PropertyDefinitionSupportedFilesType = [];
 
@@ -2321,7 +2365,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               ) : null;
 
               const fakeExternalTargets: Array<[string, number]> = [];
-              targets.forEach((t, index) => {
+              await Promise.all(targets.map(async (t, index) => {
                 const tIsRfc = t.includes("@");
                 const tRfc = tIsRfc ? this.parseRFC2822(t) : null;
 
@@ -2353,14 +2397,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                       );
                     }
 
-                    if (!this.allowUserToSendEmailToItemType(senderObj, itemDef as ItemDefinition)) {
+                    if (!(await this.allowUserToSendEmailToItemType(
+                      senderObj,
+                      tObjSplitted[0],
+                      itemDef as ItemDefinition,
+                    ))) {
                       arg.forbid(
                         "Cannot send email to target type " + type
                       );
                     }
                   }
                 }
-              });
+              }));
 
               // fix fake external targets and set them to internal ids
               if (fakeExternalTargets.length) {
@@ -2427,14 +2475,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               // and this is per each individually targeted user and whether it was considered spam for that specific user
               const allInternalTargetsByUser: Array<{ isSpam: boolean, user: ISQLTableRowValue }> = [];
 
-              let replyOf = (arg.requestedUpdateParent && arg.requestedUpdateParent.id && await arg.appData.cache.requestValue(
-                this.storageIdef,
-                arg.requestedUpdateParent.id,
-                arg.requestedUpdateParent.version,
-                {
-                  useMemoryCache: true,
-                }
-              )) || null;
+              let replyOf = arg.requestedUpdateParent && arg.requestedUpdateParent.value;
 
               // the reply is not the tip anymore for this tree
               if (replyOf && replyOf.tip) {
@@ -2515,8 +2556,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                   // now let's check whether we can send this
                   // by calling the function
                   const allowsSend = !internalIdef || internalIdef.getQualifiedPathName() === "MOD_users__IDEF_user" ?
-                    await this.allowUserToSendEmail(senderObj, isInternal ? internalTarget : t) :
-                    await this.allowUserToSendEmailToItem(senderObj, internalTarget, internalIdef);
+                    await this.allowUserToSendEmail(senderObj, isInternal ? internalTarget : t, arg.newValueSQL) :
+                    await this.allowUserToSendEmailToItem(senderObj, internalTarget, internalIdef, arg.newValueSQL);
 
                   // this one is a reject
                   if (allowsSend === "REJECT") {
@@ -2648,6 +2689,9 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                     externalTargets.push(t);
                     // and also to all the potential external targets
                     // that include everything, externals and internals
+                    // these are internal targets, expressed as extenrnal
+                    // while not all internal targets have an external expression
+                    // the ones that do will be here
                     allPotentialExternalTargets.push(t);
                   }
                 }));

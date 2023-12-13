@@ -15,7 +15,7 @@ import { AltBadgeReactioner } from "./alt-badge-reactioner";
 /**
  * The paginated search loader props
  */
-interface ISearchLoaderWithPaginationProps {
+export interface ISearchLoaderWithPaginationProps {
   /**
    * Whether to use a local state
    */

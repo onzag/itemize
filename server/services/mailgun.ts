@@ -49,7 +49,7 @@ interface IMailgunTmpFileMap {
 }
 
 const MAILGUN_PRIORITY = 10;
-const MAILGUN_LAST_TIMESTAMP = "MAILGUN_LAST_TIMESTAMP_TEST80";
+const MAILGUN_LAST_TIMESTAMP = "MAILGUN_LAST_TIMESTAMP";
 
 export class MailgunService extends MailProvider<IMailgunConfig> {
   private host: string;

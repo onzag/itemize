@@ -5,7 +5,7 @@ import ReaderMany from "../../../components/property/ReaderMany";
 import Tabs from "@mui/material/Tabs";
 import { IPropertySetterProps } from "../../../components/property/base";
 import Tab from "@mui/material/Tab";
-import { SearchLoaderWithPagination } from "../search-loader-with-pagination";
+import { ISearchLoaderWithPaginationProps, SearchLoaderWithPagination } from "../search-loader-with-pagination";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import View from "../../../components/property/View";
 import Box from "@mui/material/Box";
@@ -15,7 +15,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
-import Reader from "../../../components/property/Reader";
+import Reader, { TextReader } from "../../../components/property/Reader";
 
 import Link from "../../../components/navigation/Link";
 import SubmitActioner from "../../../components/item/SubmitActioner";
@@ -45,6 +45,8 @@ import { UNSPECIFIED_OWNER } from "../../../../constants";
 import type { ITagListSuggestion } from "../../renderers/PropertyEntry/PropertyEntryTagList";
 import Setter from "../../../components/property/Setter";
 import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
+import { styled } from "@mui/material";
 
 const style = {
   flex: {
@@ -153,31 +155,138 @@ export interface ISwitcherComponentProps {
   onLocationChange: (e: React.SyntheticEvent, value: LocationType) => void;
 }
 
-interface IBasicEmailClientProps {
+export interface IListComponentProps { }
+export interface IWrapperComponentProps { };
+export interface IPaginatorComponentProps { };
+
+export interface IBasicEmailClientProps {
+  /**
+   * The avatar element that is used to render avatars within a given
+   * user context
+   */
   userAvatarElement: React.ReactNode;
+  /**
+   * the username function to render the username
+   * @param sender whether you are currently the sender, if not you are the receiver
+   * @returns 
+   */
   userUsernameElement: (sender: boolean) => React.ReactNode;
+  /**
+   * Properties to load for the user
+   */
   userLoadProperties: string[];
 }
 
-interface IEmailClientProps extends IBasicEmailClientProps {
+export interface IEmailClientProps extends IBasicEmailClientProps {
+  /**
+   * The current location for the email client
+   */
   location: LocationType;
+  /**
+   * An event that triggers when the location changes
+   * @param e 
+   * @param location 
+   * @returns 
+   */
   onLocationChange: (e: React.SyntheticEvent, location: LocationType) => void;
+  /**
+   * The position of the switcher component
+   */
   switcherComponentPosition?: "top" | "bottom";
+  /**
+   * Switcher component to use instead of the default
+   */
   SwitcherComponent?: React.ComponentType<ISwitcherComponentProps>;
+  /**
+   * List component to use instead of the default this wraps every message
+   */
+  ListComponent?: React.ComponentType<IListComponentProps>;
+  /**
+   * Wrapper component to use instead of the default this wraps the whole
+   * box area
+   */
+  WrapperComponent?: React.ComponentType<IWrapperComponentProps>;
+  /**
+   * Internal wrapper to use instead of the default this wraps the list and the paginator
+   */
+  InternalWrapperComponent?: React.ComponentType<IWrapperComponentProps>;
+  /**
+   * Wrapper to use instead of the default for the paginator object
+   */
+  PaginatorWrapperComponent?: React.ComponentType<IPaginatorComponentProps>;
+  /**
+   * Extra props to give the search loader
+   */
+  searchLoaderProps?: ISearchLoaderWithPaginationProps;
+  /**
+   * When a new email is sent and given an id this represents where
+   * the url of such a message is located
+   * @param id the id of the email
+   * @returns the url where it can be visualized
+   */
   emailUrlResolver: (id: string) => string;
+  /**
+   * The url to create new emails
+   */
   emailNewUrl: string;
+  /**
+   * The email client cannot be used if you are not logged in
+   * use this to specify that error
+   */
+  mustBeLoggedInNode?: React.ReactNode;
 }
 
-interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderPropsBase {
+/**
+ * The props for the email reader where a single email is to be visualized
+ */
+export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderPropsBase {
+  /**
+   * the id of the email in question that is to be visualized
+   */
   id: string;
-  contentWrapper?: (content: React.ReactNode) => React.ReactNode;
+  /**
+   * Wrapper component to used inside of the content
+   */
+  WrapperContent?: React.ComponentType<IWrapperComponentProps>;
+  /**
+   * Resolve the url used to reply to a message
+   * @param replyOf the id of the email we are trying to reply
+   * @returns 
+   */
   replyUrlResolver: (replyOf: string) => string;
+  /**
+   * Resolve the url used to reply to a message (all involved targets)
+   * @param replyOf the id of the email we are trying to reply
+   * @returns 
+   */
   replyAllUrlResolver: (replyOf: string) => string;
+  /**
+   * Resolve the url used to forward a message
+   * @param replyOf the id of the email we are trying to forward
+   * @returns 
+   */
   forwardUrlResolver: (replyOf: string) => string;
+  /**
+   * When a new email is sent and given an id this represents where
+   * the url of such a message is located
+   * @param id the id of the email
+   * @returns the url where it can be visualized
+   */
   emailUrlResolver: (id: string) => string;
+  /**
+   * If we are currently replying
+   */
   replying?: "reply-all" | "reply" | "forward";
 }
 
+/**
+ * The default switcher component to switch between inbox/outbox/etc...
+ * 
+ * It is not very good, and it is not localized
+ * 
+ * @param props 
+ * @returns 
+ */
 export function DefaultSwitcherComponent(props: ISwitcherComponentProps) {
   return (
     <Tabs
@@ -193,34 +302,168 @@ export function DefaultSwitcherComponent(props: ISwitcherComponentProps) {
   )
 }
 
+
 interface IEmailSenderPropsBase {
+  /**
+   * In order the properties to use for the user, username field
+   * normally it'd be ["username"] but it could be ["real_name", "username"]
+   * use if you have more than one field for the username
+   */
   userNameProperties: string[];
+  /**
+   * A label to use when the value is invalid for example, a bad unknown user
+   * or something else entirely
+   */
   userInvalidLabel: React.ReactNode;
+  /**
+   * Same as the userNameProperties but used with other objects of other types
+   * the key is the qualified name and represents the properties in order
+   */
   objectsNameResolver?: {
-    [key: string]: string[];
+    [qualifiedName: string]: string[];
   };
+  /**
+   * Same as the userInvalidLabel but used with other objects of other types
+   * the key is the qualified name and represents the properties in order
+   */
   objectsInvalidLabel?: {
-    [key: string]: React.ReactNode;
+    [qualifiedName: string]: React.ReactNode;
   };
 }
 
-interface IEmailSenderProps extends IEmailSenderPropsBase {
+/**
+ * The props for the email sender where we are sending a first time email
+ */
+export interface IEmailSenderProps extends IEmailSenderPropsBase {
+  /**
+   * prefill for the subject field
+   */
   subjectPrefill?: string;
+  /**
+   * prefill for the target field
+   * eg. ["admin@gmail.com", "admin", "USER_ID", "ID$MOD_something__IDEF_else"]
+   */
   targetPrefill?: string[];
+  /**
+   * reply of something? if so give the id of the email that is being replied
+   */
   replyOf?: string;
+  /**
+   * When a new email is sent and given an id this represents where
+   * the url of such a message is located
+   * @param id the id of the email
+   * @returns the url where it can be visualized
+   */
   emailUrlResolver: (id: string) => string;
-}
-
-interface IActualMailSenderProps extends IEmailSenderProps {
-  userId: string;
-  supportsExternal: boolean;
-  mailDomain: string;
-  mailIdef: ItemDefinition;
-  userIdef: ItemDefinition;
-  token: string;
+  /**
+   * Use to resolve suggestions for the user
+   * @param v the string being inputted
+   * @returns 
+   */
   onFetchSuggestions?: (v: string) => Promise<ITagListSuggestion[]>;
 }
 
+interface IActualMailSenderPropsBase {
+  /**
+   * The user id trying to send
+   */
+  userId: string;
+  /**
+   * Current mail domain
+   */
+  mailDomain: string;
+  /**
+   * Mail item definition
+   */
+  mailIdef: ItemDefinition;
+  /**
+   * user item definition
+   */
+  userIdef: ItemDefinition;
+  /**
+   * Current user token
+   */
+  token: string;
+}
+
+/**
+ * Actual props for the mail sender
+ */
+interface IActualMailSenderProps extends IEmailSenderProps, IActualMailSenderPropsBase {
+  /**
+   * Whether this user supports sending external emails
+   */
+  supportsExternal: boolean;
+  /**
+   * This should resolve for a given input what the value should resolve
+   * for, normally this only applies to internal usernames
+   * @param v the information regarding this user
+   * @returns a string, should be either a 
+   */
+  valueResolver?: (v: IInternalValueResolverOptions) => Promise<string>;
+}
+
+interface IInternalValueResolverOptions extends IActualMailSenderPropsBase {
+  /**
+   * The target username being attempted to be resolved
+   */
+  username: string;
+  /**
+   * Whether the full domain syntax was used with a given ending
+   * for a local email, and was clearly specified the target domain as local
+   * this implies that this must be completed for an user
+   */
+  usedFullDomainSyntax: boolean;
+}
+
+/**
+ * This is the default resolver that will look over all the users and find one with the given
+ * username in order to retrieve it and its id, however if you have restricted search policies
+ * you may want to change the default behaviour
+ * 
+ * @param v 
+ * @returns 
+ */
+export async function defaultValueResolver(v: IInternalValueResolverOptions) {
+  const results = await runSearchQueryFor({
+    args: {
+      "IN_username": [v.username],
+    },
+    fields: {
+      count: {},
+      records: {
+        id: {},
+      },
+    },
+    createdBy: null,
+    orderBy: {},
+    parentedBy: null,
+    cachePolicy: "none",
+    token: v.token,
+    itemDefinition: v.userIdef.getSearchModeCounterpart(),
+    traditional: false,
+    offset: 0,
+    limit: 1,
+    until: null,
+    language: "en",
+    versionFilter: null,
+    waitAndMerge: true,
+    since: null,
+    enableNulls: false,
+  }, null);
+
+  if (!results || results.count === 0 || !results.records[0]) {
+    return UNSPECIFIED_OWNER;
+  } else {
+    return results.records[0].id;
+  }
+}
+
+/**
+ * Actual email sender
+ * @param props
+ * @returns 
+ */
 function ActualMailSender(props: IActualMailSenderProps) {
   const onValueInputted = useCallback(async (v: string) => {
     const trimmed = v.trim();
@@ -229,38 +472,16 @@ function ActualMailSender(props: IActualMailSenderProps) {
     const domain = splitted[1] || props.mailDomain;
 
     if (domain === props.mailDomain) {
-      const results = await runSearchQueryFor({
-        args: {
-          "IN_username": [username],
-        },
-        fields: {
-          count: {},
-          records: {
-            id: {},
-          },
-        },
-        createdBy: null,
-        orderBy: {},
-        parentedBy: null,
-        cachePolicy: "none",
+      const resolver = props.valueResolver || defaultValueResolver;
+      return resolver({
+        mailDomain: props.mailDomain,
+        mailIdef: props.mailIdef,
         token: props.token,
-        itemDefinition: props.userIdef.getSearchModeCounterpart(),
-        traditional: false,
-        offset: 0,
-        limit: 1,
-        until: null,
-        language: "en",
-        versionFilter: null,
-        waitAndMerge: true,
-        since: null,
-        enableNulls: false,
-      }, null);
-
-      if (!results || results.count === 0 || !results.records[0]) {
-        return UNSPECIFIED_OWNER;
-      } else {
-        return results.records[0].id;
-      }
+        userId: props.userId,
+        userIdef: props.userIdef,
+        username,
+        usedFullDomainSyntax: splitted[1] === props.mailDomain,
+      });
     } else {
       return trimmed;
     }
@@ -316,40 +537,35 @@ function ActualMailSender(props: IActualMailSenderProps) {
             {(arg) => {
               if (arg.notFound) {
                 const invalidLabel = (isUser ? props.userInvalidLabel : props.objectsInvalidLabel[type]) || "ERR???";
-                if (typeof invalidLabel === "string") {
-                  return (
-                    <Chip
-                      label={invalidLabel}
-                      sx={style.chip}
-                      color="error"
-                    />
-                  );
-                } else {
-                  return (
-                    <ModuleProvider module="mail">
-                      <NoStateItemProvider
-                        itemDefinition="mail"
-                      >
-                        <Chip
-                          label={invalidLabel}
-                          sx={style.chip}
-                          color="error"
-                        />
-                      </NoStateItemProvider>
-                    </ModuleProvider>
-                  )
-                }
+                return (
+                  <Chip
+                    label={invalidLabel}
+                    sx={style.chip}
+                    color="error"
+                  />
+                );
               }
 
               return (
                 <ReaderMany data={isUser ? props.userNameProperties : props.objectsNameResolver[type]}>
-                  {(...args: string[]) => (
-                    <Chip
-                      label={args.find((v) => !!v)}
-                      sx={style.chip}
-                      color={isUser ? "primary" : "secondary"}
-                    />
-                  )}
+                  {(...args: Array<string | IPropertyDefinitionSupportedTextType>) => {
+                    let valueToDisplay = args.find((v) => !!v);
+                    if (valueToDisplay && typeof valueToDisplay !== "string") {
+                      valueToDisplay = valueToDisplay.value;
+                    }
+
+                    if (!valueToDisplay) {
+                      valueToDisplay = "???";
+                    }
+
+                    return (
+                      <Chip
+                        label={valueToDisplay}
+                        sx={style.chip}
+                        color={isUser ? "primary" : "secondary"}
+                      />
+                    );
+                  }}
                 </ReaderMany>
               )
             }}
@@ -418,8 +634,8 @@ function ActualMailSender(props: IActualMailSenderProps) {
             enterWithSpace: true,
           }}
         />
-        <Entry id="subject" autoFocus={!props.subjectPrefill}/>
-        <Entry id="content" autoFocus={!!props.subjectPrefill}/>
+        <Entry id="subject" autoFocus={!props.subjectPrefill} />
+        <Entry id="content" autoFocus={!!props.subjectPrefill} />
         <Entry id="attachments" />
 
         <Reader id="target">
@@ -795,9 +1011,9 @@ export function EmailReader(props: IEmailReaderProps) {
                         return (state.loaded ? (
                           <I18nRead id="no_subject" context="mail/mail">
                             {(i18nNoSubject: string) => (
-                              <Reader id="subject">
-                                {(subject: string) => (
-                                  <I18nRead id="re" context="mail/mail" args={[subject || i18nNoSubject]}>
+                              <TextReader id="subject">
+                                {(subject) => (
+                                  <I18nRead id="re" context="mail/mail" args={[subject?.value || i18nNoSubject]}>
                                     {(i18nRe: string) => (
                                       <ReaderMany data={["source", "target"]}>
                                         {(source: string, target: string[]) => {
@@ -836,7 +1052,7 @@ export function EmailReader(props: IEmailReaderProps) {
                                     )}
                                   </I18nRead>
                                 )}
-                              </Reader>
+                              </TextReader>
                             )}
                           </I18nRead>
                         ) : null);
@@ -853,8 +1069,14 @@ export function EmailReader(props: IEmailReaderProps) {
               );
             }
 
-            if (props.contentWrapper) {
-              content = props.contentWrapper(content);
+            if (props.WrapperContent) {
+              const Wrapper = props.WrapperContent;
+              let oldContent = content;
+              content = (
+                <Wrapper>
+                  {oldContent}
+                </Wrapper>
+              );
             }
 
             return (
@@ -1109,7 +1331,7 @@ interface IEmailMenuItemProps {
   id: string;
   emailUrlResolver: (id: string) => string;
   isUnread: boolean;
-  subject: string;
+  subject: IPropertyDefinitionSupportedTextType;
 }
 
 function EmailMenuItem(props: IEmailMenuItemProps) {
@@ -1132,7 +1354,11 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
                 {avatars}
               </ListItemAvatar>
               <ListItemText
-                primary={props.subject}
+                primary={
+                  <span lang={props.subject.language}>
+                    {props.subject.value}
+                  </span>
+                }
                 secondary={usernames}
               />
             </>
@@ -1143,6 +1369,8 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
   );
 }
 
+const StyledPaginatorWrapper = styled("div")(style.paginationBox);
+
 export function EmailClient(props: IEmailClientProps) {
   const [limitoffset, setLimitOffset] = useState([20, 0]);
   const onOutOfBounds = useCallback((newLimit: number, newOffset: number) => {
@@ -1150,6 +1378,10 @@ export function EmailClient(props: IEmailClientProps) {
   }, []);
 
   const SwitcherComponent = typeof props.SwitcherComponent === "undefined" ? DefaultSwitcherComponent : props.SwitcherComponent;
+  const ListComponent = typeof props.ListComponent === "undefined" ? List : props.ListComponent;
+  const WrapperComponent = typeof props.WrapperComponent === "undefined" ? React.Fragment : props.WrapperComponent;
+  const InternalWrapperComponent = typeof props.InternalWrapperComponent === "undefined" ? React.Fragment : props.InternalWrapperComponent;
+  const PaginatorWrapperComponent = typeof props.PaginatorWrapperComponent === "undefined" ? StyledPaginatorWrapper : props.InternalWrapperComponent;
 
   const switcher = SwitcherComponent && (
     <SwitcherComponent
@@ -1161,7 +1393,7 @@ export function EmailClient(props: IEmailClientProps) {
   return (
     <UserDataRetriever>
       {(userData) => (
-        !userData.id ? "MUST_BE_LOGGED_IN" : <ModuleProvider module="mail">
+        !userData.id ? props.mustBeLoggedInNode : <ModuleProvider module="mail">
           <ItemProvider
             itemDefinition="mail"
             properties={[
@@ -1196,51 +1428,54 @@ export function EmailClient(props: IEmailClientProps) {
             }}
             cleanOnDismount={true}
           >
-            {!props.switcherComponentPosition || props.switcherComponentPosition === "top" ? switcher : null}
+            <WrapperComponent>
+              {!props.switcherComponentPosition || props.switcherComponentPosition === "top" ? switcher : null}
 
-            <SearchLoaderWithPagination
-              id="messages-search"
-              pageSize={10}
-              static="TOTAL"
-              cleanOnDismount={true}
-              total={true}
-              onTotalOutOfBounds={onOutOfBounds}
-            >
-              {(arg, pagination, noResults) => (
-                <>
-                  <List>
-                    {arg.searchRecords.map((v) => (
-                      <ItemProvider {...v.providerProps}>
-                        <ReaderMany data={["id", "source", "subject", "read", "target"]}>
-                          {(id: string, source: string, subject: string, read: boolean, target: string[]) => {
-                            const isUnread = (props.location === "INBOX" || props.location === "INBOX_SPAM" || props.location === "INBOX_UNREAD") && !read;
+              <SearchLoaderWithPagination
+                {...props.searchLoaderProps}
+                id="messages-search"
+                pageSize={10}
+                static="TOTAL"
+                cleanOnDismount={true}
+                total={true}
+                onTotalOutOfBounds={onOutOfBounds}
+              >
+                {(arg, pagination, noResults) => (
+                  <InternalWrapperComponent>
+                    <ListComponent>
+                      {arg.searchRecords.map((v) => (
+                        <ItemProvider {...v.providerProps}>
+                          <ReaderMany data={["id", "source", "subject", "read", "target"]}>
+                            {(id: string, source: string, subject: IPropertyDefinitionSupportedTextType, read: boolean, target: string[]) => {
+                              const isUnread = (props.location === "INBOX" || props.location === "INBOX_SPAM" || props.location === "INBOX_UNREAD") && !read;
 
-                            return (
-                              <EmailMenuItem
-                                isUnread={isUnread}
-                                emailUrlResolver={props.emailUrlResolver}
-                                id={id}
-                                isSources={props.location !== "OUTBOX"}
-                                sourceOrTargets={props.location === "OUTBOX" ? target : (source ? [source] : null)}
-                                subject={subject}
-                                userAvatarElement={props.userAvatarElement}
-                                userLoadProperties={props.userLoadProperties}
-                                userUsernameElement={props.userUsernameElement}
-                              />
-                            );
-                          }}
-                        </ReaderMany>
-                      </ItemProvider>
-                    ))}
-                  </List>
-                  <Box sx={style.paginationBox}>
-                    {pagination}
-                  </Box>
-                </>
-              )}
-            </SearchLoaderWithPagination>
+                              return (
+                                <EmailMenuItem
+                                  isUnread={isUnread}
+                                  emailUrlResolver={props.emailUrlResolver}
+                                  id={id}
+                                  isSources={props.location !== "OUTBOX"}
+                                  sourceOrTargets={props.location === "OUTBOX" ? target : (source ? [source] : null)}
+                                  subject={subject}
+                                  userAvatarElement={props.userAvatarElement}
+                                  userLoadProperties={props.userLoadProperties}
+                                  userUsernameElement={props.userUsernameElement}
+                                />
+                              );
+                            }}
+                          </ReaderMany>
+                        </ItemProvider>
+                      ))}
+                    </ListComponent>
+                    <PaginatorWrapperComponent>
+                      {pagination}
+                    </PaginatorWrapperComponent>
+                  </InternalWrapperComponent>
+                )}
+              </SearchLoaderWithPagination>
 
-            {props.switcherComponentPosition === "bottom" ? switcher : null}
+              {props.switcherComponentPosition === "bottom" ? switcher : null}
+            </WrapperComponent>
 
             <Link to={props.emailNewUrl}>
               <I18nRead id="new">
