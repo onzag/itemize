@@ -55,6 +55,10 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {chang
       document.title = newTitle;
       this.setState({changedTitle: true});
       ActualTitleSetter.changedListeners.forEach((listener) => listener());
+    } else {
+      // force a title change in case of buggy browser behaviours
+      // found a bug in chrome where it tries to outsmart the title
+      document.title = newTitle;
     }
   }
   public componentDidUpdate(prevProps: ITitleSetterProps) {
@@ -101,6 +105,12 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {chang
  * If set in the og mode it will not do anything and it does not update the og
  * dinamically, only the document or both mode does it; the og mode is for server
  * use only
+ * 
+ * The title is set and then left to what it was last set, it does not revert it other than
+ * unless another instance overrides it
+ * 
+ * NOTE: Due to a bug in google chrome, you should always have a title setter, the title settter
+ * sets the title and doesn't turn it back once you unload it
  */
 export default class TitleSetter extends React.Component<ITitleSetterProps, {}> {
   constructor(props: ITitleSetterProps) {

@@ -5,6 +5,16 @@ search_field_placeholder = search mail
 search_value_too_large = your search is too long, please narrow it down
 search_keywords = mail
 
+custom.unread = unread
+custom.inbox = inbox
+custom.outbox = sent
+custom.spam = spam
+
+custom.title_unread = unread messages
+custom.title_inbox = inbox
+custom.title_outbox = sent messages
+custom.title_spam = spam
+
 custom.mark_as_spam = mark as spam
 custom.mark_as_safe = mark as safe
 custom.reply = reply

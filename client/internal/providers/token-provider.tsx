@@ -268,6 +268,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         cache: "no-cache",
         headers,
         body: JSON.stringify({username, password, country: this.props.localeContext.country}),
+        credentials: "omit",
       })).json();
     } catch (err) {
       data = {
@@ -293,9 +294,9 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       // then let's get the token data our server has given us
       const tokenData = data;
       // as well as these
-      tokenDataId = tokenData ? tokenData.id as string : null;
-      tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;
-      tokenDataToken = tokenData ? tokenData.token as string : null;
+      tokenDataId = tokenData && !error ? (tokenData.id as string || null) : null;
+      tokenDataRole = tokenData && !error ? (tokenData.role as string || GUEST_METAROLE) : GUEST_METAROLE;
+      tokenDataToken = tokenData && !error ? (tokenData.token as string || null) : null;
 
       let cookieEnd = ";domain=" + location.hostname;
       if (location.protocol === "https:") {

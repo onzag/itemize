@@ -290,10 +290,6 @@ function i18nReadInternal(
     i18nValue = "???";
   }
 
-  if (props.capitalize) {
-    i18nValue = capitalize(i18nValue as string);
-  }
-
   // if we are passing arguments to replace the {0} {1} etc... numbers
   if (props.args) {
     // we have two options, these are for basic types, which is faster and returns a string
@@ -303,7 +299,13 @@ function i18nReadInternal(
     ) {
       // the standard locale replacer
       i18nValue = localeReplacer(i18nValue as string, ...props.args);
+      if (props.capitalize) {
+        i18nValue = capitalize(i18nValue as string);
+      }
     } else {
+      if (props.capitalize) {
+        i18nValue = capitalize(i18nValue as string);
+      }
       // otherwise we use the locale replacer to array which creates react fragments
       // and returns an array of react nodes, this all depends on the args that the user
       // is passing
@@ -326,6 +328,8 @@ function i18nReadInternal(
         );
       });
     }
+  } else if (props.capitalize) {
+    i18nValue = capitalize(i18nValue as string);
   }
 
   // now we want to get the final node that we are returning, the react node
@@ -474,7 +478,7 @@ export function useI18nRead(options: I18nReadOptions): React.ReactNode {
   if (options.context) {
     const rootV = root.root;
     const itemDefOrModule = rootV.registry[options.context];
-  
+
     const idef = itemDefOrModule instanceof ItemDefinition ? itemDefOrModule : null;
     const mod: Module = idef ? idef.getParentModule() : itemDefOrModule as Module;
 

@@ -46,7 +46,7 @@ import type { ITagListSuggestion } from "../../renderers/PropertyEntry/PropertyE
 import Setter from "../../../components/property/Setter";
 import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
-import { styled } from "@mui/material";
+import { SxProps, Theme, styled } from "@mui/material";
 import { useAppLanguageRetriever } from "../../../components/localization/AppLanguageRetriever";
 
 const style = {
@@ -149,7 +149,7 @@ const style = {
   }
 }
 
-type LocationType = "INBOX" | "INBOX_UNREAD" | "INBOX_SPAM" | "OUTBOX";
+type LocationType = "inbox" | "unread" | "spam" | "outbox";
 
 export interface ISwitcherComponentProps {
   location: LocationType;
@@ -180,6 +180,10 @@ export interface IBasicEmailClientProps {
 
 export interface IEmailClientProps extends IBasicEmailClientProps {
   /**
+   * sx props for the fab element
+   */
+  fabComponent: React.ReactNode;
+  /**
    * The current location for the email client
    */
   location: LocationType;
@@ -203,6 +207,10 @@ export interface IEmailClientProps extends IBasicEmailClientProps {
    */
   ListComponent?: React.ComponentType<IListComponentProps>;
   /**
+   * List component element
+   */
+  ListElementComponent?: React.ComponentType<IListElementComponentProps>;
+  /**
    * Wrapper component to use instead of the default this wraps the whole
    * box area
    */
@@ -218,7 +226,7 @@ export interface IEmailClientProps extends IBasicEmailClientProps {
   /**
    * Extra props to give the search loader
    */
-  searchLoaderProps?: ISearchLoaderWithPaginationProps;
+  searchLoaderProps?: Partial<ISearchLoaderWithPaginationProps>;
   /**
    * When a new email is sent and given an id this represents where
    * the url of such a message is located
@@ -235,6 +243,10 @@ export interface IEmailClientProps extends IBasicEmailClientProps {
    * use this to specify that error
    */
   mustBeLoggedInNode?: React.ReactNode;
+  /**
+   * Fallback avatar to render avatars
+   */
+  FallbackAvatarComponent?: React.ComponentType<{children: React.ReactNode}>;
 }
 
 /**
@@ -271,12 +283,14 @@ export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderP
    * If we are currently replying
    */
   replying?: "reply-all" | "reply" | "forward";
+  /**
+   * Fallback avatar to render avatars
+   */
+  FallbackAvatarComponent?: React.ComponentType<{children: React.ReactNode}>;
 }
 
 /**
  * The default switcher component to switch between inbox/outbox/etc...
- * 
- * It is not very good, and it is not localized
  * 
  * @param props 
  * @returns 
@@ -288,10 +302,10 @@ export function DefaultSwitcherComponent(props: ISwitcherComponentProps) {
       value={props.location}
       sx={style.tabs}
     >
-      <Tab value="INBOX_UNREAD" label="unread" />
-      <Tab value="INBOX" label="inbox" />
-      <Tab value="OUTBOX" label="sent" />
-      <Tab value="INBOX_SPAM" label="spam" />
+      <Tab value="unread" label={<I18nRead id="unread" context="mail/mail" capitalize={true} />} />
+      <Tab value="inbox" label={<I18nRead id="inbox" context="mail/mail" capitalize={true} />} />
+      <Tab value="outbox" label={<I18nRead id="outbox" context="mail/mail" capitalize={true} />} />
+      <Tab value="spam" label={<I18nRead id="spam" context="mail/mail" capitalize={true} />} />
     </Tabs>
   )
 }
@@ -426,7 +440,7 @@ export function getValueResolverAtEndpoint(endpoint: string): (v: IInternalValue
       return UNSPECIFIED_OWNER;
     }
   }
-} 
+}
 
 /**
  * This is the default resolver that will look over all the users and find one with the given
@@ -860,6 +874,7 @@ export function EmailReader(props: IEmailReaderProps) {
                       userAvatarElement={null}
                       userLoadProperties={props.userLoadProperties}
                       userUsernameElement={props.userUsernameElement}
+                      FallbackAvatarComponent={props.FallbackAvatarComponent}
                     >
                       {(avatars, usernames) => (
                         <I18nRead id="wrote_to" args={[usernames]} context="mail/mail" />
@@ -1250,10 +1265,10 @@ const outbox = [
 ];
 
 const settersCriteria = {
-  "INBOX_UNREAD": inboxUnread,
-  "INBOX_SPAM": inboxSpam,
-  "INBOX": inbox,
-  "OUTBOX": outbox,
+  "unread": inboxUnread,
+  "spam": inboxSpam,
+  "inbox": inbox,
+  "outbox": outbox,
 }
 
 interface IEmailAccumProps {
@@ -1267,20 +1282,23 @@ interface IEmailAccumProps {
   avatarAccum: React.ReactNode[];
   usernameAccum: React.ReactNode[];
 
+  FallbackAvatarComponent: React.ComponentType<{children: React.ReactNode}>;
+
   children: (avatars: React.ReactNode[], usernames: React.ReactNode) => React.ReactNode;
 }
 
 function EmailAccum(props: IEmailAccumProps) {
   const sourceOrTarget = props.sourceOrTargets && props.sourceOrTargets[props.sourceOrTargetToConsume];
   const sourceOrTargetUsername = sourceOrTarget && sourceOrTarget.split("<")[0].trim();
+  const AvatarToUse = props.FallbackAvatarComponent || Avatar;
 
   let avatar: React.ReactNode = null;
   let username: React.ReactNode = null;
   if (!sourceOrTarget) {
-    avatar = <Box sx={style.avatarOverlayer} key={props.sourceOrTargetToConsume}><Avatar>?</Avatar></Box>;
+    avatar = <Box sx={style.avatarOverlayer} key={props.sourceOrTargetToConsume}><AvatarToUse>?</AvatarToUse></Box>;
   } else if (sourceOrTarget.includes("@")) {
     const letterToUse = (sourceOrTargetUsername ? sourceOrTargetUsername[0] : sourceOrTarget[0]).toUpperCase();
-    avatar = <Box sx={style.avatarOverlayer} key={props.sourceOrTargetToConsume}><Avatar>{letterToUse}</Avatar></Box>;
+    avatar = <Box sx={style.avatarOverlayer} key={props.sourceOrTargetToConsume}><AvatarToUse>{letterToUse}</AvatarToUse></Box>;
     username = <React.Fragment key={props.sourceOrTargetToConsume}>{sourceOrTargetUsername || sourceOrTarget}</React.Fragment>;
   } else {
     avatar = (
@@ -1348,6 +1366,13 @@ function EmailAccum(props: IEmailAccumProps) {
   }
 }
 
+export interface IListElementComponentProps {
+  isUnread: boolean;
+  avatars: React.ReactNode;
+  subject: IPropertyDefinitionSupportedTextType,
+  usernames: React.ReactNode;
+}
+
 interface IEmailMenuItemProps {
   isSources: boolean;
   sourceOrTargets: string[];
@@ -1358,39 +1383,56 @@ interface IEmailMenuItemProps {
   emailUrlResolver: (id: string) => string;
   isUnread: boolean;
   subject: IPropertyDefinitionSupportedTextType;
+  /**
+   * List component element
+   */
+  ListElementComponent?: React.ComponentType<IListElementComponentProps>;
+  FallbackAvatarComponent: React.ComponentType<{children: React.ReactNode}>;
+}
+
+export function DefaultListElementComponent(props: IListElementComponentProps) {
+  return (
+    <ListItemButton sx={props.isUnread ? style.unread : style.read}>
+      <ListItemAvatar sx={style.avatarBox}>
+        {props.avatars}
+      </ListItemAvatar>
+      <ListItemText
+        primary={
+          <span lang={props.subject.language}>
+            {props.subject.value}
+          </span>
+        }
+        secondary={props.usernames}
+      />
+    </ListItemButton>
+  );
 }
 
 function EmailMenuItem(props: IEmailMenuItemProps) {
+  const ListElementComponent = props.ListElementComponent || DefaultListElementComponent;
   return (
     <Link to={props.emailUrlResolver(props.id)}>
-      <ListItemButton sx={props.isUnread ? style.unread : style.read}>
-        <EmailAccum
-          sourceOrTargetToConsume={0}
-          sourceOrTargets={props.sourceOrTargets}
-          isSources={props.isSources}
-          avatarAccum={[]}
-          userAvatarElement={props.userAvatarElement}
-          userUsernameElement={props.userUsernameElement}
-          userLoadProperties={props.userLoadProperties}
-          usernameAccum={[]}
-        >
-          {(avatars, usernames) => (
-            <>
-              <ListItemAvatar sx={style.avatarBox}>
-                {avatars}
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <span lang={props.subject.language}>
-                    {props.subject.value}
-                  </span>
-                }
-                secondary={usernames}
-              />
-            </>
-          )}
-        </EmailAccum>
-      </ListItemButton>
+
+      <EmailAccum
+        sourceOrTargetToConsume={0}
+        sourceOrTargets={props.sourceOrTargets}
+        isSources={props.isSources}
+        avatarAccum={[]}
+        userAvatarElement={props.userAvatarElement}
+        userUsernameElement={props.userUsernameElement}
+        userLoadProperties={props.userLoadProperties}
+        usernameAccum={[]}
+        FallbackAvatarComponent={props.FallbackAvatarComponent}
+      >
+        {(avatars, usernames) => (
+          <ListElementComponent
+            avatars={avatars}
+            usernames={usernames}
+            isUnread={props.isUnread}
+            subject={props.subject}
+          />
+        )}
+      </EmailAccum>
     </Link>
   );
 }
@@ -1473,19 +1515,21 @@ export function EmailClient(props: IEmailClientProps) {
                         <ItemProvider {...v.providerProps}>
                           <ReaderMany data={["id", "source", "subject", "read", "target"]}>
                             {(id: string, source: string, subject: IPropertyDefinitionSupportedTextType, read: boolean, target: string[]) => {
-                              const isUnread = (props.location === "INBOX" || props.location === "INBOX_SPAM" || props.location === "INBOX_UNREAD") && !read;
+                              const isUnread = (props.location === "inbox" || props.location === "spam" || props.location === "unread") && !read;
 
                               return (
                                 <EmailMenuItem
                                   isUnread={isUnread}
                                   emailUrlResolver={props.emailUrlResolver}
                                   id={id}
-                                  isSources={props.location !== "OUTBOX"}
-                                  sourceOrTargets={props.location === "OUTBOX" ? target : (source ? [source] : null)}
+                                  isSources={props.location !== "outbox"}
+                                  sourceOrTargets={props.location === "outbox" ? target : (source ? [source] : null)}
                                   subject={subject}
                                   userAvatarElement={props.userAvatarElement}
                                   userLoadProperties={props.userLoadProperties}
                                   userUsernameElement={props.userUsernameElement}
+                                  ListElementComponent={props.ListElementComponent}
+                                  FallbackAvatarComponent={props.FallbackAvatarComponent}
                                 />
                               );
                             }}
@@ -1504,13 +1548,13 @@ export function EmailClient(props: IEmailClientProps) {
             </WrapperComponent>
 
             <Link to={props.emailNewUrl}>
-              <I18nRead id="new">
+              {props.fabComponent ? props.fabComponent : <I18nRead id="new">
                 {(i18nNew: string) => (
                   <Fab title={i18nNew} color="primary" sx={style.fab}>
                     <Create />
                   </Fab>
                 )}
-              </I18nRead>
+              </I18nRead>}
             </Link>
 
           </ItemProvider>
