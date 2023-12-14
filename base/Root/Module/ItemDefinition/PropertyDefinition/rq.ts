@@ -129,7 +129,7 @@ export function getRQDefinitionForProperty(
     return {
       [options.prefix + propertyDefinition.getId()]: {
         ...descCopy,
-        required: !options.optionalForm,
+        required: options.optionalForm ? false : !propertyDefinition.isNullable(),
         description,
       }
     };
@@ -138,7 +138,7 @@ export function getRQDefinitionForProperty(
     return {
       [options.prefix + propertyDefinition.getId()]: {
         ...propDescr.rq,
-        required: !options.optionalForm,
+        required: options.optionalForm ? false : !propertyDefinition.isNullable(),
         description,
       }
     };
