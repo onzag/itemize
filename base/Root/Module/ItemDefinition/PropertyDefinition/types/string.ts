@@ -252,6 +252,16 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
       type: "string",
       required: ["pointer", "pointer-tracked"],
     },
+
+    // disable from general based searches
+    {
+      name: "generalSearchDisabled",
+      type: "boolean",
+    },
+    {
+      name: "generalElasticSearchProduceMetadata",
+      type: "boolean",
+    },
   ],
 
   // i18n attributes required

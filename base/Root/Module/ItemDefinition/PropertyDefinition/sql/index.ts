@@ -800,6 +800,7 @@ export function buildElasticQueryForProperty(
   language: string,
   dictionary: string,
   isOrderedByIt: boolean,
+  fullHighlights: number,
 ) {
   const searchFn = propertyDefinition.getPropertyDefinitionDescription().elasticSearch;
   if (searchFn) {
@@ -816,6 +817,7 @@ export function buildElasticQueryForProperty(
       property: propertyDefinition,
       boost: propertyDefinition.getSearchBoost(),
       appData,
+      fullHighlights,
     });
   }
 
@@ -893,6 +895,7 @@ export function buildElasticStrSearchQueryForProperty(
   language: string,
   dictionary: string,
   isOrderedByIt: boolean,
+  fullHighlights: number,
 ) {
   const searchFn = propertyDefinition.getPropertyDefinitionDescription().elasticStrSearch;
   if (searchFn) {

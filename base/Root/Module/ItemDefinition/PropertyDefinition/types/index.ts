@@ -114,28 +114,42 @@ export interface IElasticSearchInfo extends ISQLArgInfo {
   args: IRQArgs;
   isOrderedByIt: boolean;
   boost: number;
+  fullHighlights: number;
+}
+
+export interface IElasticHighlight {
+  /**
+   * The name of the original property that is being highlighted
+   * with its given prefix if it's from an include
+   */
+  name: string;
+  /**
+   * Whatever we are matching it against
+   */
+  match: string;
+  /**
+* Property definition in quesiton
+*/
+  property?: PropertyDefinition;
+  /**
+   * Include if any
+   */
+  include?: Include;
 }
 
 export interface IElasticHighlightReply {
   /**
    * The eleasticsearch field that will be highlighted
+   * the field name is the real name for the highlight
    */
-  [fieldName: string]: {
-    /**
-     * The name of the original property that is being highlighted
-     * with its given prefix if it's from an include
-     */
-    name: string;
-    /**
-     * Whatever we are matching it against
-     */
-    match: string;
-  }
+  [fieldName: string]: IElasticHighlight;
 }
 
 export interface IElasticHighlighPropertyInfo {
+  lang: string;
   highlights: string[];
   match: string;
+  full: boolean;
 }
 
 export interface IElasticHighlightSingleRecordInfo {

@@ -26,6 +26,7 @@ interface ElasticRequestOptions {
   ignoreUniqueId?: boolean | string | string[];
   onlyAggregations?: boolean;
   noHighlights?: boolean;
+  fullHighlights?: number;
   ignoresDoNotApplyToAggregations?: boolean;
 };
 
@@ -2876,7 +2877,14 @@ export class ItemizeElasticClient {
   }
 }
 
-type SubBuilderFn = (sb: ElasticQueryBuilder) => void;
+/**
+ * The subbuilder function
+ * return a boolean value (specifically false)
+ * to prevent adding itself to the children list
+ * 
+ * this will prevent the element for existing as a child
+ */
+type SubBuilderFn = (sb: ElasticQueryBuilder) => boolean | void;
 
 interface IElasticBasicOptions {
   boost?: number;
@@ -3025,11 +3033,19 @@ export class ElasticQueryBuilder {
         fields: {},
       }
       Object.keys(this.highlights).forEach((highlightKey) => {
-        resultRequest.highlight.fields[highlightKey] = {
-          fragment_size: 1,
-          pre_tags: "",
-          post_tags: ""
-        } as any;
+        if (options.fullHighlights) {
+          resultRequest.highlight.fields[highlightKey] = {
+            fragment_size: options.fullHighlights,
+            pre_tags: "<b>",
+            post_tags: "</b>"
+          } as any;
+        } else {
+          resultRequest.highlight.fields[highlightKey] = {
+            fragment_size: 1,
+            pre_tags: "",
+            post_tags: ""
+          } as any;
+        }
       });
     }
 
@@ -3045,7 +3061,10 @@ export class ElasticQueryBuilder {
   private _q(q: QueryDslQueryContainer | SubBuilderFn, type: string, options: IElasticBasicOptions = {}) {
     if (typeof q === "function") {
       const child = new ElasticQueryBuilder({});
-      q(child);
+      const shouldAdd = q(child);
+      if (shouldAdd === false) {
+        return;
+      }
       this.children.push({
         builder: child,
         q: null,
@@ -3070,25 +3089,6 @@ export class ElasticQueryBuilder {
         aggId: null,
       });
     }
-
-    // if (!this.request.query.bool) {
-    //   this.request.query.bool = {};
-    // }
-    // if (!this.request.query.bool.must) {
-    //   this.request.query.bool[type] = [];
-    // }
-
-    // let queryToUse = q;
-    // if (typeof options.boost === "number") {
-    //   queryToUse = {
-    //     bool: {
-    //       must: q,
-    //       boost: options.boost,
-    //     }
-    //   }
-    // }
-
-    // (this.request.query.bool[type] as QueryDslQueryContainer[]).push(queryToUse);
   }
 
   public must(q: QueryDslQueryContainer | SubBuilderFn, options: IElasticBasicOptions = {}) {
@@ -3327,6 +3327,10 @@ export class ElasticQueryBuilder {
 
   public removeChildForUniqueId(id: string) {
     this.children = this.children.filter((r) => r.uniqueId !== id);
+  }
+
+  public removeChild(q: QueryDslQueryContainer | ElasticQueryBuilder) {
+    this.children = this.children.filter((r) => r.q !== q && r.builder !== q);
   }
 
   public getAllChildrenWithPropertyId(options: { but?: string | string[], noAgg?: boolean, noQuery?: boolean, includeWithoutPropertyId?: boolean } = {}) {

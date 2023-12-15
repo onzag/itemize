@@ -420,7 +420,7 @@ export function buildSQLQueryForModule(
   if (search) {
     whereBuilder.andWhere((builder) => {
       mod.getAllPropExtensions().forEach((pd) => {
-        if (!pd.isSearchable()) {
+        if (!pd.isSearchable() || pd.getConfigValue("generalSearchDisabled")) {
           return;
         }
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
@@ -506,6 +506,7 @@ export function buildSQLQueryForModule(
   dictionary: string,
   search: string,
   orderBy: IOrderByRuleType,
+  fullHighlights: number,
 ) {
   const includedInSearchProperties: string[] = [];
   const includedInStrSearchProperties: string[] = [];
@@ -517,7 +518,8 @@ export function buildSQLQueryForModule(
     }
 
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-    const wasSearchedBy = buildElasticQueryForProperty(serverData, appData, null, null, pd, args, elasticQueryBuilder, language, dictionary, isOrderedByIt);
+    const wasSearchedBy = buildElasticQueryForProperty(serverData, appData, null, null, pd, args, elasticQueryBuilder,
+      language, dictionary, isOrderedByIt, fullHighlights);
     if (wasSearchedBy) {
       includedInSearchProperties.push(pd.getId());
       Object.assign(finalHighlights, wasSearchedBy);
@@ -527,18 +529,20 @@ export function buildSQLQueryForModule(
   if (search) {
     elasticQueryBuilder.must((builder) => {
       mod.getAllPropExtensions().forEach((pd) => {
-        if (!pd.isSearchable()) {
+        if (!pd.isSearchable() || pd.getConfigValue("generalSearchDisabled")) {
           return;
         }
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.should((orBuilder) => {
           const wasStrSearchedBy = buildElasticStrSearchQueryForProperty(
-            serverData, appData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt,
+            serverData, appData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt, fullHighlights,
           );
           if (wasStrSearchedBy) {
             includedInStrSearchProperties.push(pd.getId());
             Object.assign(finalHighlights, wasStrSearchedBy);
-          };
+          } else {
+            return false;
+          }
         });
       });
     });

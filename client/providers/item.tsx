@@ -83,6 +83,7 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
     searching: state.searching,
     searchEngineEnabled: state.searchEngineEnabled,
     searchEngineEnabledLang: state.searchEngineEnabledLang,
+    searchEngineUsedFullHighlights: state.searchEngineUsedFullHighlights,
     searchEngineHighlightArgs: state.searchEngineHighlightArgs,
     searchHighlights: state.searchHighlights,
     searchMetadata: state.searchMetadata,
@@ -971,6 +972,12 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   useSearchEngine?: boolean | string;
 
   /**
+   * Uses the full highlights during a search engine query, the number specified should be
+   * between 1 and 50 as it highlights (10 recommended)
+   */
+  useSearchEngineFullHighlights?: number;
+
+  /**
    * Only allow items of a specific version
    */
   versionFilter?: string;
@@ -1275,6 +1282,10 @@ export interface IItemContextType extends IBasicFns {
    * The language that was used for the search using the search engine
    */
   searchEngineEnabledLang: string;
+  /**
+   * The language that was used for the search using the search engine
+   */
+  searchEngineUsedFullHighlights: number;
   /**
    * The highlight args that were received when using a search engine
    */
@@ -2032,6 +2043,7 @@ export class ActualItemProvider extends
         searchRequestedProperties: [],
         searchEngineEnabled: false,
         searchEngineEnabledLang: null,
+        searchEngineUsedFullHighlights: null,
         searchEngineHighlightArgs: null,
         searchCachePolicy: "none",
         searchListenPolicy: "none",
@@ -2200,6 +2212,7 @@ export class ActualItemProvider extends
       searchRequestedProperties: [],
       searchEngineEnabled: false,
       searchEngineEnabledLang: null,
+      searchEngineUsedFullHighlights: null,
       searchEngineHighlightArgs: null,
       searchHighlights: {},
       searchMetadata: null,
@@ -3242,6 +3255,7 @@ export class ActualItemProvider extends
       searchRequestedProperties: [],
       searchEngineEnabled: false,
       searchEngineEnabledLang: null,
+      searchEngineUsedFullHighlights: null,
       searchEngineHighlightArgs: null,
       searchHighlights: {},
       searchMetadata: null,
@@ -5414,6 +5428,12 @@ export class ActualItemProvider extends
       );
     }
 
+    if (options.useSearchEngineFullHighlights && !options.useSearchEngine) {
+      throw new Error(
+        "Using a search engine full highlights without useSearchEngine enabled is not allowed"
+      );
+    }
+
     // if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
     //   console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
     // }
@@ -5790,6 +5810,7 @@ export class ActualItemProvider extends
       cacheStoreMetadata: options.cacheMetadata,
       cacheStoreMetadataMismatchAction: options.cacheMetadataMismatchAction,
       useSearchEngine: options.useSearchEngine,
+      useSearchEngineFullHighlights: options.useSearchEngineFullHighlights,
       versionFilter: options.versionFilter,
       idsFilter: options.idsFilter,
       idsFilterOut: options.idsFilterOut,
@@ -5829,6 +5850,7 @@ export class ActualItemProvider extends
         searchLastModified: lastModified,
         searchEngineEnabled: !!options.useSearchEngine,
         searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
+        searchEngineUsedFullHighlights: options.useSearchEngineFullHighlights || null,
         searchEngineHighlightArgs: null as any,
         searchCachePolicy: options.cachePolicy || "none",
         searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
@@ -5933,6 +5955,7 @@ export class ActualItemProvider extends
         searchLastModified: lastModified,
         searchEngineEnabled: !!options.useSearchEngine,
         searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
+        searchEngineUsedFullHighlights: options.useSearchEngineFullHighlights || null,
         searchEngineHighlightArgs: highlightArgs,
         searchCachePolicy: options.cachePolicy || "none",
         searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
@@ -6258,6 +6281,7 @@ export class ActualItemProvider extends
           searchRequestedIncludes: this.state.searchRequestedIncludes,
           searchEngineEnabled: this.state.searchEngineEnabled,
           searchEngineEnabledLang: this.state.searchEngineEnabledLang,
+          searchEngineUsedFullHighlights: this.state.searchEngineUsedFullHighlights,
           searchEngineHighlightArgs: this.state.searchEngineHighlightArgs,
           searchHighlights: this.state.searchHighlights,
           searchMetadata: this.state.searchMetadata,

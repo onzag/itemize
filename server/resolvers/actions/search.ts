@@ -16,6 +16,7 @@ import {
   retrieveUntil,
   defaultTriggerSearchInvalidForbiddenFunction,
   filterAndPrepareRQRecords,
+  checkFullHighlights,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildElasticQueryForModule, buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -62,7 +63,7 @@ export function searchModuleTraditional(
   mod: Module,
   resolverArgs: IRQResolverArgs,
 ) {
-  return searchModule(appData, mod, resolverArgs, {traditional: true});
+  return searchModule(appData, mod, resolverArgs, { traditional: true });
 }
 
 export async function searchModule(
@@ -82,7 +83,7 @@ export async function searchModule(
   );
 
   const usesElastic = resolverArgs.args.searchengine === true;
-  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_LANGUAGEuage) || null;
 
   if (usesElastic && !mod.isSearchEngineEnabled()) {
     throw new EndpointError({
@@ -96,6 +97,7 @@ export async function searchModule(
   if (!opts.noLimitOffset) {
     checkLimit(resolverArgs.args.limit as number, mod, opts.traditional);
   }
+  checkFullHighlights(resolverArgs.args.searchengine_full_highlights as number);
 
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
@@ -472,9 +474,22 @@ export async function searchModule(
       dictionary,
       resolverArgs.args.search,
       resolverArgs.args.order_by,
+      resolverArgs.args.searchengine_full_highlights,
     );
 
+    Object.keys(rHighReply).forEach((h) => {
+      const property = rHighReply[h].property;
+      if (property.isText()) {
+        const include = rHighReply[h].include;
+        const langLocation = (include ? include.getPrefixedQualifiedIdentifier() : "") + property.getId() + "_LANGUAGE";
+        if (!sqlFieldsToRequest.includes(langLocation)) {
+          sqlFieldsToRequest.push(langLocation);
+        }
+      }
+    });
+
     elasticQuery.setSourceIncludes(sqlFieldsToRequest);
+
     if (!opts.noLimitOffset) {
       elasticQuery.setFrom(offset);
       elasticQuery.setSize(limit);
@@ -674,7 +689,9 @@ export async function searchModule(
 
     // we have the count from here anyway
     if (requestBaseResult) {
-      elasticResponse = await appData.elastic.executeQuery(elasticQuery);
+      elasticResponse = await appData.elastic.executeQuery(elasticQuery, {
+        fullHighlights: resolverArgs.args.searchengine_full_highlights,
+      });
       const highlightInfo = elasticQuery.getHighlightInfo();
       const highlightKeys = Object.keys(highlightInfo);
       const highlightsJSON: IElasticHighlightRecordInfo = {};
@@ -688,12 +705,17 @@ export async function searchModule(
         if (opts.traditional) {
           highlightKeys.forEach((highlightNameOriginal) => {
             const originalMatch = highlightInfo[highlightNameOriginal];
+            const extendedId = originalMatch.property && originalMatch.property.isText() ?
+              (originalMatch.include ? originalMatch.include.getPrefixedQualifiedIdentifier() : "") + originalMatch.property.getId() + "_LANGUAGE" :
+              null;
             // record id, original name of the given property with the prefixed include
             highlightsJSON[r._id][originalMatch.name] = {
               // the array of highlighted matches
               highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
               // what was originally matched for
               match: originalMatch.match,
+              full: !!resolverArgs.args.searchengine_full_highlights,
+              lang: extendedId ? r._source[extendedId] || null : null,
             }
           });
         }
@@ -1028,7 +1050,7 @@ export function searchItemDefinitionTraditional(
   itemDefinition: ItemDefinition,
   resolverArgs: IRQResolverArgs,
 ) {
-  return searchItemDefinition(appData, itemDefinition, resolverArgs, {traditional: true});
+  return searchItemDefinition(appData, itemDefinition, resolverArgs, { traditional: true });
 }
 
 export async function searchItemDefinition(
@@ -1041,7 +1063,7 @@ export async function searchItemDefinition(
   } = {}
 ) {
   const usesElastic = resolverArgs.args.searchengine === true;
-  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_LANGUAGEuage) || null;
 
   if (usesElastic && !resolverItemDefinition.isSearchEngineEnabled()) {
     throw new EndpointError({
@@ -1084,6 +1106,7 @@ export async function searchItemDefinition(
     if (!opts.noLimitOffset) {
       checkLimit(resolverArgs.args.limit as number, itemDefinition, opts.traditional);
     }
+    checkFullHighlights(resolverArgs.args.searchengine_full_highlights as number);
 
     const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
@@ -1470,7 +1493,19 @@ export async function searchItemDefinition(
         dictionary,
         resolverArgs.args.search,
         resolverArgs.args.order_by,
+        resolverArgs.args.searchengine_full_highlights,
       );
+
+      Object.keys(rHighReply).forEach((h) => {
+        const property = rHighReply[h].property;
+        if (property.isText()) {
+          const include = rHighReply[h].include;
+          const langLocation = (include ? include.getPrefixedQualifiedIdentifier() : "") + property.getId() + "_LANGUAGE";
+          if (!sqlFieldsToRequest.includes(langLocation)) {
+            sqlFieldsToRequest.push(langLocation);
+          }
+        }
+      });
 
       elasticQuery.setSourceIncludes(sqlFieldsToRequest);
 
@@ -1671,7 +1706,9 @@ export async function searchItemDefinition(
 
       // we have the count from here anyway
       if (requestBaseResult) {
-        elasticResponse = await appData.elastic.executeQuery(elasticQuery);
+        elasticResponse = await appData.elastic.executeQuery(elasticQuery, {
+          fullHighlights: resolverArgs.args.searchengine_full_highlights,
+        });
         const highlightsJSON: IElasticHighlightRecordInfo = {};
         const highlightInfo = elasticQuery.getHighlightInfo();
         const highlightKeys = Object.keys(highlightInfo);
@@ -1686,9 +1723,14 @@ export async function searchItemDefinition(
           if (opts.traditional) {
             highlightKeys.forEach((highlightNameOriginal) => {
               const originalMatch = highlightInfo[highlightNameOriginal];
+              const extendedId = originalMatch.property && originalMatch.property.isText() ?
+                (originalMatch.include ? originalMatch.include.getPrefixedQualifiedIdentifier() : "") + originalMatch.property.getId() + "_LANGUAGE" :
+                null;
               highlightsJSON[r._id][originalMatch.name] = {
                 highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
                 match: originalMatch.match,
+                full: !!resolverArgs.args.searchengine_full_highlights,
+                lang: extendedId ? r._source[extendedId] || null : null,
               }
             });
           }

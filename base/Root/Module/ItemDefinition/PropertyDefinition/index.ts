@@ -2195,6 +2195,10 @@ export default class PropertyDefinition {
     return this.rawData.type === "text" && this.rawData.subtype === "html";
   }
 
+  public isText() {
+    return this.rawData.type === "text";
+  }
+
   public isTracked() {
     return this.rawData.type === "string" && this.rawData.subtype && this.rawData.subtype.endsWith("-tracked");
   }

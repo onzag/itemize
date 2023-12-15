@@ -1537,6 +1537,7 @@ interface ISearchQueryArg {
   parentIdsFilter?: string[];
   parentIdsFilterOut?: string[];
   useSearchEngine?: boolean | string;
+  useSearchEngineFullHighlights?: number;
 }
 
 interface IRunSearchQueryArg extends ISearchQueryArg {
@@ -1646,6 +1647,9 @@ export function getSearchArgsFor(
     searchArgs.searchengine = true;
     if (typeof arg.useSearchEngine === "string") {
       searchArgs.searchengine_language = arg.useSearchEngine;
+    }
+    if (typeof arg.useSearchEngineFullHighlights === "number") {
+      searchArgs.searchengine_full_highlights = arg.useSearchEngineFullHighlights;
     }
   }
 

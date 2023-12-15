@@ -531,6 +531,7 @@ export class Collector {
         searching: false,
         searchResults: rs.results,
         searchHighlights: highlights,
+        searchEngineUsedFullHighlights: args.useSearchEngine ? args.useSearchEngineFullHighlights : null,
         searchRecords: records,
         searchCount: rs.count,
         searchLimit: rs.limit,

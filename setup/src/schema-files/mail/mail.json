@@ -7,7 +7,10 @@
             "hidden": true,
             "nullable": true,
             "editRoleAccess": [],
-            "createRoleAccess": []
+            "createRoleAccess": [],
+            "config": {
+                "searchDisabled": true
+            }
         },
         {
             "id": "references",
@@ -40,7 +43,10 @@
             "type": "string",
             "subtype": "exact-value",
             "hidden": true,
-            "editRoleAccess": []
+            "editRoleAccess": [],
+            "config": {
+                "searchDisabled": true
+            }
         },
         {
             "id": "is_sender",
@@ -75,7 +81,10 @@
             "type": "text",
             "nullable": true,
             "maxLength": 255,
-            "editRoleAccess": []
+            "editRoleAccess": [],
+            "config": {
+                "elasticSearchUsesMatchPhrasePrefix": true
+            }
         },
         {
             "id": "content",

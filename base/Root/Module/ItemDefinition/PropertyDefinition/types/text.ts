@@ -169,7 +169,19 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTe
     // word matching, eg. if this is a title or short text
     // "this is a title" it will ensure that it matches
     {
-      name: "searchUsesMatchPhrase",
+      name: "elasticSearchUsesMatchPhrasePrefix",
+      type: "boolean",
+    },
+    {
+      name: "elasticSearchUsesMatchPhrase",
+      type: "boolean",
+    },
+    {
+      name: "generalSearchDisabled",
+      type: "boolean",
+    },
+    {
+      name: "generalElasticSearchProduceMetadata",
       type: "boolean",
     },
   ],

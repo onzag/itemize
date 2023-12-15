@@ -204,6 +204,8 @@ export function stringElasticSearch(arg: IElasticSearchInfo) {
         [arg.prefix + arg.id]: {
           name: arg.prefix + arg.id,
           match: value,
+          property: arg.property,
+          include: arg.include,
         },
       };
     }
@@ -300,6 +302,8 @@ export function stringElasticStrSearch(arg: IElasticStrSearchInfo) {
       [arg.prefix + arg.id]: {
         name: arg.prefix + arg.id,
         match: arg.search,
+        property: arg.property,
+        include: arg.include,
       },
     };
   }

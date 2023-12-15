@@ -11,6 +11,7 @@ import {
   runPolicyCheck,
   defaultTriggerForbiddenFunction,
   getDictionary,
+  checkFullHighlights,
 } from "../basic";
 import {
   INCLUDE_PREFIX,
@@ -26,7 +27,7 @@ import { IOTriggerActions } from "../triggers";
 import { buildElasticQueryForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
-import type { IElasticHighlightReply, IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import type { IElasticHighlightRecordInfo, IElasticHighlightReply } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { buildElasticQueryForModule } from "../../../base/Root/Module/sql";
 import { FRQIdefResolverType, FRQModResolverType, IRQResolverArgs } from "../../../base/Root/rq";
 
@@ -78,7 +79,7 @@ export async function getItemDefinition(
           itemDefinition,
           sqlValue,
         ) : null;
-      
+
         ownerId = sqlValue ? (itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by) : null;
         rolesManager = new CustomRoleManager(appData.customRoles, {
           cache: appData.cache,
@@ -324,7 +325,7 @@ export async function getItemDefinitionList(
   );
 
   const usesElastic = resolverArgs.args.searchengine === true;
-  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_LANGUAGEuage) || null;
 
   if (usesElastic && !itemDefinition.isSearchEngineEnabled()) {
     throw new EndpointError({
@@ -339,6 +340,7 @@ export async function getItemDefinitionList(
   checkLimit((resolverArgs.args.records as IRQSearchRecord[]).length, itemDefinition, true);
   const mod = itemDefinition.getParentModule();
   checkListTypes(resolverArgs.args.records, mod);
+  checkFullHighlights(resolverArgs.args.searchengine_full_highlights as number);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // now we find the requested fields that are requested
@@ -405,21 +407,33 @@ export async function getItemDefinitionList(
         dictionary,
         resolverArgs.args.search,
         resolverArgs.args.order_by,
+        resolverArgs.args.searchengine_full_highlights,
       );
     });
+
+    // TODO maybe limit the source includes, this is kind of a waste
+    // it's not much of a waste in request list cache because they are cached
+    // but this doesn't cache
 
     const highlightKeys = Object.keys(rHighReply);
     resultQuery.setHighlightsOn(rHighReply);
 
-    const result = await appData.elastic.executeQuery(resultQuery);
+    const result = await appData.elastic.executeQuery(resultQuery, {
+      fullHighlights: resolverArgs.args.searchengine_full_highlights,
+    });
     const highlightsJSON: IElasticHighlightRecordInfo = {};
     resultValues = result.hits.hits.map((r) => {
       highlightsJSON[r._id] = {};
       highlightKeys.forEach((highlightNameOriginal) => {
         const originalMatch = rHighReply[highlightNameOriginal];
+        const extendedId = originalMatch.property && originalMatch.property.isText() ?
+          (originalMatch.include ? originalMatch.include.getPrefixedQualifiedIdentifier() : "") + originalMatch.property.getId() + "_LANGUAGE" :
+          null;
         highlightsJSON[r._id][originalMatch.name] = {
           highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
           match: originalMatch.match,
+          full: !!resolverArgs.args.searchengine_full_highlights,
+          lang: extendedId ? r._source[extendedId] || null : null,
         }
       });
       return r._source;
@@ -647,7 +661,7 @@ export async function getModuleList(
   );
 
   const usesElastic = resolverArgs.args.searchengine === true;
-  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_LANGUAGEuage) || null;
 
   if (usesElastic && !mod.isSearchEngineEnabled()) {
     throw new EndpointError({
@@ -661,6 +675,7 @@ export async function getModuleList(
   checkLanguage(appData, resolverArgs.args);
   checkLimit((resolverArgs.args.records as IRQSearchRecord[]).length, mod, true);
   checkListTypes(resolverArgs.args.records, mod);
+  checkFullHighlights(resolverArgs.args.searchengine_full_highlights as number);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   await validateTokenIsntBlocked(appData.cache, tokenData);
 
@@ -706,21 +721,33 @@ export async function getModuleList(
         dictionary,
         resolverArgs.args.search,
         resolverArgs.args.order_by,
+        resolverArgs.args.searchengine_full_highlights,
       );
     });
 
     const highlightKeys = Object.keys(rHighReply);
     resultQuery.setHighlightsOn(rHighReply);
 
-    const result = await appData.elastic.executeQuery(resultQuery);
+    // TODO maybe limit the source includes, this is kind of a waste
+    // it's not much of a waste in request list cache because they are cached
+    // but this doesn't cache
+
+    const result = await appData.elastic.executeQuery(resultQuery, {
+      fullHighlights: resolverArgs.args.searchengine_full_highlights,
+    });
     const highlightsJSON: IElasticHighlightRecordInfo = {};
     resultValues = result.hits.hits.map((r) => {
       highlightsJSON[r._id] = {};
       highlightKeys.forEach((highlightNameOriginal) => {
         const originalMatch = rHighReply[highlightNameOriginal];
+        const extendedId = originalMatch.property && originalMatch.property.isText() ?
+          (originalMatch.include ? originalMatch.include.getPrefixedQualifiedIdentifier() : "") + originalMatch.property.getId() + "_LANGUAGE" :
+          null;
         highlightsJSON[r._id][originalMatch.name] = {
           highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
           match: originalMatch.match,
+          full: !!resolverArgs.args.searchengine_full_highlights,
+          lang: extendedId ? r._source[extendedId] || null : null,
         }
       });
       return r._source;

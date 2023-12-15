@@ -375,6 +375,7 @@ export function buildSQLQueryForInclude(
   elasticQueryBuilder: ElasticQueryBuilder,
   language: string,
   dictionary: string,
+  fullHighlights: number,
 ) {
   // we need all these prefixes
   const prefix = include.getPrefixedQualifiedIdentifier();
@@ -418,6 +419,7 @@ export function buildSQLQueryForInclude(
             language,
             dictionary,
             false,
+            fullHighlights,
           );
         });
       });

@@ -247,6 +247,12 @@ export interface IEmailClientProps extends IBasicEmailClientProps {
    * Fallback avatar to render avatars
    */
   FallbackAvatarComponent?: React.ComponentType<{children: React.ReactNode}>;
+  /**
+   * Search filter
+   */
+  searchFilter?: string;
+  useSearchEngine?: boolean;
+  useSearchEngineFullHighlights?: number;
 }
 
 /**
@@ -1371,6 +1377,7 @@ export interface IListElementComponentProps {
   avatars: React.ReactNode;
   subject: IPropertyDefinitionSupportedTextType,
   usernames: React.ReactNode;
+  id: string;
 }
 
 interface IEmailMenuItemProps {
@@ -1412,7 +1419,6 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
   const ListElementComponent = props.ListElementComponent || DefaultListElementComponent;
   return (
     <Link to={props.emailUrlResolver(props.id)}>
-
       <EmailAccum
         sourceOrTargetToConsume={0}
         sourceOrTargets={props.sourceOrTargets}
@@ -1430,6 +1436,7 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
             usernames={usernames}
             isUnread={props.isUnread}
             subject={props.subject}
+            id={props.id}
           />
         )}
       </EmailAccum>
@@ -1471,7 +1478,17 @@ export function EmailClient(props: IEmailClientProps) {
               "read",
             ]}
             searchCounterpart={true}
-            setters={settersCriteria[props.location]}
+            setters={
+              props.searchFilter ?
+              [
+                ...settersCriteria[props.location],
+                {
+                  id: "search",
+                  value: props.searchFilter,
+                },
+              ] :
+              settersCriteria[props.location]
+            }
             automaticSearch={{
               limit: limitoffset[0],
               offset: limitoffset[1],
@@ -1482,7 +1499,14 @@ export function EmailClient(props: IEmailClientProps) {
                 "source",
                 "target",
               ],
-              searchByProperties: [
+              searchByProperties: props.searchFilter ? [
+                "is_sender",
+                "is_receiver",
+                "spam",
+                "read",
+                "tip",
+                "search",
+              ] : [
                 "is_sender",
                 "is_receiver",
                 "spam",
@@ -1491,7 +1515,8 @@ export function EmailClient(props: IEmailClientProps) {
               ],
               listenPolicy: "by-owner",
               createdBy: userData.id,
-              useSearchEngine: true,
+              useSearchEngine: props.useSearchEngine,
+              useSearchEngineFullHighlights: props.useSearchEngineFullHighlights,
               traditional: true,
             }}
             cleanOnDismount={true}

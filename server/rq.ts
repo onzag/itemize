@@ -165,8 +165,6 @@ function processArgs(files: IFilesAwaiterContainer, schema: { [id: string]: RQAr
     const argSchema = schema[argKey];
     const argValue = args[argKey];
 
-    console.log(argKey, "GAVE UP THEN");
-
     if (argSchema.array) {
       if (typeof argValue === "undefined" || argValue === null) {
         // it's required but not specified

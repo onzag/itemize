@@ -245,6 +245,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchRequestedProperties: string[];
   searchRequestedIncludes: { [include: string]: string[] };
   searchEngineEnabled: boolean;
+  searchEngineUsedFullHighlights: number;
   searchEngineEnabledLang: string;
   searchEngineHighlightArgs: { [key: string]: string };
   searchHighlights: IElasticHighlightRecordInfo;
@@ -822,6 +823,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         if (this.props.searchEngineEnabledLang) {
           args.searchengine_language = this.props.searchEngineEnabledLang;
         }
+        if (this.props.searchEngineUsedFullHighlights) {
+          args.searchengine_full_highlights = this.props.searchEngineUsedFullHighlights;
+        }
       }
 
       const rqSchema = this.props.itemDefinitionInstance.getParentModule().getParentRoot().getRQSchema();
@@ -1121,6 +1125,7 @@ export default function SearchLoader(props: ISearchLoaderProps) {
       searchRequestedIncludes={itemContext.searchRequestedIncludes}
       searchRequestedProperties={itemContext.searchRequestedProperties}
       searchEngineEnabled={itemContext.searchEngineEnabled}
+      searchEngineUsedFullHighlights={itemContext.searchEngineUsedFullHighlights}
       searchEngineEnabledLang={itemContext.searchEngineEnabledLang}
       searchEngineHighlightArgs={itemContext.searchEngineHighlightArgs}
       searchError={itemContext.searchError}

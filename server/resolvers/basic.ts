@@ -9,6 +9,7 @@ import {
   INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
   JWT_KEY,
+  SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE,
 } from "../../constants";
 import { EndpointError, EndpointErrorType } from "../../base/errors";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
@@ -818,6 +819,35 @@ export function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinit
     message: "Your role is forbidden from performing search",
     code: ENDPOINT_ERRORS.FORBIDDEN,
   });
+}
+
+/**
+ * Checks that the value for full highlights is valid
+ * @param value 
+ * @returns 
+ */
+export function checkFullHighlights(value: number) {
+  if (typeof value === "undefined" || value === null) {
+    return;
+  }
+  if (typeof value !== "number") {
+    throw new EndpointError({
+      message: "Value for searchengine_full_highlights is invalid",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    }); 
+  } else {
+    if (value < 0 || value > SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE) {
+      throw new EndpointError({
+        message: "Value for searchengine_full_highlights cannot be less than 1 or greater than 50",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }); 
+    } else if (!Number.isInteger(value)) {
+      throw new EndpointError({
+        message: "Value for searchengine_full_highlights must be integer",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      });
+    }
+  }
 }
 
 /**

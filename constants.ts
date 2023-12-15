@@ -110,6 +110,11 @@ export interface IItemizeConstantsConfig {
    * to specify it
    */
   PROTECTED_USERNAMES?: string[];
+  /**
+   * Establishes the maximum possible value for the searchengine_full_highlights
+   * search filed, default is 100
+   */
+  SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE?: number;
 }
 
 // in the client side it gets injected via esbuild in the server side
@@ -1388,7 +1393,12 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES_RQ: (orderByRule: RQArg) => {[id: s
     type: "string",
     description: "A ISO code for a language to use to limit the search engine indexes against " +
       "for example if you are sure you only want english results that have been indexed in english, then pass en here",
-  }
+  },
+  searchengine_full_highlights: {
+    type: "integer-positive",
+    description: "Whether to use and provide full highlight support for the searchengine highlights," +
+      "the number should be between 1 and 50 and specifies the fragment_size",
+  },
 });
 
 /**
@@ -1487,6 +1497,11 @@ export const RESERVED_GETTER_LIST_PROPERTIES_RQ: {[id: string]: RQArg} = {
     type: "string",
     description: "A ISO code for a language to use to limit the search engine indexes against " +
       "for example if you are sure you only want english results that have been indexed in english, then pass en here",
+  },
+  searchengine_full_highlights: {
+    type: "integer-positive",
+    description: "Whether to use and provide full highlight support for the searchengine highlights," +
+      "the number should be between 1 and 50 and specifies the fragment_size",
   },
   created_by: {
     type: "string",
@@ -1669,3 +1684,8 @@ export const SECONDARY_JWT_KEY = "SECONDARY_JWT_KEY";
  * Location for cached selects in the global
  */
 export const CACHED_SELECTS_LOCATION_GLOBAL = "CACHED_SELECTS";
+
+/**
+ * Specifies the maximum size for the searchengine_full_highlights value
+ */
+export const SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE = R_ITEMIZE_CONSTANTS_CONFIG.SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE || 100;

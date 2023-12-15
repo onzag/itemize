@@ -68,6 +68,7 @@ export interface IItemSearchStateType {
   searchFields: any;
   searchEngineEnabled: boolean;
   searchEngineEnabledLang: string;
+  searchEngineUsedFullHighlights: number;
   // these are used when standard search is done
   searchEngineHighlightArgs: IItemSearchStateHighlightArgsType;
   // similar to results, obtained from traditional search

@@ -297,12 +297,19 @@ export function textElasticSearch(arg: IElasticSearchInfo) {
   const isRichText = arg.property.isRichText();
 
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
-    const usePhrase = arg.property.getConfigValue("searchUsesMatchPhrase");
+    const usePhrasePrefix = arg.property.getConfigValue("elasticSearchUsesMatchPhrasePrefix");
+    const usePhrase = arg.property.getConfigValue("elasticSearchUsesMatchPhrase");
     const matchRule = {
       [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.args[searchName] as string,
     };
-    if (usePhrase) {
+    if (usePhrasePrefix) {
       arg.elasticQueryBuilder.mustMatchPhrasePrefix(matchRule, {
+        boost: arg.boost,
+        groupId: searchName,
+        propertyId: arg.prefix + arg.id,
+      });
+    } else if (usePhrase) {
+      arg.elasticQueryBuilder.mustMatchPhrase(matchRule, {
         boost: arg.boost,
         groupId: searchName,
         propertyId: arg.prefix + arg.id,
@@ -317,6 +324,8 @@ export function textElasticSearch(arg: IElasticSearchInfo) {
 
     return {
       [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: {
+        property: arg.property,
+        include: arg.include,
         name: arg.prefix + arg.id,
         match: arg.args[searchName] as string,
       },
@@ -388,18 +397,38 @@ export function textSQLStrSearch(arg: ISQLStrSearchInfo): boolean | [string, any
  */
 export function textElasticStrSearch(arg: IElasticStrSearchInfo) {
   const isRichText = arg.property.isRichText();
-  arg.elasticQueryBuilder && arg.elasticQueryBuilder.mustMatch({
+  const usePhrasePrefix = arg.property.getConfigValue("elasticSearchUsesMatchPhrasePrefix");
+  const usePhrase = arg.property.getConfigValue("elasticSearchUsesMatchPhrase");
+  const ruleValue = {
     [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.search,
-  }, {
-    boost: arg.boost,
-    groupId: "STRSEARCH",
-    propertyId: arg.prefix + arg.id,
-  });
+  };
+
+  if (usePhrasePrefix) {
+    arg.elasticQueryBuilder && arg.elasticQueryBuilder.mustMatchPhrasePrefix(ruleValue, {
+      boost: arg.boost,
+      groupId: "STRSEARCH",
+      propertyId: arg.prefix + arg.id,
+    });
+  } else if (usePhrase) {
+    arg.elasticQueryBuilder && arg.elasticQueryBuilder.mustMatchPhrase(ruleValue, {
+      boost: arg.boost,
+      groupId: "STRSEARCH",
+      propertyId: arg.prefix + arg.id,
+    });
+  } else {
+    arg.elasticQueryBuilder && arg.elasticQueryBuilder.mustMatch(ruleValue, {
+      boost: arg.boost,
+      groupId: "STRSEARCH",
+      propertyId: arg.prefix + arg.id,
+    });
+  }
 
   return {
     [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: {
       name: arg.prefix + arg.id,
       match: arg.search,
+      property: arg.property,
+      include: arg.include,
     },
   };
 }
