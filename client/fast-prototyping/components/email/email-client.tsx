@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { ItemProvider, NoStateItemProvider } from "../../../providers/item";
 import { ModuleProvider } from "../../../providers/module";
 import ReaderMany from "../../../components/property/ReaderMany";
@@ -6,7 +6,7 @@ import Tabs from "@mui/material/Tabs";
 import { IPropertySetterProps } from "../../../components/property/base";
 import Tab from "@mui/material/Tab";
 import { ISearchLoaderWithPaginationProps, SearchLoaderWithPagination } from "../search-loader-with-pagination";
-import UserDataRetriever from "../../../components/user/UserDataRetriever";
+import UserDataRetriever, { useUserDataRetriever } from "../../../components/user/UserDataRetriever";
 import View from "../../../components/property/View";
 import Box from "@mui/material/Box";
 
@@ -33,7 +33,7 @@ import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import Snackbar from "../snackbar";
 import Fab from "@mui/material/Fab";
 import Create from "@mui/icons-material/Create";
-import RootRetriever from "../../../components/root/RootRetriever";
+import RootRetriever, { useRootRetriever } from "../../../components/root/RootRetriever";
 import type ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import { SubmitButton } from "../buttons";
 import Chip from "@mui/material/Chip";
@@ -48,6 +48,9 @@ import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/It
 import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { SxProps, Theme, styled } from "@mui/material";
 import { useAppLanguageRetriever } from "../../../components/localization/AppLanguageRetriever";
+import { IPropertyEntryRendererProps } from "../../../internal/components/PropertyEntry";
+import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import { PropertyDefinitionSupportedStringType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/string";
 
 const style = {
   flex: {
@@ -130,6 +133,9 @@ const style = {
   },
   chip: {
     margin: "10px 10px 0 10px",
+  },
+  chipOulined: {
+    margin: "5px 10px 5px 10px",
   },
   avatarBox: {
     display: "flex",
@@ -246,7 +252,7 @@ export interface IEmailClientProps extends IBasicEmailClientProps {
   /**
    * Fallback avatar to render avatars
    */
-  FallbackAvatarComponent?: React.ComponentType<{children: React.ReactNode}>;
+  FallbackAvatarComponent?: React.ComponentType<{ children: React.ReactNode }>;
   /**
    * Search filter
    */
@@ -292,7 +298,7 @@ export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderP
   /**
    * Fallback avatar to render avatars
    */
-  FallbackAvatarComponent?: React.ComponentType<{children: React.ReactNode}>;
+  FallbackAvatarComponent?: React.ComponentType<{ children: React.ReactNode }>;
 }
 
 /**
@@ -363,6 +369,29 @@ interface IEmailSenderPropsBase {
    * @returns 
    */
   onFetchSuggestions?: (v: string) => Promise<ITagListSuggestion[]>;
+  /**
+   * Wrapper component to use instead of the default this wraps the whole
+   * box area
+   */
+  WrapperComponent?: React.ComponentType<IWrapperComponentProps>;
+  targetEntryRenderer?: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedStringType>>;
+  targetEntryRendererArgs?: any;
+  subjectEntryRenderer?: React.ComponentType<IPropertyEntryRendererProps<IPropertyDefinitionSupportedTextType>>;
+  subjectEntryRendererArgs?: any;
+  contentEntryRenderer?: React.ComponentType<IPropertyEntryRendererProps<IPropertyDefinitionSupportedTextType>>;
+  contentEntryRendererArgs?: any;
+  attachmentsEntryRenderer?: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedFilesType>>;
+  attachmentsEntryRendererArgs?: any;
+  hideLabels?: boolean;
+  hideLabelTarget?: boolean;
+  hideLabelSubject?: boolean;
+  hideLabelContent?: boolean;
+  hideLabelAttachments?: boolean;
+  hideDescriptions?: boolean,
+  hideDescriptionTarget?: boolean;
+  hideDescriptionSubject?: boolean;
+  hideDescriptionContent?: boolean;
+  hideDescriptionAttachments?: boolean;
 }
 
 /**
@@ -523,11 +552,12 @@ function ActualMailSender(props: IActualMailSenderProps) {
     }
   }, [props.mailDomain, props.userNameProperties, props.userIdef, props.token]);
   const chipRenderer = useCallback((v: string) => {
+    const chipstyle = props.targetEntryRendererArgs?.fieldVariant === "outlined" ? style.chipOulined : style.chip;
     if (v.includes("@")) {
       return (
         <Chip
           label={v}
-          sx={style.chip}
+          sx={chipstyle}
           color="primary"
         />
       );
@@ -541,7 +571,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
         return (
           <Chip
             label={v}
-            sx={style.chip}
+            sx={chipstyle}
             color="info"
           />
         );
@@ -553,7 +583,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
             label={
               <strong><I18nRead id="me" capitalize={true} context="mail/mail" /></strong>
             }
-            sx={style.chip}
+            sx={chipstyle}
             color="default"
           />
         );
@@ -576,7 +606,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
                 return (
                   <Chip
                     label={invalidLabel}
-                    sx={style.chip}
+                    sx={chipstyle}
                     color="error"
                   />
                 );
@@ -597,7 +627,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
                     return (
                       <Chip
                         label={valueToDisplay}
-                        sx={style.chip}
+                        sx={chipstyle}
                         color={isUser ? "primary" : "secondary"}
                       />
                     );
@@ -609,7 +639,13 @@ function ActualMailSender(props: IActualMailSenderProps) {
         </ItemProvider>
       );
     }
-  }, [props.objectsNameResolver, props.objectsInvalidLabel, props.userNameProperties, props.userInvalidLabel])
+  }, [
+    props.objectsNameResolver,
+    props.objectsInvalidLabel,
+    props.userNameProperties,
+    props.userInvalidLabel,
+    props.targetEntryRendererArgs && props.targetEntryRendererArgs.fieldVariant,
+  ])
 
   const prefills: IPropertySetterProps<PropertyDefinitionSupportedType>[] = [];
   if (props.targetPrefill) {
@@ -625,172 +661,185 @@ function ActualMailSender(props: IActualMailSenderProps) {
     });
   }
 
+  const Wrapper = props.WrapperComponent || "div";
+
   return (
-    <ModuleProvider module="mail">
-      <ItemProvider
-        itemDefinition="mail"
-        properties={[
-          "source",
-          "target",
-          "content",
-          "attachments",
-          "cid_attachments",
-          "subject",
-          "is_sender",
-          "is_receiver",
-          "read",
-          "spam",
-        ]}
-        setters={[
-          {
-            id: "source",
-            value: props.userId,
-          },
-          {
-            id: "is_sender",
-            value: true,
-          },
-          {
-            id: "read",
-            value: true,
-          },
-          {
-            id: "spam",
-            value: false,
-          },
-        ]}
-        prefills={prefills}
-      >
-        <Entry
-          id="target"
-          rendererArgs={{
-            chipRenderer,
-            onValueInputted,
-            fetchSuggestions: props.onFetchSuggestions,
-            enterWithSpace: true,
-          }}
-        />
-        <Entry id="subject" autoFocus={!props.subjectPrefill} />
-        <Entry id="content" autoFocus={!!props.subjectPrefill} />
-        <Entry id="attachments" />
+    <Wrapper>
+      <ModuleProvider module="mail">
+        <ItemProvider
+          itemDefinition="mail"
+          properties={[
+            "source",
+            "target",
+            "content",
+            "attachments",
+            "cid_attachments",
+            "subject",
+            "is_sender",
+            "is_receiver",
+            "read",
+            "spam",
+          ]}
+          setters={[
+            {
+              id: "source",
+              value: props.userId,
+            },
+            {
+              id: "is_sender",
+              value: true,
+            },
+            {
+              id: "read",
+              value: true,
+            },
+            {
+              id: "spam",
+              value: false,
+            },
+          ]}
+          prefills={prefills}
+        >
+          <Entry
+            id="target"
+            rendererArgs={{
+              chipRenderer,
+              onValueInputted,
+              fetchSuggestions: props.onFetchSuggestions,
+              enterWithSpace: true,
+              ...props.targetEntryRendererArgs,
+            }}
+            renderer={props.targetEntryRenderer}
+            hideLabel={props.hideLabels || props.hideLabelTarget}
+            hideDescription={props.hideDescriptions || props.hideDescriptionTarget}
+          />
+          <Entry
+            id="subject"
+            autoFocus={!props.subjectPrefill}
+            renderer={props.subjectEntryRenderer}
+            rendererArgs={props.subjectEntryRendererArgs}
+            hideLabel={props.hideLabels || props.hideLabelSubject}
+            hideDescription={props.hideDescriptions || props.hideDescriptionSubject}
+          />
+          <Entry
+            id="content"
+            autoFocus={!!props.subjectPrefill}
+            renderer={props.contentEntryRenderer}
+            rendererArgs={props.contentEntryRendererArgs}
+            hideLabel={props.hideLabels || props.hideLabelContent}
+            hideDescription={props.hideDescriptions || props.hideDescriptionContent}
+            />
+          <Entry
+            id="attachments"
+            renderer={props.attachmentsEntryRenderer}
+            rendererArgs={props.attachmentsEntryRendererArgs}
+            hideLabel={props.hideLabels || props.hideLabelAttachments}
+            hideDescription={props.hideDescriptions || props.hideDescriptionAttachments}
+          />
 
-        <Reader id="target">
-          {(target: string[]) => {
-            const isReceiver = target ? target.includes(props.userId) : false;
-            return (
-              <Setter id="is_receiver" value={isReceiver} />
-            );
-          }}
-        </Reader>
+          <Reader id="target">
+            {(target: string[]) => {
+              const isReceiver = target ? target.includes(props.userId) : false;
+              return (
+                <Setter id="is_receiver" value={isReceiver} />
+              );
+            }}
+          </Reader>
 
-        <SubmitButton
-          i18nId="send"
-          options={{
-            properties: [
-              "source",
-              "target",
-              "content",
-              "attachments",
-              "cid_attachments",
-              "subject",
-              "is_sender",
-              "is_receiver",
-              "read",
-              "spam",
-            ],
-            cleanStateOnSuccess: true,
-            parentedBy: props.replyOf ? {
-              id: props.replyOf,
-              item: props.mailIdef.getQualifiedPathName(),
-            } : null
-          }}
-          redirectOnSuccess={
-            (status) => {
-              return props.emailUrlResolver(status.id)
+          <SubmitButton
+            i18nId="send"
+            options={{
+              properties: [
+                "source",
+                "target",
+                "content",
+                "attachments",
+                "cid_attachments",
+                "subject",
+                "is_sender",
+                "is_receiver",
+                "read",
+                "spam",
+              ],
+              cleanStateOnSuccess: true,
+              parentedBy: props.replyOf ? {
+                id: props.replyOf,
+                item: props.mailIdef.getQualifiedPathName(),
+              } : null
+            }}
+            redirectOnSuccess={
+              (status) => {
+                return props.emailUrlResolver(status.id)
+              }
             }
-          }
-          redirectReplace={true}
-        />
+            redirectReplace={true}
+          />
 
-        <SubmitActioner>
-          {(actioner) => {
-            return (
-              <Snackbar
-                id={"email-send-error"}
-                severity="error"
-                i18nDisplay={actioner.submitError}
-                open={!!actioner.submitError}
-                onClose={actioner.dismissError}
-              />
-            )
-          }}
-        </SubmitActioner>
-      </ItemProvider>
-    </ModuleProvider>
+          <SubmitActioner>
+            {(actioner) => {
+              return (
+                <Snackbar
+                  id={"email-send-error"}
+                  severity="error"
+                  i18nDisplay={actioner.submitError}
+                  open={!!actioner.submitError}
+                  onClose={actioner.dismissError}
+                />
+              )
+            }}
+          </SubmitActioner>
+        </ItemProvider>
+      </ModuleProvider>
+    </Wrapper>
   );
 }
 
 export function EmailSender(props: IEmailSenderProps) {
+  const config = useContext(ConfigContext);
+  const tokenData = useContext(TokenContext);
+  const userData = useUserDataRetriever();
+  const root = useRootRetriever();
+
+  const hasEExternal = (root.root.registry["users/user"] as ItemDefinition).hasPropertyDefinitionFor("e_external", true);
+  if (hasEExternal) {
+    return (
+      <ModuleProvider
+        module="users"
+      >
+        <ItemProvider
+          itemDefinition="user"
+          forId={userData.id}
+          properties={["e_external"]}
+        >
+          <Reader id="e_external">
+            {(hasEExternal: boolean) => (
+              <ActualMailSender
+                {...props}
+                supportsExternal={hasEExternal}
+                userId={userData.id}
+                mailDomain={config.mailDomain}
+                mailIdef={root.root.registry[config.mailStorage] as ItemDefinition}
+                userIdef={root.root.registry["users/user"] as ItemDefinition}
+                token={tokenData.token}
+              />
+            )}
+          </Reader>
+        </ItemProvider>
+      </ModuleProvider>
+    )
+  }
+
   return (
-    <ConfigContext.Consumer>
-      {(config) => (
-        <TokenContext.Consumer>
-          {(tokenData) => (
-            <UserDataRetriever>
-              {(userData) => (
-                <RootRetriever>
-                  {(root) => {
-
-                    const hasEExternal = (root.root.registry["users/user"] as ItemDefinition).hasPropertyDefinitionFor("e_external", true);
-                    if (hasEExternal) {
-                      return (
-                        <ModuleProvider
-                          module="users"
-                        >
-                          <ItemProvider
-                            itemDefinition="user"
-                            forId={userData.id}
-                            properties={["e_external"]}
-                          >
-                            <Reader id="e_external">
-                              {(hasEExternal: boolean) => (
-                                <ActualMailSender
-                                  {...props}
-                                  supportsExternal={hasEExternal}
-                                  userId={userData.id}
-                                  mailDomain={config.mailDomain}
-                                  mailIdef={root.root.registry[config.mailStorage] as ItemDefinition}
-                                  userIdef={root.root.registry["users/user"] as ItemDefinition}
-                                  token={tokenData.token}
-                                />
-                              )}
-                            </Reader>
-                          </ItemProvider>
-                        </ModuleProvider>
-                      )
-                    }
-
-                    return (
-                      <ActualMailSender
-                        {...props}
-                        supportsExternal={false}
-                        userId={userData.id}
-                        mailDomain={config.mailDomain}
-                        mailIdef={root.root.registry[config.mailStorage] as ItemDefinition}
-                        userIdef={root.root.registry["users/user"] as ItemDefinition}
-                        token={tokenData.token}
-                      />
-                    );
-                  }}
-                </RootRetriever>
-
-              )}
-            </UserDataRetriever>
-          )}
-        </TokenContext.Consumer>
-      )}
-    </ConfigContext.Consumer>
-  )
+    <ActualMailSender
+      {...props}
+      supportsExternal={false}
+      userId={userData.id}
+      mailDomain={config.mailDomain}
+      mailIdef={root.root.registry[config.mailStorage] as ItemDefinition}
+      userIdef={root.root.registry["users/user"] as ItemDefinition}
+      token={tokenData.token}
+    />
+  );
 }
 
 export function EmailReader(props: IEmailReaderProps) {
@@ -1288,7 +1337,7 @@ interface IEmailAccumProps {
   avatarAccum: React.ReactNode[];
   usernameAccum: React.ReactNode[];
 
-  FallbackAvatarComponent: React.ComponentType<{children: React.ReactNode}>;
+  FallbackAvatarComponent: React.ComponentType<{ children: React.ReactNode }>;
 
   children: (avatars: React.ReactNode[], usernames: React.ReactNode) => React.ReactNode;
 }
@@ -1394,7 +1443,7 @@ interface IEmailMenuItemProps {
    * List component element
    */
   ListElementComponent?: React.ComponentType<IListElementComponentProps>;
-  FallbackAvatarComponent: React.ComponentType<{children: React.ReactNode}>;
+  FallbackAvatarComponent: React.ComponentType<{ children: React.ReactNode }>;
 }
 
 export function DefaultListElementComponent(props: IListElementComponentProps) {
@@ -1480,14 +1529,14 @@ export function EmailClient(props: IEmailClientProps) {
             searchCounterpart={true}
             setters={
               props.searchFilter ?
-              [
-                ...settersCriteria[props.location],
-                {
-                  id: "search",
-                  value: props.searchFilter,
-                },
-              ] :
-              settersCriteria[props.location]
+                [
+                  ...settersCriteria[props.location],
+                  {
+                    id: "search",
+                    value: props.searchFilter,
+                  },
+                ] :
+                settersCriteria[props.location]
             }
             automaticSearch={{
               limit: limitoffset[0],

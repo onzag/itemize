@@ -1043,7 +1043,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               // fird the search result information, if any, for the given record
               const searchResult = this.state.currentSearchResultsFromTheRecords[index];
               const mergedId = searchRecord.id + "." + (searchRecord.version || "");
-              const highlights = (this.props.searchHighlights[mergedId] || this.state.retrievedHighlights[mergedId]) || {};
+              const highlights = ((this.props.searchHighlights && this.props.searchHighlights[mergedId]) ||
+                (this.state.retrievedHighlights && this.state.retrievedHighlights[mergedId])) || {};
 
               // and we add something called the provider props, which explains how to instantiate
               // a item definition provider so that it's in sync with this seach and loads what this search

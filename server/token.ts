@@ -8,6 +8,11 @@
  */
 
 import jwt from "jsonwebtoken";
+import express from "express";
+import type { IServerSideTokenDataType } from "./resolvers/basic";
+import { ENDPOINT_ERRORS, JWT_KEY } from "../constants";
+import type { EndpointErrorType } from "../base/errors";
+import type { IAppDataType } from "../server";
 
 /**
  * Sign a payload
@@ -98,4 +103,64 @@ export function jwtDecode<T>(
   options?: jwt.DecodeOptions,
 ): T {
   return jwt.decode(token, options) as T;
+}
+
+export async function jwtVerifyRequest(
+  appData: IAppDataType,
+  req: express.Request,
+): Promise<{verified: boolean; err: EndpointErrorType, info: IServerSideTokenDataType;}> {
+  const token = req.headers.token;
+
+  if (!token) {
+    return {
+      verified: false,
+      err: {
+        code: ENDPOINT_ERRORS.MUST_BE_LOGGED_IN,
+        message: "User did not provide a token",
+      },
+      info: null,
+    };
+  }
+  
+  let infoRaw: IServerSideTokenDataType;
+  try {
+    infoRaw = await jwtVerify<IServerSideTokenDataType>(token as string, await appData.registry.getJWTSecretFor(JWT_KEY));
+  } catch {
+    return {
+      verified: false,
+      err: {
+        code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+        message: "User did not provide valid credentials",
+      },
+      info: null,
+    };
+  }
+
+  let isInValid = false;
+  if (!infoRaw.custom || infoRaw.isRealUser) {
+    isInValid = (
+      typeof infoRaw.id !== "string" ||
+      typeof infoRaw.role !== "string" ||
+      typeof infoRaw.sessionId !== "number"
+    );
+  } else {
+    isInValid = typeof infoRaw.role !== "string";
+  }
+
+  if (isInValid) {
+    return {
+      verified: false,
+      err: {
+        code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+        message: "Credentials deemed invalid",
+      },
+      info: null,
+    };
+  }
+
+  return {
+    verified: true,
+    err: null,
+    info: infoRaw,
+  };
 }

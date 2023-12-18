@@ -1993,7 +1993,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           selector="div[contenteditable]"
           disabled={this.props.reactionerDisabled}
           fullWidth={true}
-          sx={{display: "block"}}
+          sx={{display: "block", flex: "1 1 100%"}}
         >
           {box}
         </AltBadgeReactioner>

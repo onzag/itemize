@@ -669,7 +669,7 @@ export async function searchModule(
     });
   }
 
-  let highlights: string = null;
+  let highlights: IElasticHighlightRecordInfo = null;
 
   let baseResult: ISQLTableRowValue[] = [];
   let count: number = 0;
@@ -724,7 +724,7 @@ export async function searchModule(
 
       // setting the highlights
       if (opts.traditional) {
-        highlights = JSON.stringify(highlightsJSON);
+        highlights = highlightsJSON;
       }
     } else if (requestCount) {
       const result = await appData.elastic.executeCountQuery(elasticQuery);
@@ -1688,7 +1688,7 @@ export async function searchItemDefinition(
     // into such query
     let count: number = 0;
     let baseResult: ISQLTableRowValue[] = [];
-    let highlights: string = null;
+    let highlights: IElasticHighlightRecordInfo = null;
 
     let elasticResponse: SearchResponse = null;
     let sqlResponse: ISQLTableRowValue[] = null;
@@ -1737,7 +1737,7 @@ export async function searchItemDefinition(
           return r._source;
         });
         if (opts.traditional) {
-          highlights = JSON.stringify(highlightsJSON);
+          highlights = highlightsJSON;
         }
       } else if (requestCount) {
         const result = await appData.elastic.executeCountQuery(elasticQuery);

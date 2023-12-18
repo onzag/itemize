@@ -519,12 +519,7 @@ export class Collector {
         ];
       }
 
-      let highlights: any;
-      try {
-        highlights = rs.highlights ? (JSON.parse(rs.highlights) || {}) : {};
-      } catch {
-        highlights = {};
-      }
+      const highlights: any = rs.highlights || {};
 
       const searchState: IItemSearchStateType = {
         searchError: null as any,

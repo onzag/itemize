@@ -2104,16 +2104,7 @@ export async function runSearchQueryFor(
   let offset: number = (data && data.offset as number);
   let count: number = (data && data.count as number);
 
-  let highlights: IElasticHighlightRecordInfo = null;
-  try {
-    if (data && data.highlights) {
-      highlights = JSON.parse(data.highlights as string) || {};
-    } else {
-      highlights = {};
-    }
-  } catch {
-    highlights = {};
-  }
+  const highlights: IElasticHighlightRecordInfo = (data && (data.highlights as any)) || null;
 
   const metadata: string = (data && (data.metadata as string)) || null;
 

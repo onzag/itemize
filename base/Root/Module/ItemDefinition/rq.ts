@@ -340,7 +340,7 @@ export function getRQSchemaForItemDefinition(
     delete traditionalStdFields.earliest_created_at;
     delete traditionalStdFields.oldest_created_at;
     traditionalStdFields.highlights ={
-      type: "string",
+      type: "any",
     };
     traditionalStdFields.results = resultsField;
 
@@ -354,7 +354,7 @@ export function getRQSchemaForItemDefinition(
       stdFields: {
         results: resultsField,
         highlights: {
-          type: "string",
+          type: "any",
         }
       },
       ownFields: {},

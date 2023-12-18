@@ -25,6 +25,8 @@ import { css as emotionCss } from "@emotion/css";
 import { css } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Input from "@mui/material/Input";
 
 /**
  * The styles of the renderer
@@ -69,6 +71,21 @@ export const style = {
       flex: "1 0 auto",
       width: "200px",
       padding: "10px 0",
+      marginBottom: "-10px",
+    },
+  },
+  fieldInputOutlined: {
+    "display": "flex",
+    "alignItems": "center",
+    "flexWrap": "wrap",
+    paddingTop: '10px',
+    paddingBottom: '12px',
+    paddingLeft: '14px',
+    paddingRight: '14px',
+    "& > input": {
+      flex: "1 0 auto",
+      width: "200px",
+      padding: "7px 0 13px 0",
       marginBottom: "-10px",
     },
   },
@@ -271,7 +288,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
         component="div"
         onClick={insertChip.bind(null, suggestion.value)}
       >
-        {props.args.suggestionRenderer(suggestion, matchParts)}
+        {props.args.suggestionRenderer ? props.args.suggestionRenderer(suggestion, matchParts) : matchParts}
       </MenuItem>
     );
   }, [insertChip])
@@ -318,18 +335,28 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       </InputAdornment>
     ) : null;
 
-    const appliedInputProps: any = {
-      inputProps: {
-        "aria-describedby": props.description ? props.uniqueId + "_desc" : null,
-      },
+    let idToUse = (props.args.InputProps && props.args.InputProps.id) || props.uniqueId;
+
+    const inputPropsToSet: any = {
+      id: idToUse,
+      "aria-describedby": props.description ? idToUse + "_desc" : null,
+      ...inputProps,
     };
 
     if (!props.currentValid) {
-      appliedInputProps.inputProps["aria-invalid"] = true;
+      inputPropsToSet["aria-invalid"] = true;
 
       if (!props.args.hideError) {
-        appliedInputProps["aria-errormessage"] = props.currentInvalidReason;
+        inputPropsToSet["aria-errormessage"] = idToUse + "_error";
       }
+    }
+
+    let InputToUse = FilledInput;
+
+    if (props.args.fieldVariant === "standard") {
+      InputToUse = Input;
+    } else if (props.args.fieldVariant === "outlined") {
+      InputToUse = OutlinedInput;
     }
 
     return (
@@ -340,7 +367,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
         variant={props.args.fieldVariant || "filled"}
       >
         <InputLabel
-          htmlFor={props.propertyId}
+          htmlFor={idToUse}
           sx={style.label(!props.currentValid)}
           classes={{
             focused: "focused",
@@ -349,9 +376,9 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
           {props.label}
         </InputLabel>
 
-        <FilledInput
+        <InputToUse
           // typescript on it again, refuses to take this object
-          sx={style.fieldInput}
+          sx={props.args.fieldVariant === "outlined" ? style.fieldInputOutlined : style.fieldInput}
           error={!props.currentValid}
           id={props.propertyId}
           value={inputValue}
@@ -364,8 +391,9 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
           endAdornment={addornment}
           startAdornment={chips}
           onBlur={handleBlur}
-          {...inputProps}
-          {...appliedInputProps}
+          inputProps={inputPropsToSet}
+          label={props.label}
+          {...props.args.InputProps}
         />
       </FormControl>
     )
@@ -435,21 +463,23 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
     object = renderBody();
   }
 
+  const idToUse = (props.args.InputProps && props.args.InputProps.id) || props.uniqueId;
+
   let descriptionObject: React.ReactNode = null;
   if (props.description) {
     descriptionObject = descriptionAsAlert ? (
-      <Alert severity="info" sx={style.description} role="note" id={props.uniqueId + "_desc"}>
+      <Alert severity="info" sx={style.description} role="note" id={idToUse + "_desc"}>
         {props.description}
       </Alert>
     ) : (
-      <Typography variant="caption" sx={style.description} id={props.uniqueId + "_desc"}>
+      <Typography variant="caption" sx={style.description} id={idToUse + "_desc"}>
         {props.description}
       </Typography>
     );
   }
 
   const error = (
-    props.args.hideError ? null : <Box sx={style.errorMessage} id={props.uniqueId + "_error"}>
+    props.args.hideError ? null : <Box sx={style.errorMessage} id={idToUse + "_error"}>
       {props.currentInvalidReason}
     </Box>
   );

@@ -64,7 +64,7 @@ export interface IRQSearchResultsContainer {
   limit: number;
   offset: number;
   last_modified: string;
-  highlights: string;
+  highlights: any;
   metadata: string;
 }
 

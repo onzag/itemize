@@ -380,7 +380,7 @@ export async function getItemDefinitionList(
     }
   });
 
-  let highlights: string = null;
+  let highlights: IElasticHighlightRecordInfo = null;
   let resultValues: ISQLTableRowValue[];
 
   if (usesElastic) {
@@ -438,7 +438,7 @@ export async function getItemDefinitionList(
       });
       return r._source;
     });
-    highlights = JSON.stringify(highlightsJSON);
+    highlights = highlightsJSON;
   } else {
     resultValues = await appData.cache.requestListCache(
       resolverArgs.args.records,
@@ -694,7 +694,7 @@ export async function getModuleList(
 
   const created_by = resolverArgs.args.created_by;
 
-  let highlights: string = null;
+  let highlights: IElasticHighlightRecordInfo = null;
   let resultValues: ISQLTableRowValue[];
 
   if (usesElastic) {
@@ -752,7 +752,7 @@ export async function getModuleList(
       });
       return r._source;
     });
-    highlights = JSON.stringify(highlightsJSON);
+    highlights = highlightsJSON;
   } else {
     resultValues = await appData.cache.requestListCache(
       resolverArgs.args.records,
