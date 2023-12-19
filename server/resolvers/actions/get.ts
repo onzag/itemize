@@ -384,10 +384,10 @@ export async function getItemDefinitionList(
   let resultValues: ISQLTableRowValue[];
 
   if (usesElastic) {
-    const resultQuery = appData.elastic.getSelectBuilder(
-      itemDefinition,
-      elasticIndexLang,
-    );
+    const resultQuery = appData.elastic.getSelectBuilder({
+      itemOrModule: itemDefinition,
+      language: elasticIndexLang,
+    });
     resultQuery.mustTerms({
       _id: resolverArgs.args.records.map((r: IRQSearchRecord) => r.id + "." + (r.version || ""))
     });
@@ -698,10 +698,10 @@ export async function getModuleList(
   let resultValues: ISQLTableRowValue[];
 
   if (usesElastic) {
-    const resultQuery = appData.elastic.getSelectBuilder(
-      mod,
-      elasticIndexLang,
-    );
+    const resultQuery = appData.elastic.getSelectBuilder({
+      itemOrModule: mod,
+      language: elasticIndexLang,
+    });
     resultQuery.mustTerms({
       _id: resolverArgs.args.records.map((r: IRQSearchRecord) => r.id + "." + (r.version || ""))
     });

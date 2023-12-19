@@ -663,6 +663,17 @@ function ActualMailSender(props: IActualMailSenderProps) {
 
   const Wrapper = props.WrapperComponent || "div";
 
+  // const onFetchSuggestionsWrapped = useCallback(async (v: string) => {
+  //   const suggs = await props.onFetchSuggestions(v);
+  //   if (suggs) {
+  //     return suggs.map((v) => ({
+  //       ...v,
+  //       value: v.value + "@__RAW__",
+  //     }));
+  //   }
+  //   return [];
+  // }, [props.onFetchSuggestions]);
+
   return (
     <Wrapper>
       <ModuleProvider module="mail">
@@ -706,7 +717,8 @@ function ActualMailSender(props: IActualMailSenderProps) {
               chipRenderer,
               onValueInputted,
               fetchSuggestions: props.onFetchSuggestions,
-              enterWithSpace: true,
+              // enterWithSpace: true,
+              enterWithComma: true,
               ...props.targetEntryRendererArgs,
             }}
             renderer={props.targetEntryRenderer}

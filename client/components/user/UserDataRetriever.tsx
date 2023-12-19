@@ -15,6 +15,7 @@ interface IUserDataRetrieverProps {
   children: (arg: {
     id: string;
     role: string;
+    token: string;
   }) => React.ReactNode;
 }
 
@@ -38,6 +39,7 @@ export default function UserDataRetriever(props: IUserDataRetrieverProps) {
           return props.children({
             id: value.id,
             role: value.role,
+            token: value.token,
           });
         }
       }
@@ -51,5 +53,6 @@ export function useUserDataRetriever() {
   return {
     id: value.id,
     role: value.role,
+    token: value.token,
   };
 }

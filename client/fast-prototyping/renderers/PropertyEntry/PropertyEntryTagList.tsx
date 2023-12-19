@@ -41,7 +41,6 @@ export const style = {
   },
   container: {
     width: "100%",
-    paddingBottom: "1.3rem",
   },
   description: {
     width: "100%",
@@ -158,6 +157,7 @@ export const style = {
 export interface ITagListSuggestion {
   label: string;
   value: string;
+  metadata: any;
 }
 
 function getSuggestionValue(s: ITagListSuggestion) {
@@ -178,38 +178,46 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
   const delayRef = useRef<NodeJS.Timer>();
 
   const [inputValue, setInputValue] = useState("");
-  const [suggestions, setSuggestions] = useState<ITagListSuggestion[]>();
+  const [suggestions, setSuggestions] = useState<ITagListSuggestion[]>([]);
 
   const focus = useCallback(() => {
     actualInputRef.current.focus();
   }, []);
   const updateValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    // must check the type due to a bug in autosuggest
+    // sometimes passing nonsense in here for no reason
+    if (typeof e.target.value === "string") {
+      setInputValue(e.target.value);
+    }
   }, []);
-  const handleBlur = useCallback(async () => {
-    const inputValueTrimmed = inputValue.trim();
+  // const handleBlur = useCallback(async () => {
+  //   const inputValueTrimmed = inputValue.trim();
 
-    if (inputValueTrimmed === "") {
-      return;
-    }
+  //   if (inputValueTrimmed === "") {
+  //     return;
+  //   }
 
-    setInputValue("");
+  //   setInputValue("");
 
-    if (props.args.onValueInputted) {
-      const newInputValue = await props.args.onValueInputted(inputValueTrimmed);
-      const newValue = props.currentValue ? [...props.currentValue] : [];
-      newValue.push(newInputValue);
-      props.onChange(newValue, null);
-    } else {
-      const newValue = props.currentValue ? [...props.currentValue] : [];
-      newValue.push(inputValueTrimmed);
-      props.onChange(newValue, null);
-    }
-  }, [inputValue, props.currentValue, props.args]);
+  //   if (props.args.onValueInputted) {
+  //     const newInputValue = await props.args.onValueInputted(inputValueTrimmed);
+  //     const newValue = props.currentValue ? [...props.currentValue] : [];
+  //     newValue.push(newInputValue);
+  //     props.onChange(newValue, null);
+  //   } else {
+  //     const newValue = props.currentValue ? [...props.currentValue] : [];
+  //     newValue.push(inputValueTrimmed);
+  //     props.onChange(newValue, null);
+  //   }
+  // }, [inputValue, props.currentValue, props.args]);
   const handleKeyDown = useCallback(async (e: React.KeyboardEvent<HTMLInputElement>) => {
     const inputValueTrimmed = inputValue.trim();
-    if ((e.key === "Enter" || (props.args.enterWithSpace && e.key === " ")) && inputValueTrimmed) {
+    if ((e.key === "Enter" || (props.args.enterWithSpace && e.key === " ") || (e.key === "," && props.args.enterWithComma)) && inputValueTrimmed) {
       setInputValue("");
+
+      if (e.key === ",") {
+        e.preventDefault();
+      }
 
       if (props.args.onValueInputted) {
         const newInputValue = await props.args.onValueInputted(inputValueTrimmed);
@@ -226,11 +234,12 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       newValue.pop();
       props.onChange(newValue, null);
     }
-  }, [inputValue, props.currentValue, props.args]);
+  }, [inputValue, props.currentValue, props.args.onValueInputted, props.args.enterWithSpace, props.args.enterWithComma]);
   const insertChip = useCallback((value: string) => {
     const newValue = props.currentValue ? [...props.currentValue] : [];
     newValue.push(value);
     props.onChange(newValue, null);
+    setInputValue("");
   }, [props.currentValue]);
   const onDeleteChip = useCallback((index: number) => {
     if (!props.currentValue) {
@@ -245,7 +254,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
   const onSuggestionsFetchRequested = useCallback((arg: { value: string }) => {
     clearTimeout(delayRef.current);
     delayRef.current = setTimeout(async () => {
-      setSuggestions(await props.args.fetchSuggestions(arg.value));
+      setSuggestions((await props.args.fetchSuggestions(arg.value)) || []);
     }, 600);
   }, []);
 
@@ -256,6 +265,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       <Paper
         {...options.containerProps}
         square={true}
+        sx={{marginTop: "21px"}}
       >
         {options.children}
       </Paper>
@@ -263,20 +273,22 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
   }, []);
 
   const renderSuggestion = useCallback((suggestion: ITagListSuggestion, params: Autosuggest.RenderSuggestionParams) => {
+    const label = props.args.labelRetriever ? props.args.labelRetriever(suggestion) : suggestion.label;
+
     // we use this to highlight
-    const matches = match(suggestion.value, params.query);
-    const parts = parse(suggestion.value, matches);
+    const matches = match(label, params.query);
+    const parts = parse(label, matches);
 
     const matchParts = (
       parts.map((part, index) =>
         part.highlight ? (
-          <span key={index} style={{ fontWeight: 500 }}>
-            {part.text}
-          </span>
-        ) : (
-          <strong key={index} style={{ fontWeight: 300 }}>
+          <strong key={index}>
             {part.text}
           </strong>
+        ) : (
+          <span key={index}>
+            {part.text}
+          </span>
         ),
       )
     );
@@ -291,7 +303,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
         {props.args.suggestionRenderer ? props.args.suggestionRenderer(suggestion, matchParts) : matchParts}
       </MenuItem>
     );
-  }, [insertChip])
+  }, [insertChip]);
 
   const renderBody = useCallback((inputProps?: any) => {
     let icon: React.ReactNode = null;
@@ -359,6 +371,14 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       InputToUse = OutlinedInput;
     }
 
+    if (inputPropsToSet.onKeyDown) {
+      const originalEv = inputPropsToSet.onKeyDown;
+      inputPropsToSet.onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        originalEv(e);
+        handleKeyDown(e);
+      }
+    }
+
     return (
       <FormControl
         fullWidth={true}
@@ -390,7 +410,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
           placeholder={props.placeholder}
           endAdornment={addornment}
           startAdornment={chips}
-          onBlur={handleBlur}
+          // onBlur={handleBlur}
           inputProps={inputPropsToSet}
           label={props.label}
           {...props.args.InputProps}
@@ -403,7 +423,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
     inputValue,
     updateValue,
     handleKeyDown,
-    handleBlur,
+    //handleBlur,
     props.disabled,
     props.placeholder,
     props.canRestore && !props.args.disableRestore,
@@ -442,7 +462,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       rsTheme[k] = emotionCss(baseTheme[k].styles)
     });
 
-    return (
+    object = (
       <Autosuggest
         renderInputComponent={renderBody}
         renderSuggestionsContainer={renderContainer}

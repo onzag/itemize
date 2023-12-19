@@ -43,6 +43,13 @@ interface IElasticPingSetter<N, T> extends IElasticPing<N> {
   statusRetriever: () => T;
 }
 
+export interface IElasticSelectBuilderArg {
+  itemOrModule: string | ItemDefinition | Module;
+  language?: string;
+  types?: (string | ItemDefinition)[];
+  boost?: number;
+}
+
 export interface IPingEvent<N, T> extends IElasticPing<N> {
   status: T;
 }
@@ -2594,40 +2601,84 @@ export class ItemizeElasticClient {
    * @returns 
    */
   public async performElasticSelect(
-    itemDefinitionOrModule: string | ItemDefinition | Module,
+    itemDefinitionOrModule: string | ItemDefinition | Module | Array<string | ItemDefinition | Module | IElasticSelectBuilderArg>,
     selecter: (builder: ElasticQueryBuilder) => void,
     language?: string,
   ) {
-    const builder = this.getSelectBuilder(itemDefinitionOrModule, language);
-    selecter(builder);
-    return await this.executeQuery(builder);
+    if (!Array.isArray(itemDefinitionOrModule)) {
+      const builder = this.getSelectBuilder({
+        itemOrModule: itemDefinitionOrModule,
+        language,
+      });
+      selecter(builder);
+      return await this.executeQuery(builder);
+    } else {
+      const builder = this.getSelectBuilder(...itemDefinitionOrModule.map((v) => (
+        typeof (v as IElasticSelectBuilderArg).itemOrModule !== "undefined" ? (v as IElasticSelectBuilderArg) : {
+          itemOrModule: v as any,
+          language,
+        }
+      )));
+      selecter(builder);
+      return await this.executeQuery(builder);
+    }
   }
 
-  public getSelectBuilder(
-    itemDefinitionOrModule: string | ItemDefinition | Module,
-    language?: string,
-    types?: (string | ItemDefinition)[],
-  ) {
-    const idefOrMod = typeof itemDefinitionOrModule === "string" ? this.root.registry[itemDefinitionOrModule] : itemDefinitionOrModule;
-    let indexToUse: string;
-    if (idefOrMod instanceof Module) {
-      // these types should have been checked by the search function already
-      // and so we can assume they are safe
-      let typesToReadFrom = types || idefOrMod.getAllChildItemDefinitions();
-      indexToUse = typesToReadFrom.map((t) => {
-        const v = typeof t === "string" ? this.root.registry[t] as ItemDefinition : t;
-        if (!v.isSearchEngineEnabled()) {
-          return null;
+  public getSelectBuilder(...selects: Array<IElasticSelectBuilderArg | string>) {
+    let indexToUse: string = "";
+    let indices_boost: any = null;
+
+    selects.forEach((s) => {
+      const idefOrMod = typeof s === "string" ? this.root.registry[s] :
+        (typeof s.itemOrModule === "string" ? this.root.registry[s.itemOrModule] : s.itemOrModule);
+      const language = typeof s === "string" ? "*" : (s.language || "*");
+
+      let foundIndexes: string[] = [];
+
+      if (idefOrMod instanceof Module) {
+        // these types should have been checked by the search function already
+        // and so we can assume they are safe
+        let typesToReadFrom = typeof s !== "string" ? (s.types || idefOrMod.getAllChildItemDefinitions()) : idefOrMod.getAllChildItemDefinitions();
+        if (indexToUse) {
+          indexToUse += ",";
         }
-        return v.getQualifiedPathName().toLowerCase() + "_" + (language || "*");
-      }).filter((v) => v).join(",");
-    } else if (idefOrMod instanceof ItemDefinition) {
-      indexToUse = idefOrMod.getQualifiedPathName().toLowerCase() + "_" + (language || "*");
-    }
+        foundIndexes = typesToReadFrom.map((t) => {
+          const v = typeof t === "string" ? this.root.registry[t] as ItemDefinition : t;
+          if (!v.isSearchEngineEnabled()) {
+            return null;
+          }
+          return v.getQualifiedPathName().toLowerCase() + "_" + language;
+        }).filter((v) => v);
+        indexToUse += foundIndexes.join(",");
+      } else if (idefOrMod instanceof ItemDefinition) {
+        if (indexToUse) {
+          indexToUse += ",";
+        }
+        foundIndexes = [idefOrMod.getQualifiedPathName().toLowerCase() + "_" + language];
+        indexToUse += foundIndexes[0];
+      } else {
+        throw new Error("Unknown item or module being selected at elasticsearch query");
+      }
+
+      if (typeof s !== "string" && typeof s.boost === "number") {
+        if (!indices_boost) {
+          indices_boost = [];
+        }
+        foundIndexes.forEach((i) => {
+          indices_boost.push({
+            [i]: s.boost,
+          });
+        });
+      }
+    });
 
     const builder = new ElasticQueryBuilder({
       index: indexToUse,
     });
+
+    if (indices_boost) {
+      builder.request.indices_boost = indices_boost;
+    }
 
     return builder;
   }
@@ -3247,6 +3298,18 @@ export class ElasticQueryBuilder {
       match_phrase_prefix: matchRule,
     };
     this.shouldNot(query, options);
+  }
+
+  public mustNotBeBlocked() {
+    this.mustTerm({
+      "blocked_by": "?NULL",
+    });
+  }
+
+  public mustBeCreatedBy(userid: string) {
+    this.mustTerm({
+      "created_by": userid,
+    });
   }
 
   public setSourceIncludes(list: string[]) {

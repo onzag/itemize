@@ -292,11 +292,11 @@ export async function searchModule(
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
   if (usesElastic) {
-    elasticQuery = appData.elastic.getSelectBuilder(
-      mod,
-      elasticIndexLang,
-      resolverArgs.args.types,
-    );
+    elasticQuery = appData.elastic.getSelectBuilder({
+      itemOrModule: mod,
+      language: elasticIndexLang,
+      types: resolverArgs.args.types,
+    });
     elasticQuery.mustTerm({
       blocked_by: "?NULL",
     }, {
@@ -1328,10 +1328,10 @@ export async function searchItemDefinition(
 
     // now we build the search query
     if (usesElastic) {
-      elasticQuery = appData.elastic.getSelectBuilder(
-        itemDefinition,
-        elasticIndexLang,
-      );
+      elasticQuery = appData.elastic.getSelectBuilder({
+        itemOrModule: itemDefinition,
+        language: elasticIndexLang,
+      });
       elasticQuery.mustTerm({
         blocked_by: "?NULL",
       }, {
