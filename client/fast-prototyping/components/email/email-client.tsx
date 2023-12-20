@@ -51,6 +51,7 @@ import { useAppLanguageRetriever } from "../../../components/localization/AppLan
 import { IPropertyEntryRendererProps } from "../../../internal/components/PropertyEntry";
 import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { PropertyDefinitionSupportedStringType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/string";
+import type { EndpointErrorType } from "../../../../base/errors";
 
 const style = {
   flex: {
@@ -133,9 +134,20 @@ const style = {
   },
   chip: {
     margin: "10px 10px 0 10px",
+    fontWeight: 800,
   },
   chipOulined: {
     margin: "5px 10px 5px 10px",
+    fontWeight: 800,
+  },
+  chipBasic: {
+    "& .MuiChip-label": {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      columnGap: '10px',
+      fontSize: "14px",
+    },
   },
   avatarBox: {
     display: "flex",
@@ -165,6 +177,9 @@ export interface ISwitcherComponentProps {
 export interface IListComponentProps { }
 export interface IWrapperComponentProps { };
 export interface IPaginatorComponentProps { };
+export interface INoResultsComponentProps { 
+  err?: EndpointErrorType;
+}
 
 export interface IBasicEmailClientProps {
   /**
@@ -229,6 +244,10 @@ export interface IEmailClientProps extends IBasicEmailClientProps {
    * Wrapper to use instead of the default for the paginator object
    */
   PaginatorWrapperComponent?: React.ComponentType<IPaginatorComponentProps>;
+  /**
+   * No search results found for a given search
+   */
+  NoResultsComponent?: React.ComponentType<INoResultsComponentProps>;
   /**
    * Extra props to give the search loader
    */
@@ -336,12 +355,24 @@ interface IEmailSenderPropsBase {
    */
   userInvalidLabel: React.ReactNode;
   /**
+   * Determines the label as how it is to be displayed by default it will take the first value
+   * according to the order given
+   */
+  userNameDisplayer?: (...args: Array<string | IPropertyDefinitionSupportedTextType>) => React.ReactNode;
+  /**
    * Same as the userNameProperties but used with other objects of other types
    * the key is the qualified name and represents the properties in order
    */
   objectsNameResolver?: {
     [qualifiedName: string]: string[];
   };
+  /**
+   * Determines the label as how it is to be displayed by default it will take the first value
+   * according to the order given
+   */
+  objectsNameDisplayer?: {
+    [qualifiedName: string]: (...args: Array<string | IPropertyDefinitionSupportedTextType>) => React.ReactNode;
+  },
   /**
    * Same as the userInvalidLabel but used with other objects of other types
    * the key is the qualified name and represents the properties in order
@@ -552,7 +583,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
     }
   }, [props.mailDomain, props.userNameProperties, props.userIdef, props.token]);
   const chipRenderer = useCallback((v: string) => {
-    const chipstyle = props.targetEntryRendererArgs?.fieldVariant === "outlined" ? style.chipOulined : style.chip;
+    const chipstyle = [style.chipBasic, props.targetEntryRendererArgs?.fieldVariant === "outlined" ? style.chipOulined : style.chip];
     if (v.includes("@")) {
       return (
         <Chip
@@ -567,7 +598,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
       const isUser = type === "MOD_users__IDEF_user";
       const id = splitted[0];
 
-      if (!isUser && !props.objectsNameResolver[type]) {
+      if (!isUser && (!props.objectsNameResolver || !props.objectsNameResolver[type])) {
         return (
           <Chip
             label={v}
@@ -615,13 +646,20 @@ function ActualMailSender(props: IActualMailSenderProps) {
               return (
                 <ReaderMany data={isUser ? props.userNameProperties : props.objectsNameResolver[type]}>
                   {(...args: Array<string | IPropertyDefinitionSupportedTextType>) => {
-                    let valueToDisplay = args.find((v) => !!v);
-                    if (valueToDisplay && typeof valueToDisplay !== "string") {
-                      valueToDisplay = valueToDisplay.value;
-                    }
+                    let valueToDisplay: React.ReactNode = null;
 
-                    if (!valueToDisplay) {
-                      valueToDisplay = "???";
+                    const displayerFn = isUser ? props.userNameDisplayer : (props.objectsNameDisplayer && props.objectsNameDisplayer[type]);
+                    if (displayerFn) {
+                      valueToDisplay = displayerFn(...args);
+                    } else {
+                      valueToDisplay = args.find((v) => !!v);
+                      if (valueToDisplay && typeof valueToDisplay !== "string") {
+                        valueToDisplay = (valueToDisplay as any).value;
+                      }
+
+                      if (!valueToDisplay) {
+                        valueToDisplay = "???";
+                      }
                     }
 
                     return (
@@ -641,6 +679,8 @@ function ActualMailSender(props: IActualMailSenderProps) {
     }
   }, [
     props.objectsNameResolver,
+    props.objectsNameDisplayer,
+    props.userNameDisplayer,
     props.objectsInvalidLabel,
     props.userNameProperties,
     props.userInvalidLabel,
@@ -724,10 +764,11 @@ function ActualMailSender(props: IActualMailSenderProps) {
             renderer={props.targetEntryRenderer}
             hideLabel={props.hideLabels || props.hideLabelTarget}
             hideDescription={props.hideDescriptions || props.hideDescriptionTarget}
+            autoFocus={!props.targetPrefill}
           />
           <Entry
             id="subject"
-            autoFocus={!props.subjectPrefill}
+            autoFocus={!props.subjectPrefill && !!props.targetPrefill}
             renderer={props.subjectEntryRenderer}
             rendererArgs={props.subjectEntryRendererArgs}
             hideLabel={props.hideLabels || props.hideLabelSubject}
@@ -735,12 +776,12 @@ function ActualMailSender(props: IActualMailSenderProps) {
           />
           <Entry
             id="content"
-            autoFocus={!!props.subjectPrefill}
+            autoFocus={!!props.subjectPrefill && !!props.targetPrefill}
             renderer={props.contentEntryRenderer}
             rendererArgs={props.contentEntryRendererArgs}
             hideLabel={props.hideLabels || props.hideLabelContent}
             hideDescription={props.hideDescriptions || props.hideDescriptionContent}
-            />
+          />
           <Entry
             id="attachments"
             renderer={props.attachmentsEntryRenderer}
@@ -1507,6 +1548,10 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
 
 const StyledPaginatorWrapper = styled("div")(style.paginationBox);
 
+function FakeNoResultsComponent(props: INoResultsComponentProps) {
+  return null as any;
+}
+
 export function EmailClient(props: IEmailClientProps) {
   const [limitoffset, setLimitOffset] = useState([20, 0]);
   const onOutOfBounds = useCallback((newLimit: number, newOffset: number) => {
@@ -1525,6 +1570,8 @@ export function EmailClient(props: IEmailClientProps) {
       onLocationChange={props.onLocationChange}
     />
   );
+
+  const NoResultsComponent = typeof props.NoResultsComponent !== "undefined" ? props.NoResultsComponent : FakeNoResultsComponent;
 
   return (
     <UserDataRetriever>
@@ -1596,7 +1643,7 @@ export function EmailClient(props: IEmailClientProps) {
               >
                 {(arg, pagination, noResults) => (
                   <InternalWrapperComponent>
-                    <ListComponent>
+                    {noResults || arg.error ? <NoResultsComponent err={arg.error} /> : <ListComponent>
                       {arg.searchRecords.map((v) => (
                         <ItemProvider {...v.providerProps}>
                           <ReaderMany data={["id", "source", "subject", "read", "target"]}>
@@ -1622,10 +1669,10 @@ export function EmailClient(props: IEmailClientProps) {
                           </ReaderMany>
                         </ItemProvider>
                       ))}
-                    </ListComponent>
-                    <PaginatorWrapperComponent>
+                    </ListComponent>}
+                    {noResults || arg.error ? null : <PaginatorWrapperComponent>
                       {pagination}
-                    </PaginatorWrapperComponent>
+                    </PaginatorWrapperComponent>}
                   </InternalWrapperComponent>
                 )}
               </SearchLoaderWithPagination>

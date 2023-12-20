@@ -132,6 +132,78 @@ export class WhereBuilder extends ConditionalBuilder {
   }
 
   /**
+   * Specifies whether the column is within any of the given values in the array
+   * @param column 
+   * @param values 
+   * @param type 
+   * @returns 
+   */
+  public andWhereColumnIn(
+    column: string,
+    values: Array<string | number>,
+    type: "INTEGER" | "TEXT" | "BIGINT" | "DATE" | "TIME" | "TIMESTAMP",
+  ) {
+    return this.andWhere(
+      JSON.stringify(column) + " = ANY(ARRAY[" + values.map((v) => "?").join(",") + "]::" + type + "[])",
+      values,
+    );
+  }
+
+  /**
+   * Specifies whether the column is a subset of the given array
+   * @param column 
+   * @param values 
+   * @param type 
+   * @returns 
+   */
+  public andWhereColumnSuperset(
+    column: string,
+    values: Array<string | number>,
+    type: "INTEGER" | "TEXT" | "BIGINT" | "DATE" | "TIME" | "TIMESTAMP",
+  ) {
+    return this.andWhere(
+      JSON.stringify(column) + " @> ARRAY[" + values.map((v) => "?").join(",") + "]::" + type + "[]",
+      values,
+    );
+  }
+
+  /**
+   * Specifies whether the column is a subset of the given array
+   * @param column 
+   * @param values 
+   * @param type 
+   * @returns 
+   */
+  public andWhereColumnSubset(
+    column: string,
+    values: Array<string | number>,
+    type: "INTEGER" | "TEXT" | "BIGINT" | "DATE" | "TIME" | "TIMESTAMP",
+  ) {
+    return this.andWhere(
+      JSON.stringify(column) + " <@ ARRAY[" + values.map((v) => "?").join(",") + "]::" + type + "[]",
+      values,
+    );
+  }
+
+  /**
+   * Specifies whether the column is a subset of the given array
+   * @param column 
+   * @param values 
+   * @param type 
+   * @returns 
+   */
+  public andWhereColumnOverlaps(
+    column: string,
+    values: Array<string | number>,
+    type: "INTEGER" | "TEXT" | "BIGINT" | "DATE" | "TIME" | "TIMESTAMP",
+  ) {
+    return this.andWhere(
+      JSON.stringify(column) + " && ARRAY[" + values.map((v) => "?").join(",") + "]::" + type + "[]",
+      values,
+    );
+  }
+
+  /**
    * Specifies an OR rule for a column with a given value or comparator
    * @param column the column in question
    * @param valueOrComparator a value to compare against in equality or a comparator

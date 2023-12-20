@@ -1613,7 +1613,17 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * @override to resolve messages aimed to object types
    * @param user 
    * @param target 
-   * @param targetType 
+   * @param targetType
+   * 
+   * The returned users should contain the properties
+   * id
+   * username
+   * real_name or actual_name if available
+   * container_id
+   * app_country
+   * email
+   * e_notifications if available
+   * e_validated if available
    */
   public async resolveUsersForEmailToItem(user: ISQLTableRowValue, target: ISQLTableRowValue, targetType: ItemDefinition): Promise<ISQLTableRowValue[]> {
     return [];

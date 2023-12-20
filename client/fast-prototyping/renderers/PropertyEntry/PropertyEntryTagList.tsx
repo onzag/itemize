@@ -6,7 +6,7 @@
  */
 
 import { IPropertyEntryTagListRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryTagList";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
@@ -182,6 +182,11 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
 
   const focus = useCallback(() => {
     actualInputRef.current.focus();
+  }, []);
+  useEffect(() => {
+    if (props.autoFocus) {
+      focus();
+    }
   }, []);
   const updateValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // must check the type due to a bug in autosuggest
@@ -407,7 +412,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
           inputRef={actualInputRef}
           disabled={props.disabled}
           fullWidth={true}
-          placeholder={props.placeholder}
+          placeholder={props.currentValue && props.currentValue.length ? null : props.placeholder}
           endAdornment={addornment}
           startAdornment={chips}
           // onBlur={handleBlur}
