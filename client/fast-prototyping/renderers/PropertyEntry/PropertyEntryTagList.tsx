@@ -224,6 +224,17 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
         e.preventDefault();
       }
 
+      if (e.key === "Enter") {
+        const selected = document.querySelector(".autsuggestselector.highlighted") as HTMLElement;
+        if (selected) {
+          const value = selected.dataset.value;
+          const newValue = props.currentValue ? [...props.currentValue] : [];
+          newValue.push(value);
+          props.onChange(newValue, null);
+          return;
+        }
+      }
+
       if (props.args.onValueInputted) {
         const newInputValue = await props.args.onValueInputted(inputValueTrimmed);
         const newValue = props.currentValue ? [...props.currentValue] : [];
@@ -270,7 +281,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       <Paper
         {...options.containerProps}
         square={true}
-        sx={{marginTop: "21px"}}
+        sx={{ marginTop: "21px" }}
       >
         {options.children}
       </Paper>
@@ -304,6 +315,8 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
         selected={params.isHighlighted}
         component="div"
         onClick={insertChip.bind(null, suggestion.value)}
+        data-value={suggestion.value}
+        className={"autsuggestselector " + (params.isHighlighted ? " highlighted" : "")}
       >
         {props.args.suggestionRenderer ? props.args.suggestionRenderer(suggestion, matchParts) : matchParts}
       </MenuItem>

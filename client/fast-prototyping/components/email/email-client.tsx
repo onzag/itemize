@@ -18,7 +18,7 @@ import Avatar from '@mui/material/Avatar';
 import Reader, { TextReader } from "../../../components/property/Reader";
 
 import Link from "../../../components/navigation/Link";
-import SubmitActioner from "../../../components/item/SubmitActioner";
+import SubmitActioner, { ISubmitActionerInfoArgType } from "../../../components/item/SubmitActioner";
 import Alert from "@mui/material/Alert";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
@@ -52,6 +52,7 @@ import { IPropertyEntryRendererProps } from "../../../internal/components/Proper
 import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { PropertyDefinitionSupportedStringType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/string";
 import type { EndpointErrorType } from "../../../../base/errors";
+import { localizedRedirectTo } from "../../../components/navigation";
 
 const style = {
   flex: {
@@ -177,8 +178,12 @@ export interface ISwitcherComponentProps {
 export interface IListComponentProps { }
 export interface IWrapperComponentProps { };
 export interface IPaginatorComponentProps { };
-export interface INoResultsComponentProps { 
+export interface INoResultsComponentProps {
   err?: EndpointErrorType;
+}
+export interface ISubmitButtonProps {
+  onClick: () => void;
+  arg?: ISubmitActionerInfoArgType;
 }
 
 export interface IBasicEmailClientProps {
@@ -360,6 +365,12 @@ interface IEmailSenderPropsBase {
    */
   userNameDisplayer?: (...args: Array<string | IPropertyDefinitionSupportedTextType>) => React.ReactNode;
   /**
+   * Used to display email addresses
+   * @param rfcEmail 
+   * @returns 
+   */
+  emailDisplayer?: (rfcEmail: string) => React.ReactNode;
+  /**
    * Same as the userNameProperties but used with other objects of other types
    * the key is the qualified name and represents the properties in order
    */
@@ -395,6 +406,11 @@ interface IEmailSenderPropsBase {
    */
   emailUrlResolver: (id: string) => string;
   /**
+   * Specify a query string or just arbitrary string
+   * to append to newly resolved urls
+   */
+  emailUrlResolverAddQSToNew?: string;
+  /**
    * Use to resolve suggestions for the user
    * @param v the string being inputted
    * @returns 
@@ -405,6 +421,7 @@ interface IEmailSenderPropsBase {
    * box area
    */
   WrapperComponent?: React.ComponentType<IWrapperComponentProps>;
+  SubmitButton?: React.ComponentType<ISubmitButtonProps>;
   targetEntryRenderer?: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedStringType>>;
   targetEntryRendererArgs?: any;
   subjectEntryRenderer?: React.ComponentType<IPropertyEntryRendererProps<IPropertyDefinitionSupportedTextType>>;
@@ -587,7 +604,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
     if (v.includes("@")) {
       return (
         <Chip
-          label={v}
+          label={props.emailDisplayer ? props.emailDisplayer(v) : v}
           sx={chipstyle}
           color="primary"
         />
@@ -702,6 +719,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
   }
 
   const Wrapper = props.WrapperComponent || "div";
+  const SubmitButtonToUse = props.SubmitButton;
 
   // const onFetchSuggestionsWrapped = useCallback(async (v: string) => {
   //   const suggs = await props.onFetchSuggestions(v);
@@ -799,7 +817,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
             }}
           </Reader>
 
-          <SubmitButton
+          {!props.SubmitButton ? <SubmitButton
             i18nId="send"
             options={{
               properties: [
@@ -822,22 +840,62 @@ function ActualMailSender(props: IActualMailSenderProps) {
             }}
             redirectOnSuccess={
               (status) => {
-                return props.emailUrlResolver(status.id)
+                return props.emailUrlResolver(status.id) +
+                  (props.emailUrlResolverAddQSToNew ? props.emailUrlResolverAddQSToNew : "");
               }
             }
             redirectReplace={true}
-          />
+          /> : null}
 
           <SubmitActioner>
             {(actioner) => {
+              let button: React.ReactNode;
+              if (props.SubmitButton) {
+                const onClick = async () => {
+                  const status = await actioner.submit({
+                    properties: [
+                      "source",
+                      "target",
+                      "content",
+                      "attachments",
+                      "cid_attachments",
+                      "subject",
+                      "is_sender",
+                      "is_receiver",
+                      "read",
+                      "spam",
+                    ],
+                    cleanStateOnSuccess: true,
+                    parentedBy: props.replyOf ? {
+                      id: props.replyOf,
+                      item: props.mailIdef.getQualifiedPathName(),
+                    } : null,
+                  });
+
+                  if (status.id) {
+                    localizedRedirectTo(props.emailUrlResolver(status.id) +
+                      (props.emailUrlResolverAddQSToNew ? props.emailUrlResolverAddQSToNew : ""), {
+                      replace: true,
+                    });
+                  }
+                }
+
+                button = (
+                  <SubmitButtonToUse onClick={onClick} arg={actioner} />
+                );
+              }
+
               return (
-                <Snackbar
-                  id={"email-send-error"}
-                  severity="error"
-                  i18nDisplay={actioner.submitError}
-                  open={!!actioner.submitError}
-                  onClose={actioner.dismissError}
-                />
+                <>
+                  {button}
+                  <Snackbar
+                    id={"email-send-error"}
+                    severity="error"
+                    i18nDisplay={actioner.submitError}
+                    open={!!actioner.submitError}
+                    onClose={actioner.dismissError}
+                  />
+                </>
               )
             }}
           </SubmitActioner>
