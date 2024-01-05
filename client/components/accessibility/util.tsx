@@ -150,6 +150,11 @@ function AccessibleImage(props: IAccessibleImageProps) {
   delete newProps.i18nLabelContext;
   delete newProps.i18nLabelId;
 
+  // image nonsense
+  delete newProps.children;
+
+  const Tag = props.Tag as any;
+
   if (props.styleActive || props.styleHover) {
     if (!props.onImageClick) {
       return (
@@ -164,9 +169,7 @@ function AccessibleImage(props: IAccessibleImageProps) {
             ["aria-label"]: i18nLabel + (props.image.alt ? (" - " + props.image.alt) : ""),
           }}
           priority={props.priority}
-        >
-          {props.children}
-        </AltText>
+        />
       );
     } else {
       return (
@@ -192,8 +195,6 @@ function AccessibleImage(props: IAccessibleImageProps) {
     }
   }
 
-  const Tag = props.Tag as any;
-
   if (!props.onImageClick) {
     return (
       <AltText
@@ -203,9 +204,7 @@ function AccessibleImage(props: IAccessibleImageProps) {
           ["aria-label"]: i18nLabel + (props.image.alt ? (" - " + props.image.alt) : ""),
         }}
         priority={props.priority}
-      >
-        {props.children}
-      </AltText>
+      />
     );
   }
 
@@ -388,7 +387,7 @@ function accessibilityEnabledCustomTextProcesser(
     Tag: string,
     styleActive?: any,
     styleHover?: any,
-    defaultReturn: () => React.ReactNode,
+    defaultReturn: (extraProps?: any) => React.ReactNode,
     parent: RichElement | IRootLevelDocument,
     tree: IRootLevelDocument,
   },
@@ -483,16 +482,15 @@ function accessibilityEnabledCustomTextProcesser(
   // container types need to be wrapped
   if (
     (element as RichElement).type === "container" ||
-    (element as RichElement).type === "custom"
+    (element as RichElement).type === "custom" ||
+    (
+      (element as RichElement).type === "unmanaged" &&
+      (element as RichElement).children.length
+    )
   ) {
-    return (
-      <AltGroup
-        component={info.Tag}
-        componentProps={props}
-      >
-        {info.defaultReturn()}
-      </AltGroup>
-    );
+    return info.defaultReturn({
+      ["data-alt-group"]: "DEFAULT",
+    });
   }
 
   // clickable types
@@ -512,6 +510,7 @@ function accessibilityEnabledCustomTextProcesser(
         priority={fns.priority}
         i18nLabelId={fns.imageI18nId || "rich_image"}
         i18nLabelContext={fns.imageI18nContext}
+        Tag={info.Tag}
       />
     );
   }

@@ -412,6 +412,8 @@ export function serializeElementBase(
   return elementComponent;
 }
 
+const VOID_TAGS_UNMANAGED = ["br"];
+
 /**
  * Reactifies an element so that it can be given its react
  * form, basically converts the element into a react one
@@ -713,7 +715,7 @@ export function reactifyElementBase(
   }
 
   // if we are working as a template and we have a html data attribute
-  if (arg.asTemplate && typeof base.html === "string") {
+  if (arg.asTemplate && typeof base.html === "string" && !VOID_TAGS_UNMANAGED.includes(Tag)) {
     // we remove the children if we have them
     delete finalProps.children;
 
@@ -742,7 +744,7 @@ export function reactifyElementBase(
     } else {
       finalProps.children = null;
     }
-  } else if (arg.asTemplate && typeof base.textContent === "string") {
+  } else if (arg.asTemplate && typeof base.textContent === "string" && !VOID_TAGS_UNMANAGED.includes(Tag)) {
     // we remove the children if we have them
     delete finalProps.children;
     // and define the text content
@@ -765,8 +767,7 @@ export function reactifyElementBase(
     } else {
       finalProps.children = null;
     }
-
-  } else if (!finalProps.children && children) {
+  } else if (!finalProps.children && children && children.length) {
     // otherwise if no children have been defined in the given
     // custom properties, then we are going to instantiate
     // based on the children we are requested to render
@@ -818,7 +819,7 @@ export function reactifyElementBase(
   }
 
   // if we have a function to wrap children
-  if (wrapChildren) {
+  if (wrapChildren && finalProps.children) {
     // that's what we use as children
     finalProps.children = wrapChildren(finalProps.children);
   }
@@ -836,7 +837,7 @@ export function reactifyElementBase(
     <React.Fragment key={arg.key}>
       {
         retrieveElementActionsForReact(base, currentTemplateArgs, currentTemplateRootArgs, (events) => {
-          const defaultReturn = (pstyleActive?: any, pstyleHover?: any) => {
+          const defaultReturn = (pstyleActive?: any, pstyleHover?: any, extraProps?: any) => {
             if (base.styleActive || base.styleHover) {
               // then we fetch them
               const styleActive = pstyleActive || convertStyleStringToReactObject(base.styleActive);
@@ -851,11 +852,18 @@ export function reactifyElementBase(
                 styleHover,
               };
 
+              if (extraProps) {
+                Object.assign(propsForThis, extraProps);
+              }
+
               // and now we return with the dynamic component
               return (
                 <ReactifiedElementWithHoverAndActive {...propsForThis} />
               );
             } else {
+              if (extraProps) {
+                return (<Tag {...finalProps} {...extraProps} {...events} />);
+              }
               return (<Tag {...finalProps} {...events} />);
             };
           }

@@ -23,7 +23,7 @@ import Alert from "@mui/material/Alert";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Entry from "../../../components/property/Entry";
-import I18nRead from "../../../components/localization/I18nRead";
+import I18nRead, { useI18nRead } from "../../../components/localization/I18nRead";
 
 import ReplyIcon from "@mui/icons-material/Reply";
 import ReplyAllIcon from "@mui/icons-material/ReplyAll";
@@ -53,6 +53,7 @@ import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Modu
 import { PropertyDefinitionSupportedStringType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/string";
 import type { EndpointErrorType } from "../../../../base/errors";
 import { localizedRedirectTo } from "../../../components/navigation";
+import TitleSetter from "../../../components/util/TitleSetter";
 
 const style = {
   flex: {
@@ -281,7 +282,13 @@ export interface IEmailClientProps extends IBasicEmailClientProps {
    * Search filter
    */
   searchFilter?: string;
+  /**
+   * Whethet to use search engine for the searching
+   */
   useSearchEngine?: boolean;
+  /**
+   * Whether to use full highlights during the search
+   */
   useSearchEngineFullHighlights?: number;
 }
 
@@ -297,6 +304,14 @@ export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderP
    * Wrapper component to used inside of the content
    */
   WrapperContent?: React.ComponentType<IWrapperComponentProps>;
+  /**
+   * Wrapper component to used inside of the content
+   */
+  WrapperSpamWarning?: React.ComponentType<IWrapperComponentProps>;
+  /**
+   * Wrapper component to used inside of the content
+   */
+  WrapperUser?: React.ComponentType<IWrapperComponentProps>;
   /**
    * Resolve the url used to reply to a message
    * @param replyOf the id of the email we are trying to reply
@@ -323,6 +338,37 @@ export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderP
    * Fallback avatar to render avatars
    */
   FallbackAvatarComponent?: React.ComponentType<{ children: React.ReactNode }>;
+  /**
+   * Use the given property to be set as the title
+   * for example the subjct
+   */
+  setAsTitle?: string;
+  /**
+   * An alternative for the entire content
+   * you should use <View content and <View attachments for displaying
+   * the content itself and <View subject
+   */
+  ContentViewer?: React.ComponentType<IContentViewerProps>;
+}
+
+/**
+ * Props for the custom content viewer
+ */
+export interface IContentViewerProps {
+  isSpam: boolean;
+  canReply: boolean;
+  replyURL: string;
+  canReplyAll: boolean;
+  replyAllURL: string;
+  canForward: boolean;
+  forwardURL: string;
+  i18nReply: string;
+  i18nReplyAll: string;
+  i18nForward: string;
+  i18nToggleSpam: string;
+  isTogglingSpam: boolean;
+  toggleSpam: () => void;
+  children: React.ReactNode;
 }
 
 /**
@@ -385,6 +431,14 @@ interface IEmailSenderPropsBase {
     [qualifiedName: string]: (...args: Array<string | IPropertyDefinitionSupportedTextType>) => React.ReactNode;
   },
   /**
+   * A list of qualified path name that can be replied all
+   */
+  objectsAllowedReplyAll?: string[];
+  /**
+   * A blacklist for replying all
+   */
+  replyAllBlacklist?: string[];
+  /**
    * Same as the userInvalidLabel but used with other objects of other types
    * the key is the qualified name and represents the properties in order
    */
@@ -440,6 +494,17 @@ interface IEmailSenderPropsBase {
   hideDescriptionSubject?: boolean;
   hideDescriptionContent?: boolean;
   hideDescriptionAttachments?: boolean;
+  /**
+   * Determine how the entries are to be rendered
+   * @returns 
+   */
+  customEntriesRenderer?: (
+    target: React.ReactNode,
+    subject: React.ReactNode,
+    content: React.ReactNode,
+    attachments: React.ReactNode,
+    button: React.ReactNode,
+  ) => React.ReactNode;
 }
 
 /**
@@ -570,6 +635,24 @@ export async function defaultValueResolver(v: IInternalValueResolverOptions) {
   } else {
     return results.records[0].id;
   }
+}
+
+function defaultEntriesRenderer(
+  target: React.ReactNode,
+  subject: React.ReactNode,
+  content: React.ReactNode,
+  attachments: React.ReactNode,
+  button: React.ReactNode,
+) {
+  return (
+    <>
+      {target}
+      {subject}
+      {content}
+      {attachments}
+      {button}
+    </>
+  );
 }
 
 /**
@@ -732,6 +815,8 @@ function ActualMailSender(props: IActualMailSenderProps) {
   //   return [];
   // }, [props.onFetchSuggestions]);
 
+  const entriesRenderer = props.customEntriesRenderer || defaultEntriesRenderer;
+
   return (
     <Wrapper>
       <ModuleProvider module="mail">
@@ -769,44 +854,142 @@ function ActualMailSender(props: IActualMailSenderProps) {
           ]}
           prefills={prefills}
         >
-          <Entry
-            id="target"
-            rendererArgs={{
-              chipRenderer,
-              onValueInputted,
-              fetchSuggestions: props.onFetchSuggestions,
-              // enterWithSpace: true,
-              enterWithComma: true,
-              ...props.targetEntryRendererArgs,
-            }}
-            renderer={props.targetEntryRenderer}
-            hideLabel={props.hideLabels || props.hideLabelTarget}
-            hideDescription={props.hideDescriptions || props.hideDescriptionTarget}
-            autoFocus={!props.targetPrefill}
-          />
-          <Entry
-            id="subject"
-            autoFocus={!props.subjectPrefill && !!props.targetPrefill}
-            renderer={props.subjectEntryRenderer}
-            rendererArgs={props.subjectEntryRendererArgs}
-            hideLabel={props.hideLabels || props.hideLabelSubject}
-            hideDescription={props.hideDescriptions || props.hideDescriptionSubject}
-          />
-          <Entry
-            id="content"
-            autoFocus={!!props.subjectPrefill && !!props.targetPrefill}
-            renderer={props.contentEntryRenderer}
-            rendererArgs={props.contentEntryRendererArgs}
-            hideLabel={props.hideLabels || props.hideLabelContent}
-            hideDescription={props.hideDescriptions || props.hideDescriptionContent}
-          />
-          <Entry
-            id="attachments"
-            renderer={props.attachmentsEntryRenderer}
-            rendererArgs={props.attachmentsEntryRendererArgs}
-            hideLabel={props.hideLabels || props.hideLabelAttachments}
-            hideDescription={props.hideDescriptions || props.hideDescriptionAttachments}
-          />
+          {
+            entriesRenderer(
+              (
+                <Entry
+                  id="target"
+                  rendererArgs={{
+                    chipRenderer,
+                    onValueInputted,
+                    fetchSuggestions: props.onFetchSuggestions,
+                    // enterWithSpace: true,
+                    enterWithComma: true,
+                    ...props.targetEntryRendererArgs,
+                  }}
+                  renderer={props.targetEntryRenderer}
+                  hideLabel={props.hideLabels || props.hideLabelTarget}
+                  hideDescription={props.hideDescriptions || props.hideDescriptionTarget}
+                  autoFocus={!props.targetPrefill}
+                />
+              ),
+              (
+                <Entry
+                  id="subject"
+                  autoFocus={!props.subjectPrefill && !!props.targetPrefill}
+                  renderer={props.subjectEntryRenderer}
+                  rendererArgs={props.subjectEntryRendererArgs}
+                  hideLabel={props.hideLabels || props.hideLabelSubject}
+                  hideDescription={props.hideDescriptions || props.hideDescriptionSubject}
+                />
+              ),
+              (
+                <Entry
+                  id="content"
+                  autoFocus={!!props.subjectPrefill && !!props.targetPrefill}
+                  renderer={props.contentEntryRenderer}
+                  rendererArgs={props.contentEntryRendererArgs}
+                  hideLabel={props.hideLabels || props.hideLabelContent}
+                  hideDescription={props.hideDescriptions || props.hideDescriptionContent}
+                />
+              ),
+              (
+                <Entry
+                  id="attachments"
+                  renderer={props.attachmentsEntryRenderer}
+                  rendererArgs={props.attachmentsEntryRendererArgs}
+                  hideLabel={props.hideLabels || props.hideLabelAttachments}
+                  hideDescription={props.hideDescriptions || props.hideDescriptionAttachments}
+                />
+              ),
+              (
+                <>
+                  {!props.SubmitButton ? <SubmitButton
+                    i18nId="send"
+                    options={{
+                      properties: [
+                        "source",
+                        "target",
+                        "content",
+                        "attachments",
+                        "cid_attachments",
+                        "subject",
+                        "is_sender",
+                        "is_receiver",
+                        "read",
+                        "spam",
+                      ],
+                      cleanStateOnSuccess: true,
+                      parentedBy: props.replyOf ? {
+                        id: props.replyOf,
+                        item: props.mailIdef.getQualifiedPathName(),
+                      } : null
+                    }}
+                    redirectOnSuccess={
+                      (status) => {
+                        return props.emailUrlResolver(status.id) +
+                          (props.emailUrlResolverAddQSToNew ? props.emailUrlResolverAddQSToNew : "");
+                      }
+                    }
+                    redirectReplace={true}
+                  /> : null}
+
+                  <SubmitActioner>
+                    {(actioner) => {
+                      let button: React.ReactNode;
+                      if (props.SubmitButton) {
+                        const onClick = async () => {
+                          const status = await actioner.submit({
+                            properties: [
+                              "source",
+                              "target",
+                              "content",
+                              "attachments",
+                              "cid_attachments",
+                              "subject",
+                              "is_sender",
+                              "is_receiver",
+                              "read",
+                              "spam",
+                            ],
+                            cleanStateOnSuccess: true,
+                            parentedBy: props.replyOf ? {
+                              id: props.replyOf,
+                              item: props.mailIdef.getQualifiedPathName(),
+                            } : null,
+                          });
+
+                          if (status.id) {
+                            localizedRedirectTo(props.emailUrlResolver(status.id) +
+                              (props.emailUrlResolverAddQSToNew ? props.emailUrlResolverAddQSToNew : ""), {
+                              replace: true,
+                            });
+                          }
+                        }
+
+                        button = (
+                          <SubmitButtonToUse onClick={onClick} arg={actioner} />
+                        );
+                      }
+
+                      return (
+                        <>
+                          {button}
+                          <Snackbar
+                            id={"email-send-error"}
+                            severity="error"
+                            i18nDisplay={actioner.submitError}
+                            open={!!actioner.submitError}
+                            onClose={actioner.dismissError}
+                          />
+                        </>
+                      )
+                    }}
+                  </SubmitActioner>
+                </>
+              ),
+            )
+          }
 
           <Reader id="target">
             {(target: string[]) => {
@@ -816,89 +999,6 @@ function ActualMailSender(props: IActualMailSenderProps) {
               );
             }}
           </Reader>
-
-          {!props.SubmitButton ? <SubmitButton
-            i18nId="send"
-            options={{
-              properties: [
-                "source",
-                "target",
-                "content",
-                "attachments",
-                "cid_attachments",
-                "subject",
-                "is_sender",
-                "is_receiver",
-                "read",
-                "spam",
-              ],
-              cleanStateOnSuccess: true,
-              parentedBy: props.replyOf ? {
-                id: props.replyOf,
-                item: props.mailIdef.getQualifiedPathName(),
-              } : null
-            }}
-            redirectOnSuccess={
-              (status) => {
-                return props.emailUrlResolver(status.id) +
-                  (props.emailUrlResolverAddQSToNew ? props.emailUrlResolverAddQSToNew : "");
-              }
-            }
-            redirectReplace={true}
-          /> : null}
-
-          <SubmitActioner>
-            {(actioner) => {
-              let button: React.ReactNode;
-              if (props.SubmitButton) {
-                const onClick = async () => {
-                  const status = await actioner.submit({
-                    properties: [
-                      "source",
-                      "target",
-                      "content",
-                      "attachments",
-                      "cid_attachments",
-                      "subject",
-                      "is_sender",
-                      "is_receiver",
-                      "read",
-                      "spam",
-                    ],
-                    cleanStateOnSuccess: true,
-                    parentedBy: props.replyOf ? {
-                      id: props.replyOf,
-                      item: props.mailIdef.getQualifiedPathName(),
-                    } : null,
-                  });
-
-                  if (status.id) {
-                    localizedRedirectTo(props.emailUrlResolver(status.id) +
-                      (props.emailUrlResolverAddQSToNew ? props.emailUrlResolverAddQSToNew : ""), {
-                      replace: true,
-                    });
-                  }
-                }
-
-                button = (
-                  <SubmitButtonToUse onClick={onClick} arg={actioner} />
-                );
-              }
-
-              return (
-                <>
-                  {button}
-                  <Snackbar
-                    id={"email-send-error"}
-                    severity="error"
-                    i18nDisplay={actioner.submitError}
-                    open={!!actioner.submitError}
-                    onClose={actioner.dismissError}
-                  />
-                </>
-              )
-            }}
-          </SubmitActioner>
         </ItemProvider>
       </ModuleProvider>
     </Wrapper>
@@ -955,6 +1055,14 @@ export function EmailSender(props: IEmailSenderProps) {
 
 export function EmailReader(props: IEmailReaderProps) {
   const appLanguage = useAppLanguageRetriever();
+  const userData = useUserDataRetriever();
+
+  const i18nMarkAsSpam = useI18nRead({ id: "mark_as_spam", context: "mail/mail" }) as string;
+  const i18nMarkAsSafe = useI18nRead({ id: "mark_as_safe", context: "mail/mail" }) as string;
+  const i18nForward = useI18nRead({ id: "forward", context: "mail/mail" }) as string;
+  const i18nReply = useI18nRead({ id: "reply", context: "mail/mail" }) as string;
+  const i18nReplyAll = useI18nRead({ id: "reply_all", context: "mail/mail" }) as string;
+
   return (
     <ModuleProvider module="mail">
       <ItemProvider
@@ -1067,7 +1175,77 @@ export function EmailReader(props: IEmailReaderProps) {
               )
             }
 
-            let content: React.ReactNode = (
+            const targetsToReplyAll = (source ? [source] : []).concat(target || []).filter((t, index, arr) => arr.indexOf(t) === index && t !== userData.id)
+              // remove objects from reply all
+              .filter((t) => {
+                // chck the type to see if it's allowed
+                if (!t.includes("@") && t.includes("$")) {
+                  const type = t.split("$")[1];
+                  const isAllowedByType = ((props.objectsAllowedReplyAll || []).includes(type));
+                  if (!isAllowedByType) {
+                    return false;
+                  }
+                }
+
+                // check the blacklist
+                if (!props.replyAllBlacklist) {
+                  return true;
+                }
+
+                return !props.replyAllBlacklist.includes(t);
+              });
+
+            const targetsToReply = source === userData.id ? targetsToReplyAll : ((props.replyAllBlacklist || []).includes(source) ? [] : [source]);
+
+            // can reply if it can reply to source
+            const canReply = targetsToReply.length >= 1;
+            // can reply all if the targets to reply all are different from the reply otherwise it's the same
+            const canReplyAll = targetsToReply === targetsToReplyAll ? false : !targetsToReplyAll.every((t) => targetsToReply.includes(t));
+
+            const ContentViewer = props.ContentViewer;
+
+            let content: React.ReactNode = ContentViewer ? (
+              <SubmitActioner>
+                {(actioner) => {
+                  const toggleSpam = actioner.submit.bind(null, {
+                    properties: ["spam"],
+                    action: "edit",
+                    propertyOverrides: [
+                      {
+                        id: "spam",
+                        value: !spam,
+                      }
+                    ]
+                  });
+
+                  return (
+                    <ContentViewer
+                      canForward={true}
+                      forwardURL={props.forwardUrlResolver(props.id)}
+                      canReply={canReply}
+                      replyURL={props.replyUrlResolver(props.id)}
+                      canReplyAll={canReplyAll}
+                      replyAllURL={props.replyAllUrlResolver(props.id)}
+                      i18nReply={i18nReply}
+                      i18nForward={i18nForward}
+                      i18nReplyAll={i18nReplyAll}
+                      i18nToggleSpam={spam ? i18nMarkAsSafe : i18nMarkAsSpam}
+                      isSpam={spam}
+                      isTogglingSpam={actioner.submitting}
+                      toggleSpam={toggleSpam}
+                    >
+                      <Snackbar
+                        id={"email-mark-error-" + props.id}
+                        severity="error"
+                        i18nDisplay={actioner.submitError}
+                        open={!!actioner.submitError}
+                        onClose={actioner.dismissError}
+                      />
+                    </ContentViewer>
+                  )
+                }}
+              </SubmitActioner>
+            ) : (
               <>
                 <Typography variant="h3" sx={style.subject}>
                   <View id="subject" />
@@ -1110,7 +1288,7 @@ export function EmailReader(props: IEmailReaderProps) {
                         )
                       }}
                     </SubmitActioner>
-                    <Link to={props.replyUrlResolver(props.id)}>
+                    {canReply ? <Link to={props.replyUrlResolver(props.id)}>
                       <I18nRead id="reply">
                         {(i18nReply: string) => (
                           <IconButton
@@ -1120,8 +1298,8 @@ export function EmailReader(props: IEmailReaderProps) {
                           </IconButton>
                         )}
                       </I18nRead>
-                    </Link>
-                    <Link to={props.replyAllUrlResolver(props.id)}>
+                    </Link> : null}
+                    {canReplyAll ? <Link to={props.replyAllUrlResolver(props.id)}>
                       <I18nRead id="reply_all">
                         {(i18nReplyAll: string) => (
                           <IconButton
@@ -1131,7 +1309,7 @@ export function EmailReader(props: IEmailReaderProps) {
                           </IconButton>
                         )}
                       </I18nRead>
-                    </Link>
+                    </Link> : null}
                     <Link to={props.forwardUrlResolver(props.id)}>
                       <I18nRead id="forward">
                         {(i18nForward: string) => (
@@ -1236,7 +1414,27 @@ export function EmailReader(props: IEmailReaderProps) {
                                           }
 
                                           // remove repeating and self
-                                          const allTargets = target.concat([source]).filter((t, index, arr) => arr.indexOf(t) === index && t !== userData.id);
+                                          const allTargets = target.concat(source ? [source] : [])
+                                            // remove repeats and own user
+                                            .filter((t, index, arr) => arr.indexOf(t) === index && t !== userData.id)
+                                            // remove objects from reply all
+                                            .filter((t) => {
+                                              // chck the type to see if it's allowed
+                                              if (!t.includes("@") && t.includes("$")) {
+                                                const type = t.split("$")[1];
+                                                const isAllowedByType = ((props.objectsAllowedReplyAll || []).includes(type));
+                                                if (!isAllowedByType) {
+                                                  return false;
+                                                }
+                                              }
+
+                                              // check the blacklist
+                                              if (!props.replyAllBlacklist) {
+                                                return true;
+                                              }
+
+                                              return !props.replyAllBlacklist.includes(t);
+                                            });
 
                                           // we got nothing as a result, we must be sending a message to ourselves
                                           // this is the fallback so that even with a simple reply it still works
@@ -1286,29 +1484,64 @@ export function EmailReader(props: IEmailReaderProps) {
               );
             }
 
+            if (props.WrapperUser) {
+              const WrapperUser = props.WrapperUser;
+              let oldUser = userContent;
+              userContent = (
+                <WrapperUser>
+                  {oldUser}
+                </WrapperUser>
+              );
+            }
+
+            let spamWarning = (
+              spam ?
+                (
+                  <Alert severity="warning" sx={style.spamWarning} role="note">
+                    <I18nRead id="spam_warning" />
+                  </Alert>
+                ) : null
+            );
+
+            if (spamWarning && props.WrapperSpamWarning) {
+              const WrapperSpam = props.WrapperSpamWarning;
+              let oldSpam = spamWarning;
+              spamWarning = (
+                <WrapperSpam>
+                  {oldSpam}
+                </WrapperSpam>
+              );
+            }
+
             return (
               <>
+                {
+                  props.setAsTitle ? (
+                    <Reader id={props.setAsTitle} useAppliedValue={true}>
+                      {(v: string | IPropertyDefinitionSupportedTextType) => {
+                        if (typeof v === "string") {
+                          return <TitleSetter>{v}</TitleSetter>;
+                        } else if (v && v.value) {
+                          return <TitleSetter>{v.value}</TitleSetter>;
+                        } else {
+                          return <TitleSetter>{""}</TitleSetter>;
+                        }
+                      }}
+                    </Reader>
+                  ) : null
+                }
+                {submitRead}
+                {userContent}
+                {spamWarning}
+                {content}
                 {parentId ? (
                   <EmailReader
                     {...props}
                     replying={null}
                     id={parentId}
+                    setAsTitle={null}
                   />
                 ) : null}
-
-                {submitRead}
-                {userContent}
-
-                {
-                  spam ?
-                    (
-                      <Alert severity="warning" sx={style.spamWarning} role="note">
-                        <I18nRead id="spam_warning" />
-                      </Alert>
-                    ) : null
-                }
-
-                {content}
               </>
             );
           }}

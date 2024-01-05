@@ -29,6 +29,7 @@ import { IVoidBlock, registerVoidBlock } from "./types/void-block";
 import { IVoidSuperBlock, registerVoidSuperBlock } from "./types/void-superblock";
 import { IVoidInline, registerVoidInline } from "./types/void-inline";
 import type { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
+import { IUnmanaged, registerUnmanaged } from "./types/unmanaged";
 
 /**
  * Represents a basic deserialization function that takes a
@@ -188,6 +189,12 @@ export interface ISerializationRegistryType {
      * This is for the text element
      */
     text: (n: Node) => IText;
+    /**
+     * Unknown element
+     * @param n 
+     * @returns 
+     */
+    unmanaged: (n: HTMLElement) => IUnmanaged;
   };
 
   /**
@@ -316,6 +323,7 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
     byClassNamePrefix: {},
     byTag: {},
     text: null,
+    unmanaged: null,
   },
   ALLOWS_CHILDREN: {},
   PROHIBIT_TEXT: {},
@@ -353,6 +361,7 @@ registerListItem(SERIALIZATION_REGISTRY);
 registerTableElements(SERIALIZATION_REGISTRY);
 registerVoidBlock(SERIALIZATION_REGISTRY);
 registerVoidInline(SERIALIZATION_REGISTRY);
+registerUnmanaged(SERIALIZATION_REGISTRY);
 
 SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.document = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.container;
 SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.document = SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.container;
@@ -722,7 +731,8 @@ export interface IRootLevelDocument {
  * but it's not a text
  */
 export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
-  IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITfoot | ITd | ITh | IVoidBlock | IVoidInline | IVoidSuperBlock;
+  IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITfoot | ITd |
+  ITh | IVoidBlock | IVoidInline | IVoidSuperBlock | IUnmanaged;
 
 /**
  * This is the text namespace, and it's used in uuid for creating
@@ -1506,7 +1516,23 @@ function internalNormalizeElement(
       SERIALIZATION_REGISTRY.PROHIBIT_TEXT[type]
     );
 
-    if (typeof (v as IText).text === "string") {
+    if (element.type === "unmanaged") {
+      if (element.tagName === "br") {
+        primaryExecution.updateNodeAt(
+          childrenPath,
+          { tagName: undefined, type: "paragraph", children: [STANDARD_TEXT_NODE()] } as any,
+        );
+        secondaryExecution && secondaryExecution.updateNodeAt(
+          childrenPath,
+          { tagName: undefined, type: "paragraph", children: [STANDARD_TEXT_NODE()] } as any,
+        );
+      } else {
+        // delete unmanaged nodes during normalization
+        primaryExecution.deleteNodeAt(childrenPath);
+        secondaryExecution && secondaryExecution.deleteNodeAt(childrenPath);
+        offset -= 1;
+      }
+    } else if (typeof (v as IText).text === "string") {
       if (cannotHaveTextAsChildren) {
         const wrapper = (
           SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH[type] ?
@@ -2064,6 +2090,8 @@ function deserializeElement(
     // and there's a raw tag catcher, then let's use that one
     if (!raw && SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName]) {
       raw = SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName](node) as any;
+    } else {
+      raw = SERIALIZATION_REGISTRY.DESERIALIZE.unmanaged(node as HTMLElement);
     }
   }
 
