@@ -412,7 +412,24 @@ export function serializeElementBase(
   return elementComponent;
 }
 
-const VOID_TAGS_UNMANAGED = ["br"];
+const VOID_TAGS_UNMANAGED = [
+  "br",
+  "hr",
+  "area",
+  "base",
+  "col",
+  "command",
+  "embed",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+];
 
 /**
  * Reactifies an element so that it can be given its react

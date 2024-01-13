@@ -8,20 +8,6 @@ import React from "react";
 import { IPropertyViewFileRendererProps } from "../../../internal/components/PropertyView/PropertyViewFile";
 import Box from "@mui/material/Box";
 
-// check for whether the current environment supports lazyload standard loading form
-// because of SSR we must check for document
-const supportsBasicLoadingProperty = typeof document !== "undefined" ? !!(document.createElement("img") as any).loading : false;
-
-/**
- * The state for the file
- */
-interface IPropertyViewFileRendererState {
-  /**
-   * Basically when the image is loaded
-   */
-  loaded: boolean;
-}
-
 /**
  * The property view file renderer will show a file, and if it's an image
  * it will show as an image with all lazyloading and all
@@ -35,154 +21,7 @@ interface IPropertyViewFileRendererState {
  * - imageSizes: the image sizes for the sizes attribute for the image, default 70vw
  * - lazyLoad: whether to use lazyloading for images alone
  */
-export default class PropertyViewFileRenderer extends React.Component<IPropertyViewFileRendererProps, IPropertyViewFileRendererState> {
-  /**
-   * whether the scroll event is actually attached
-   */
-  private isScrollEventAttached: boolean = false;
-  /**
-   * The image reference
-   */
-  private refImg: React.RefObject<HTMLImageElement>;
-  /**
-   * Intersection observer to see when the element pops into view, if necessary
-   */
-  private io: IntersectionObserver;
-
-  /**
-   * Builds the renderer
-   * @param props the handler passed props
-   */
-  constructor(props: IPropertyViewFileRendererProps) {
-    super(props);
-
-    this.refImg = React.createRef<HTMLImageElement>();
-
-    // loaded represents the properties src and srcset when using native
-    // image loading it's unecessary to have them removed as the browser
-    // will handle it natively
-    this.state = {
-      loaded: this.props.args.lazyLoad ? false : true,
-    }
-  }
-
-  /**
-   * Attach the scroll event, only necessary for traditional
-   * lazyloading
-   */
-  public attachScrollEvent() {
-    // if we don't have a scroll event
-    if (!this.isScrollEventAttached) {
-      // we add it
-      this.isScrollEventAttached = true;
-      document.body.addEventListener("scroll", this.checkWhetherInViewOldSchool);
-    }
-  }
-
-  /**
-   * Removes the attached scroll event for lazyloading
-   */
-  public removeScrollEvent() {
-    if (this.isScrollEventAttached) {
-      this.isScrollEventAttached = false;
-      document.body.removeEventListener("scroll", this.checkWhetherInViewOldSchool);
-    }
-  }
-
-  /**
-   * Old school way to check if an element is in view
-   */
-  public checkWhetherInViewOldSchool() {
-    const bounding = this.refImg.current.getBoundingClientRect();
-    const isInView = (
-      bounding.top >= 0 &&
-      bounding.left >= 0 &&
-      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-
-    // if it's in view we set it as loaded
-    if (isInView) {
-      this.setState({ loaded: true });
-      this.removeScrollEvent();
-    } else {
-      this.attachScrollEvent();
-    }
-  }
-
-  /**
-   * Intersection observer way to check if the image is in view
-   */
-  public setupIntersectionObserver() {
-    const target = this.refImg.current;
-    if (!target) {
-      this.setState({
-        loaded: true,
-      });
-      return;
-    }
-    this.io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          this.setState({
-            loaded: true,
-          });
-          this.io.unobserve(target);
-          // this one is disposable
-          this.io.disconnect();
-          this.io = null;
-        }
-      });
-    });
-    this.io.observe(target);
-  }
-
-  /**
-   * Remove the intersection observer if it exist
-   * it might have never been triggered
-   */
-  public removeIntersectionObserver() {
-    if (this.io) {
-      this.io.disconnect();
-    }
-  }
-
-  /**
-   * Now when the element mounts
-   */
-  public componentDidMount() {
-    // we can't know if supports image loading is valid via lazy yet because the constructor
-    // can run within SSR, so we need to do it here
-    const supportsBasicLoadingPropertyAndWantsToLazyLoad = this.props.args.lazyLoad && supportsBasicLoadingProperty;
-    if (supportsBasicLoadingPropertyAndWantsToLazyLoad && !this.state.loaded) {
-      // this will set all srcs and since loading is lazy already
-      // it should be fine
-      this.setState({
-        loaded: true,
-      });
-    }
-    if (this.props.args.lazyLoad) {
-      if (!(window as any).IntersectionObserver && !supportsBasicLoadingProperty) {
-        this.checkWhetherInViewOldSchool();
-      } else if ((window as any).IntersectionObserver && !supportsBasicLoadingProperty) {
-        this.setupIntersectionObserver();
-      }
-    }
-  }
-  public componentDidUpdate(prevProps: IPropertyViewFileRendererProps) {
-    // if now we want to lazyload but we didn't want before
-    if (this.props.args.lazyLoad && !prevProps.args.lazyLoad && !this.state.loaded) {
-      if (!(window as any).IntersectionObserver && !supportsBasicLoadingProperty) {
-        this.checkWhetherInViewOldSchool();
-      } else if ((window as any).IntersectionObserver && !supportsBasicLoadingProperty) {
-        this.setupIntersectionObserver();
-      }
-    }
-  }
-  public componentWillUnmount() {
-    this.removeScrollEvent();
-    this.removeIntersectionObserver();
-  }
+export default class PropertyViewFileRenderer extends React.Component<IPropertyViewFileRendererProps> {
   public render() {
     if (!this.props.currentValue) {
       if (this.props.args.nullNode) {
@@ -205,11 +44,10 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
       const img = (
         <Box
           component="img"
-          ref={this.refImg}
-          srcSet={!this.state.loaded ? null : this.props.imageSrcSet}
+          srcSet={this.props.imageSrcSet}
           sizes={imageSizes}
           data-src={this.props.currentValue.url}
-          src={!this.state.loaded ? null : this.props.currentValue.url}
+          src={this.props.currentValue.url}
           className={imageClassName}
           sx={this.props.args.imageSx}
           loading={this.props.args.lazyLoad ? "lazy" : null}
@@ -257,6 +95,7 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
                 src={this.props.currentValue.url}
                 className="thumbnail"
                 alt={this.props.currentValue.name}
+                loading={this.props.args.lazyLoad ? "lazy" : null}
               />
             ) : (
               <span className="file-icon">

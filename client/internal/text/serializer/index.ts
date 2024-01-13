@@ -2045,6 +2045,19 @@ export function checkShouldMerge(n1: RichElement | IText, n2: RichElement | ITex
 }
 
 /**
+ * Even when it should all be sanitized this will help
+ * prevent further issues regarding safety and resilliant
+ * adds redundance
+ */
+const FORBIDDEN_UNMANAGED_TAGS = [
+  "script",
+  "keygen",
+  "embed",
+  "param",
+  "wbr",
+];
+
+/**
  * Deserializes a single element from its node into a rich element
  * or a text
  * @returns a RichElement or a text node 
@@ -2090,7 +2103,7 @@ function deserializeElement(
     // and there's a raw tag catcher, then let's use that one
     if (!raw && SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName]) {
       raw = SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName](node) as any;
-    } else {
+    } else if (!FORBIDDEN_UNMANAGED_TAGS.includes(tagName)) {
       raw = SERIALIZATION_REGISTRY.DESERIALIZE.unmanaged(node as HTMLElement);
     }
   }

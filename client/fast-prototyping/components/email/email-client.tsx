@@ -309,6 +309,11 @@ export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderP
    */
   WrapperSpamWarning?: React.ComponentType<IWrapperComponentProps>;
   /**
+   * Spam warning to use inside the warning object
+   * defaults to <I18nRead id="spam_warning" />
+   */
+  spamWarning?: React.ReactNode;
+  /**
    * Wrapper component to used inside of the content
    */
   WrapperUser?: React.ComponentType<IWrapperComponentProps>;
@@ -1349,11 +1354,7 @@ export function EmailReader(props: IEmailReaderProps) {
 
             if (props.replying) {
               const senderArgs = {
-                emailUrlResolver: props.emailUrlResolver,
-                userInvalidLabel: props.userInvalidLabel,
-                userNameProperties: props.userNameProperties,
-                objectsInvalidLabel: props.objectsInvalidLabel,
-                objectsNameResolver: props.objectsNameResolver,
+                ...props,
                 replyOf: props.id,
               }
               const replyObject = props.replying === "forward" ? (
@@ -1498,7 +1499,7 @@ export function EmailReader(props: IEmailReaderProps) {
               spam ?
                 (
                   <Alert severity="warning" sx={style.spamWarning} role="note">
-                    <I18nRead id="spam_warning" />
+                    {props.spamWarning || <I18nRead id="spam_warning" />}
                   </Alert>
                 ) : null
             );
