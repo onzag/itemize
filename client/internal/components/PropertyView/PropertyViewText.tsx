@@ -8,9 +8,10 @@ import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
-import { sanitize } from "../../../internal/text";
+import { sanitize } from "@onzag/itemize-text-engine/sanitizer";
 import { deepRendererArgsComparer } from "../general-fn";
 import { applyHighlights } from "./highlights";
+import { fileResolver } from "../PropertyEntry/PropertyEntryText";
 
 /**
  * The property view renderer props as it requires the properties
@@ -104,15 +105,19 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
 
       currentValueText = sanitize(
         {
-          cacheFiles: this.props.cacheFiles,
-          config: this.props.config,
-          containerId: this.props.containerId,
-          currentFiles,
-          forId: this.props.forId,
-          forVersion: this.props.forVersion,
-          include: this.props.include,
-          itemDefinition: this.props.itemDefinition,
-          mediaProperty,
+          fileResolver: fileResolver.bind(
+            null,
+            this.props.config,
+            currentFiles,
+            this.props.itemDefinition,
+            this.props.forId,
+            this.props.forVersion || null,
+            this.props.containerId,
+            this.props.include,
+            mediaProperty,
+            this.props.cacheFiles,
+          ),
+          imageFail: "/rest/resource/image-fail.svg",
         },
         {
           supportsFiles,

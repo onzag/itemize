@@ -12,10 +12,14 @@ import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupporte
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
-import { IFeatureSupportOptions, sanitize } from "@onzag/itemize-text-engine";
+import { IFeatureSupportOptions, sanitize } from "@onzag/itemize-text-engine/sanitizer";
+import { IWrapperI18nRichTextInfo } from "@onzag/itemize-text-engine/editor/slate/wrapper";
 import { deepRendererArgsComparer } from "../general-fn";
 import type { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { imageSrcSetRetriever } from "../../../components/util";
+import type { IConfigRawJSONDataType } from "../../../../config";
+import type ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
+import type Include from "../../../../base/Root/Module/ItemDefinition/Include";
 
 function canRestoreCalculator(v: IPropertyDefinitionSupportedTextType, v2: IPropertyDefinitionSupportedTextType) {
   if (v === v2) {
@@ -36,6 +40,49 @@ function canRestoreCalculator(v: IPropertyDefinitionSupportedTextType, v2: IProp
   return language1 !== language2 || value1 !== value2;
 }
 
+export function fileResolver(
+  config: IConfigRawJSONDataType,
+  currentFiles: PropertyDefinitionSupportedFilesType,
+  itemDefinition: ItemDefinition,
+  forId: string,
+  forVersion: string,
+  containerId: string,
+  include: Include,
+  mediaProperty: PropertyDefinition,
+  cacheFiles: boolean,
+  fileId: string,
+  isImage: boolean,
+  node: HTMLElement,
+) {
+  const currentFileIndex = currentFiles ? currentFiles.findIndex((f) => f.id === fileId) : -1;
+  const currentFile = currentFileIndex !== -1 ? currentFiles[currentFileIndex] : null;
+
+  if (!currentFile) {
+    return null;
+  }
+
+  const domain = process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
+  const absolutedFile = fileURLAbsoluter(
+    domain,
+    config.containersHostnamePrefixes,
+    currentFile,
+    itemDefinition,
+    forId,
+    forVersion || null,
+    containerId,
+    include,
+    mediaProperty,
+    cacheFiles,
+    false,
+  );
+
+  const srcset = isImage ? imageSrcSetRetriever(absolutedFile, mediaProperty) : null;
+
+  return {
+    src: absolutedFile.url,
+    srcset,
+  };
+}
 
 /**
  * Information about the file that has just been inserted
@@ -79,11 +126,7 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * For rich text contains the information about
    * building the standard toolbar that is expected
    */
-  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
-  /**
-   * The i18n root
-   */
-  i18nRoot: any;
+  i18nRichInfo: IWrapperI18nRichTextInfo;
 
   /**
    * Rich text features
@@ -94,17 +137,6 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * Whether it is rich text
    */
   isRichText: boolean;
-
-  /**
-   * A generic error that is included for building the interface
-   * you can use to show a dialog for when the loading of file
-   * has failed and show this error
-   */
-  i18nGenericError: string;
-  /**
-   * A localized version of ok
-   */
-  i18nOk: string;
   /**
    * A localized version of an error for the last loaded file
    * that failed to load, try to dismiss it before attempting
@@ -821,15 +853,19 @@ export default class PropertyEntryText
 
       currentValueText = sanitize(
         {
-          cacheFiles: this.props.cacheFiles,
-          config: this.props.config,
-          containerId: this.props.containerId,
-          currentFiles,
-          forId: this.props.forId,
-          forVersion: this.props.forVersion,
-          include: this.props.include,
-          itemDefinition: this.props.itemDefinition,
-          mediaProperty: this.cachedMediaProperty,
+          fileResolver: fileResolver.bind(
+            null,
+            this.props.config,
+            currentFiles,
+            this.props.itemDefinition,
+            this.props.forId,
+            this.props.forVersion || null,
+            this.props.containerId,
+            this.props.include,
+            this.cachedMediaProperty,
+            this.props.cacheFiles,
+          ),
+          imageFail: "/rest/resource/image-fail.svg",
         },
         features,
         currentValueText,
@@ -904,7 +940,6 @@ export default class PropertyEntryText
 
       autoFocus: this.props.autoFocus || false,
 
-      i18nRoot,
       i18nRichInfo: isRichText ? {
         formatBoldLabel: i18nInLanguage.format_bold,
         formatItalicLabel: i18nInLanguage.format_italic,
@@ -1027,10 +1062,10 @@ export default class PropertyEntryText
         richContainers: i18nRoot.rich_containers || {},
         richCustoms: i18nRoot.rich_customs || {},
         richTables: i18nRoot.rich_tables || {},
-      } : null,
 
-      i18nGenericError: i18nInLanguage.generic_error,
-      i18nOk: i18nInLanguage.ok,
+        genericError: i18nInLanguage.generic_error,
+        ok: i18nInLanguage.ok,
+      } : null,
 
       features,
       isRichText,
