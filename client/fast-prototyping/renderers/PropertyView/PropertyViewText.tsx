@@ -10,14 +10,13 @@ import {
   IPropertyViewTextRendererProps,
 } from "../../../internal/components/PropertyView/PropertyViewText";
 import React from "react";
-import { DOMWindow } from "../../../../util";
+import { DOMWindow } from "@onzag/itemize-text-engine/serializer/dom";
 import equals from "deep-equal";
-import { renderTemplateDynamically } from "../../../internal/text";
-import type { TemplateArgs } from "../../../internal/text/serializer/template-args";
-import type { IImage } from "../../../internal/text/serializer/types/image";
-import { deserialize, deserializePlain, IRootLevelDocument } from "../../../internal/text/serializer";
-import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
-import type { RichElement } from "../../../internal/text/serializer";
+import { renderTemplateDynamically } from "@onzag/itemize-text-engine/renderer"
+import type { TemplateArgs } from "@onzag/itemize-text-engine/serializer/template-args";
+import { deserialize, deserializePlain, IRootLevelDocument } from "@onzag/itemize-text-engine/serializer";
+import { IText } from "@onzag/itemize-text-engine/serializer/types/text";
+import type { RichElement } from "@onzag/itemize-text-engine/serializer";
 
 /**
  * The current intersection observer

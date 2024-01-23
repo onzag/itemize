@@ -1,4 +1,4 @@
-@import "./rich.scss";
+@import "@onzag/itemize-text-engine/css/original.scss";
 
 @mixin prefix($property, $prefixes, $values...) {
   @each $prefix in $prefixes {

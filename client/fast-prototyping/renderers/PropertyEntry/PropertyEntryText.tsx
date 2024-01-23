@@ -10,8 +10,7 @@
  */
 import React from "react";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import { SlateEditor } from "../../components/slate";
-import { MaterialUISlateWrapper } from "../../components/slate/wrapper";
+import { ISlateEditorElementWrappers, SlateEditor } from "@onzag/itemize-text-engine/editor/slate";
 
 import { capitalize } from "../../../../util";
 import Alert from '@mui/material/Alert';
@@ -21,7 +20,13 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import ClearIcon from "@mui/icons-material/Clear";
 import Box from "@mui/material/Box";
 import { RestoreIconButton } from "./general";
-import { materialUIElementWrappers } from "../../components/slate/element-wrappers";
+import { MaterialUISlateWrapper } from "../../components/slate/wrapper";
+import { materialUIElementWrappersProps } from "../../components/slate/element-wrappers";
+import { FILE_SUPPORTED_IMAGE_TYPES, LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
+import { defaultElementWrappers } from "@onzag/itemize-text-engine/editor/slate/element-wrappers";
+import { IFeatureSupportOptions } from "@onzag/itemize-text-engine/sanitizer";
+
+const supportedJoined = FILE_SUPPORTED_IMAGE_TYPES.join(",");
 
 /**
  * A simple helper function that says when it should show invalid
@@ -126,6 +131,15 @@ interface IPropertyEntryTextRendererState {
  * The class that does the magic
  */
 class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRendererProps, IPropertyEntryTextRendererState> {
+  private currentElementWrappers: ISlateEditorElementWrappers = null;
+  private currentElementWrappersSrc: any = null;
+
+  private currentElementWrappersArgs: any = null;
+  private currentElementWrappersArgsSrc: any = null;
+
+  private currentFeatures: IFeatureSupportOptions = null;
+  private currentFeaturesSrc: IFeatureSupportOptions = null;
+
   constructor(props: IPropertyEntryTextRendererProps) {
     super(props);
 
@@ -192,9 +206,12 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
 
     // extending element wrappers
-    let elementWrappers = materialUIElementWrappers;
-    if (this.props.args.elementWrappers) {
-      elementWrappers = { ...elementWrappers };
+    let elementWrappers = this.currentElementWrappers;
+    // basically a memoing hack
+    if (!elementWrappers || this.currentElementWrappersSrc !== this.props.args.elementWrappers) {
+      this.currentElementWrappersSrc = this.props.args.elementWrappers;
+
+      elementWrappers = { ...defaultElementWrappers };
       Object.keys(this.props.args.elementWrappers).forEach((k) => {
         if (elementWrappers[k]) {
           elementWrappers[k] = { ...elementWrappers[k] };
@@ -205,20 +222,39 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
           elementWrappers[k] = this.props.args.elementWrappers[k];
         }
       });
+
+      this.currentElementWrappers = elementWrappers;
+    }
+
+    // another memoing hack
+    // should prevent useless updates with this expensive editor
+    let elementWrappersArgs = this.currentElementWrappersArgs;
+    if (!elementWrappersArgs || this.currentElementWrappersArgsSrc !== this.props.args.elementWrappersArgs) {
+      this.currentElementWrappersArgsSrc = this.props.args.elementWrappersArgs;
+      elementWrappersArgs = { ...materialUIElementWrappersProps, ...this.props.args.elementWrappersArgs };
+      this.currentElementWrappers = elementWrappersArgs;
+    }
+
+    // another memoing hack
+    let currentFeatures = this.currentFeatures;
+    if (!currentFeatures || this.currentFeaturesSrc !== this.props.args.features) {
+      this.currentFeaturesSrc = this.props.args.features;
+      currentFeatures = this.props.args.features ? { ...this.props.features, ...this.props.args.features } : this.props.features;
+      this.currentFeatures = currentFeatures;
     }
 
     const editor =
       <SlateEditor
         id={this.props.uniqueId}
-        features={this.props.args.features ? { ...this.props.features, ...this.props.args.features } : this.props.features}
+        features={currentFeatures}
         value={this.props.currentValueText}
         autoFocus={this.props.autoFocus}
-        currentValue={this.props.currentInternalValue}
+        treeValue={this.props.currentInternalValue}
         onChange={this.onChange}
-        onInsertFile={this.props.onInsertFile}
-        onInsertFileFromURL={this.props.onInsertFileFromURL}
-        onRetrieveFile={this.props.onRetrieveFile}
-        onRetrieveImage={this.props.onRetrieveImage}
+        onInsertFile={this.props.onInsertFile as any}
+        onInsertFileFromURL={this.props.onInsertFileFromURL as any}
+        onRetrieveFile={this.props.onRetrieveFile as any}
+        onRetrieveImage={this.props.onRetrieveImage as any}
         // onRetrieveDataURI={this.props.onRetrieveDataURI}
         isRichText={this.props.isRichText}
         onFocus={this.onFocus}
@@ -231,27 +267,15 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
         elementWrappers={elementWrappers as any}
-        elementWrappersArgs={
-          {
-            i18nGenericError: this.props.i18nGenericError,
-            i18nOk: this.props.i18nOk,
-            i18nRichInfo: this.props.i18nRichInfo,
-            ...this.props.args.elementWrapperArgs,
-          }
-        }
-        rootI18n={this.props.i18nRoot}
+        elementWrappersArgs={this.props.args.elementWrappersArgs}
+        baseI18n={this.props.i18nRichInfo}
         placeholder={this.props.placeholder}
         disabled={this.props.disabled}
-        wrapperArgs={
-          {
-            i18nGenericError: this.props.i18nGenericError,
-            i18nOk: this.props.i18nOk,
-            i18nRichInfo: this.props.i18nRichInfo,
-            ...this.props.args.wrapperArgs,
-          }
-        }
+        wrapperArgs={this.props.args.wrapperArgs}
         scrollMarginTop={this.props.args.scrollMarginTop}
         lang={this.props.currentValueLang}
+        supportedImageTypes={supportedJoined}
+        cacheStoreCountGlobal={LAST_RICH_TEXT_CHANGE_LENGTH}
       />
 
     if (this.props.args.disjointedMode) {
