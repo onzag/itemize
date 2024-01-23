@@ -12,7 +12,7 @@ import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupporte
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
-import { IFeatureSupportOptions, sanitize } from "../../../internal/text";
+import { IFeatureSupportOptions, sanitize } from "@onzag/itemize-text-engine";
 import { deepRendererArgsComparer } from "../general-fn";
 import type { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { imageSrcSetRetriever } from "../../../components/util";
@@ -57,140 +57,6 @@ export interface IInsertedFileInformationType {
    * whether it is an image
    */
   isImage: boolean;
-}
-
-export interface IPropertyEntryI18nRichTextInfo {
-  formatBoldLabel: string;
-  formatItalicLabel: string;
-  formatUnderlineLabel: string;
-  formatLinkLabel: string;
-  formatTitleLabel: string;
-  formatQuoteLabel: string;
-  formatListNumberedLabel: string;
-  formatListBulletedLabel: string;
-  formatAddImageLabel: string;
-  formatAddVideoLabel: string;
-  formatAddFileLabel: string;
-  formatAddContainerLabel: string;
-  formatAddTableLabel: string;
-  formatAddTheadLabel: string;
-  formatAddTbodyLabel: string;
-  formatAddTfootLabel: string;
-  formatAddTrLabel: string;
-  formatAddTdLabel: string;
-  formatAddThLabel: string;
-  formatDelTrLabel: string;
-  formatDelTdLabel: string;
-  formatDelThLabel: string;
-  formatAddCustomLabel: string;
-  formatSetStyleLabel: string;
-  formatSetHoverStyleLabel: string;
-  formatSetActiveStyleLabel: string;
-  formatSetClassLabel: string;
-  formatSetEventHandlers: string;
-  formatSetContext: string;
-  formatSetRenderCondition: string;
-  formatMakeLoop: string;
-  formatSetUIHandlerLabel: string;
-  formatSetUIHandlerArgLabel: string;
-  formatSetUIHandlerArgName: string;
-  formatSetUIHandlerArgValue: string;
-  formatAddTemplateText: string;
-  formatAddTemplateHTML: string;
-  formatDeleteElement: string;
-  formatMore: string;
-
-  name: string;
-  alt: string;
-  sizes: string;
-  container: string;
-  inline: string;
-  text: string;
-  custom: string;
-  file: string;
-  image: string;
-  link: string;
-  list: string;
-  listItem: string;
-  paragraph: string;
-  quote: string;
-  title: string;
-  table: string;
-  thead: string;
-  tbody: string;
-  tfoot: string;
-  tr: string;
-  td: string;
-  th: string;
-  video: string;
-  styled: string;
-  template: string;
-  interactive: string;
-  style: string;
-  styleActive: string;
-  styleHover: string;
-  classes: string;
-  settings: string;
-  styles: string;
-  templating: string;
-  actions: string;
-  each: string;
-  context: string;
-  renderCondition: string;
-  uiHandler: string;
-  type: string;
-  standalone: string;
-
-  loadVideo: {
-    invalid: string;
-    label: string;
-    placeholder: string;
-    title: string;
-    submit: string;
-  };
-
-  setLink: {
-    invalid: string;
-    label: string;
-    placeholder: string;
-    placeholderLocalOnly: string;
-    templated: string;
-    templatedLabel: string;
-    templatedPlaceholder: string;
-    templatedUnspecified: string;
-    title: string;
-    submit: string;
-  };
-
-  addTemplateText: {
-    title: string;
-    label: string;
-    placeholder: string;
-    submit: string;
-  };
-
-  addTemplateHTML: {
-    title: string;
-    label: string;
-    placeholder: string;
-    submit: string;
-  };
-
-  richUIHandlerElement: {
-    [key: string]: string;
-  };
-  richTables: {
-    [key: string]: string;
-  };
-  richContainers: {
-    [key: string]: string;
-  };
-  richClasses: {
-    [key: string]: string;
-  };
-  richCustoms: {
-    [key: string]: string;
-  };
 }
 
 /**

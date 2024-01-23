@@ -5,8 +5,6 @@
  */
 
 import MomentDef from "moment";
-import { JSDOM as JSDOMDef } from "jsdom";
-import createDOMPurify from "dompurify";
 import { DATETIME_FORMAT, DATE_FORMAT, FILE_SUPPORTED_IMAGE_TYPES, TIME_FORMAT } from "./constants";
 import { IRQFile } from "./rq-querier";
 import ItemDefinition from "./base/Root/Module/ItemDefinition";
@@ -23,7 +21,6 @@ import prettyBytes from "pretty-bytes";
 import type { IConfigRawJSONDataType } from "./config";
 
 export const Moment = MomentDef;
-export const JSDOM = JSDOMDef;
 
 /**
  * @ignore
@@ -928,6 +925,3 @@ export function isLibReady(id: string): boolean {
   const element = document.getElementById(id);
   return !!(element && element.dataset.loading !== "true");
 }
-
-export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
-export const DOMPurify = createDOMPurify(DOMWindow);
