@@ -24,7 +24,6 @@ import {
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
 import { EndpointError } from "../../../../errors";
-import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
 import { IRQFile, IRQRequestFields } from "../../../../../rq-querier";
 import Include from "../Include";
@@ -33,6 +32,7 @@ import type { PropertyDefinitionSupportedFilesType } from "./types/files";
 import type { PropertyDefinitionSupportedFileType } from "./types/file";
 import type { IPropertyDefinitionSupportedTextType } from "./types/text";
 import { validateRQShape } from "./rq";
+import { DOMWindow } from "@onzag/itemize-text-engine/serializer/dom";
 
 /**
  * These are the main errors a property is able to give
