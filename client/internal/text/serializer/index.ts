@@ -2103,7 +2103,7 @@ function deserializeElement(
     // and there's a raw tag catcher, then let's use that one
     if (!raw && SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName]) {
       raw = SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName](node) as any;
-    } else if (!FORBIDDEN_UNMANAGED_TAGS.includes(tagName)) {
+    } else if (!raw && !FORBIDDEN_UNMANAGED_TAGS.includes(tagName)) {
       raw = SERIALIZATION_REGISTRY.DESERIALIZE.unmanaged(node as HTMLElement);
     }
   }
