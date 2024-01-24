@@ -836,7 +836,7 @@ export function reactifyElementBase(
   }
 
   // if we have a function to wrap children
-  if (wrapChildren && finalProps.children) {
+  if (wrapChildren) {
     // that's what we use as children
     finalProps.children = wrapChildren(finalProps.children);
   }

@@ -150,9 +150,6 @@ function AccessibleImage(props: IAccessibleImageProps) {
   delete newProps.i18nLabelContext;
   delete newProps.i18nLabelId;
 
-  // image nonsense
-  delete newProps.children;
-
   const Tag = props.Tag as any;
 
   if (props.styleActive || props.styleHover) {

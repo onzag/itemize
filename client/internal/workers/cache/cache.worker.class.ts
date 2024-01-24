@@ -223,8 +223,12 @@ function fixOneFile(
     return;
   }
 
-  file.url = URL.createObjectURL(file.src as Blob);
-  delete file.src;
+  try {
+    file.url = URL.createObjectURL(file.src as Blob);
+    delete file.src;
+  } catch (err) {
+    console.error("Could not resolve file src for", file);
+  }
 }
 
 export function fixFilesURLAt(

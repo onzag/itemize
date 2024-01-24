@@ -59,6 +59,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
       },
     }
   },
+  rqRepresentsFile: true,
 
   searchable: false,
   configOptions: [
