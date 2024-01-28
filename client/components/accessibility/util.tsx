@@ -1,14 +1,14 @@
-import { countWords } from "../../internal/text";
+import { hasWords } from "../../internal/text";
 import { IRootLevelDocument, RichElement } from "../../internal/text/serializer";
 import { ReactifiedElementWithHoverAndActive } from "../../internal/text/serializer/dynamic-component";
 import { IFile } from "../../internal/text/serializer/types/file";
 import { IImage } from "../../internal/text/serializer/types/image";
 import React, { useCallback } from "react";
 import AltText from "./AltText";
-import AltGroup from "./AltGroup";
 import { IText } from "../../internal/text/serializer/types/text";
-import { ILink } from "../../internal/text/serializer/types/link";
 import { useI18nRead } from "../localization/I18nRead";
+import { IWord } from "../../internal/text/serializer/types/segmenter-types/word";
+import { ISentence } from "../../internal/text/serializer/types/segmenter-types/sentence";
 
 export function onKeyDown(e: React.KeyboardEvent) {
   if (e.code === "Enter" || e.code === "Space") {
@@ -149,9 +149,6 @@ function AccessibleImage(props: IAccessibleImageProps) {
   delete newProps.priority;
   delete newProps.i18nLabelContext;
   delete newProps.i18nLabelId;
-
-  // image nonsense
-  delete newProps.children;
 
   const Tag = props.Tag as any;
 
@@ -299,6 +296,18 @@ function AccessibleFile(props: IAccessibleFileProps) {
   )
 }
 
+export interface ISentenceComponentProps {
+  index: number;
+  element: ISentence;
+  children: React.ReactNode;
+}
+
+export interface IWordComponentProps {
+  index: number;
+  element: IWord;
+  children: React.ReactNode;
+}
+
 interface IAccessibleFns {
   /**
    * When a link is clicked and it's external, what to do?
@@ -377,6 +386,16 @@ interface IAccessibleFns {
    * here as it is compatible
    */
   AltReactionerComponent: AltReactionerComponentType;
+  /**
+   * Used with segmented trees, allows to wrap the sentence in this
+   * instead of the default
+   */
+  SentenceComponent?: React.ComponentType<ISentenceComponentProps>;
+  /**
+   * Used with segmented trees, allows to wrap the word in this
+   * instead of the default
+   */
+  WordComponent?: React.ComponentType<IWordComponentProps>;
 }
 
 function accessibilityEnabledCustomTextProcesser(
@@ -389,41 +408,67 @@ function accessibilityEnabledCustomTextProcesser(
     styleHover?: any,
     defaultReturn: (extraProps?: any) => React.ReactNode,
     parent: RichElement | IRootLevelDocument,
+    trueParent: RichElement | IRootLevelDocument,
     tree: IRootLevelDocument,
+    wordNumber: number,
+    sentenceNumber: number,
   },
 ) {
+  // invlid list item that has orphaned children
+  const listItemOrphanedChildren = (
+    (element as RichElement).type === "list-item" &&
+    (element as RichElement).children.some((e) =>
+      (e as IText).text ||
+      (e as RichElement).type === "inline" ||
+      (e as RichElement).type === "link" ||
+      (e as RichElement).type === "sentence" ||
+      (e as RichElement).type === "word"
+    )
+  );
+
   if (
-    (
-      (element as RichElement).type === "paragraph" ||
-      (element as RichElement).type === "title" ||
-      (element as RichElement).type === "quote" ||
-
-      // CORRUPTED ELEEMNTS
-      // orphaned inline
+    listItemOrphanedChildren || (
       (
-        (element as RichElement).type === "inline" &&
-        info.parent.type !== "paragraph"
-      ) ||
+        (element as RichElement).type === "paragraph" ||
+        (element as RichElement).type === "title" ||
+        (element as RichElement).type === "quote" ||
 
-      // orphaned text that does not follow other criteria
-      (
-        (element as IText).text &&
-        // we expect text here
-        info.parent.type !== "paragraph" &&
-        info.parent.type !== "inline" &&
-        info.parent.type !== "link" &&
-        info.parent.type !== "quote" &&
-        info.parent.type !== "title" &&
+        // CORRUPTED ELEEMNTS
+        // orphaned inline
+        (
+          ((element as RichElement).type === "inline" || (element as RichElement).type === "link") &&
+          info.trueParent.type !== "paragraph" &&
+          // this is special as we check list items
+          // in case to see if they are containing direct children
+          // that are not selectable
+          info.trueParent.type !== "list-item"
+        ) ||
 
-        // what? but okay
-        info.parent.type !== "image" &&
-        info.parent.type !== "file" &&
-        info.parent.type !== "void-block" &&
-        info.parent.type !== "void-superblock" &&
-        info.parent.type !== "void-inline"
-      )
-    ) &&
-    countWords(element) !== 0
+        // orphaned text that does not follow other criteria
+        (
+          (element as IText).text &&
+          // we expect text here
+          info.trueParent.type !== "paragraph" &&
+          info.trueParent.type !== "inline" &&
+          info.trueParent.type !== "link" &&
+          info.trueParent.type !== "quote" &&
+          info.trueParent.type !== "title" &&
+
+          // this is special as we check list items
+          // in case to see if they are containing direct children
+          // that are not selectable
+          info.trueParent.type !== "list-item" &&
+
+          // what? but okay
+          info.trueParent.type !== "image" &&
+          info.trueParent.type !== "file" &&
+          info.trueParent.type !== "void-block" &&
+          info.trueParent.type !== "void-superblock" &&
+          info.trueParent.type !== "void-inline"
+        )
+      ) &&
+      hasWords(element)
+    )
   ) {
     if (info.styleActive || info.styleHover) {
       return (
@@ -453,13 +498,59 @@ function accessibilityEnabledCustomTextProcesser(
     );
   }
 
+  if ((element as RichElement).type === "word") {
+    if (fns.WordComponent) {
+      const WordComponent = fns.WordComponent;
+      return (
+        <WordComponent
+          element={element as any}
+          index={info.sentenceNumber}
+        >
+          {props.children}
+        </WordComponent>
+      );
+    }
+    return (
+      <span data-word-index={info.wordNumber} className="word">
+        {props.children}
+      </span>
+    );
+  }
+
+  if ((element as RichElement).type === "sentence") {
+    if (fns.SentenceComponent) {
+      const SentenceComponent = fns.SentenceComponent;
+      return (
+        <SentenceComponent
+          element={element as any}
+          index={info.sentenceNumber}
+        >
+          {props.children}
+        </SentenceComponent>
+      );
+    }
+    return (
+      <span data-sentence-index={info.sentenceNumber} className="sentence">
+        {props.children}
+      </span>
+    );
+  }
+
   if (
     (element as RichElement).type === "link"
   ) {
     // an empty link
     if (
-      (element as ILink).children[0].text === "" &&
-      (element as ILink).children.length === 1
+      (element as any).children[0].type === "word" ?
+        (
+          (element as any).children[0].children[0].text === "" &&
+          (element as any).children[0].children.length === 1 &&
+          (element as any).children.length === 1
+        ) :
+        (
+          (element as any).children[0].text === "" &&
+          (element as any).children.length === 1
+        )
     ) {
       return info.defaultReturn();
     }

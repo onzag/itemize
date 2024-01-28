@@ -1432,7 +1432,7 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
         data-priority={this.props.priority || 0}
         {...this.props.componentProps}
       >
-        {this.props.children}
+        {this.props.children || this.props.componentProps.children}
       </Element>
     );
   }

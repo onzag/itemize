@@ -391,6 +391,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
 
 interface ITemplatedPropertyViewRichTextRendererProps extends IPropertyViewRichTextViewerProps {
   templateArgs: TemplateArgs;
+  segmenter: SegmenterType,
 }
 
 /**
@@ -413,7 +414,7 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   }
   public render() {
     const deserializedValue = this.props.isRichText ?
-      deserialize(this.props.children, null, { dontNormalize: true }) :
+      deserialize(this.props.children, null, { dontNormalize: true, segmenter: this.props.segmenter }) :
       deserializePlain(this.props.children, null);
     const Node = this.props.Node;
     return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")} lang={this.props.lang} {...this.props.NodeProps}>
@@ -469,6 +470,7 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
           onCustomWrap={props.args.onCustomWrap}
           lang={props.args.overrideLanguage || props.currentValueLang}
           isRichText={props.isRichText}
+          segmenter={props.args.segmenter}
         >
           {props.currentValueText}
         </TemplatedPropertyViewRichTextRenderer>

@@ -90,7 +90,7 @@ function onAnyTab(ev: KeyboardEvent) {
   setTimeout(() => {
     const editorElement = EDITOR_POOL.get(document.activeElement as any);
     EDITOR_POOL.forEach((e) => e !== editorElement && e.selectiveHardBlurIfHasSelectedElement(ev, document.activeElement instanceof HTMLElement ?
-        document.activeElement : null));
+      document.activeElement : null));
     if (editorElement) {
       // maybe a way to keep the cursor where it was?....
       // it's kind of annoying that the cursor moves
@@ -1565,7 +1565,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // if we still have the element and it has children
     // we need to process those too
     if (newElement && newElement.children && !wasOverwritten) {
-      newElement = {...newElement};
+      newElement = { ...newElement };
       newElement.children = (
         await Promise.all((newElement.children as any).map(this.findAndInsertFilesFromDataTransfer.bind(this, data)))
       ).filter(e => !!e) as any;
@@ -2941,6 +2941,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // we don't care as we are not using the onCustom function
         parent: null,
         tree: null,
+        path: [],
+        accumulatedSentence: null,
+        accumulatedWord: null,
+        trueParent: null,
       }) as any;
 
       const contextSwichContext = this.getContextFor(element as any, "final", true);
@@ -3049,6 +3053,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // this will prevent normalization but that's fine
       parent: null,
       tree: null,
+      path: [],
+      accumulatedSentence: null,
+      accumulatedWord: null,
+      trueParent: null,
     }) as any;
   }
 
