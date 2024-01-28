@@ -259,14 +259,14 @@ export interface IToolbarPrescenseElement {
   /**
    * Alternatively an action
    */
-  onClick?: (defaultAction: () => RichElement, e: React.MouseEvent<HTMLElement>) => void;
+  onClick?: (defaultAction: () => RichElement, e: React.MouseEvent<HTMLElement>, helpers: IHelperFunctions) => void;
   /**
    * Handle refocus attempts during the click event
    * @param defaultAction 
    * @param e 
    * @returns 
    */
-  refocusHandler?: (defaultAction: () => void, e: React.MouseEvent<HTMLElement>) => void;
+  refocusHandler?: (defaultAction: () => void, e: React.MouseEvent<HTMLElement>, helpers: IHelperFunctions) => void;
   /**
    * Trigger on any keydown event
    * @param e 
@@ -481,6 +481,9 @@ export interface IMaterialUISlateWrapperProps extends ISlateEditorWrapperBasePro
   toolbarSx?: SxProps;
   /**
    * A function to define custom extra children
+   * 
+   * Note that this uses the default character count and word count algorithm
+   * which may not work in some languages
    */
   customExtraChildren?: (characterCount: number, wordCount: number) => React.ReactNode;
 
@@ -1109,11 +1112,11 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     tabIndex: -1,
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
       if (props.extra.refocusHandler) {
-        props.extra.refocusHandler(props.helpers.focus, e);
+        props.extra.refocusHandler(props.helpers.focus, e, props.helpers);
       } else {
         props.helpers.focus();
       }
-      props.extra.onClick ? props.extra.onClick(defaultAction, e) : defaultAction();
+      props.extra.onClick ? props.extra.onClick(defaultAction, e, props.helpers) : defaultAction();
     }
   }
 

@@ -30,6 +30,8 @@ import { IVoidSuperBlock, registerVoidSuperBlock } from "./types/void-superblock
 import { IVoidInline, registerVoidInline } from "./types/void-inline";
 import type { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { IUnmanaged, registerUnmanaged } from "./types/unmanaged";
+import { ISentence, registerSentence } from "./types/segmenter-types/sentence";
+import { IWord, registerWord } from "./types/segmenter-types/word";
 
 /**
  * Represents a basic deserialization function that takes a
@@ -54,7 +56,14 @@ export interface IReactifyExtraOptions {
    * 
    * return an object or null
    */
-  onCustomAttributesFor?: (element: RichElement | IText) => any;
+  onCustomAttributesFor?: (
+    element: RichElement | IText,
+    info: {
+      path: number[];
+      wordNumber?: number;
+      sentenceNumber?: number;
+    }
+  ) => any;
 
   /**
    * use this to modify how the element renders
@@ -68,12 +77,16 @@ export interface IReactifyExtraOptions {
     element: RichElement | IText,
     props: any,
     info: {
-      styleActive?: any,
-      styleHover?: any,
-      Tag: string,
-      defaultReturn: () => React.ReactNode,
-      parent: RichElement | IRootLevelDocument,
-      tree: IRootLevelDocument,
+      styleActive?: any;
+      styleHover?: any;
+      Tag: string;
+      defaultReturn: () => React.ReactNode;
+      parent: RichElement | IRootLevelDocument;
+      tree: IRootLevelDocument;
+      path: number[];
+      wordNumber?: number;
+      sentenceNumber?: number;
+      trueParent: RichElement | IRootLevelDocument;
     },
   ) => React.ReactNode;
 
@@ -81,7 +94,226 @@ export interface IReactifyExtraOptions {
    * Allows to wrap an element with features of the choosing
    * return the elementAsNode itself or a new node to replace it
    */
-  onCustomWrap?: (element: RichElement | IText, elementAsNode: React.ReactNode) => React.ReactNode;
+  onCustomWrap?: (
+    element: RichElement | IText,
+    elementAsNode: React.ReactNode,
+    info: {
+      path: number[];
+      wordNumber?: number;
+      sentenceNumber?: number;
+    },
+  ) => React.ReactNode;
+}
+
+export type SegmenterType = (children: Array<IText | ILink | IFile | IInline>) => ISentence[];
+
+/**
+ * Applies the segmenter to a given element
+ * @param element 
+ * @param segmenter 
+ */
+export function applySegmenterInElement(
+  element: RichElement,
+  segmenter: SegmenterType,
+) {
+  if (
+    (SERIALIZATION_REGISTRY.BLOCKS[element.type] || SERIALIZATION_REGISTRY.INLINES[element.type]) &&
+    !SERIALIZATION_REGISTRY.PROHIBIT_TEXT[element.type] &&
+    !SERIALIZATION_REGISTRY.VOIDS[element.type] &&
+    element.children
+  ) {
+    element.children = segmenter(element.children as any);
+  } else if (element.children && !SERIALIZATION_REGISTRY.VOIDS[element.type]) {
+    // basically a superblock that is contaning inlines and text instead of a sentence
+    const isInInvalidForm = element.children.every((c) => typeof (c as any).text === "string" || SERIALIZATION_REGISTRY.INLINES[(c as any).type]);
+    if (isInInvalidForm) {
+      element.children = segmenter(element.children as any);
+    } else {
+      element.children.forEach((e) => {
+        applySegmenterInElement(e as any, segmenter);
+      });
+    }
+  }
+}
+
+/**
+ * Applies the segmenter to a given document
+ * @param doc 
+ * @param segmenter 
+ */
+export function applySegmenterInDocument(
+  doc: IRootLevelDocument,
+  segmenter: SegmenterType,
+) {
+  doc.children.forEach((e) => {
+    applySegmenterInElement(e, segmenter);
+  });
+
+  doc.segmented = true;
+}
+
+
+const sentenceEndingPunctuation = [
+  '.', // Period (.)
+  '!', // Exclamation mark (!)
+  '?', // Question mark (?)
+  '\u203D', // Interrobang
+  '\u2047', // Double question mark
+  '\u2048', // Question-exclamation mark
+  '\u2049', // Exclamation-question mark
+  '\u3002', // Ideographic full stop
+  '\uFF01', // Fullwidth exclamation mark
+  '\uFF1F', // Fullwidth question mark
+  '\u06D4', // Arabic full stop
+  '\u2E2E'  // Reversed question mark
+];
+
+const needsSpaceAfterChars = [
+  "."
+];
+
+const sentenceEndingRegex = new RegExp(`([${sentenceEndingPunctuation.join('')}])`, 'g');
+const spacesRegex = new RegExp(/(\s+)/g);
+
+/**
+ * Given a text node it will push words where it is necessary
+ * and indicate end of sentences
+ * @param e 
+ * @returns 
+ */
+function wordSegmenter(e: IText): Array<IWord | IText | "EOS"> {
+  // basically just a space or nothing in particular
+  if (e.text.trim().length === 0) {
+    return [e];
+  }
+
+  const result: Array<IWord | IText | "EOS"> = [];
+
+  // we split by potential sentences
+  const splitted = e.text.split(sentenceEndingRegex);
+
+  // something accumulated in case our last was not a real sentence ending
+  let previousAccumulated = "";
+  for (let i = 0; i < splitted.length; i += 2) {
+    // we loop
+    const wordGroup = previousAccumulated + splitted[i];
+    const sentenceEnd = splitted[i+1] || null;
+    const nextWordGroup = splitted[i+2] || null;
+
+    // if we have a sentence end and it needs a space, and we have a next group, and there's no space in that group
+    if (sentenceEnd && needsSpaceAfterChars.includes(sentenceEnd) && nextWordGroup && nextWordGroup[0] !== " ") {
+      // we add it to the accumulated and go for the next
+      previousAccumulated = wordGroup + sentenceEnd;
+      continue;
+    }
+
+    // otherwise we split by spaces
+    const spacesSplitted = wordGroup.split(spacesRegex);
+    spacesSplitted.forEach((bit, index) => {
+      if (!bit) {
+        return;
+      }
+
+      // if it's odd it's a space
+      const isSpace = index % 2 === 1;
+
+      // this is our text
+      const textElement = {
+        ...e,
+        text: bit,
+      };
+
+      // and if we are just a space
+      if (isSpace) {
+        result.push(textElement);
+      } else {
+        // otherwise we must be a word
+        // and mark as such
+        result.push({
+          type: "word",
+          children: [
+            textElement,
+          ],
+        });
+      }
+    });
+
+    if (sentenceEnd) {
+      // add the end and signal the end of sentence
+      result.push({
+        ...e,
+        text: sentenceEnd,
+      });
+      result.push("EOS");
+    }
+  }
+
+  return result;
+}
+
+/**
+ * This is a standard basic segmenter that works fine with a variety of languages, it is however unable to
+ * find words within many asian languages, you may need to create your own custom segmenter in order to segment
+ * such
+ * 
+ * @param children 
+ * @returns 
+ */
+export function defaultBasicSegmenter(children: Array<IText | ILink | IFile | IInline>): ISentence[] {
+  // first we make this
+  const sentences: ISentence[] = [];
+  let accumulatedObjectsSentence: Array<IText | ILink | IFile | IInline | IWord> = [];
+  children.forEach((c) => {
+    if (typeof (c as IText).text === "string") {
+      const splitPunctuation = wordSegmenter(c as IText);
+      splitPunctuation.forEach((v) => {
+        if (v === "EOS") {
+          sentences.push({
+            type: "sentence",
+            children: accumulatedObjectsSentence,
+          });
+          accumulatedObjectsSentence = [];
+        } else if (typeof (v as any).text === "string") {
+          accumulatedObjectsSentence.push(v as any);
+        } else {
+          // it is a word
+          const lastAccumulated = accumulatedObjectsSentence[accumulatedObjectsSentence.length - 1];
+          if (lastAccumulated && (lastAccumulated as IWord).type === "word") {
+            (lastAccumulated as IWord).children = (lastAccumulated as IWord).children.concat((v as IWord).children);
+          } else {
+            accumulatedObjectsSentence.push(v as any);
+          }
+        }
+      });
+    } else {
+      if ((c as any).children) {
+        const calculated = defaultBasicSegmenter((c as any).children);
+        
+        const newC = {...c};
+        (newC as any).children = [];
+        calculated.forEach((r) => {
+          if ((r as any).type === "sentence") {
+            (newC as any).children = (newC as any).children.concat((r as any).children);
+          } else {
+            (newC as any).children.push(r);
+          }
+        });
+
+        accumulatedObjectsSentence.push(newC);
+      } else {
+        accumulatedObjectsSentence.push(c);
+      }
+    }
+  });
+
+  if (accumulatedObjectsSentence.length) {
+    sentences.push({
+      type: "sentence",
+      children: accumulatedObjectsSentence,
+    });
+  }
+
+  return sentences;
 }
 
 /**
@@ -143,10 +375,27 @@ export interface IReactifyArg<T> {
    */
   parent: RichElement | IRootLevelDocument;
   /**
+   * The true parent that doesn't include
+   * sentences and words
+   */
+  trueParent: RichElement | IRootLevelDocument;
+  /**
    * The tree this element comes from
    * or null if no tree is available
    */
   tree: IRootLevelDocument;
+  /**
+   * accumulated words
+   */
+  accumulatedWord: {value: number};
+  /**
+   * accumulated words
+   */
+  accumulatedSentence: {value: number};
+  /**
+   * path of element
+   */
+  path: number[];
 }
 
 /**
@@ -204,6 +453,14 @@ export interface ISerializationRegistryType {
   REACTIFY: {
     [type: string]: (arg: IReactifyArg<RichElement | IText>) => React.ReactNode;
   };
+
+  /**
+   * UNSERIALIZABLES cannot be serialized and are void elements
+   * for reactification purposes they are used for segmentation and text analysis
+   */
+  UNSERIALIZABLES?: {
+    [type: string]: boolean;
+  }
 
   /**
    * Specify which children are allowed for a given object type
@@ -339,7 +596,8 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
   REACTIFY: {},
   MERGABLES: {},
   CUSTOM_NORMALIZER_POST: {},
-  CUSTOM_NORMALIZER_PRE: {}
+  CUSTOM_NORMALIZER_PRE: {},
+  UNSERIALIZABLES: {},
 }
 
 // NOW we register all the elements that are part of this
@@ -362,6 +620,8 @@ registerTableElements(SERIALIZATION_REGISTRY);
 registerVoidBlock(SERIALIZATION_REGISTRY);
 registerVoidInline(SERIALIZATION_REGISTRY);
 registerUnmanaged(SERIALIZATION_REGISTRY);
+registerSentence(SERIALIZATION_REGISTRY);
+registerWord(SERIALIZATION_REGISTRY);
 
 SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.document = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.container;
 SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.document = SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.container;
@@ -445,13 +705,13 @@ export function getUIHandlerValueWithKnownContextFor(
   elementContext: ITemplateArgContextDefinition,
   rootContext: ITemplateArgContextDefinition,
 ) {
-  if (!elementContext || elementContext.type !== "context" || !element || !element.uiHandler || !rootContext) {
+  if (!elementContext || elementContext.type !== "context" || !element || !(element as any).uiHandler || !rootContext) {
     return null;
   }
 
-  let uiHandlerValue: ITemplateArgUIHandlerDefinition = elementContext.properties[element.uiHandler] as ITemplateArgUIHandlerDefinition;
+  let uiHandlerValue: ITemplateArgUIHandlerDefinition = elementContext.properties[(element as any).uiHandler] as ITemplateArgUIHandlerDefinition;
   if (!uiHandlerValue || uiHandlerValue.type !== "ui-handler") {
-    uiHandlerValue = rootContext.properties[element.uiHandler] as ITemplateArgUIHandlerDefinition;
+    uiHandlerValue = rootContext.properties[(element as any).uiHandler] as ITemplateArgUIHandlerDefinition;
     if (!uiHandlerValue || uiHandlerValue.type !== "ui-handler" || uiHandlerValue.nonRootInheritable) {
       uiHandlerValue = null;
     }
@@ -466,7 +726,7 @@ export function getUIHandlerValueFor(
   rootElement: IRootLevelDocument,
   rootContext: ITemplateArgContextDefinition,
 ) {
-  if (!element.uiHandler) {
+  if (!(element as any).uiHandler) {
     return null;
   }
 
@@ -678,14 +938,14 @@ export function getInfoFor(
   // check for whether is interactive and other options
   const isInteractive = templatedInteractiveActions.some((attr) => typeof node[attr] !== "undefined" && node[attr] !== null);
   const isTemplateStyled = templatedStyledAttributes.some((attr) => typeof node[attr] !== "undefined" && node[attr] !== null);
-  const isBasicStyled = !!(node as RichElement).style || ((node as RichElement).richClassList && (node as RichElement).richClassList.length);
+  const isBasicStyled = !!(node as any).style || ((node as any).richClassList && (node as any).richClassList.length);
   const isBasicTemplated = templatedAttributes.some((attr) => typeof node[attr] !== "undefined" && node[attr] !== null);
   const isTemplate = isInteractive || isTemplateStyled || isBasicTemplated;
 
   // now let's build the name label for the given language
-  const foundCustomName = (!(node as RichElement).givenName && (node as RichElement).uiHandler) ?
-    i18nData.richUIHandlerElement[(node as RichElement).uiHandler.replace(/-/g, "_")] : null;
-  let nameLabel: string = (node as RichElement).givenName ? (node as RichElement).givenName : (
+  const foundCustomName = (!(node as any).givenName && (node as any).uiHandler) ?
+    i18nData.richUIHandlerElement[(node as any).uiHandler.replace(/-/g, "_")] : null;
+  let nameLabel: string = (node as any).givenName ? (node as any).givenName : (
     foundCustomName || (
       (node as RichElement).type ?
         (i18nData[specialTypes[(node as RichElement).type] ? specialTypes[(node as RichElement).type] : (node as RichElement).type.replace(/-/g, "_")] ||
@@ -693,7 +953,7 @@ export function getInfoFor(
         i18nData.text)
   );
 
-  if (!(node as RichElement).givenName && !foundCustomName) {
+  if (!(node as any).givenName && !foundCustomName) {
     if (isBasicStyled || isTemplateStyled) {
       nameLabel = localeReplacer(i18nData.styled, nameLabel);
     }
@@ -723,6 +983,7 @@ export interface IRootLevelDocument {
   type: "document",
   rich: boolean;
   id: string;
+  segmented?: boolean;
   children: RichElement[];
 }
 
@@ -732,7 +993,7 @@ export interface IRootLevelDocument {
  */
 export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
   IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITfoot | ITd |
-  ITh | IVoidBlock | IVoidInline | IVoidSuperBlock | IUnmanaged;
+  ITh | IVoidBlock | IVoidInline | IVoidSuperBlock | IUnmanaged | ISentence | IWord;
 
 /**
  * This is the text namespace, and it's used in uuid for creating
@@ -933,6 +1194,7 @@ const deserializeCache: Array<{
   doc: IRootLevelDocument;
   dontNormalize: boolean;
   useContextRulesOf: ITemplateArgContextDefinition;
+  segmenter: (children: Array<IText | ILink | IFile | IInline>) => Array<ISentence | IWord>;
 }> = [];
 
 /**
@@ -946,12 +1208,13 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
   const dontNormalize = specialRules ? (specialRules.dontNormalize || false) : false;
   const useContextRulesOf = specialRules ? (specialRules.useContextRulesOf || null) : null;
   const ignoreNodesAt = specialRules ? (specialRules.ignoreNodesAt || null) : null;
+  const segmenter = specialRules ? (specialRules.segmenter || null) : null;
 
   // first we find if we have it in the cache when we use a string
   // as initial value
   if (typeof html === "string" && !ignoreNodesAt) {
     const cachedIndex = deserializeCache
-      .findIndex((v) => v.data === html && v.dontNormalize === dontNormalize && v.useContextRulesOf === useContextRulesOf);
+      .findIndex((v) => v.data === html && v.dontNormalize === dontNormalize && v.useContextRulesOf === useContextRulesOf && v.segmenter === segmenter);
 
     if (cachedIndex !== -1) {
       const cached = deserializeCache[cachedIndex];
@@ -1001,6 +1264,7 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
         doc: comparer,
         dontNormalize,
         useContextRulesOf,
+        segmenter,
       });
 
       if (deserializeCache.length > deserializeCacheSize) {
@@ -1038,12 +1302,18 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
     normalize(newDocument, specialRules || null);
   }
 
+  // apply the segmenter after normalization
+  if (segmenter) {
+    applySegmenterInDocument(newDocument, segmenter);
+  }
+
   if (!ignoreNodesAt) {
     deserializeCache.push({
       data,
       doc: newDocument,
       dontNormalize,
       useContextRulesOf,
+      segmenter,
     });
 
     if (deserializeCache.length > deserializeCacheSize) {
@@ -1059,6 +1329,10 @@ export function normalize(
   doc: IRootLevelDocument,
   specialRules?: ISpecialRules,
 ): IRootLevelDocument {
+  if (doc.segmented) {
+    throw new Error("Attempted to normalize a segmented tree, this is not allowed, segmented trees cannot be normalized");
+  }
+
   if (!doc.rich || (specialRules && specialRules.dontNormalize)) {
     return doc;
   }
@@ -1088,6 +1362,20 @@ interface ISpecialRules {
    * avoid normalization altogether
    */
   dontNormalize?: boolean;
+  /**
+   * Use a segementer to generate sentences and words within paragraphs
+   * will modify the tree
+   * 
+   * the segmenter is only applied once per element that has children that can be segmented
+   * 
+   * DO NOT use a segmenter for values intended for an editor, even when it should work in theory
+   * the segmenter is meant to be used for visualization purposes as editors are not expected
+   * to create or normalize values that are segmented
+   * 
+   * @param children 
+   * @returns 
+   */
+  segmenter?: SegmenterType;
 }
 
 const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) => ({
@@ -1446,6 +1734,13 @@ export function normalizeElement(
   customExecution?: ICustomExecution,
   specialRules?: ISpecialRules,
 ) {
+  if ((element as any).segmented) {
+    throw new Error("Attempted to normalize a segmented document, this is not allowed");
+  }
+  if (element.type === "word" || element.type === "sentence") {
+    throw new Error("Attempted to normalize a segmented element, this is not allowed");
+  }
+
   if (specialRules && specialRules.dontNormalize) {
     return;
   }
@@ -1458,7 +1753,7 @@ export function normalizeElement(
   if (!primaryExecution.workOnOriginal) {
     executionRoot = shallowRootCopy(root);
     secondaryExecution = standardExecFn(executionRoot);
-    executionElement = getNodeFor(path, executionRoot) as RichElement;
+    executionElement = getNodeFor(path, executionRoot) as any;
   }
 
   internalNormalizeElement(executionElement, path, executionRoot, primaryExecution, secondaryExecution, specialRules);

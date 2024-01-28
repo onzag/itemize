@@ -9,6 +9,8 @@ import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } 
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
+import { ISentence } from "./segmenter-types/sentence";
+import { IWord } from "./segmenter-types/word";
 import { IText } from "./text";
 
 /**
@@ -26,7 +28,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
    */
   function serializeTitle(title: ITitle) {
     // we just call the base function
-    return serializeElementBase(registry, title, title.titleType, null, null, title.children);
+    return serializeElementBase(registry, title, title.titleType, null, null, title.children as any);
   }
   
   /**
@@ -68,7 +70,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
       // no base class
       null,
       // the children to use
-      arg.element.children,
+      arg.element.children as any,
       // no wrap children function
       null,
       // and the arg itself
@@ -100,5 +102,5 @@ export interface ITitle extends IElementBase {
    * The title only has one children and it's text
    * as it only contains text within it
    */
-  children: Array<IText | ILink | IFile>;
+  children: Array<IText | ILink | IFile | ISentence | IWord>;
 }

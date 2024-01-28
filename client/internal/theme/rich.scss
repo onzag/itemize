@@ -20,6 +20,10 @@ $superblock-highlight-color: #33691e;
   white-space: pre-wrap;
   width: 100%;
 
+  .sentence, .word {
+    display: contents;
+  }
+
   table {
     width: 100%;
     border: solid 1px #ccc;
@@ -122,7 +126,10 @@ $superblock-highlight-color: #33691e;
       }
     }
 
-    li>* {
+    li>*,
+    li>.sentence:first-of-type>*:first-of-type,
+    li>.word:first-of-type>*:first-of-type,
+    li>.sentence:first-of-type>.word:first-of-type>*:first-of-type {
       html[dir="rtl"] & {
         padding-right: 2.5rem;
       }

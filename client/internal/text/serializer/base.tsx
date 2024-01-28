@@ -390,13 +390,18 @@ export function serializeElementBase(
 
   // fi we have specified children
   if (children) {
-    // then we loop into them
-    children.forEach((c) => {
+    const processChild = (c: IText | RichElement) => {
       // if it's a text node
       if ((c as IText).text) {
         // then we use the text conversion function
         const textNode: Node = registry.SERIALIZE.text(c as IText);
         elementComponent.appendChild(textNode);
+      } else if (registry.UNSERIALIZABLES[(c as RichElement).type]) {
+        // skip unserializables and put the children straight
+        // onto the parent
+        if ((c as RichElement).children) {
+          (c as RichElement).children.forEach(processChild);
+        }
       } else if (registry.SERIALIZE[(c as RichElement).type]) {
         // if it's another type then we pick the function
         const fn = registry.SERIALIZE[(c as RichElement).type];
@@ -405,7 +410,9 @@ export function serializeElementBase(
         // and push that
         elementComponent.appendChild(childElement);
       }
-    });
+    }
+    // then we loop into them
+    children.forEach(processChild);
   }
 
   // return it
@@ -513,7 +520,14 @@ export function reactifyElementBase(
               extraOptions: arg.extraOptions,
               parent: arg.parent,
               tree: arg.tree,
-            }
+              accumulatedSentence: arg.accumulatedSentence,
+              accumulatedWord: arg.accumulatedWord,
+              path: arg.path,
+              trueParent: (
+                (base as any).type === "sentence"
+                || (base as any).type === "word"
+              ) ? arg.trueParent : (base as RichElement),
+            },
           );
         }
 
@@ -584,6 +598,13 @@ export function reactifyElementBase(
             extraOptions: arg.extraOptions,
             parent: arg.parent,
             tree: arg.tree,
+            accumulatedSentence: arg.accumulatedSentence,
+            accumulatedWord: arg.accumulatedWord,
+            path: arg.path,
+            trueParent: (
+              (base as any).type === "sentence"
+              || (base as any).type === "word"
+            ) ? arg.trueParent : (base as RichElement),
           }
         );
       })
@@ -641,12 +662,19 @@ export function reactifyElementBase(
           extraOptions: arg.extraOptions,
           parent: base as RichElement,
           tree: arg.tree,
+          accumulatedSentence: arg.accumulatedSentence,
+          accumulatedWord: arg.accumulatedWord,
+          path: [...arg.path, index],
+          trueParent: (
+            (base as any).type === "sentence"
+            || (base as any).type === "word"
+          ) ? arg.trueParent : (base as RichElement),
         };
 
         // and then we call the reactify
         if ((c as IText).text) {
           return registry.REACTIFY.text(specificChildTemplateOptions);
-        } else if (registry.SERIALIZE[(c as RichElement).type]) {
+        } else if (registry.REACTIFY[(c as RichElement).type]) {
           return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
         }
 
@@ -806,12 +834,19 @@ export function reactifyElementBase(
               extraOptions: arg.extraOptions,
               parent: base as RichElement,
               tree: arg.tree,
+              accumulatedSentence: arg.accumulatedSentence,
+              accumulatedWord: arg.accumulatedWord,
+              path: [...arg.path, index],
+              trueParent: (
+                (base as any).type === "sentence"
+                || (base as any).type === "word"
+              ) ? arg.trueParent : (base as RichElement),
             };
 
             // and then we call the reactify
             if ((c as IText).text) {
               return registry.REACTIFY.text(specificChildTemplateOptions);
-            } else if (registry.SERIALIZE[(c as RichElement).type]) {
+            } else if (registry.REACTIFY[(c as RichElement).type]) {
               return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
             }
 
@@ -842,7 +877,14 @@ export function reactifyElementBase(
   }
 
   if (arg.extraOptions && arg.extraOptions.onCustomAttributesFor) {
-    const extraProps = arg.extraOptions.onCustomAttributesFor(base as any);
+    const extraProps = arg.extraOptions.onCustomAttributesFor(
+      base as any,
+      {
+        path: arg.path,
+        sentenceNumber: arg.accumulatedSentence.value,
+        wordNumber: arg.accumulatedWord.value,
+      },
+    );
     if (extraProps) {
       Object.keys(extraProps).forEach((attr) => {
         finalProps[attr] = extraProps[attr];
@@ -901,6 +943,13 @@ export function reactifyElementBase(
                 defaultReturn: defaultReturn.bind(null, styleActive, styleHover),
                 parent: arg.parent,
                 tree: arg.tree,
+                path: arg.path,
+                sentenceNumber: arg.accumulatedSentence.value,
+                wordNumber: arg.accumulatedWord.value,
+                trueParent: (
+                  (base as any).type === "sentence"
+                  || (base as any).type === "word"
+                ) ? arg.trueParent : (base as RichElement),
               },
             );
           } else {
@@ -908,7 +957,15 @@ export function reactifyElementBase(
           }
 
           if (arg.extraOptions && arg.extraOptions.onCustomWrap) {
-            return arg.extraOptions.onCustomWrap(base as any, toRender);
+            return arg.extraOptions.onCustomWrap(
+              base as any,
+              toRender,
+              {
+                path: arg.path,
+                sentenceNumber: arg.accumulatedSentence.value,
+                wordNumber: arg.accumulatedWord.value,
+              },
+            );
           } else {
             return toRender;
           }

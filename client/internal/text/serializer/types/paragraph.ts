@@ -10,6 +10,8 @@ import { deserializeElementBase, IElementBase, reactifyElementBase, serializeEle
 import { IFile } from "./file";
 import { IInline } from "./inline";
 import { ILink } from "./link";
+import { ISentence } from "./segmenter-types/sentence";
+import { IWord } from "./segmenter-types/word";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function STANDARD_PARAGRAPH(textOrInline?: string | IText | RichElement): IParagraph {
@@ -115,5 +117,5 @@ export interface IParagraph extends IElementBase {
   /**
    * The paragraph children can be either text or link or file for the inlines
    */
-  children: Array<IText | ILink | IFile | IInline>;
+  children: Array<IText | ILink | IFile | IInline | ISentence | IWord>;
 }

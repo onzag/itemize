@@ -9,6 +9,8 @@ import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType} f
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
+import { ISentence } from "./segmenter-types/sentence";
+import { IWord } from "./segmenter-types/word";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
@@ -38,7 +40,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
       // no special attributes
       null,
       // the children
-      quote.children,
+      quote.children as any,
     );
   }
   
@@ -81,7 +83,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
       // no base class
       null,
       // the children to use
-      arg.element.children,
+      arg.element.children as any,
       // nothing to use as a wrap function
       null,
       // the argument itself
@@ -108,5 +110,5 @@ export interface IQuote extends IElementBase {
   /**
    * Represents the children
    */
-  children: Array<IText | ILink | IFile>;
+  children: Array<IText | ILink | IFile | ISentence | IWord>;
 }

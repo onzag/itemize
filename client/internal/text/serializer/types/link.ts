@@ -8,6 +8,7 @@
 import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
 import { IAttrs, serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { NonRootInheritable } from "../template-args";
+import { IWord } from "./segmenter-types/word";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
@@ -163,7 +164,7 @@ export interface ILink extends IElementBase {
   /**
    * The children for the link is a text that specifies the link
    */
-  children: IText[];
+  children: Array<IText | IWord>;
   /**
    * Represents the data-href templating attribute
    */

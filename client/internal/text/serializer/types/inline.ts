@@ -8,6 +8,7 @@
 
 import { IReactifyArg, ISerializationRegistryType, deserializeChildrenForNode, RichElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
+import { IWord } from "./segmenter-types/word";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
@@ -36,7 +37,7 @@ export function registerInline(registry: ISerializationRegistryType) {
       // no special attributes
       null,
       // the children inside the inline, these are rich elements
-      inline.children,
+      inline.children as any,
     );
   }
 
@@ -78,7 +79,7 @@ export function registerInline(registry: ISerializationRegistryType) {
       // we pass either the inline type prefixed or the inline class itself
       "inline",
       // the children of the inline
-      arg.element.children,
+      arg.element.children as any,
       // no wrap children function
       null,
       // and the arg of reactification
@@ -106,5 +107,5 @@ export interface IInline extends IElementBase {
    * It can have as many children as it requires
    * but not text directly
    */
-  children: IText[];
+  children: Array<IText | IWord>;
 }
