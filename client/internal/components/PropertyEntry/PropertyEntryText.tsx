@@ -50,6 +50,7 @@ export function fileResolver(
   include: Include,
   mediaProperty: PropertyDefinition,
   cacheFiles: boolean,
+  forceFullURLS: boolean,
   fileId: string,
   isImage: boolean,
   node: HTMLElement,
@@ -73,7 +74,7 @@ export function fileResolver(
     include,
     mediaProperty,
     cacheFiles,
-    false,
+    forceFullURLS,
   );
 
   const srcset = isImage ? imageSrcSetRetriever(absolutedFile, mediaProperty) : null;
@@ -864,6 +865,7 @@ export default class PropertyEntryText
             this.props.include,
             this.cachedMediaProperty,
             this.props.cacheFiles,
+            false,
           ),
           imageFail: "/rest/resource/image-fail.svg",
         },

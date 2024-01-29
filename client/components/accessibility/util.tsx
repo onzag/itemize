@@ -1,14 +1,14 @@
-import { hasWords } from "../../internal/text";
-import { IRootLevelDocument, RichElement } from "../../internal/text/serializer";
-import { ReactifiedElementWithHoverAndActive } from "../../internal/text/serializer/dynamic-component";
-import { IFile } from "../../internal/text/serializer/types/file";
-import { IImage } from "../../internal/text/serializer/types/image";
 import React, { useCallback } from "react";
 import AltText from "./AltText";
-import { IText } from "../../internal/text/serializer/types/text";
 import { useI18nRead } from "../localization/I18nRead";
-import { IWord } from "../../internal/text/serializer/types/segmenter-types/word";
-import { ISentence } from "../../internal/text/serializer/types/segmenter-types/sentence";
+import { ReactifiedElementWithHoverAndActive } from "@onzag/itemize-text-engine/serializer/dynamic-component";
+import { IImage } from "@onzag/itemize-text-engine/serializer/types/image";
+import { IFile } from "@onzag/itemize-text-engine/serializer/types/file";
+import { ISentence } from "@onzag/itemize-text-engine/serializer/types/segmenter-types/sentence";
+import { IWord } from "@onzag/itemize-text-engine/serializer/types/segmenter-types/word";
+import { IText } from "@onzag/itemize-text-engine/serializer/types/text";
+import { RichElement, IRootLevelDocument } from "@onzag/itemize-text-engine/serializer";
+import { hasWords } from "@onzag/itemize-text-engine/util";
 
 export function onKeyDown(e: React.KeyboardEvent) {
   if (e.code === "Enter" || e.code === "Space") {

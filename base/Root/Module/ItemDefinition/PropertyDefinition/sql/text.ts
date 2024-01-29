@@ -6,7 +6,7 @@
 
 import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, IElasticSearchInfo, IArgInfo, ISQLOutInfo, IElasticStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { DOMWindow, DOMPurify } from "../../../../../../util";
+import { DOMWindow, DOMPurify } from "@onzag/itemize-text-engine/serializer/dom";
 import type { IPropertyDefinitionSupportedTextType } from "../types/text";
 
 /**

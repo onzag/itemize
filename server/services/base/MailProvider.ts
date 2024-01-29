@@ -10,7 +10,9 @@
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { renderTemplate, sanitize } from "../../../client/internal/text";
+import { sanitize } from "@onzag/itemize-text-engine/sanitizer";
+import { renderTemplate } from "@onzag/itemize-text-engine/renderer";
+import { DOMWindow } from "@onzag/itemize-text-engine/serializer/dom";
 import type { IRQValue } from "../../../rq-querier";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
@@ -19,7 +21,7 @@ import { FORCE_ALL_OUTBOUND_MAIL_TO, NODE_ENV } from "../../environment";
 import type { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { IOTriggerActions, ITriggerRegistry } from "../../resolvers/triggers";
 import path from "path";
-import { DOMWindow, escapeHtml, formatDateTime, getContainerIdFromMappers } from "../../../util";
+import { escapeHtml, formatDateTime, getContainerIdFromMappers } from "../../../util";
 import { SECONDARY_JWT_KEY, UNSPECIFIED_OWNER } from "../../../constants";
 import { isRTL, languages } from "../../../imported-resources";
 import uuid from "uuid";
@@ -32,6 +34,7 @@ import { httpRequest } from "../../request";
 import fs, { ReadStream } from "fs";
 import os from "os";
 import type { RegistryService } from "../registry";
+import { fileResolver } from "../../../client/internal/components/PropertyEntry/PropertyEntryText";
 
 /**
  * This is the mail namespace, and it's used to convert the mail
@@ -262,7 +265,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     if (FORCE_ALL_OUTBOUND_MAIL_TO) {
       const originalSendMail = this.sendEmail.bind(this);
       this.sendEmail = (data: ISendEmailData) => {
-        const newData = {...data};
+        const newData = { ...data };
         newData.to = FORCE_ALL_OUTBOUND_MAIL_TO;
 
         return originalSendMail(newData);
@@ -676,16 +679,19 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           // calling the render template function
           parsedTemplateValue = renderTemplate(
             {
-              cacheFiles: false,
-              config: this.appConfig,
-              containerId: templateValue.container_id,
-              currentFiles,
-              forId: arg.id,
-              forVersion: arg.version,
-              forceFullURLs: true,
-              mediaProperty,
-              itemDefinition: actualItemDefinition,
-              include: null,
+              fileResolver: fileResolver.bind(
+                null,
+                this.appConfig,
+                currentFiles,
+                actualItemDefinition,
+                arg.id,
+                arg.version || null,
+                templateValue.container_id,
+                null,
+                mediaProperty,
+                false,
+                true,
+              ),
             },
             {
               supportsFiles,
@@ -1467,8 +1473,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 version: null,
                 language: specifiedLanguageCode || user.app_language,
                 dictionary: specifiedDictionary ||
-                this.localAppData.databaseConfig.dictionaries[user.app_language] ||
-                this.localAppData.databaseConfig.dictionaries["*"],
+                  this.localAppData.databaseConfig.dictionaries[user.app_language] ||
+                  this.localAppData.databaseConfig.dictionaries["*"],
                 parent,
                 ignoreAlreadyExists: true,
                 ifAlreadyExistsCall(v) {
@@ -1508,7 +1514,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               false,
             );
           }
-    
+
           if (externalReceivesSpam.length) {
             // same here if the sender exists the default function
             // will not leak the sender's email and use its own
@@ -1522,7 +1528,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               true,
             );
           }
-    
+
           // inform of emails that bounced
           if (bounces.length) {
             await this.onExternalEmailBounced(bounces, potentialSender, data);
@@ -1938,25 +1944,31 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     // forceFullURLs they should work as cdn
     let htmlBase = sanitize(
       {
-        cacheFiles: false,
-        config: this.appConfig,
-        containerId: message.container_id,
-        currentFiles: cidAttachments,
-        forId: message.id,
-        forVersion: message.version || null,
-        forceFullURLs: true,
-        mediaProperty,
-        itemDefinition: this.storageIdef,
-        include: null,
-        forMail: true,
-        forMailCidCollected(file, index) {
-          cidAttachmentsToAttach.push(file);
-          const newId = "attachment_" + (index + 1);
-          cidMap[newId] = file.id;
-          return newId;
+        fileResolver(fileId: string) {
+          const fileIndex = cidAttachments.findIndex((f) => f.id === fileId);
+          if (fileIndex !== -1) {
+            const newId = "cid:attachment_" + message.id + "_" + (fileIndex + 1);
+            return {
+              src: newId,
+            }
+          }
         },
-        forMailFileCollected(file) {
-          cidAttachmentsToAttach.push(file);
+        mail: true,
+        mailShouldAttachCidFile(fileId: string) {
+          const fileIndex = cidAttachments.findIndex((f) => f.id === fileId);
+          if (fileIndex !== -1) {
+            const file = cidAttachments[fileIndex];
+            cidAttachmentsToAttach.push(file);
+            const newId = "attachment_" + message.id + "_" + (fileIndex + 1);
+            // TODO check does this need the word cid or not
+            cidMap[newId] = file.id;
+          }
+        },
+        mailShouldAttachFile(fileId: string) {
+          const file = cidAttachments.find((f) => f.id === fileId);
+          if (file) {
+            cidAttachmentsToAttach.push(file);
+          }
         },
       },
       {

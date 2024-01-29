@@ -17,6 +17,7 @@ import type { TemplateArgs } from "@onzag/itemize-text-engine/serializer/templat
 import { deserialize, deserializePlain, IRootLevelDocument } from "@onzag/itemize-text-engine/serializer";
 import { IText } from "@onzag/itemize-text-engine/serializer/types/text";
 import type { RichElement } from "@onzag/itemize-text-engine/serializer";
+import type { SegmenterType } from "@onzag/itemize-text-engine/segmenter";
 
 /**
  * The current intersection observer

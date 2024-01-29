@@ -1,5 +1,5 @@
 import type { IAppDataType } from "../server";
-import { nodesThatRepresentLines } from "../client/internal/text";
+import { nodesThatRepresentLines } from "@onzag/itemize-text-engine/renderer";
 import type Root from "../base/Root";
 
 /**

@@ -10,10 +10,10 @@
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { renderTemplateAsNode, convertNodeToText } from "../../../client/internal/text";
+import { renderTemplateAsNode, convertNodeToText } from "@onzag/itemize-text-engine/renderer";
 import type { IRQValue } from "../../../rq-querier";
 import { ServiceProvider, ServiceProviderType } from "..";
-import { FORCE_ALL_OUTBOUND_SMS_TO, NODE_ENV } from "../../environment";
+import { FORCE_ALL_OUTBOUND_SMS_TO } from "../../environment";
 import type { RegistryService } from "../registry";
 
 /**

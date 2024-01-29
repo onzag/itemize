@@ -116,6 +116,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
             this.props.include,
             mediaProperty,
             this.props.cacheFiles,
+            false,
           ),
           imageFail: "/rest/resource/image-fail.svg",
         },
