@@ -53,5 +53,7 @@
         var CONFIG = "$CONFIG";
         // the SSR data, note that this is runtime calculated, so it differs, just like $MODE
         var SSR = "$SSR";
+        // Resource prefix to prevent the editor from parsing stylesheets from other sources
+        var SLATE_EDITOR_STYLESHEETS_PREFIX = location.protocol + "//" + location.host + "/rest/resource";
     </script>
 </html>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useState } from "react";
 import {
   DefaultSlateWrapper, IDefaultSlateWrapperProps, IDrawerBodyProps,
   IDrawerContainerBoxProps, IDrawerSpacerProps, IEditorContainerProps, IEditorProps, IEditorWrapperProps,
@@ -91,6 +91,7 @@ const style = {
     fontSize: "1rem",
     height: "1rem",
     flex: "0 0 1rem",
+    whiteSpace: "nowrap",
   },
   editorDrawer: {
     width: 0,
@@ -259,6 +260,8 @@ const style = {
   },
   elementTitleContainer: {
     width: "100%",
+    display: "flex",
+    flexWrap: "wrap",
   },
   elementTitleSelected: {
     color: "#0d47a1",
@@ -501,7 +504,7 @@ export function WrapperDrawerMultiSelectField(props: IWrapperDrawerMultiSelectFi
       >
         {
           props.options.map((element) => (
-            <MenuItem key={element.value} value={element.value}>
+            <MenuItem key={element.value} value={element.value} data-unblur={true}>
               {element.label}
             </MenuItem>
           ))
@@ -556,6 +559,7 @@ export function WrapperDrawerSelectField(props: IWrapperDrawerSelectFieldProps) 
                   key={vv.value}
                   value={vv.value}
                   sx={vv.primary ? style.optionPrimary : null}
+                  data-unblur={true}
                 >{
                     vv.label
                   }</MenuItem>;
@@ -731,6 +735,7 @@ export interface IMUIToolbarButtonProps extends IToolbarButtonProps {
   fastKey?: string;
   icon?: React.ReactNode;
   useStyleTransform?: boolean;
+  useTriggerAltAfterAction?: boolean;
 }
 
 function ToolbarButtonBadged(props: IMUIToolbarButtonProps) {
@@ -768,9 +773,9 @@ function ToolbarButtonBadged(props: IMUIToolbarButtonProps) {
     return (
       <ElementFastKey
         priority={1}
-        useTransform={props.disjointedMode}
+        useTransform={props.disjointedMode || props.useStyleTransform}
         altBadgedChildren={badged}
-        triggerAltAfterAction={true}
+        triggerAltAfterAction={props.useTriggerAltAfterAction}
         fastKey={fastKey}
         disabled={props.disabled}
       >
@@ -809,8 +814,8 @@ function ToolbarButton(props: IMUIToolbarButtonProps) {
     return (
       <ElementFastKey
         priority={1}
-        useTransform={props.disjointedMode}
-        triggerAltAfterAction={true}
+        useTransform={props.disjointedMode || props.useStyleTransform}
+        triggerAltAfterAction={props.useTriggerAltAfterAction}
         fastKey={fastKey}
         disabled={props.disabled}
       >
@@ -993,10 +998,13 @@ export interface IMaterialUISlateWrapperProps extends IDefaultSlateWrapperProps 
   toolbarSx?: any;
 }
 
-export function MaterialUISlateWrapper(props: IMaterialUISlateWrapperProps) {
+export const MaterialUISlateWrapper = forwardRef((props: IMaterialUISlateWrapperProps, ref) => {
   return (
     <DefaultSlateWrapper
       {...props}
+
+      // the forward ref
+      ref={ref as any}
 
       // final wrapper to wrap the editor
       FinalWrapper={FinalWrapperOutlined}
@@ -1062,4 +1070,4 @@ export function MaterialUISlateWrapper(props: IMaterialUISlateWrapperProps) {
       }}
     />
   )
-}
+});

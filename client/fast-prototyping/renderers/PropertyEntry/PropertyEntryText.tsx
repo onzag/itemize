@@ -212,16 +212,18 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
       this.currentElementWrappersSrc = this.props.args.elementWrappers;
 
       elementWrappers = { ...defaultElementWrappers };
-      Object.keys(this.props.args.elementWrappers).forEach((k) => {
-        if (elementWrappers[k]) {
-          elementWrappers[k] = { ...elementWrappers[k] };
-          Object.keys(this.props.args.elementWrappers[k]).forEach((k2) => {
-            elementWrappers[k][k2] = this.props.args.elementWrappers[k][k2];
-          });
-        } else {
-          elementWrappers[k] = this.props.args.elementWrappers[k];
-        }
-      });
+      if (this.props.args.elementWrappers) {
+        Object.keys(this.props.args.elementWrappers).forEach((k) => {
+          if (elementWrappers[k]) {
+            elementWrappers[k] = { ...elementWrappers[k] };
+            Object.keys(this.props.args.elementWrappers[k]).forEach((k2) => {
+              elementWrappers[k][k2] = this.props.args.elementWrappers[k][k2];
+            });
+          } else {
+            elementWrappers[k] = this.props.args.elementWrappers[k];
+          }
+        });
+      }
 
       this.currentElementWrappers = elementWrappers;
     }
@@ -232,7 +234,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
     if (!elementWrappersArgs || this.currentElementWrappersArgsSrc !== this.props.args.elementWrappersArgs) {
       this.currentElementWrappersArgsSrc = this.props.args.elementWrappersArgs;
       elementWrappersArgs = { ...materialUIElementWrappersProps, ...this.props.args.elementWrappersArgs };
-      this.currentElementWrappers = elementWrappersArgs;
+      this.currentElementWrappersArgs = elementWrappersArgs;
     }
 
     // another memoing hack
@@ -267,7 +269,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
         elementWrappers={elementWrappers as any}
-        elementWrappersArgs={this.props.args.elementWrappersArgs}
+        elementWrappersArgs={elementWrappersArgs}
         baseI18n={this.props.i18nRichInfo}
         placeholder={this.props.placeholder}
         disabled={this.props.disabled}

@@ -12,6 +12,9 @@ export default {
       "@onzag/itemize/*": [
         "./node_modules/@onzag/itemize/nodejs/*",
       ],
+      "@onzag/itemize-text-engine/*": [
+        "./node_modules/@onzag/itemize-text-engine/nodejs/*",
+      ],
     },
     target: "esnext",
     module: "commonjs",

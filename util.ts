@@ -17,7 +17,7 @@ import { PropertyDefinitionSupportedFileType } from "./base/Root/Module/ItemDefi
 import convert from "convert-units";
 import { countries, currencies } from "./imported-resources";
 import type { IAppDataType } from "./server";
-import prettyBytes from "pretty-bytes";
+import prettyBytes from "@onzag/itemize-text-engine/util/pretty-bytes";
 import type { IConfigRawJSONDataType } from "./config";
 
 export const Moment = MomentDef;

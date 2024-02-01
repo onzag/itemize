@@ -10,7 +10,7 @@ import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Modul
 import equals from "deep-equal";
 import { imageSrcSetRetriever } from "../../../components/util";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
-import prettyBytes from "pretty-bytes";
+import prettyBytes from "@onzag/itemize-text-engine/util/pretty-bytes";
 import { fileURLAbsoluter, mimeTypeToExtension } from "../../../../util";
 import { deepRendererArgsComparer } from "../general-fn";
 

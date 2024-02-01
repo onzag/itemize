@@ -9,7 +9,7 @@ import equals from "deep-equal";
 import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 import uuid from "uuid";
 import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
-import prettyBytes from "pretty-bytes";
+import prettyBytes from "@onzag/itemize-text-engine/util/pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 import { deepRendererArgsComparer } from "../general-fn";

@@ -11,7 +11,7 @@ import { checkFileInAccepts, processAccepts, localeReplacer, fileURLAbsoluter } 
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
-import prettyBytes from "pretty-bytes";
+import prettyBytes from "@onzag/itemize-text-engine/util/pretty-bytes";
 import { IFeatureSupportOptions, sanitize } from "@onzag/itemize-text-engine/sanitizer";
 import { IWrapperI18nRichTextInfo } from "@onzag/itemize-text-engine/editor/slate/wrapper";
 import { deepRendererArgsComparer } from "../general-fn";
