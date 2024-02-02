@@ -111,7 +111,7 @@ export interface IParentedSearchRecordsAddedEventWithTime extends IParentedSearc
   time: string;
 }
 
-export interface IMountedExplorers {
+export interface IMountedExplorers {
   id: string;
   label: string;
   time: string;

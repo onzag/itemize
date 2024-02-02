@@ -19,6 +19,8 @@ interface IHTTPRequestInfo {
   processAsJSON?: boolean;
   returnNonOk?: boolean;
   auth?: string;
+  noDebug?: boolean;
+  port?: string | number;
 }
 
 interface IHTTPResponse<T> {
@@ -39,7 +41,7 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
     throw new Error("Cannot use stream and url ecoded at the same time in request");
   }
 
-  if (CAN_LOG_DEBUG) {
+  if (CAN_LOG_DEBUG && !data.noDebug) {
     logger.debug({
       message: "HTTP request",
       data,
@@ -108,6 +110,7 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
         path: data.path,
         headers,
         auth: data.auth,
+        port: data.port,
       });
 
       if (stream) {
@@ -150,7 +153,7 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
               }
             }
 
-            if (CAN_LOG_DEBUG) {
+            if (CAN_LOG_DEBUG && !data.noDebug) {
               logger.debug({
                 message: "HTTP request resolved",
                 data: valueToRespondWith,

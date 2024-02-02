@@ -3,6 +3,8 @@ import { Test } from "..";
 import { strict as assert } from "assert";
 import { IUserInfoAndTokensForTesting } from ".";
 import { ENDPOINT_ERRORS } from "../../constants";
+import { httpRequest } from "../../server/request";
+import { EndpointErrorType } from "../../base/errors";
 
 export class TokenTest extends Test {
   private testingUserInfo: IUserInfoAndTokensForTesting;
@@ -15,190 +17,64 @@ export class TokenTest extends Test {
     this.testingUserInfo = testingUserInfo;
   }
   public describe() {
-  //   this.it(
-  //     "Should specify invalid credentials when no token specified",
-  //     async () => {
-  //       const response = await fetchNode(this.fullHost + "/rq", {
-  //         method: "POST",
-  //         body: JSON.stringify({ query: "query{token{token,}}", variables: null }),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
+    this.it(
+      "Should specify invalid credentials when no token specified",
+      async () => {
+        const url = new URL(this.fullHost);
+        const response = await httpRequest<{error: EndpointErrorType}>({
+          host: url.hostname,
+          path: "/rest/user/token",
+          isHttps: url.protocol.startsWith("https"),
+          method: "POST",
+          processAsJSON: true,
+          noDebug: true,
+          returnNonOk: true,
+        });
 
-  //       assert.strictEqual(response.status, 200, "Did not return 200 OK");
+        assert.strictEqual(response.response.statusCode, 403, "Did not return 403 Forbidden");
+        
+        if (!response?.data?.error?.code) {
+          assert.fail("Did not return a formed error");
+        }
 
-  //       const rqAnswer = await response.json();
+        assert.strictEqual(
+          response.data.error.code,
+          ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+          "Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+        );
+      }
+    );
 
-  //       if (
-  //         !rqAnswer.errors ||
-  //         !rqAnswer.errors[0] ||
-  //         !rqAnswer.errors[0].error ||
-  //         rqAnswer.errors[0].error.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
-  //       ) {
-  //         assert.fail("Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
-  //       }
+    this.it(
+      "Should provide the same token when a valid token is given",
+      async () => {
+        JSON.stringify(this.testingUserInfo.testToken)
+        const url = new URL(this.fullHost);
+        const response = await httpRequest<{token: string, id: string, role: string}>({
+          host: url.hostname,
+          path: "/rest/user/token",
+          isHttps: url.protocol.startsWith("https"),
+          method: "POST",
+          processAsJSON: true,
+          headers: {
+            "Content-Type": "application/json",
+            token: this.testingUserInfo.testToken,
+          },
+          noDebug: true,
+        });
 
-  //       assert.strictEqual(rqAnswer.data.token, null);
-  //     }
-  //   );
+        assert.strictEqual(response.response.statusCode, 200, "Did not return 200 OK");
 
-  //   this.it(
-  //     "Should provide the same token when a valid token is given",
-  //     async () => {
-  //       const response = await fetchNode(this.fullHost + "/rq", {
-  //         method: "POST",
-  //         body: JSON.stringify({ query: "query{token(token: " + JSON.stringify(this.testingUserInfo.testToken) + "){token,}}", variables: null }),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
+        if (
+          !response.data.id ||
+          !response.data.role ||
+          !response.data.token
+        ) {
+          assert.fail("Malformed response");
+        }
 
-  //       assert.strictEqual(response.status, 200, "Did not return 200 OK");
-
-  //       const rqAnswer = await response.json();
-
-  //       if (
-  //         rqAnswer.errors
-  //       ) {
-  //         if (rqAnswer.errors[0] && rqAnswer.errors[0].error && rqAnswer.errors[0].error.code) {
-  //           assert.fail("Did not provide the same token but rather gave error code " + rqAnswer.errors[0].error.code);
-  //         }
-  //         assert.fail("Provided an error without code");
-  //       }
-
-  //       assert.strictEqual(rqAnswer.data.token.token, this.testingUserInfo.testToken);
-  //     }
-  //   );
-
-  //   this.it(
-  //     "Should allow a rq action when using the valid token",
-  //     async () => {
-  //       const response = await fetchNode(this.fullHost + "/rq", {
-  //         method: "POST",
-  //         body: JSON.stringify(
-  //           {
-  //             query:
-  //               "mutation{EDIT_MOD_users__IDEF_user(token: " +
-  //               JSON.stringify(this.testingUserInfo.testToken) +
-  //               ",id:" +
-  //               JSON.stringify(this.testingUserInfo.testUser.id) +
-  //               ",version:null,language:" +
-  //               JSON.stringify(this.testingUserInfo.testUser.app_language) +
-  //               ",listener_uuid:null){id,}}",
-  //             variables: null
-  //           }
-  //         ),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-
-  //       assert.strictEqual(response.status, 200, "Did not return 200 OK");
-
-  //       const rqAnswer = await response.json();
-
-  //       if (
-  //         !rqAnswer.errors ||
-  //         !rqAnswer.errors[0] ||
-  //         !rqAnswer.errors[0].error ||
-  //         rqAnswer.errors[0].error.code !== ENDPOINT_ERRORS.NOTHING_TO_UPDATE
-  //       ) {
-  //         assert.fail("Did not return code for " + ENDPOINT_ERRORS.NOTHING_TO_UPDATE);
-  //       }
-  //     }
-  //   );
-
-  //   const otherTests = [
-  //     {
-  //       label: "Should detect malformed tokens",
-  //       token: this.testingUserInfo.malformedTestToken,
-  //     },
-  //     {
-  //       label: "Should detect tokens signed with the wrong key",
-  //       token: this.testingUserInfo.invalidSignatureTestToken,
-  //     },
-  //     {
-  //       label: "Should not validate against expired tokens via user action",
-  //       token: this.testingUserInfo.invalidSessionIdTestToken,
-  //     },
-  //     {
-  //       label: "Should detect role forgery",
-  //       token: this.testingUserInfo.invalidRoleTestToken
-  //     },
-  //     {
-  //       label: "Should detect totally made up tokens",
-  //       token: this.testingUserInfo.garbageMadeUpToken
-  //     },
-  //   ];
-
-  //   otherTests.forEach((t) => {
-  //     this.it(
-  //       t.label,
-  //       async () => {
-  //         const response = await fetchNode(this.fullHost + "/rq", {
-  //           method: "POST",
-  //           body: JSON.stringify({ query: "query{token(token: " + JSON.stringify(t.token) + "){token,}}", variables: null }),
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         });
-  
-  //         assert.strictEqual(response.status, 200, "Did not return 200 OK");
-  
-  //         const rqAnswer = await response.json();
-  
-  //         if (
-  //           !rqAnswer.errors ||
-  //           !rqAnswer.errors[0] ||
-  //           !rqAnswer.errors[0].error ||
-  //           rqAnswer.errors[0].error.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
-  //         ) {
-  //           assert.fail("Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
-  //         }
-  
-  //         assert.strictEqual(rqAnswer.data.token, null);
-  //       }
-  //     );
-
-  //     this.it(
-  //       t.label + " during a rq action",
-  //       async () => {
-  //         const response = await fetchNode(this.fullHost + "/rq", {
-  //           method: "POST",
-  //           body: JSON.stringify(
-  //             {
-  //               query:
-  //                 "mutation{EDIT_MOD_users__IDEF_user(token: " +
-  //                 JSON.stringify(t.token) +
-  //                 ",id:" +
-  //                 JSON.stringify(this.testingUserInfo.testUser.id) +
-  //                 ",version:null,language:" +
-  //                 JSON.stringify(this.testingUserInfo.testUser.app_language) +
-  //                 ",listener_uuid:null){id,}}",
-  //               variables: null
-  //             }
-  //           ),
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         });
-  
-  //         assert.strictEqual(response.status, 200, "Did not return 200 OK");
-  
-  //         const rqAnswer = await response.json();
-  
-  //         if (
-  //           !rqAnswer.errors ||
-  //           !rqAnswer.errors[0] ||
-  //           !rqAnswer.errors[0].error ||
-  //           rqAnswer.errors[0].error.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
-  //         ) {
-  //           console.log(rqAnswer);
-  //           assert.fail("Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
-  //         }
-  //       }
-  //     );
-  //   });
+        assert.strictEqual(response.data.token, this.testingUserInfo.testToken);
+      }
+    );
   }
 }

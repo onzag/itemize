@@ -53,13 +53,40 @@ class WarnHandle {
  * for all subtests
  */
 export class Test {
+  /**
+   * This queue contains in order
+   * all the it definitions as well as steps
+   * to execute during the test
+   */
   private itQueue: ItHandle[];
+
+  /**
+   * This queue contains the description of subtests
+   * that are added to the test
+   */
   private describeQueue: Array<{
     label: string;
     test: Test;
   }>;
+
+  /**
+   * This queue contains the list of warnings added
+   * during the execution of the test, the warnings
+   * are reset each time a new step from the
+   * itQueue is executed
+   */
   private warningQueue: WarnHandle[];
+
+  /**
+   * Specifies that the next step from the itQueue
+   * should be cancelled
+   */
   private doSkipNext: boolean = false;
+
+  /**
+   * Specifies that all subsequent step from the itQueue
+   * should be cancelled
+   */
   private doSkipAll: boolean = false;
   private doSkipLayer: boolean = false;
   private doStop: boolean = false;
@@ -123,6 +150,7 @@ export class Test {
 
   /**
    * Define a new assertion
+   * 
    * @param label the label for the assertion
    * @param fn the assetion to execute
    */
@@ -130,6 +158,7 @@ export class Test {
     label: string,
     fn: () => void | PromiseLike<void> = null,
   ): ItHandle {
+    // no qeue then we create it
     if (!this.itQueue) {
       this.itQueue = [];
     }
@@ -138,6 +167,14 @@ export class Test {
     return handle;
   }
 
+  /**
+   * Defines a new step, works similar
+   * to defining an assertion but it has no label
+   * and is just a singular hidden step
+   * 
+   * @param fn 
+   * @returns 
+   */
   public step(
     fn: () => void | PromiseLike<void> = null,
   ): ItHandle {
@@ -149,6 +186,12 @@ export class Test {
     return handle;
   }
 
+  /**
+   * Warns during the test
+   * 
+   * @param txt 
+   * @returns 
+   */
   public warn(txt: string) {
     if (!this.warningQueue) {
       this.warningQueue = [];
@@ -159,6 +202,12 @@ export class Test {
     return handle;
   }
 
+  /**
+   * Provides information during the test
+   * 
+   * @param txt 
+   * @returns 
+   */
   public info(txt: string) {
     const handle = this.warn(txt);
     handle.markAsInfo();
@@ -168,6 +217,7 @@ export class Test {
   /**
    * Skip all the next IT tests
    * they should be on the same layer
+   * it will not skip what's on a deeper layer
    */
   public skipNext() {
     if (this.currentStep === "it") {
@@ -181,7 +231,7 @@ export class Test {
 
   /**
    * Skips all the following IT tests
-   * and by all it means all of them
+   * regardless of layer
    */
   public skipAll() {
     if (this.currentStep === "it") {
@@ -195,8 +245,10 @@ export class Test {
 
   /**
    * Skip all the tests that are
-   * on the same layer following
-   * this
+   * on the same layer only
+   * 
+   * because .it and .step can be nested
+   * inside others, and they count as their own child layer
    */
   public skipLayer() {
     if (this.currentStep === "it") {
@@ -207,7 +259,13 @@ export class Test {
       this.doSkipLayer = true;
     });
   }
-
+  
+  /**
+   * Helper function to wait
+   * 
+   * @param ms 
+   * @returns 
+   */
   public wait(ms: number): Promise<void> {
     return new Promise((r) => {
       setTimeout(r, ms);
@@ -221,6 +279,13 @@ export class Test {
     this.doStop = true;
   }
 
+  /**
+   * Executes all the it available from
+   * the it queue
+   * 
+   * @param level basically the number of tabs to use
+   * @returns 
+   */
   private async executeIts(level: number) {
     // reset these as they are only for this layer
     this.doSkipNext = false;
@@ -236,28 +301,45 @@ export class Test {
     // clear the warning queue
     this.warningQueue = null;
 
+    // if we have a queue
     if (this.itQueue) {
+
+      // we loop on it and clear the it queue
+      // the children may generate its own it queue
       const loopItQueue = this.itQueue;
       this.itQueue = null;
+
       for (let itAttr of loopItQueue) {
+
+        // if we are already skipping
         if (this.doSkipAll || this.doSkipNext || this.doSkipLayer) {
+          // we skip and mark the non-next if it was skipped
           this.doSkipNext = false;
           console.log(tabs + colors.gray("⦰ [skipped]") + " " + colors.gray(itAttr.label));
           continue;
         }
 
+        // we add the total if we had a label for it
         if (itAttr.label) {
           total++;
         }
 
+        // now we try to execute the test
         try {
+          // by calling it
           itAttr.fn ? await itAttr.fn.call(this) : null;
+          // and so we display if it has a label
           if (itAttr.label) {
             console.log(tabs + colors.green("✓") + " " + colors.gray(itAttr.label));
           }
+
+          // if get the warnings and clear
           const itWarnings = this.warningQueue;
           this.warningQueue = null;
+
+          // if we had warnings
           if (itWarnings) {
+            // display them first
             for (let warningToShow of itWarnings) {
               const colorFn = warningToShow.isInfo ? colors.cyan : colors.yellow;
               console.log(
@@ -269,11 +351,15 @@ export class Test {
               }
             }
           }
+          // and then we have passed if it's not a step
           if (itAttr.label) {
             passed++;
           }
         } catch (err) {
+          // now we clear the warning queue as well
           this.warningQueue = null;
+
+          // if we are skipped on fails we mark them
           if (itAttr.isSkippedAllOnFail) {
             this.doSkipAll = true;
           }
@@ -283,6 +369,8 @@ export class Test {
           if (itAttr.isSkippedNextOnFail) {
             this.doSkipNext = true;
           }
+
+          // or if we are stopped
           if (itAttr.isQuitted) {
             this.doStop = true;
           }
@@ -291,15 +379,19 @@ export class Test {
           // as it failed so children won't be executed
           this.itQueue = null;
 
+          // it failed
           if (itAttr.label) {
             console.log(tabs + colors.red("✗") + " " + colors.gray(itAttr.label));
           }
+
+          // so we log
           console.log(
             (itAttr.label ? tabsPlus : tabs) +
             err.message.replace(/\n/g, "\n" + tabsPlus)
           );
         }
 
+        // if we have to stop we break
         if (this.doStop) {
           break;
         }
@@ -326,6 +418,7 @@ export class Test {
       }
     }
 
+    // now we can return
     return {
       total,
       passed,

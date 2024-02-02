@@ -163,7 +163,7 @@ export class ExplorerText extends Test {
       "Should have a matching provider for every item loaded via SSR (either present or in history)",
       () => {
         if (!this.currentTestingContextSSR) {
-          assert.fail("Did not provide SSR data, server must've crashed");
+          assert.fail("Did not provide SSR data, server must've crashed or was initialized with NO_SSR=true variable");
         }
 
         this.currentTestingContextSSR.queries.forEach((q) => {
