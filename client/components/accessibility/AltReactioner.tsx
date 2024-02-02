@@ -268,6 +268,17 @@ const ALT_REGISTRY: {
 
 // (window as any).ALT_REGISTRY = ALT_REGISTRY;
 
+/**
+ * Provide a given alt reactioner component from the pool
+ * based on the provided element
+ * 
+ * @param element 
+ * @returns 
+ */
+export function findReactComponentFromElement(element: HTMLElement) {
+  return ALT_REGISTRY.all.find((e) => e.getElement() === element) || null;
+}
+
 export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
   // hide the scroller too
   if (butKeycodes.length === 0) {

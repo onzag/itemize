@@ -504,7 +504,7 @@ function accessibilityEnabledCustomTextProcesser(
       return (
         <WordComponent
           element={element as any}
-          index={info.sentenceNumber}
+          index={info.wordNumber}
         >
           {props.children}
         </WordComponent>
