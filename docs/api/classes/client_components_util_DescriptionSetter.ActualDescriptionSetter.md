@@ -70,7 +70,7 @@ React.Component\&lt;\{children: string}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/DescriptionSetter.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/DescriptionSetter.tsx#L33)
+[client/components/util/DescriptionSetter.tsx:33](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/DescriptionSetter.tsx#L33)
 
 ## Properties
 
@@ -355,7 +355,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/DescriptionSetter.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/DescriptionSetter.tsx#L36)
+[client/components/util/DescriptionSetter.tsx:36](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/DescriptionSetter.tsx#L36)
 
 ___
 
@@ -380,7 +380,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/components/util/DescriptionSetter.tsx:52](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/DescriptionSetter.tsx#L52)
+[client/components/util/DescriptionSetter.tsx:52](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/DescriptionSetter.tsx#L52)
 
 ___
 
@@ -474,7 +474,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/DescriptionSetter.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/DescriptionSetter.tsx#L59)
+[client/components/util/DescriptionSetter.tsx:59](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/DescriptionSetter.tsx#L59)
 
 ___
 
@@ -590,7 +590,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/DescriptionSetter.tsx:65](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/DescriptionSetter.tsx#L65)
+[client/components/util/DescriptionSetter.tsx:65](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/DescriptionSetter.tsx#L65)
 
 ___
 

@@ -35,4 +35,4 @@ for custom role management
 
 #### Defined in
 
-[base/Root/index.ts:76](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L76)
+[base/Root/index.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/index.ts#L77)

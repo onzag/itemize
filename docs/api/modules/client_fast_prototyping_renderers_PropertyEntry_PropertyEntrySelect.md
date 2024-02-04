@@ -57,4 +57,4 @@ The styles for the select
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:64](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L64)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:64](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L64)

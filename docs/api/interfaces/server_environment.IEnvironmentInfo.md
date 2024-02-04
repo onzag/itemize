@@ -26,7 +26,7 @@
 
 #### Defined in
 
-[server/environment.ts:87](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L87)
+[server/environment.ts:87](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L87)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:90](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L90)
+[server/environment.ts:90](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L90)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:95](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L95)
+[server/environment.ts:95](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L95)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:86](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L86)
+[server/environment.ts:86](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L86)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:88](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L88)
+[server/environment.ts:88](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L88)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:94](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L94)
+[server/environment.ts:94](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L94)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:92](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L92)
+[server/environment.ts:92](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L92)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:91](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L91)
+[server/environment.ts:91](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L91)
 
 ___
 
@@ -120,4 +120,4 @@ ___
 
 #### Defined in
 
-[server/environment.ts:93](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L93)
+[server/environment.ts:93](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L93)

@@ -25,7 +25,7 @@ for a single node in an extended instance
 
 #### Defined in
 
-[database/index.ts:24](https://github.com/onzag/itemize/blob/59702dd5/database/index.ts#L24)
+[database/index.ts:24](https://github.com/onzag/itemize/blob/73e0c39e/database/index.ts#L24)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[database/index.ts:23](https://github.com/onzag/itemize/blob/59702dd5/database/index.ts#L23)
+[database/index.ts:23](https://github.com/onzag/itemize/blob/73e0c39e/database/index.ts#L23)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[database/index.ts:25](https://github.com/onzag/itemize/blob/59702dd5/database/index.ts#L25)
+[database/index.ts:25](https://github.com/onzag/itemize/blob/73e0c39e/database/index.ts#L25)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[database/index.ts:26](https://github.com/onzag/itemize/blob/59702dd5/database/index.ts#L26)
+[database/index.ts:26](https://github.com/onzag/itemize/blob/73e0c39e/database/index.ts#L26)
 
 ___
 
@@ -65,4 +65,4 @@ ___
 
 #### Defined in
 
-[database/index.ts:22](https://github.com/onzag/itemize/blob/59702dd5/database/index.ts#L22)
+[database/index.ts:22](https://github.com/onzag/itemize/blob/73e0c39e/database/index.ts#L22)

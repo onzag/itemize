@@ -77,4 +77,4 @@ The default schema for an Include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/schema.ts:16](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/Include/schema.ts#L16)
+[base/Root/Module/ItemDefinition/Include/schema.ts:16](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/Include/schema.ts#L16)

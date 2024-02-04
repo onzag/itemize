@@ -65,7 +65,7 @@ Contructor for the class
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:65](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L65)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:65](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L65)
 
 ## Properties
 
@@ -75,7 +75,7 @@ Contructor for the class
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:51](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L51)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:51](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L51)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:52](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L52)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:52](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L52)
 
 ## Methods
 
@@ -113,7 +113,7 @@ the property map with property values
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:79](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L79)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:79](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L79)
 
 ___
 
@@ -138,7 +138,7 @@ definition itself for referred properties
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:108](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L108)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:108](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L108)
 
 ___
 
@@ -163,4 +163,4 @@ a boolean on whether it has such a property value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:97](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L97)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:97](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L97)

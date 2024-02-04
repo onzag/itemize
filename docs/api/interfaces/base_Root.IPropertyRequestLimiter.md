@@ -22,7 +22,7 @@ and how
 
 #### Defined in
 
-[base/Root/index.ts:47](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L47)
+[base/Root/index.ts:47](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/index.ts#L47)
 
 ___
 
@@ -32,4 +32,4 @@ ___
 
 #### Defined in
 
-[base/Root/index.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/Root/index.ts#L48)
+[base/Root/index.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/index.ts#L48)

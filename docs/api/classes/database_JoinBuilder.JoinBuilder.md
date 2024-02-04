@@ -59,7 +59,7 @@ Builds a new join builder
 
 #### Defined in
 
-[database/JoinBuilder.ts:80](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L80)
+[database/JoinBuilder.ts:80](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L80)
 
 ## Properties
 
@@ -71,7 +71,7 @@ These are the list of all the builders that represents the join rules
 
 #### Defined in
 
-[database/JoinBuilder.ts:75](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L75)
+[database/JoinBuilder.ts:75](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L75)
 
 ## Methods
 
@@ -97,7 +97,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L69)
 
 ___
 
@@ -123,7 +123,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L77)
 
 ___
 
@@ -141,7 +141,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:149](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L149)
+[database/JoinBuilder.ts:149](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L149)
 
 ___
 
@@ -161,7 +161,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L105)
 
 ___
 
@@ -183,7 +183,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/JoinBuilder.ts:159](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L159)
+[database/JoinBuilder.ts:159](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L159)
 
 ___
 
@@ -208,7 +208,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:139](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L139)
+[database/JoinBuilder.ts:139](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L139)
 
 ___
 
@@ -231,7 +231,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L168)
 
 ___
 
@@ -256,7 +256,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:103](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L103)
+[database/JoinBuilder.ts:103](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L103)
 
 ___
 
@@ -281,7 +281,7 @@ the new builder
 
 #### Defined in
 
-[database/JoinBuilder.ts:90](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L90)
+[database/JoinBuilder.ts:90](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L90)
 
 ___
 
@@ -306,7 +306,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:115](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L115)
+[database/JoinBuilder.ts:115](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L115)
 
 ___
 
@@ -326,7 +326,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L112)
 
 ___
 
@@ -351,7 +351,7 @@ itself
 
 #### Defined in
 
-[database/JoinBuilder.ts:127](https://github.com/onzag/itemize/blob/59702dd5/database/JoinBuilder.ts#L127)
+[database/JoinBuilder.ts:127](https://github.com/onzag/itemize/blob/73e0c39e/database/JoinBuilder.ts#L127)
 
 ___
 
@@ -378,7 +378,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L89)
 
 ___
 
@@ -405,7 +405,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L98)
 
 ___
 
@@ -427,4 +427,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L129)

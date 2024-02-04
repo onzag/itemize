@@ -38,7 +38,7 @@ a boolean on whether it equals or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:32](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L32)
+[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:32](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L32)
 
 ___
 
@@ -65,4 +65,4 @@ a boolean on whether it equals
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:22](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts:22](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/local-sql.ts#L22)

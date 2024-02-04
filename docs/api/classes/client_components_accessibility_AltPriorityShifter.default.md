@@ -64,7 +64,7 @@ React.PureComponent\&lt;IAltPriorityShifterProps\&gt;.constructor
 
 #### Defined in
 
-[client/components/accessibility/AltPriorityShifter.tsx:16](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltPriorityShifter.tsx#L16)
+[client/components/accessibility/AltPriorityShifter.tsx:16](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltPriorityShifter.tsx#L16)
 
 ## Properties
 
@@ -594,7 +594,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/accessibility/AltPriorityShifter.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltPriorityShifter.tsx#L20)
+[client/components/accessibility/AltPriorityShifter.tsx:20](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltPriorityShifter.tsx#L20)
 
 ___
 

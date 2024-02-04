@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[base/Root/sql.ts:116](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L116)
+[base/Root/sql.ts:116](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/sql.ts#L116)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 #### Defined in
 
-[base/Root/sql.ts:119](https://github.com/onzag/itemize/blob/59702dd5/base/Root/sql.ts#L119)
+[base/Root/sql.ts:119](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/sql.ts#L119)

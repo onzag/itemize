@@ -24,7 +24,7 @@ in the file itself
 | Name | Type |
 | :------ | :------ |
 | `additionalProperties` | `boolean` |
-| `properties` | \{ `children`: \{ `items`: \{ `type`: `string` = "string" } ; `minItems`: `number` = 1; `type`: `string` = "array" } ; `description`: \{ `type`: `string` = "string" } ; `maxSearchRecords`: \{ `type`: `string` = "number" } ; `maxSearchResults`: \{ `type`: `string` = "number" } ; `modRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `readRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `searchEngineEnabled`: \{ `type`: `string` = "boolean" } ; `searchLimiters`: \{ `additionalProperties`: `boolean` = false; `properties`: \{ `condition`: \{ `enum`: `string`[] ; `type`: `string` = "string" } ; `createdBy`: \{ `type`: `string` = "boolean" } ; `custom`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `parenting`: \{ `type`: `string` = "boolean" } ; `since`: \{ `type`: `string` = "boolean" }  } ; `required`: `string`[] ; `type`: `string` = "object" } ; `searchRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `searchable`: \{ `type`: `string` = "boolean" } ; `type`: \{ `const`: `string` = "module" }  } |
+| `properties` | \{ `children`: \{ `items`: \{ `type`: `string` = "string" } ; `minItems`: `number` = 1; `type`: `string` = "array" } ; `description`: \{ `type`: `string` = "string" } ; `maxSearchRecords`: \{ `type`: `string` = "number" } ; `maxSearchResults`: \{ `type`: `string` = "number" } ; `modRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `readRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `searchEngineEnabled`: \{ `type`: `string` = "boolean" } ; `searchLimiters`: \{ `additionalProperties`: `boolean` = false; `properties`: \{ `condition`: \{ `enum`: `string`[] ; `type`: `string` = "string" } ; `createdBy`: \{ `type`: `string` = "boolean" } ; `ignoreRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `parenting`: \{ `type`: `string` = "boolean" } ; `properties`: \{ `items`: \{ `properties`: \{ `id`: \{ `type`: `string` = "string" } ; `values`: \{ `items`: {} = \{}; `type`: `string` = "array" }  } ; `required`: `string`[] ; `type`: `string` = "object" } ; `type`: `string` = "array" } ; `since`: \{ `type`: `string` = "boolean" }  } ; `required`: `string`[] ; `type`: `string` = "object" } ; `searchRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `searchable`: \{ `type`: `string` = "boolean" } ; `type`: \{ `const`: `string` = "module" }  } |
 | `properties.children` | \{ `items`: \{ `type`: `string` = "string" } ; `minItems`: `number` = 1; `type`: `string` = "array" } |
 | `properties.children.items` | \{ `type`: `string` = "string" } |
 | `properties.children.items.type` | `string` |
@@ -46,20 +46,31 @@ in the file itself
 | `properties.readRoleAccess.type` | `string` |
 | `properties.searchEngineEnabled` | \{ `type`: `string` = "boolean" } |
 | `properties.searchEngineEnabled.type` | `string` |
-| `properties.searchLimiters` | \{ `additionalProperties`: `boolean` = false; `properties`: \{ `condition`: \{ `enum`: `string`[] ; `type`: `string` = "string" } ; `createdBy`: \{ `type`: `string` = "boolean" } ; `custom`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `parenting`: \{ `type`: `string` = "boolean" } ; `since`: \{ `type`: `string` = "boolean" }  } ; `required`: `string`[] ; `type`: `string` = "object" } |
+| `properties.searchLimiters` | \{ `additionalProperties`: `boolean` = false; `properties`: \{ `condition`: \{ `enum`: `string`[] ; `type`: `string` = "string" } ; `createdBy`: \{ `type`: `string` = "boolean" } ; `ignoreRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `parenting`: \{ `type`: `string` = "boolean" } ; `properties`: \{ `items`: \{ `properties`: \{ `id`: \{ `type`: `string` = "string" } ; `values`: \{ `items`: {} = \{}; `type`: `string` = "array" }  } ; `required`: `string`[] ; `type`: `string` = "object" } ; `type`: `string` = "array" } ; `since`: \{ `type`: `string` = "boolean" }  } ; `required`: `string`[] ; `type`: `string` = "object" } |
 | `properties.searchLimiters.additionalProperties` | `boolean` |
-| `properties.searchLimiters.properties` | \{ `condition`: \{ `enum`: `string`[] ; `type`: `string` = "string" } ; `createdBy`: \{ `type`: `string` = "boolean" } ; `custom`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `parenting`: \{ `type`: `string` = "boolean" } ; `since`: \{ `type`: `string` = "boolean" }  } |
+| `properties.searchLimiters.properties` | \{ `condition`: \{ `enum`: `string`[] ; `type`: `string` = "string" } ; `createdBy`: \{ `type`: `string` = "boolean" } ; `ignoreRoleAccess`: \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } ; `parenting`: \{ `type`: `string` = "boolean" } ; `properties`: \{ `items`: \{ `properties`: \{ `id`: \{ `type`: `string` = "string" } ; `values`: \{ `items`: {} = \{}; `type`: `string` = "array" }  } ; `required`: `string`[] ; `type`: `string` = "object" } ; `type`: `string` = "array" } ; `since`: \{ `type`: `string` = "boolean" }  } |
 | `properties.searchLimiters.properties.condition` | \{ `enum`: `string`[] ; `type`: `string` = "string" } |
 | `properties.searchLimiters.properties.condition.enum` | `string`[] |
 | `properties.searchLimiters.properties.condition.type` | `string` |
 | `properties.searchLimiters.properties.createdBy` | \{ `type`: `string` = "boolean" } |
 | `properties.searchLimiters.properties.createdBy.type` | `string` |
-| `properties.searchLimiters.properties.custom` | \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } |
-| `properties.searchLimiters.properties.custom.items` | \{ `type`: `string` = "string" } |
-| `properties.searchLimiters.properties.custom.items.type` | `string` |
-| `properties.searchLimiters.properties.custom.type` | `string` |
+| `properties.searchLimiters.properties.ignoreRoleAccess` | \{ `items`: \{ `type`: `string` = "string" } ; `type`: `string` = "array" } |
+| `properties.searchLimiters.properties.ignoreRoleAccess.items` | \{ `type`: `string` = "string" } |
+| `properties.searchLimiters.properties.ignoreRoleAccess.items.type` | `string` |
+| `properties.searchLimiters.properties.ignoreRoleAccess.type` | `string` |
 | `properties.searchLimiters.properties.parenting` | \{ `type`: `string` = "boolean" } |
 | `properties.searchLimiters.properties.parenting.type` | `string` |
+| `properties.searchLimiters.properties.properties` | \{ `items`: \{ `properties`: \{ `id`: \{ `type`: `string` = "string" } ; `values`: \{ `items`: {} = \{}; `type`: `string` = "array" }  } ; `required`: `string`[] ; `type`: `string` = "object" } ; `type`: `string` = "array" } |
+| `properties.searchLimiters.properties.properties.items` | \{ `properties`: \{ `id`: \{ `type`: `string` = "string" } ; `values`: \{ `items`: {} = \{}; `type`: `string` = "array" }  } ; `required`: `string`[] ; `type`: `string` = "object" } |
+| `properties.searchLimiters.properties.properties.items.properties` | \{ `id`: \{ `type`: `string` = "string" } ; `values`: \{ `items`: {} = \{}; `type`: `string` = "array" }  } |
+| `properties.searchLimiters.properties.properties.items.properties.id` | \{ `type`: `string` = "string" } |
+| `properties.searchLimiters.properties.properties.items.properties.id.type` | `string` |
+| `properties.searchLimiters.properties.properties.items.properties.values` | \{ `items`: {} = \{}; `type`: `string` = "array" } |
+| `properties.searchLimiters.properties.properties.items.properties.values.items` | {} |
+| `properties.searchLimiters.properties.properties.items.properties.values.type` | `string` |
+| `properties.searchLimiters.properties.properties.items.required` | `string`[] |
+| `properties.searchLimiters.properties.properties.items.type` | `string` |
+| `properties.searchLimiters.properties.properties.type` | `string` |
 | `properties.searchLimiters.properties.since` | \{ `type`: `string` = "boolean" } |
 | `properties.searchLimiters.properties.since.type` | `string` |
 | `properties.searchLimiters.required` | `string`[] |
@@ -77,4 +88,4 @@ in the file itself
 
 #### Defined in
 
-[base/Root/Module/schema.ts:11](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/schema.ts#L11)
+[base/Root/Module/schema.ts:11](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/schema.ts#L11)

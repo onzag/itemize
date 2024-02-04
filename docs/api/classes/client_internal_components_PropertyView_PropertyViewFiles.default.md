@@ -67,7 +67,7 @@ React.Component\&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFiles.tsx:57](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFiles.tsx#L57)
+[client/internal/components/PropertyView/PropertyViewFiles.tsx:57](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewFiles.tsx#L57)
 
 ## Properties
 
@@ -599,7 +599,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFiles.tsx:76](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFiles.tsx#L76)
+[client/internal/components/PropertyView/PropertyViewFiles.tsx:76](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewFiles.tsx#L76)
 
 ___
 
@@ -617,7 +617,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFiles.tsx:79](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFiles.tsx#L79)
+[client/internal/components/PropertyView/PropertyViewFiles.tsx:79](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewFiles.tsx#L79)
 
 ___
 
@@ -672,4 +672,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFiles.tsx:62](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewFiles.tsx#L62)
+[client/internal/components/PropertyView/PropertyViewFiles.tsx:62](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewFiles.tsx#L62)

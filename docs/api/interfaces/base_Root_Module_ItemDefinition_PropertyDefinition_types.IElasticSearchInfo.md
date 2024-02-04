@@ -19,6 +19,7 @@
 - [boost](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md#boost)
 - [dictionary](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md#dictionary)
 - [elasticQueryBuilder](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md#elasticquerybuilder)
+- [fullHighlights](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md#fullhighlights)
 - [id](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md#id)
 - [include](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md#include)
 - [isOrderedByIt](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md#isorderedbyit)
@@ -40,7 +41,7 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:80](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L80)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:80](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L80)
 
 ___
 
@@ -50,7 +51,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:114](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L114)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:114](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L114)
 
 ___
 
@@ -60,7 +61,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:116](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L116)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:116](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L116)
 
 ___
 
@@ -70,7 +71,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:112](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L112)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L112)
 
 ___
 
@@ -80,7 +81,17 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:113](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L113)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:113](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L113)
+
+___
+
+### fullHighlights
+
+• **fullHighlights**: `number`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:117](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L117)
 
 ___
 
@@ -94,7 +105,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:66](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L66)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:66](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L66)
 
 ___
 
@@ -108,7 +119,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
 
 ___
 
@@ -118,7 +129,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:115](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L115)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:115](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L115)
 
 ___
 
@@ -132,7 +143,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
 
 ___
 
@@ -142,7 +153,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:111](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L111)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:111](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L111)
 
 ___
 
@@ -156,7 +167,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
 
 ___
 
@@ -170,7 +181,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
 
 ___
 
@@ -184,4 +195,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:79](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L79)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:79](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L79)

@@ -43,7 +43,7 @@ provider
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/base.tsx#L28)
 
 ___
 
@@ -59,7 +59,7 @@ the policy name, should be provided with a policy type
 
 #### Defined in
 
-[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L47)
+[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/base.tsx#L47)
 
 ___
 
@@ -75,7 +75,7 @@ the policy type, should be provided with a policy name
 
 #### Defined in
 
-[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L43)
+[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/base.tsx#L43)
 
 ___
 
@@ -92,7 +92,7 @@ only truly available in search mode
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/base.tsx#L33)
 
 ___
 
@@ -104,4 +104,4 @@ The value to provide to such property
 
 #### Defined in
 
-[client/components/property/base.tsx:168](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L168)
+[client/components/property/base.tsx:168](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/base.tsx#L168)

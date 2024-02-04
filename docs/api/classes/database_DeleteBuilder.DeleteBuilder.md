@@ -56,7 +56,7 @@ Builds a new select query builder
 
 #### Defined in
 
-[database/DeleteBuilder.ts:22](https://github.com/onzag/itemize/blob/59702dd5/database/DeleteBuilder.ts#L22)
+[database/DeleteBuilder.ts:22](https://github.com/onzag/itemize/blob/73e0c39e/database/DeleteBuilder.ts#L22)
 
 ## Properties
 
@@ -66,7 +66,7 @@ Builds a new select query builder
 
 #### Defined in
 
-[database/DeleteBuilder.ts:17](https://github.com/onzag/itemize/blob/59702dd5/database/DeleteBuilder.ts#L17)
+[database/DeleteBuilder.ts:17](https://github.com/onzag/itemize/blob/73e0c39e/database/DeleteBuilder.ts#L17)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[database/DeleteBuilder.ts:14](https://github.com/onzag/itemize/blob/59702dd5/database/DeleteBuilder.ts#L14)
+[database/DeleteBuilder.ts:14](https://github.com/onzag/itemize/blob/73e0c39e/database/DeleteBuilder.ts#L14)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[database/DeleteBuilder.ts:16](https://github.com/onzag/itemize/blob/59702dd5/database/DeleteBuilder.ts#L16)
+[database/DeleteBuilder.ts:16](https://github.com/onzag/itemize/blob/73e0c39e/database/DeleteBuilder.ts#L16)
 
 ## Methods
 
@@ -112,7 +112,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L69)
 
 ___
 
@@ -138,7 +138,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L77)
 
 ___
 
@@ -156,7 +156,7 @@ itself
 
 #### Defined in
 
-[database/DeleteBuilder.ts:36](https://github.com/onzag/itemize/blob/59702dd5/database/DeleteBuilder.ts#L36)
+[database/DeleteBuilder.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/database/DeleteBuilder.ts#L36)
 
 ___
 
@@ -176,7 +176,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L105)
 
 ___
 
@@ -198,7 +198,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/DeleteBuilder.ts:58](https://github.com/onzag/itemize/blob/59702dd5/database/DeleteBuilder.ts#L58)
+[database/DeleteBuilder.ts:58](https://github.com/onzag/itemize/blob/73e0c39e/database/DeleteBuilder.ts#L58)
 
 ___
 
@@ -222,7 +222,7 @@ itself
 
 #### Defined in
 
-[database/DeleteBuilder.ts:50](https://github.com/onzag/itemize/blob/59702dd5/database/DeleteBuilder.ts#L50)
+[database/DeleteBuilder.ts:50](https://github.com/onzag/itemize/blob/73e0c39e/database/DeleteBuilder.ts#L50)
 
 ___
 
@@ -245,7 +245,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L168)
 
 ___
 
@@ -265,7 +265,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L112)
 
 ___
 
@@ -292,7 +292,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L89)
 
 ___
 
@@ -319,7 +319,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L98)
 
 ___
 
@@ -341,4 +341,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L129)

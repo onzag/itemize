@@ -92,7 +92,7 @@ Readable.constructor
 
 #### Defined in
 
-[server/fs-capacitor.ts:34](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L34)
+[server/fs-capacitor.ts:34](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L34)
 
 ## Properties
 
@@ -102,7 +102,7 @@ Readable.constructor
 
 #### Defined in
 
-[server/fs-capacitor.ts:31](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L31)
+[server/fs-capacitor.ts:31](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L31)
 
 ___
 
@@ -112,7 +112,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:32](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L32)
+[server/fs-capacitor.ts:32](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L32)
 
 ___
 
@@ -357,7 +357,7 @@ Readable.\_read
 
 #### Defined in
 
-[server/fs-capacitor.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L43)
+[server/fs-capacitor.ts:43](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L43)
 
 ___
 

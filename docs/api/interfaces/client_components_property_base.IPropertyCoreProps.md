@@ -28,7 +28,7 @@ provider
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/base.tsx#L28)
 
 ___
 
@@ -41,4 +41,4 @@ only truly available in search mode
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/base.tsx#L33)

@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[server/resolvers/index.ts:9](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/index.ts#L9)
+[server/resolvers/index.ts:9](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/index.ts#L9)

@@ -33,7 +33,7 @@ off a search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:192](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L192)
+[client/components/search/SearchLoader.tsx:192](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L192)
 
 ___
 
@@ -59,7 +59,7 @@ The children function which specifies how to retrieve these results
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:172](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L172)
+[client/components/search/SearchLoader.tsx:172](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L172)
 
 ___
 
@@ -71,7 +71,7 @@ Whether the resulting search results should clean on dismount
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:181](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L181)
+[client/components/search/SearchLoader.tsx:181](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L181)
 
 ___
 
@@ -85,7 +85,7 @@ otherwise this will cause an error
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:168](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L168)
+[client/components/search/SearchLoader.tsx:168](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L168)
 
 ___
 
@@ -98,7 +98,7 @@ results provider props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:186](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L186)
+[client/components/search/SearchLoader.tsx:186](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L186)
 
 ___
 
@@ -111,7 +111,7 @@ item definition loader props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:177](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L177)
+[client/components/search/SearchLoader.tsx:177](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L177)
 
 ___
 
@@ -138,7 +138,7 @@ Triggers when the search data changes, as in a new search id
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:216](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L216)
+[client/components/search/SearchLoader.tsx:216](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L216)
 
 ___
 
@@ -152,7 +152,7 @@ at once
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L162)
+[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L162)
 
 ___
 
@@ -168,7 +168,7 @@ starts at true
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:200](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L200)
+[client/components/search/SearchLoader.tsx:200](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L200)
 
 ___
 
@@ -188,4 +188,4 @@ this is why total is the better option
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:212](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchLoader.tsx#L212)
+[client/components/search/SearchLoader.tsx:212](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchLoader.tsx#L212)

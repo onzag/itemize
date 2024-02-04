@@ -28,7 +28,7 @@ we can specify a per property rule for fetching new records
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:60](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L60)
+[client/internal/rq-client-util.ts:60](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L60)
 
 ___
 
@@ -41,7 +41,7 @@ this condition
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:65](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L65)
+[client/internal/rq-client-util.ts:65](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L65)
 
 ___
 
@@ -54,7 +54,7 @@ something has happened to it that the record was missing
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:70](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L70)
+[client/internal/rq-client-util.ts:70](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L70)
 
 ___
 
@@ -67,4 +67,4 @@ from the old metadata and the new metadata
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:75](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L75)
+[client/internal/rq-client-util.ts:75](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L75)

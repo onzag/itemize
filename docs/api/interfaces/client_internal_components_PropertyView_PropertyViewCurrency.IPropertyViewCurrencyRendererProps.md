@@ -45,7 +45,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L19)
 
 ___
 
@@ -60,7 +60,7 @@ the current's user currency
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:55](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L55)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:55](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L55)
 
 ___
 
@@ -73,7 +73,7 @@ to match the user's locale
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:48](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L48)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:48](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L48)
 
 ___
 
@@ -87,7 +87,7 @@ otherwise null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:43](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L43)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:43](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L43)
 
 ___
 
@@ -103,7 +103,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -116,7 +116,7 @@ $N means symbol first, number last N$ means the opposite
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L20)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:20](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L20)
 
 ___
 
@@ -130,7 +130,7 @@ is null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:37](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L37)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:37](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L37)
 
 ___
 
@@ -144,7 +144,7 @@ if the currency value itself is null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:31](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L31)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:31](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L31)
 
 ___
 
@@ -157,7 +157,7 @@ if the value itself is null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L25)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:25](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L25)
 
 ___
 
@@ -173,4 +173,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L15)

@@ -25,7 +25,7 @@ The rq alias
 
 #### Defined in
 
-[rq-querier.ts:518](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L518)
+[rq-querier.ts:518](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L518)
 
 ___
 
@@ -37,7 +37,7 @@ The arguments to use
 
 #### Defined in
 
-[rq-querier.ts:522](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L522)
+[rq-querier.ts:522](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L522)
 
 ___
 
@@ -49,7 +49,7 @@ And the fields
 
 #### Defined in
 
-[rq-querier.ts:526](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L526)
+[rq-querier.ts:526](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L526)
 
 ___
 
@@ -61,4 +61,4 @@ The rq query name
 
 #### Defined in
 
-[rq-querier.ts:514](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L514)
+[rq-querier.ts:514](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L514)

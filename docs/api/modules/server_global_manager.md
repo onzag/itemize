@@ -38,4 +38,4 @@ data and other resources
 
 #### Defined in
 
-[server/global-manager.ts:54](https://github.com/onzag/itemize/blob/59702dd5/server/global-manager.ts#L54)
+[server/global-manager.ts:54](https://github.com/onzag/itemize/blob/73e0c39e/server/global-manager.ts#L54)

@@ -21,4 +21,4 @@ as strings
 
 #### Defined in
 
-[client/components/navigation/LocationReader.tsx:89](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationReader.tsx#L89)
+[client/components/navigation/LocationReader.tsx:89](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationReader.tsx#L89)

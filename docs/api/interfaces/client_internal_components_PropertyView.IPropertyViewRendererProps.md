@@ -64,7 +64,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L19)
 
 ___
 
@@ -76,7 +76,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -92,4 +92,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L15)

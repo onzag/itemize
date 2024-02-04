@@ -30,7 +30,7 @@ Whether it has failed to synchronize, whether itself or at any children level
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:65](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L65)
+[client/components/util/BaseSyncer.tsx:65](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L65)
 
 ___
 
@@ -43,7 +43,7 @@ if no cache worker is present, it just can't sync
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:71](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L71)
+[client/components/util/BaseSyncer.tsx:71](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L71)
 
 ___
 
@@ -56,7 +56,7 @@ to an unsynced state, basically specifies whether it has synced at least once
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:60](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L60)
+[client/components/util/BaseSyncer.tsx:60](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L60)
 
 ___
 
@@ -69,7 +69,7 @@ a delay
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:54](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L54)
+[client/components/util/BaseSyncer.tsx:54](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L54)
 
 ___
 
@@ -82,7 +82,7 @@ to an unsynced state, basically specifies whether it has synced at least once
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:42](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L42)
+[client/components/util/BaseSyncer.tsx:42](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L42)
 
 ___
 
@@ -95,7 +95,7 @@ the value always starts in a false state
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L36)
+[client/components/util/BaseSyncer.tsx:36](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L36)
 
 ___
 
@@ -108,7 +108,7 @@ syncers
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:16](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L16)
+[client/components/util/BaseSyncer.tsx:16](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L16)
 
 ___
 
@@ -120,7 +120,7 @@ Whether it is ready to begin syncing
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:21](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L21)
+[client/components/util/BaseSyncer.tsx:21](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L21)
 
 ___
 
@@ -133,7 +133,7 @@ this means that all the item data is loaded, in an search syncer that the search
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:48](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L48)
+[client/components/util/BaseSyncer.tsx:48](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L48)
 
 ___
 
@@ -149,7 +149,7 @@ to use this value, use gracefulTreeSynced instead which will try to make up for 
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L30)
+[client/components/util/BaseSyncer.tsx:30](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L30)
 
 ___
 
@@ -161,4 +161,4 @@ A reference to being unmounted
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:75](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/BaseSyncer.tsx#L75)
+[client/components/util/BaseSyncer.tsx:75](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/BaseSyncer.tsx#L75)

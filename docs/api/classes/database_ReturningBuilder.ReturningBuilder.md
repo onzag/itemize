@@ -57,7 +57,7 @@ Builds a new SQL RETURNING statment
 
 #### Defined in
 
-[database/ReturningBuilder.ts:20](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L20)
+[database/ReturningBuilder.ts:20](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L20)
 
 ## Properties
 
@@ -69,7 +69,7 @@ the expressions that we are returning
 
 #### Defined in
 
-[database/ReturningBuilder.ts:15](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L15)
+[database/ReturningBuilder.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L15)
 
 ## Methods
 
@@ -95,7 +95,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L69)
 
 ___
 
@@ -121,7 +121,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L77)
 
 ___
 
@@ -139,7 +139,7 @@ itself
 
 #### Defined in
 
-[database/ReturningBuilder.ts:85](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L85)
+[database/ReturningBuilder.ts:85](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L85)
 
 ___
 
@@ -159,7 +159,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L105)
 
 ___
 
@@ -181,7 +181,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/ReturningBuilder.ts:74](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L74)
+[database/ReturningBuilder.ts:74](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L74)
 
 ___
 
@@ -204,7 +204,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L168)
 
 ___
 
@@ -224,7 +224,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L112)
 
 ___
 
@@ -249,7 +249,7 @@ itself
 
 #### Defined in
 
-[database/ReturningBuilder.ts:60](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L60)
+[database/ReturningBuilder.ts:60](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L60)
 
 ___
 
@@ -273,7 +273,7 @@ itself
 
 #### Defined in
 
-[database/ReturningBuilder.ts:29](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L29)
+[database/ReturningBuilder.ts:29](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L29)
 
 ___
 
@@ -297,7 +297,7 @@ itself
 
 #### Defined in
 
-[database/ReturningBuilder.ts:41](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L41)
+[database/ReturningBuilder.ts:41](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L41)
 
 ___
 
@@ -322,7 +322,7 @@ itself
 
 #### Defined in
 
-[database/ReturningBuilder.ts:50](https://github.com/onzag/itemize/blob/59702dd5/database/ReturningBuilder.ts#L50)
+[database/ReturningBuilder.ts:50](https://github.com/onzag/itemize/blob/73e0c39e/database/ReturningBuilder.ts#L50)
 
 ___
 
@@ -349,7 +349,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L89)
 
 ___
 
@@ -376,7 +376,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L98)
 
 ___
 
@@ -398,4 +398,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L129)

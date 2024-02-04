@@ -27,6 +27,7 @@ users without hands
 
 - [calculateLayereds](client_components_accessibility_AltReactioner.md#calculatelayereds)
 - [default](client_components_accessibility_AltReactioner.md#default)
+- [findReactComponentFromElement](client_components_accessibility_AltReactioner.md#findreactcomponentfromelement)
 - [hideAll](client_components_accessibility_AltReactioner.md#hideall)
 - [showLayereds](client_components_accessibility_AltReactioner.md#showlayereds)
 - [toggleAlt](client_components_accessibility_AltReactioner.md#togglealt)
@@ -52,7 +53,7 @@ users without hands
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:372](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L372)
+[client/components/accessibility/AltReactioner.tsx:383](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltReactioner.tsx#L383)
 
 ___
 
@@ -78,6 +79,29 @@ node_modules/@types/react/index.d.ts:354
 
 ___
 
+### findReactComponentFromElement
+
+▸ **findReactComponentFromElement**(`element`): [`ActualAltBase`](../classes/client_components_accessibility_AltReactioner.ActualAltBase.md)\<`any`, `any`\>
+
+Provide a given alt reactioner component from the pool
+based on the provided element
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `element` | `HTMLElement` |
+
+#### Returns
+
+[`ActualAltBase`](../classes/client_components_accessibility_AltReactioner.ActualAltBase.md)\<`any`, `any`\>
+
+#### Defined in
+
+[client/components/accessibility/AltReactioner.tsx:278](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltReactioner.tsx#L278)
+
+___
+
 ### hideAll
 
 ▸ **hideAll**(`butKeycodes?`): `void`
@@ -94,7 +118,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:271](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L271)
+[client/components/accessibility/AltReactioner.tsx:282](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltReactioner.tsx#L282)
 
 ___
 
@@ -114,7 +138,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:431](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L431)
+[client/components/accessibility/AltReactioner.tsx:442](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltReactioner.tsx#L442)
 
 ___
 
@@ -128,7 +152,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:779](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L779)
+[client/components/accessibility/AltReactioner.tsx:790](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltReactioner.tsx#L790)
 
 ___
 
@@ -148,7 +172,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1489](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1489)
+[client/components/accessibility/AltReactioner.tsx:1500](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltReactioner.tsx#L1500)
 
 ___
 
@@ -162,4 +186,4 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1516](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltReactioner.tsx#L1516)
+[client/components/accessibility/AltReactioner.tsx:1527](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltReactioner.tsx#L1527)

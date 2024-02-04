@@ -72,7 +72,7 @@ React.Component\&lt;ILanguagePickerProps, ILanguagePickerState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:109](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/language-picker.tsx#L109)
+[client/fast-prototyping/components/language-picker.tsx:109](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/language-picker.tsx#L109)
 
 ## Properties
 
@@ -604,7 +604,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:120](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/language-picker.tsx#L120)
+[client/fast-prototyping/components/language-picker.tsx:120](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/language-picker.tsx#L120)
 
 ___
 
@@ -625,7 +625,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:130](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/language-picker.tsx#L130)
+[client/fast-prototyping/components/language-picker.tsx:130](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/language-picker.tsx#L130)
 
 ___
 
@@ -639,7 +639,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:125](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/language-picker.tsx#L125)
+[client/fast-prototyping/components/language-picker.tsx:125](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/language-picker.tsx#L125)
 
 ___
 
@@ -657,7 +657,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:141](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/language-picker.tsx#L141)
+[client/fast-prototyping/components/language-picker.tsx:141](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/language-picker.tsx#L141)
 
 ___
 

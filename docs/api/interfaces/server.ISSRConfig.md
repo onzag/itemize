@@ -40,7 +40,7 @@ Specifies the SSR configuration for the multiple pages
 
 #### Defined in
 
-[server/index.ts:156](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L156)
+[server/index.ts:156](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L156)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:158](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L158)
+[server/index.ts:158](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L158)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:155](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L155)
+[server/index.ts:155](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L155)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:157](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L157)
+[server/index.ts:157](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L157)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:154](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L154)
+[server/index.ts:154](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L154)
 
 ___
 
@@ -115,4 +115,4 @@ ___
 
 #### Defined in
 
-[server/index.ts:159](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L159)
+[server/index.ts:159](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L159)

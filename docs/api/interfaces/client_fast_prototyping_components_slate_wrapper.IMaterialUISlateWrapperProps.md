@@ -4,42 +4,57 @@
 
 [client/fast-prototyping/components/slate/wrapper](../modules/client_fast_prototyping_components_slate_wrapper.md).IMaterialUISlateWrapperProps
 
-These are the base props that this wrapper uses, note how we extend the base wrapper props as defined
-in the slate editor itself, and add the styles for the classes and these i18n info
-
-If you wonder how the i18n information is to be added, in the PropertyEntryText when creating
-the slate editor as a component the wrapper can receive wrapperArgs so these args are passed
-when the editor is created with the wrapper itself
-
 ## Hierarchy
 
-- [`ISlateEditorWrapperBaseProps`](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md)
+- `IDefaultSlateWrapperProps`
 
   ↳ **`IMaterialUISlateWrapperProps`**
-
-  ↳↳ [`RichTextEditorToolbarProps`](client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md)
-
-  ↳↳ [`IDrawerContainerProps`](client_fast_prototyping_components_slate_wrapper.IDrawerContainerProps.md)
 
 ## Table of contents
 
 ### Properties
 
+- [BaseWrapper](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#basewrapper)
+- [Dialog](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#dialog)
+- [DisjointedEditor](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#disjointededitor)
+- [DisjointedEditorContainer](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#disjointededitorcontainer)
+- [DrawerBody](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#drawerbody)
+- [DrawerContainerBox](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#drawercontainerbox)
+- [DrawerSpacer](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#drawerspacer)
+- [DrawerWrapper](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#drawerwrapper)
+- [Editor](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#editor)
+- [EditorContainer](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#editorcontainer)
+- [FinalWrapper](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#finalwrapper)
+- [Toolbar](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbar)
+- [ToolbarButton](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbarbutton)
+- [ToolbarDrawerButton](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbardrawerbutton)
+- [ToolbarHDivider](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbarhdivider)
+- [ToolbarVDivider](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbarvdivider)
+- [ToolbarWrapper](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbarwrapper)
+- [WrapperDrawerCheckboxField](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawercheckboxfield)
+- [WrapperDrawerElementTitle](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawerelementtitle)
+- [WrapperDrawerElementTitleWrapper](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawerelementtitlewrapper)
+- [WrapperDrawerInfoPanelWrapper](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawerinfopanelwrapper)
+- [WrapperDrawerInternalPanelWrapper](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawerinternalpanelwrapper)
+- [WrapperDrawerMultiSelectField](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawermultiselectfield)
+- [WrapperDrawerSelectField](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawerselectfield)
+- [WrapperDrawerTabs](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawertabs)
+- [WrapperDrawerTextField](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperdrawertextfield)
+- [baseI18n](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#basei18n)
 - [children](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#children)
 - [currentLoadError](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#currentloaderror)
+- [customArgs](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#customargs)
 - [customExtraChildren](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#customextrachildren)
 - [customToolbar](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#customtoolbar)
 - [disabled](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#disabled)
 - [disjointedMode](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#disjointedmode)
 - [disjointedModeKeepToolbar](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#disjointedmodekeeptoolbar)
 - [dismissCurrentLoadError](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#dismisscurrentloaderror)
+- [drawerExtraChildren](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#drawerextrachildren)
 - [drawerExtras](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#drawerextras)
 - [featureSupport](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#featuresupport)
 - [helpers](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#helpers)
 - [hideDrawer](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#hidedrawer)
-- [i18nGenericError](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#i18ngenericerror)
-- [i18nOk](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#i18nok)
-- [i18nRichInfo](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#i18nrichinfo)
 - [reactionerDisabled](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#reactionerdisabled)
 - [reactionerKey](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#reactionerkey)
 - [reactionerPriority](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#reactionerpriority)
@@ -49,12 +64,453 @@ when the editor is created with the wrapper itself
 - [toolbarExtras](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbarextras)
 - [toolbarSx](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#toolbarsx)
 - [variant](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#variant)
-- [wrapperClassName](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrapperclassname)
 - [wrapperSx](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrappersx)
-- [wrapperTextEditorClassName](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrappertexteditorclassname)
 - [wrapperTextEditorSx](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md#wrappertexteditorsx)
 
 ## Properties
+
+### BaseWrapper
+
+• `Optional` **BaseWrapper**: `ComponentType`\<`IEditorWrapperProps`\>
+
+A wrapper for the editing region
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.BaseWrapper
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:498
+
+___
+
+### Dialog
+
+• `Optional` **Dialog**: `ComponentType`\<`IDialogComponentProps`\>
+
+Used for displaying dialogs with errors
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.Dialog
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:508
+
+___
+
+### DisjointedEditor
+
+• `Optional` **DisjointedEditor**: `ComponentType`\<`IEditorProps`\>
+
+The disjointed editor itself
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.DisjointedEditor
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:472
+
+___
+
+### DisjointedEditorContainer
+
+• `Optional` **DisjointedEditorContainer**: `ComponentType`\<`IEditorContainerProps`\>
+
+When used disjointed mode a container is given to the editor
+to wrap it use this to specify it, remember to allow it to pass
+a ref as it's required for this component
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.DisjointedEditorContainer
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:468
+
+___
+
+### DrawerBody
+
+• `Optional` **DrawerBody**: `DrawerBodyComponent`
+
+Customization for the drawer
+the body object containment itself
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.DrawerBody
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:433
+
+___
+
+### DrawerContainerBox
+
+• `Optional` **DrawerContainerBox**: `DrawerContainerBoxComponent`
+
+Customization for the drawer
+the container box that wraps the entire drawer
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.DrawerContainerBox
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:421
+
+___
+
+### DrawerSpacer
+
+• `Optional` **DrawerSpacer**: `DrawerSpacerComponent`
+
+Customization for the drawer
+the spacer that is added on disjointed mode only
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.DrawerSpacer
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:427
+
+___
+
+### DrawerWrapper
+
+• `Optional` **DrawerWrapper**: `ComponentType`\<`IEditorWrapperProps`\>
+
+A wrapper for the drawer
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.DrawerWrapper
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:503
+
+___
+
+### Editor
+
+• `Optional` **Editor**: `ComponentType`\<`IEditorProps`\>
+
+The editor itself, not used in disjointed mode
+the DisjointedEditor is used instead
+a ref is required for this component to be supported
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.Editor
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:478
+
+___
+
+### EditorContainer
+
+• `Optional` **EditorContainer**: `ComponentType`\<`IEditorContainerProps`\>
+
+When using the standard mode, it contains
+the editor itself
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.EditorContainer
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:483
+
+___
+
+### FinalWrapper
+
+• `Optional` **FinalWrapper**: `ComponentType`\<`IEditorWrapperProps`\>
+
+A wrapper for everything
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.FinalWrapper
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:493
+
+___
+
+### Toolbar
+
+• `Optional` **Toolbar**: `ComponentType`\<`IToolbarProps`\>
+
+Used for the toolbar itself
+the toolbar should also support a ref
+as it's used to calculate the height of the toolbar
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.Toolbar
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:461
+
+___
+
+### ToolbarButton
+
+• `Optional` **ToolbarButton**: `ToolbarButtonComponent`
+
+Customization for the button wrapper that is used
+in the toolbar
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.ToolbarButton
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:439
+
+___
+
+### ToolbarDrawerButton
+
+• `Optional` **ToolbarDrawerButton**: `ComponentType`\<`IToolbarDrawerButtonProps`\>
+
+The button used to toggle the drawer from the toolbar
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.ToolbarDrawerButton
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:444
+
+___
+
+### ToolbarHDivider
+
+• `Optional` **ToolbarHDivider**: `ComponentType`\<{}\>
+
+Used for separation in the toolbar (horizontal)
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.ToolbarHDivider
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:449
+
+___
+
+### ToolbarVDivider
+
+• `Optional` **ToolbarVDivider**: `ComponentType`\<{}\>
+
+Used for separation in the toolbar (vertical)
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.ToolbarVDivider
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:454
+
+___
+
+### ToolbarWrapper
+
+• `Optional` **ToolbarWrapper**: `ComponentType`\<`IEditorWrapperProps`\>
+
+A wrapper for the toolbar component
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.ToolbarWrapper
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:488
+
+___
+
+### WrapperDrawerCheckboxField
+
+• `Optional` **WrapperDrawerCheckboxField**: `ComponentType`\<`IWrapperDrawerCheckBoxProps`\>
+
+Used to make checkbox input fields
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerCheckboxField
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:543
+
+___
+
+### WrapperDrawerElementTitle
+
+• `Optional` **WrapperDrawerElementTitle**: `ComponentType`\<`IWrapperDrawerElementTitleProps`\>
+
+Used for generating the title and hirearchy of each element in the drawer
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerElementTitle
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:513
+
+___
+
+### WrapperDrawerElementTitleWrapper
+
+• `Optional` **WrapperDrawerElementTitleWrapper**: `ComponentType`\<`IWrapperDrawerElementTitleWrapperProps`\>
+
+Used for wrapping all the titles generated
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerElementTitleWrapper
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:518
+
+___
+
+### WrapperDrawerInfoPanelWrapper
+
+• `Optional` **WrapperDrawerInfoPanelWrapper**: `ComponentType`\<`IWrapperDrawerInfoPanelWrapperProps`\>
+
+Wraps the information panel from the drawer, whatever is visible
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerInfoPanelWrapper
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:523
+
+___
+
+### WrapperDrawerInternalPanelWrapper
+
+• `Optional` **WrapperDrawerInternalPanelWrapper**: `ComponentType`\<`IWrapperDrawerInternalPanelWrapperProps`\>
+
+Used to wrap the internal panel
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerInternalPanelWrapper
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:533
+
+___
+
+### WrapperDrawerMultiSelectField
+
+• `Optional` **WrapperDrawerMultiSelectField**: `ComponentType`\<`IWrapperDrawerMultiSelectFieldProps`\>
+
+Used to make select input fields
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerMultiSelectField
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:553
+
+___
+
+### WrapperDrawerSelectField
+
+• `Optional` **WrapperDrawerSelectField**: `ComponentType`\<`IWrapperDrawerSelectFieldProps`\>
+
+Used to make select input fields
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerSelectField
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:548
+
+___
+
+### WrapperDrawerTabs
+
+• `Optional` **WrapperDrawerTabs**: `ComponentType`\<`IWrapperDrawerTabsProps`\>
+
+Used for the tabs switcher component that is used in the drawer
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerTabs
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:528
+
+___
+
+### WrapperDrawerTextField
+
+• `Optional` **WrapperDrawerTextField**: `ComponentType`\<`IWrapperDrawerTextFieldProps`\>
+
+Used to make text input fields
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.WrapperDrawerTextField
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:538
+
+___
+
+### baseI18n
+
+• **baseI18n**: `IBaseI18nRichTextInfo`
+
+the base i18n given
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.baseI18n
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1103
+
+___
 
 ### children
 
@@ -67,11 +523,11 @@ where it is expected to be used
 
 #### Inherited from
 
-[ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md).[children](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#children)
+IDefaultSlateWrapperProps.children
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L827)
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1086
 
 ___
 
@@ -87,11 +543,27 @@ indeed provide this as a prop for the render
 
 #### Inherited from
 
-[ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md).[currentLoadError](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#currentloaderror)
+IDefaultSlateWrapperProps.currentLoadError
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:835](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L835)
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1094
+
+___
+
+### customArgs
+
+• `Optional` **customArgs**: `any`
+
+custom args that are passed to every element down the stream that is custom
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.customArgs
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:558
 
 ___
 
@@ -105,6 +577,9 @@ ___
 
 A function to define custom extra children
 
+Note that this uses the default character count and word count algorithm
+which may not work in some languages
+
 ##### Parameters
 
 | Name | Type |
@@ -116,21 +591,29 @@ A function to define custom extra children
 
 `ReactNode`
 
+#### Inherited from
+
+IDefaultSlateWrapperProps.customExtraChildren
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:485](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L485)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:415
 
 ___
 
 ### customToolbar
 
-• `Optional` **customToolbar**: [`SlateEditorWrapperCustomToolbarElement`](../modules/client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelement)[]
+• `Optional` **customToolbar**: `SlateEditorWrapperCustomToolbarElement`[]
 
 Function to be used to specify a whole custom toolbar down to the very basics
 
+#### Inherited from
+
+IDefaultSlateWrapperProps.customToolbar
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:452](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L452)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:388
 
 ___
 
@@ -142,11 +625,11 @@ Whether it is disabled
 
 #### Inherited from
 
-[ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md).[disabled](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#disabled)
+IDefaultSlateWrapperProps.disabled
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L803)
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1062
 
 ___
 
@@ -156,9 +639,13 @@ ___
 
 The disjointed mode
 
+#### Inherited from
+
+IDefaultSlateWrapperProps.disjointedMode
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:464](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L464)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:400
 
 ___
 
@@ -166,9 +653,15 @@ ___
 
 • `Optional` **disjointedModeKeepToolbar**: `boolean`
 
+The toolbar is retained even if the text isn't focused
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.disjointedModeKeepToolbar
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:465](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L465)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:404
 
 ___
 
@@ -189,29 +682,49 @@ as the currentLoadError
 
 #### Inherited from
 
-[ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md).[dismissCurrentLoadError](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#dismisscurrentloaderror)
+IDefaultSlateWrapperProps.dismissCurrentLoadError
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:840](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L840)
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1099
+
+___
+
+### drawerExtraChildren
+
+• `Optional` **drawerExtraChildren**: `ReactNode`
+
+add extra children to the drawer
+
+#### Inherited from
+
+IDefaultSlateWrapperProps.drawerExtraChildren
+
+#### Defined in
+
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:563
 
 ___
 
 ### drawerExtras
 
-• `Optional` **drawerExtras**: [`IDrawerConfiguratorElement`](client_fast_prototyping_components_slate_wrapper.IDrawerConfiguratorElement.md)[]
+• `Optional` **drawerExtras**: `IDrawerConfiguratorElement`[]
 
 Drawer extras for the ui handled types
 
+#### Inherited from
+
+IDefaultSlateWrapperProps.drawerExtras
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:456](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L456)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:392
 
 ___
 
 ### featureSupport
 
-• **featureSupport**: [`IAccessibleFeatureSupportOptions`](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md)
+• **featureSupport**: `IAccessibleFeatureSupportOptions`
 
 This is a list of extended features that are available
 to the editor, and the wrapper can render buttons
@@ -219,28 +732,28 @@ and whatnot from it
 
 #### Inherited from
 
-[ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md).[featureSupport](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#featuresupport)
+IDefaultSlateWrapperProps.featureSupport
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L815)
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1074
 
 ___
 
 ### helpers
 
-• **helpers**: [`IHelperFunctions`](client_fast_prototyping_components_slate.IHelperFunctions.md)
+• **helpers**: `IHelperFunctions`
 
 These are helper functions that are used to insert elements
 and modify nodes
 
 #### Inherited from
 
-[ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md).[helpers](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#helpers)
+IDefaultSlateWrapperProps.helpers
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L820)
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1079
 
 ___
 
@@ -250,45 +763,13 @@ ___
 
 Whether to hide the drawer
 
-#### Defined in
+#### Inherited from
 
-[client/fast-prototyping/components/slate/wrapper.tsx:460](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L460)
-
-___
-
-### i18nGenericError
-
-• **i18nGenericError**: `string`
-
-A generic error message
+IDefaultSlateWrapperProps.hideDrawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:435](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L435)
-
-___
-
-### i18nOk
-
-• **i18nOk**: `string`
-
-A generic ok
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:439](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L439)
-
-___
-
-### i18nRichInfo
-
-• **i18nRichInfo**: [`IPropertyEntryI18nRichTextInfo`](client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryI18nRichTextInfo.md)
-
-The whole of the i18n rich information that is given by default
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:443](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L443)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:396
 
 ___
 
@@ -296,9 +777,11 @@ ___
 
 • `Optional` **reactionerDisabled**: `boolean`
 
+Whether the reactioner is disabled
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:492](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L492)
+[client/fast-prototyping/components/slate/wrapper.tsx:982](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L982)
 
 ___
 
@@ -306,9 +789,11 @@ ___
 
 • `Optional` **reactionerKey**: `string`
 
+key to use with the reactioner
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:491](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L491)
+[client/fast-prototyping/components/slate/wrapper.tsx:978](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L978)
 
 ___
 
@@ -320,7 +805,7 @@ For generating an alt badge reactioner
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:490](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L490)
+[client/fast-prototyping/components/slate/wrapper.tsx:973](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L973)
 
 ___
 
@@ -328,15 +813,17 @@ ___
 
 • `Optional` **reactionerUseInFlow**: `boolean`
 
+Whether the reactioner is to be used in flow
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:493](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L493)
+[client/fast-prototyping/components/slate/wrapper.tsx:986](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L986)
 
 ___
 
 ### state
 
-• **state**: [`ISlateEditorInternalStateType`](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
+• **state**: `ISlateEditorInternalStateType`
 
 This is the slate editor current state
 that is passed to the wrapper in order
@@ -344,11 +831,11 @@ so it can get state information
 
 #### Inherited from
 
-[ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md).[state](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#state)
+IDefaultSlateWrapperProps.state
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/index.tsx#L809)
+node_modules/@onzag/itemize-text-engine/editor/slate/index.tsx:1068
 
 ___
 
@@ -358,32 +845,42 @@ ___
 
 Add a class name to the toolbar in the wrapper
 
+#### Inherited from
+
+IDefaultSlateWrapperProps.toolbarClassName
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:480](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L480)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:408
 
 ___
 
 ### toolbarExtras
 
-• `Optional` **toolbarExtras**: [`IToolbarPrescenseElement`](client_fast_prototyping_components_slate_wrapper.IToolbarPrescenseElement.md)[]
+• `Optional` **toolbarExtras**: `IToolbarPrescenseElement`[]
 
 Function that should be specified to assign extra toolbar elements
 to be used either by ui handled components and whatnot
 
+#### Inherited from
+
+IDefaultSlateWrapperProps.toolbarExtras
+
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:448](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L448)
+node_modules/@onzag/itemize-text-engine/editor/slate/wrapper.tsx:384
 
 ___
 
 ### toolbarSx
 
-• `Optional` **toolbarSx**: `SxProps`\<{}\>
+• `Optional` **toolbarSx**: `any`
+
+toolbar sx used for the toolbar
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:481](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L481)
+[client/fast-prototyping/components/slate/wrapper.tsx:998](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L998)
 
 ___
 
@@ -395,48 +892,26 @@ The wrapper variant
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:431](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L431)
-
-___
-
-### wrapperClassName
-
-• `Optional` **wrapperClassName**: `string`
-
-Add a class name to the entire wrapper
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:469](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L469)
+[client/fast-prototyping/components/slate/wrapper.tsx:968](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L968)
 
 ___
 
 ### wrapperSx
 
-• `Optional` **wrapperSx**: `SxProps`\<{}\>
+• **wrapperSx**: `any`
+
+Wrapper sx
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:470](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L470)
-
-___
-
-### wrapperTextEditorClassName
-
-• `Optional` **wrapperTextEditorClassName**: `string`
-
-Add a class name to the container in the wrapper
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:474](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L474)
+[client/fast-prototyping/components/slate/wrapper.tsx:991](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L991)
 
 ___
 
 ### wrapperTextEditorSx
 
-• `Optional` **wrapperTextEditorSx**: `SxProps`\<{}\>
+• **wrapperTextEditorSx**: `any`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:475](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L475)
+[client/fast-prototyping/components/slate/wrapper.tsx:993](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L993)

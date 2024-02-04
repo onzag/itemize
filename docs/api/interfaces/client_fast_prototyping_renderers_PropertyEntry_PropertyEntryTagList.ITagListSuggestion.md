@@ -9,6 +9,7 @@
 ### Properties
 
 - [label](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryTagList.ITagListSuggestion.md#label)
+- [metadata](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryTagList.ITagListSuggestion.md#metadata)
 - [value](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryTagList.ITagListSuggestion.md#value)
 
 ## Properties
@@ -19,7 +20,17 @@
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:142](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L142)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:158](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L158)
+
+___
+
+### metadata
+
+• **metadata**: `any`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:160](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L160)
 
 ___
 
@@ -29,4 +40,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:143](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L143)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:159](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L159)

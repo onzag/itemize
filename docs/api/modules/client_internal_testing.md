@@ -18,7 +18,6 @@ This data is serializable on purpose
 - [IGlobalTestingType](../interfaces/client_internal_testing.IGlobalTestingType.md)
 - [IIdentifiedEventWithTime](../interfaces/client_internal_testing.IIdentifiedEventWithTime.md)
 - [IIdentifyRequestWithTime](../interfaces/client_internal_testing.IIdentifyRequestWithTime.md)
-- [IMountedExplorers](../interfaces/client_internal_testing.IMountedExplorers.md)
 - [IMountedItem](../interfaces/client_internal_testing.IMountedItem.md)
 - [IMountedModule](../interfaces/client_internal_testing.IMountedModule.md)
 - [IOwnedSearchFeedbackRequestWithTime](../interfaces/client_internal_testing.IOwnedSearchFeedbackRequestWithTime.md)
@@ -48,4 +47,4 @@ This data is serializable on purpose
 
 #### Defined in
 
-[client/internal/testing.ts:147](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L147)
+[client/internal/testing.ts:140](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/testing.ts#L140)

@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/fs-capacitor.ts:19](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L19)
+[server/fs-capacitor.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L19)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:18](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L18)
+[server/fs-capacitor.ts:18](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L18)

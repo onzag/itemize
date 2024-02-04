@@ -37,7 +37,7 @@ the attribute of that property, as some properties are objects
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:71](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L71)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:71](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L71)
 
 ___
 
@@ -49,7 +49,7 @@ the comparator, equal, greater than, etc...
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:79](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L79)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:79](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L79)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
 
 ___
 
@@ -103,7 +103,7 @@ the method, default, string or datetime (uses Date)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:75](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L75)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:75](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L75)
 
 ___
 
@@ -115,7 +115,7 @@ the property to be compared
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:67](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L67)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:67](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L67)
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:56](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L56)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:56](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L56)
 
 ___
 
@@ -141,7 +141,7 @@ the value to be compared against, either a value itself, or alternatively, a pro
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:83](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L83)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:83](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L83)
 
 ___
 
@@ -154,4 +154,4 @@ with the comparator, rather than the value of itself
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L88)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:88](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L88)

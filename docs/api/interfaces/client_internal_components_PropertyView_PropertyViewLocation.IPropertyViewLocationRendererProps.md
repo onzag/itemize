@@ -42,7 +42,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L19)
 
 ___
 
@@ -56,7 +56,7 @@ be reset
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:34](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L34)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:34](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewLocation.tsx#L34)
 
 ___
 
@@ -72,7 +72,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -92,7 +92,7 @@ Reset viewport center
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L28)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:28](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewLocation.tsx#L28)
 
 ___
 
@@ -118,7 +118,7 @@ The viewport change event
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L24)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:24](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewLocation.tsx#L24)
 
 ___
 
@@ -134,7 +134,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L15)
 
 ___
 
@@ -146,4 +146,4 @@ A viewport that is currently in use
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L20)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:20](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewLocation.tsx#L20)

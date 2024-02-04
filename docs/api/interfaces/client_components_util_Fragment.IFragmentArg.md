@@ -31,7 +31,7 @@ Whether it is allowed to edit based on its role
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L32)
+[client/components/util/Fragment.tsx:32](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L32)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:54](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L54)
+[client/components/util/Fragment.tsx:54](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L54)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:53](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L53)
+[client/components/util/Fragment.tsx:53](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L53)
 
 ___
 
@@ -87,7 +87,7 @@ download the current fragment state
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L36)
+[client/components/util/Fragment.tsx:36](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L36)
 
 ___
 
@@ -99,7 +99,7 @@ Whether it is currently editing
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L28)
+[client/components/util/Fragment.tsx:28](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L28)
 
 ___
 
@@ -115,7 +115,7 @@ the nodes for the properties of the fragment
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:40](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L40)
+[client/components/util/Fragment.tsx:40](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L40)
 
 ___
 
@@ -135,7 +135,7 @@ save the current state
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:50](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L50)
+[client/components/util/Fragment.tsx:50](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L50)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:51](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L51)
+[client/components/util/Fragment.tsx:51](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L51)
 
 ___
 
@@ -155,7 +155,7 @@ ___
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:52](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L52)
+[client/components/util/Fragment.tsx:52](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L52)
 
 ___
 
@@ -175,4 +175,4 @@ upload the file
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:46](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Fragment.tsx#L46)
+[client/components/util/Fragment.tsx:46](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Fragment.tsx#L46)

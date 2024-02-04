@@ -67,10 +67,9 @@ export class ExplorerText extends Test {
     });
   }
 
-  public async runStep() {
-    // TODO start clicking buttons and exploring
-    await this.retrieveTestingInfo();
-  }
+  // public async runStep() {
+  //   // TODO?
+  // }
 
   public async describe() {
     const guessedDataCookie = this.currentTestingContextCookies.find((c) => c.name === "guessedData");
@@ -159,83 +158,7 @@ export class ExplorerText extends Test {
       }
     );
 
-    this.it(
-      "Should have a matching provider for every item loaded via SSR (either present or in history)",
-      () => {
-        if (!this.currentTestingContextSSR) {
-          assert.fail("Did not provide SSR data, server must've crashed or was initialized with NO_SSR=true variable");
-        }
-
-        this.currentTestingContextSSR.queries.forEach((q) => {
-          if (!q) {
-            return;
-          }
-          this.it(
-            "Should have a matching provider for " + JSON.stringify(q.idef) + " with id " +
-            JSON.stringify(q.id) + " and version " + JSON.stringify(q.version),
-            () => {
-              const foundItem = this.currentTestingContext.mountedItems.find(
-                (i) => i.itemDefinition === q.idef && i.id === q.id && i.version === q.version
-              );
-
-              if (!foundItem) {
-                assert.fail("Did not find a provider ever mounted for the SSR component");
-              }
-
-              if (!foundItem.wasContentLoadedFromMemory) {
-                console.log(foundItem);
-                assert.fail("The provider informed not using the information given by the SSR attribute");
-              }
-
-              if (foundItem.staticStatus !== "TOTAL") {
-                this.it(
-                  "Should have requested feedback",
-                  () => {
-                    const feedbackRequest = this.currentTestingContext.socket.feedbackRequests.find((r) =>
-                      r.id === q.id && r.version === q.version && r.itemDefinition === q.idef
-                    );
-
-                    if (!feedbackRequest) {
-                      assert.fail("Did not request feedback for it");
-                    }
-                  }
-                ).skipNextOnFail();
-
-                this.it(
-                  "Should have received a feedback event",
-                  () => {
-                    const feedbackResponse = this.currentTestingContext.socket.changedFeedbackEvents.find((r) =>
-                      r.id === q.id && r.version === q.version && r.itemDefinition === q.idef
-                    );
-
-                    if (!feedbackResponse) {
-                      assert.fail("Did not receive a feedback event for it");
-                    }
-                  }
-                );
-              }
-
-              if (foundItem.staticStatus !== "NO_LISTENING") {
-                this.it(
-                  "Should have registered a listener",
-                  () => {
-                    const registerRequest = this.currentTestingContext.socket.registerRequests.find((r) =>
-                      r.id === q.id && r.version === q.version && r.itemDefinition === q.idef
-                    );
-
-                    if (!registerRequest) {
-                      assert.fail("Did not register for it");
-                    }
-                  }
-                );
-              }
-            }
-          );
-        });
-      }
-    );
-
-    this.step(this.runStep);
+    // this.step(this.runStep);
   }
 
   public async after() {

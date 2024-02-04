@@ -41,7 +41,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L19)
 
 ___
 
@@ -53,7 +53,7 @@ Whether it should capitalize
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L20)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:20](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewSimple.tsx#L20)
 
 ___
 
@@ -69,7 +69,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -82,7 +82,7 @@ and only regards to highlights
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L29)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:29](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewSimple.tsx#L29)
 
 ___
 
@@ -94,7 +94,7 @@ The language code it's currently using
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L24)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:24](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewSimple.tsx#L24)
 
 ___
 
@@ -110,4 +110,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L15)

@@ -40,7 +40,7 @@ containers id
 
 #### Defined in
 
-[config.ts:266](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L266)
+[config.ts:266](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L266)
 
 ___
 
@@ -53,7 +53,7 @@ can be null, currency type won't work
 
 #### Defined in
 
-[config.ts:237](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L237)
+[config.ts:237](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L237)
 
 ___
 
@@ -69,7 +69,7 @@ Custom information added to the sensitive config
 
 #### Defined in
 
-[config.ts:288](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L288)
+[config.ts:288](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L288)
 
 ___
 
@@ -81,7 +81,7 @@ The default container id used when required, eg. creating an admin
 
 #### Defined in
 
-[config.ts:279](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L279)
+[config.ts:279](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L279)
 
 ___
 
@@ -94,7 +94,7 @@ interface
 
 #### Defined in
 
-[config.ts:284](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L284)
+[config.ts:284](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L284)
 
 ___
 
@@ -106,7 +106,7 @@ A local container (if any)
 
 #### Defined in
 
-[config.ts:275](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L275)
+[config.ts:275](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L275)
 
 ___
 
@@ -118,7 +118,7 @@ The mapping search api key, can be null, address search won't work
 
 #### Defined in
 
-[config.ts:241](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L241)
+[config.ts:241](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L241)
 
 ___
 
@@ -130,7 +130,7 @@ The logging service information
 
 #### Defined in
 
-[config.ts:261](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L261)
+[config.ts:261](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L261)
 
 ___
 
@@ -142,7 +142,7 @@ The mail service information, api key what not
 
 #### Defined in
 
-[config.ts:249](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L249)
+[config.ts:249](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L249)
 
 ___
 
@@ -154,7 +154,7 @@ The payment configuration
 
 #### Defined in
 
-[config.ts:245](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L245)
+[config.ts:245](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L245)
 
 ___
 
@@ -166,7 +166,7 @@ The phone service information, api key what not
 
 #### Defined in
 
-[config.ts:253](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L253)
+[config.ts:253](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L253)
 
 ___
 
@@ -183,7 +183,7 @@ but kept into the sensitive or standard file (eg. client side api keys)
 
 #### Defined in
 
-[config.ts:295](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L295)
+[config.ts:295](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L295)
 
 ___
 
@@ -195,7 +195,7 @@ Used for localization services to localize users
 
 #### Defined in
 
-[config.ts:232](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L232)
+[config.ts:232](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L232)
 
 ___
 
@@ -207,4 +207,4 @@ For ussd usage
 
 #### Defined in
 
-[config.ts:257](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L257)
+[config.ts:257](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L257)

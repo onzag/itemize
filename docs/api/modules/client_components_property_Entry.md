@@ -33,4 +33,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/Entry.tsx:17](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Entry.tsx#L17)
+[client/components/property/Entry.tsx:17](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Entry.tsx#L17)

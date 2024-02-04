@@ -624,7 +624,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/needs-submit-prompt.tsx:133](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/needs-submit-prompt.tsx#L133)
+[client/fast-prototyping/components/needs-submit-prompt.tsx:133](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/needs-submit-prompt.tsx#L133)
 
 ___
 

@@ -37,7 +37,7 @@ properly
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:216](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L216)
+[server/services/base/MailProvider.ts:219](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L219)
 
 ___
 
@@ -54,7 +54,7 @@ to the id of the attachment
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:221](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L221)
+[server/services/base/MailProvider.ts:224](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L224)
 
 ___
 
@@ -66,7 +66,7 @@ Who sent the email
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:183](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L183)
+[server/services/base/MailProvider.ts:186](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L186)
 
 ___
 
@@ -78,7 +78,7 @@ The html content
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:198](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L198)
+[server/services/base/MailProvider.ts:201](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L201)
 
 ___
 
@@ -96,7 +96,7 @@ somevaliduuid@externalsite.com
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:161](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L161)
+[server/services/base/MailProvider.ts:164](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L164)
 
 ___
 
@@ -109,7 +109,7 @@ as the emails need to be indexed in a specific supported language
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:203](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L203)
+[server/services/base/MailProvider.ts:206](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L206)
 
 ___
 
@@ -123,7 +123,7 @@ should be a parseble json object
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:209](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L209)
+[server/services/base/MailProvider.ts:212](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L212)
 
 ___
 
@@ -138,7 +138,7 @@ should be an array of
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:169](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L169)
+[server/services/base/MailProvider.ts:172](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L172)
 
 ___
 
@@ -151,7 +151,7 @@ rfc stuff, for example, "mail@cat.com"
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:232](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L232)
+[server/services/base/MailProvider.ts:235](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L235)
 
 ___
 
@@ -163,7 +163,7 @@ Whether to consider the email spam
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:226](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L226)
+[server/services/base/MailProvider.ts:229](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L229)
 
 ___
 
@@ -175,7 +175,7 @@ The subject of the email
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:194](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L194)
+[server/services/base/MailProvider.ts:197](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L197)
 
 ___
 
@@ -191,7 +191,7 @@ for informative purposes
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:178](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L178)
+[server/services/base/MailProvider.ts:181](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L181)
 
 ___
 
@@ -206,4 +206,4 @@ enabled
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:190](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L190)
+[server/services/base/MailProvider.ts:193](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L193)

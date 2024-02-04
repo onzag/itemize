@@ -37,4 +37,4 @@
 
 #### Defined in
 
-[server/fs-capacitor.ts:286](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L286)
+[server/fs-capacitor.ts:286](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L286)

@@ -22,4 +22,4 @@ Contains the select query builder that allows to create SELECT queries
 
 #### Defined in
 
-[database/FetchOrMoveFromCursorBuilder.ts:8](https://github.com/onzag/itemize/blob/59702dd5/database/FetchOrMoveFromCursorBuilder.ts#L8)
+[database/FetchOrMoveFromCursorBuilder.ts:8](https://github.com/onzag/itemize/blob/73e0c39e/database/FetchOrMoveFromCursorBuilder.ts#L8)

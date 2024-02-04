@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[client/components/item/ItemSyncer.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemSyncer.tsx#L59)
+[client/components/item/ItemSyncer.tsx:59](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/ItemSyncer.tsx#L59)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[client/components/item/ItemSyncer.tsx:63](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemSyncer.tsx#L63)
+[client/components/item/ItemSyncer.tsx:63](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/ItemSyncer.tsx#L63)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[client/components/item/ItemSyncer.tsx:61](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemSyncer.tsx#L61)
+[client/components/item/ItemSyncer.tsx:61](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/ItemSyncer.tsx#L61)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[client/components/item/ItemSyncer.tsx:60](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemSyncer.tsx#L60)
+[client/components/item/ItemSyncer.tsx:60](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/ItemSyncer.tsx#L60)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[client/components/item/ItemSyncer.tsx:58](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemSyncer.tsx#L58)
+[client/components/item/ItemSyncer.tsx:58](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/ItemSyncer.tsx#L58)
 
 ___
 
@@ -73,4 +73,4 @@ ___
 
 #### Defined in
 
-[client/components/item/ItemSyncer.tsx:62](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/ItemSyncer.tsx#L62)
+[client/components/item/ItemSyncer.tsx:62](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/ItemSyncer.tsx#L62)

@@ -32,7 +32,7 @@ for use with property set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)
+[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)
 
 ___
 
@@ -216,4 +216,4 @@ we should have at least one
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:52](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L52)
+[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:52](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L52)

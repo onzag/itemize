@@ -70,7 +70,7 @@ React.PureComponent\&lt;PromptProps, PromptState\&gt;.constructor
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:143](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L143)
+[client/components/navigation/Prompt.tsx:143](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L143)
 
 ## Properties
 
@@ -112,7 +112,7 @@ The original location the prompt was mounted for
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:141](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L141)
+[client/components/navigation/Prompt.tsx:141](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L141)
 
 ___
 
@@ -338,7 +338,7 @@ just stay where we are and avoid to go where we were going
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:207](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L207)
+[client/components/navigation/Prompt.tsx:207](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L207)
 
 ___
 
@@ -386,7 +386,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:282](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L282)
+[client/components/navigation/Prompt.tsx:282](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L282)
 
 ___
 
@@ -512,7 +512,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:292](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L292)
+[client/components/navigation/Prompt.tsx:292](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L292)
 
 ___
 
@@ -570,7 +570,7 @@ Confirm the dialog, aka confirm the changes and proceed
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:247](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L247)
+[client/components/navigation/Prompt.tsx:247](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L247)
 
 ___
 
@@ -586,7 +586,7 @@ Discard the dialog, aka ignore it, and proceed to where we were going
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:228](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L228)
+[client/components/navigation/Prompt.tsx:228](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L228)
 
 ___
 
@@ -667,7 +667,7 @@ a boolean
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:165](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L165)
+[client/components/navigation/Prompt.tsx:165](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L165)
 
 ___
 
@@ -691,7 +691,7 @@ saving changes
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:271](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L271)
+[client/components/navigation/Prompt.tsx:271](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L271)
 
 ___
 
@@ -711,7 +711,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:300](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Prompt.tsx#L300)
+[client/components/navigation/Prompt.tsx:300](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Prompt.tsx#L300)
 
 ___
 

@@ -23,7 +23,7 @@ once you need to figure out how resources are requested
 
 ### buildElasticQueryForItemDefinition
 
-▸ **buildElasticQueryForItemDefinition**(`serverData`, `appData`, `itemDefinition`, `args`, `elasticQueryBuilder`, `language`, `dictionary`, `search`, `orderBy`): [`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
+▸ **buildElasticQueryForItemDefinition**(`serverData`, `appData`, `itemDefinition`, `args`, `elasticQueryBuilder`, `language`, `dictionary`, `search`, `orderBy`, `fullHighlights`): [`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
 
 Builds a elastic query for an item definition so that it can be
 queried for searches
@@ -41,6 +41,7 @@ queried for searches
 | `dictionary` | `string` | the dictionary being used |
 | `search` | `string` | the search arg value |
 | `orderBy` | [`IOrderByRuleType`](../interfaces/constants.IOrderByRuleType.md) | the order by rules |
+| `fullHighlights` | `number` | - |
 
 #### Returns
 
@@ -50,7 +51,7 @@ a list of raw added selected fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:627](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L627)
+[base/Root/Module/ItemDefinition/sql.ts:628](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L628)
 
 ___
 
@@ -84,7 +85,7 @@ a list of raw added selected fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:475](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L475)
+[base/Root/Module/ItemDefinition/sql.ts:475](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L475)
 
 ___
 
@@ -119,7 +120,7 @@ a sql value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:378](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L378)
+[base/Root/Module/ItemDefinition/sql.ts:378](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L378)
 
 ___
 
@@ -142,7 +143,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:315](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L315)
+[base/Root/Module/ItemDefinition/sql.ts:315](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L315)
 
 ___
 
@@ -173,7 +174,7 @@ a rq value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:260](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L260)
+[base/Root/Module/ItemDefinition/sql.ts:260](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L260)
 
 ___
 
@@ -196,7 +197,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:50](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L50)
+[base/Root/Module/ItemDefinition/sql.ts:50](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L50)
 
 ___
 
@@ -224,7 +225,7 @@ a complete table definition type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:107](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L107)
+[base/Root/Module/ItemDefinition/sql.ts:107](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L107)
 
 ___
 
@@ -250,4 +251,4 @@ a partial sql schema definition for the whole database (adds tables)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:229](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/sql.ts#L229)
+[base/Root/Module/ItemDefinition/sql.ts:229](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/sql.ts#L229)

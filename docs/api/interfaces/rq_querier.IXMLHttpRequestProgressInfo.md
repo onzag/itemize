@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[rq-querier.ts:717](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L717)
+[rq-querier.ts:717](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L717)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:716](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L716)
+[rq-querier.ts:716](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L716)

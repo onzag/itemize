@@ -33,4 +33,4 @@ a react component
 
 #### Defined in
 
-[client/components/offline/OfflineStatusRetriever.tsx:151](https://github.com/onzag/itemize/blob/59702dd5/client/components/offline/OfflineStatusRetriever.tsx#L151)
+[client/components/offline/OfflineStatusRetriever.tsx:151](https://github.com/onzag/itemize/blob/73e0c39e/client/components/offline/OfflineStatusRetriever.tsx#L151)

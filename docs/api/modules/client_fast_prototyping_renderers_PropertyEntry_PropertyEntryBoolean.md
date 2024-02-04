@@ -56,7 +56,7 @@ The styles of the renderer
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:27](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L27)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:27](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L27)
 
 ## Functions
 
@@ -83,4 +83,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:95](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L95)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:95](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L95)

@@ -27,6 +27,7 @@ The class module that defines how the module behaves
 
 - [applySoftReadRoleAccessTo](base_Root_Module.default.md#applysoftreadroleaccessto)
 - [checkRoleAccessFor](base_Root_Module.default.md#checkroleaccessfor)
+- [checkRoleAccessForIgnoreLimiters](base_Root_Module.default.md#checkroleaccessforignorelimiters)
 - [checkRoleAccessForModeration](base_Root_Module.default.md#checkroleaccessformoderation)
 - [cleanState](base_Root_Module.default.md#cleanstate)
 - [getAllChildDefinitionsRecursive](base_Root_Module.default.md#getallchilddefinitionsrecursive)
@@ -91,7 +92,7 @@ Builds a module from raw json data
 
 #### Defined in
 
-[base/Root/Module/index.ts:347](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L347)
+[base/Root/Module/index.ts:347](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L347)
 
 ## Properties
 
@@ -103,7 +104,7 @@ The children item definitions, as instances
 
 #### Defined in
 
-[base/Root/Module/index.ts:321](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L321)
+[base/Root/Module/index.ts:321](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L321)
 
 ___
 
@@ -115,7 +116,7 @@ The children modules as instances
 
 #### Defined in
 
-[base/Root/Module/index.ts:325](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L325)
+[base/Root/Module/index.ts:325](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L325)
 
 ___
 
@@ -128,7 +129,7 @@ all the prop extensions as an item definition itself
 
 #### Defined in
 
-[base/Root/Module/index.ts:330](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L330)
+[base/Root/Module/index.ts:330](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L330)
 
 ___
 
@@ -141,7 +142,7 @@ as an instance
 
 #### Defined in
 
-[base/Root/Module/index.ts:310](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L310)
+[base/Root/Module/index.ts:310](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L310)
 
 ___
 
@@ -153,7 +154,7 @@ The root that contains the module
 
 #### Defined in
 
-[base/Root/Module/index.ts:305](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L305)
+[base/Root/Module/index.ts:305](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L305)
 
 ___
 
@@ -167,7 +168,7 @@ inherits
 
 #### Defined in
 
-[base/Root/Module/index.ts:336](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L336)
+[base/Root/Module/index.ts:336](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L336)
 
 ___
 
@@ -179,7 +180,7 @@ The raw data of the module
 
 #### Defined in
 
-[base/Root/Module/index.ts:300](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L300)
+[base/Root/Module/index.ts:300](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L300)
 
 ___
 
@@ -193,7 +194,7 @@ functionality
 
 #### Defined in
 
-[base/Root/Module/index.ts:316](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L316)
+[base/Root/Module/index.ts:316](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L316)
 
 ## Methods
 
@@ -221,7 +222,7 @@ read role access
 
 #### Defined in
 
-[base/Root/Module/index.ts:861](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L861)
+[base/Root/Module/index.ts:861](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L861)
 
 ___
 
@@ -251,7 +252,31 @@ a boolean on whether the user is granted role access
 
 #### Defined in
 
-[base/Root/Module/index.ts:933](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L933)
+[base/Root/Module/index.ts:973](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L973)
+
+___
+
+### checkRoleAccessForIgnoreLimiters
+
+▸ **checkRoleAccessForIgnoreLimiters**(`role`, `userId`, `ownerUserId`, `rolesManager`, `throwError`): `Promise`\<`boolean`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `role` | `string` |
+| `userId` | `string` |
+| `ownerUserId` | `string` |
+| `rolesManager` | [`ICustomRoleManager`](../interfaces/base_Root.ICustomRoleManager.md) |
+| `throwError` | `boolean` |
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+#### Defined in
+
+[base/Root/Module/index.ts:887](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L887)
 
 ___
 
@@ -275,7 +300,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/index.ts:887](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L887)
+[base/Root/Module/index.ts:927](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L927)
 
 ___
 
@@ -289,7 +314,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/index.ts:445](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L445)
+[base/Root/Module/index.ts:445](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L445)
 
 ___
 
@@ -308,7 +333,7 @@ an array of item definitions
 
 #### Defined in
 
-[base/Root/Module/index.ts:654](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L654)
+[base/Root/Module/index.ts:654](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L654)
 
 ___
 
@@ -326,7 +351,7 @@ a list of item definitions
 
 #### Defined in
 
-[base/Root/Module/index.ts:645](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L645)
+[base/Root/Module/index.ts:645](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L645)
 
 ___
 
@@ -347,7 +372,7 @@ a list of all the child modules as Module instances
 
 #### Defined in
 
-[base/Root/Module/index.ts:692](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L692)
+[base/Root/Module/index.ts:692](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L692)
 
 ___
 
@@ -365,7 +390,7 @@ a list of property definitions
 
 #### Defined in
 
-[base/Root/Module/index.ts:637](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L637)
+[base/Root/Module/index.ts:637](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L637)
 
 ___
 
@@ -389,7 +414,7 @@ a Module instance for the child module, or throws an error
 
 #### Defined in
 
-[base/Root/Module/index.ts:701](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L701)
+[base/Root/Module/index.ts:701](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L701)
 
 ___
 
@@ -413,7 +438,7 @@ an object or null (if locale not valid)
 
 #### Defined in
 
-[base/Root/Module/index.ts:675](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L675)
+[base/Root/Module/index.ts:675](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L675)
 
 ___
 
@@ -442,7 +467,7 @@ an error if the path finds a dead end
 
 #### Defined in
 
-[base/Root/Module/index.ts:539](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L539)
+[base/Root/Module/index.ts:539](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L539)
 
 ___
 
@@ -471,7 +496,7 @@ an error if this item definition does not exist
 
 #### Defined in
 
-[base/Root/Module/index.ts:518](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L518)
+[base/Root/Module/index.ts:518](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L518)
 
 ___
 
@@ -489,7 +514,7 @@ an integer
 
 #### Defined in
 
-[base/Root/Module/index.ts:1004](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L1004)
+[base/Root/Module/index.ts:1044](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L1044)
 
 ___
 
@@ -507,7 +532,7 @@ an integer
 
 #### Defined in
 
-[base/Root/Module/index.ts:1012](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L1012)
+[base/Root/Module/index.ts:1052](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L1052)
 
 ___
 
@@ -531,7 +556,7 @@ a module that exists within this module
 
 #### Defined in
 
-[base/Root/Module/index.ts:575](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L575)
+[base/Root/Module/index.ts:575](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L575)
 
 ___
 
@@ -549,7 +574,7 @@ a string
 
 #### Defined in
 
-[base/Root/Module/index.ts:666](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L666)
+[base/Root/Module/index.ts:666](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L666)
 
 ___
 
@@ -567,7 +592,7 @@ a module (or null)
 
 #### Defined in
 
-[base/Root/Module/index.ts:748](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L748)
+[base/Root/Module/index.ts:748](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L748)
 
 ___
 
@@ -585,7 +610,7 @@ the parent root
 
 #### Defined in
 
-[base/Root/Module/index.ts:756](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L756)
+[base/Root/Module/index.ts:756](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L756)
 
 ___
 
@@ -603,7 +628,7 @@ an array of string that represents the path all the way to the root
 
 #### Defined in
 
-[base/Root/Module/index.ts:764](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L764)
+[base/Root/Module/index.ts:764](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L764)
 
 ___
 
@@ -631,7 +656,7 @@ error if the property does not exist
 
 #### Defined in
 
-[base/Root/Module/index.ts:613](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L613)
+[base/Root/Module/index.ts:613](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L613)
 
 ___
 
@@ -645,7 +670,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/index.ts:566](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L566)
+[base/Root/Module/index.ts:566](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L566)
 
 ___
 
@@ -664,7 +689,7 @@ the string qualified path name
 
 #### Defined in
 
-[base/Root/Module/index.ts:782](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L782)
+[base/Root/Module/index.ts:782](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L782)
 
 ___
 
@@ -689,7 +714,7 @@ an array of string with the roles that have the specific io role access
 
 #### Defined in
 
-[base/Root/Module/index.ts:811](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L811)
+[base/Root/Module/index.ts:811](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L811)
 
 ___
 
@@ -708,7 +733,7 @@ an array of string with the roles that have moderation access
 
 #### Defined in
 
-[base/Root/Module/index.ts:825](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L825)
+[base/Root/Module/index.ts:825](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L825)
 
 ___
 
@@ -728,7 +753,7 @@ an array with the approved roles or the anyone metarole
 
 #### Defined in
 
-[base/Root/Module/index.ts:801](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L801)
+[base/Root/Module/index.ts:801](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L801)
 
 ___
 
@@ -746,7 +771,7 @@ the request limiters object or null
 
 #### Defined in
 
-[base/Root/Module/index.ts:996](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L996)
+[base/Root/Module/index.ts:1036](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L1036)
 
 ___
 
@@ -765,7 +790,7 @@ the search form of the module
 
 #### Defined in
 
-[base/Root/Module/index.ts:729](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L729)
+[base/Root/Module/index.ts:729](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L729)
 
 ___
 
@@ -784,7 +809,7 @@ the standard form of the module
 
 #### Defined in
 
-[base/Root/Module/index.ts:715](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L715)
+[base/Root/Module/index.ts:715](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L715)
 
 ___
 
@@ -801,7 +826,7 @@ for the module
 
 #### Defined in
 
-[base/Root/Module/index.ts:793](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L793)
+[base/Root/Module/index.ts:793](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L793)
 
 ___
 
@@ -826,7 +851,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/index.ts:479](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L479)
+[base/Root/Module/index.ts:479](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L479)
 
 ___
 
@@ -844,7 +869,7 @@ a boolean on whether this module is parented
 
 #### Defined in
 
-[base/Root/Module/index.ts:773](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L773)
+[base/Root/Module/index.ts:773](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L773)
 
 ___
 
@@ -868,7 +893,7 @@ a boolean on whether this prop extension exists
 
 #### Defined in
 
-[base/Root/Module/index.ts:601](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L601)
+[base/Root/Module/index.ts:601](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L601)
 
 ___
 
@@ -886,7 +911,7 @@ Root class executes this function recursively
 
 #### Defined in
 
-[base/Root/Module/index.ts:458](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L458)
+[base/Root/Module/index.ts:458](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L458)
 
 ___
 
@@ -904,7 +929,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/index.ts:740](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L740)
+[base/Root/Module/index.ts:740](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L740)
 
 ___
 
@@ -929,7 +954,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/index.ts:627](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L627)
+[base/Root/Module/index.ts:627](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L627)
 
 ___
 
@@ -947,7 +972,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/index.ts:847](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L847)
+[base/Root/Module/index.ts:847](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L847)
 
 ___
 
@@ -965,7 +990,7 @@ a boolean on whether the module is setup as searchable
 
 #### Defined in
 
-[base/Root/Module/index.ts:836](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L836)
+[base/Root/Module/index.ts:836](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L836)
 
 ___
 
@@ -983,7 +1008,7 @@ a list of string for the module names
 
 #### Defined in
 
-[base/Root/Module/index.ts:683](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L683)
+[base/Root/Module/index.ts:683](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L683)
 
 ___
 
@@ -1008,7 +1033,7 @@ the state is not lost
 
 #### Defined in
 
-[base/Root/Module/index.ts:1023](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L1023)
+[base/Root/Module/index.ts:1063](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L1063)
 
 ___
 
@@ -1035,7 +1060,7 @@ a raw json for the search module
 
 #### Defined in
 
-[base/Root/Module/index.ts:235](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L235)
+[base/Root/Module/index.ts:235](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L235)
 
 ___
 
@@ -1060,7 +1085,7 @@ a name
 
 #### Defined in
 
-[base/Root/Module/index.ts:260](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L260)
+[base/Root/Module/index.ts:260](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L260)
 
 ___
 
@@ -1085,4 +1110,4 @@ a raw property definition
 
 #### Defined in
 
-[base/Root/Module/index.ts:248](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L248)
+[base/Root/Module/index.ts:248](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L248)

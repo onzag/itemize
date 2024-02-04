@@ -40,4 +40,4 @@ The root schema unprocessed and unbuilt
 
 #### Defined in
 
-[base/Root/schema.ts:12](https://github.com/onzag/itemize/blob/59702dd5/base/Root/schema.ts#L12)
+[base/Root/schema.ts:12](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/schema.ts#L12)

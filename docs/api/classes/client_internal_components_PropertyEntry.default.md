@@ -73,7 +73,7 @@ React.Component\&lt;IPropertyEntryMainHandlerProps\&lt;PropertyDefinitionSupport
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:676](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L676)
+[client/internal/components/PropertyEntry/index.tsx:676](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/index.tsx#L676)
 
 ## Properties
 
@@ -358,7 +358,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:680](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L680)
+[client/internal/components/PropertyEntry/index.tsx:680](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/index.tsx#L680)
 
 ___
 
@@ -601,7 +601,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:686](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/index.tsx#L686)
+[client/internal/components/PropertyEntry/index.tsx:686](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/index.tsx#L686)
 
 ___
 

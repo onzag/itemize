@@ -52,7 +52,7 @@ false to throw the error
 
 #### Defined in
 
-[server/resolvers/triggers.ts:211](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L211)
+[server/resolvers/triggers.ts:211](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L211)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:204](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L204)
+[server/resolvers/triggers.ts:204](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L204)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:205](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L205)
+[server/resolvers/triggers.ts:205](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L205)
 
 ## Functions
 
@@ -120,4 +120,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:315](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L315)
+[server/resolvers/triggers.ts:315](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L315)

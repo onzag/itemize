@@ -38,7 +38,7 @@ a react element
 
 #### Defined in
 
-[client/components/user/UserDataRetriever.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/user/UserDataRetriever.tsx#L33)
+[client/components/user/UserDataRetriever.tsx:34](https://github.com/onzag/itemize/blob/73e0c39e/client/components/user/UserDataRetriever.tsx#L34)
 
 ___
 
@@ -54,7 +54,8 @@ ___
 | :------ | :------ |
 | `id` | `string` |
 | `role` | `string` |
+| `token` | `string` |
 
 #### Defined in
 
-[client/components/user/UserDataRetriever.tsx:48](https://github.com/onzag/itemize/blob/59702dd5/client/components/user/UserDataRetriever.tsx#L48)
+[client/components/user/UserDataRetriever.tsx:50](https://github.com/onzag/itemize/blob/73e0c39e/client/components/user/UserDataRetriever.tsx#L50)

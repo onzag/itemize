@@ -29,7 +29,7 @@ the rqFields and the rqAddFileToFields which adds file functionality
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:22](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:22](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L22)
 
 ## Variables
 
@@ -41,4 +41,4 @@ The type value represents the behaviour of files in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:27](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:27](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L27)

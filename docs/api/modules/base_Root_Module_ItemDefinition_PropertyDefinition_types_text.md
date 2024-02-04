@@ -24,4 +24,4 @@ The type describes how the text type behaves in the app, this includes rich text
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L48)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L48)

@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:152](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L152)
+[client/fast-prototyping/components/email/email-client.tsx:175](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/email/email-client.tsx#L175)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:153](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/email/email-client.tsx#L153)
+[client/fast-prototyping/components/email/email-client.tsx:176](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/email/email-client.tsx#L176)

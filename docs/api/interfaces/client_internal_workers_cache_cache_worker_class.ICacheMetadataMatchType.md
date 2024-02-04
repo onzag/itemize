@@ -20,4 +20,4 @@ The value of the match
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:179](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L179)
+[client/internal/workers/cache/cache.worker.class.ts:179](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.class.ts#L179)

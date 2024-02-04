@@ -26,7 +26,7 @@ The string type is described, by, you guessed it, a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:33](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L33)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:33](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L33)
 
 ## Variables
 
@@ -38,4 +38,4 @@ The behaviour of strings is described by this type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:38](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts:38](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist.ts#L38)

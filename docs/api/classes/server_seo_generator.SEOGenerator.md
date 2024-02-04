@@ -77,7 +77,7 @@ Buillds a new seo generator
 
 #### Defined in
 
-[server/seo/generator.ts:59](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L59)
+[server/seo/generator.ts:59](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L59)
 
 ## Properties
 
@@ -87,7 +87,7 @@ Buillds a new seo generator
 
 #### Defined in
 
-[server/seo/generator.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L48)
+[server/seo/generator.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L48)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L47)
+[server/seo/generator.ts:47](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L47)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L44)
+[server/seo/generator.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L44)
 
 ___
 
@@ -117,7 +117,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L43)
+[server/seo/generator.ts:43](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L43)
 
 ___
 
@@ -127,7 +127,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L45)
+[server/seo/generator.ts:45](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L45)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L46)
+[server/seo/generator.ts:46](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L46)
 
 ## Methods
 
@@ -159,7 +159,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:193](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L193)
+[server/seo/generator.ts:193](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L193)
 
 ___
 
@@ -182,4 +182,4 @@ This is what does the processing hooking directly into the sitemap.xml
 
 #### Defined in
 
-[server/seo/generator.ts:83](https://github.com/onzag/itemize/blob/59702dd5/server/seo/generator.ts#L83)
+[server/seo/generator.ts:83](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/generator.ts#L83)

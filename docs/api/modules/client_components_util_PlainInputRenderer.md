@@ -32,4 +32,4 @@ elementProps passes properties to this element
 
 #### Defined in
 
-[client/components/util/PlainInputRenderer.tsx:14](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/PlainInputRenderer.tsx#L14)
+[client/components/util/PlainInputRenderer.tsx:14](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/PlainInputRenderer.tsx#L14)

@@ -43,7 +43,6 @@ for all subtests
 - [it](testing_client_explorer.ExplorerText.md#it)
 - [quit](testing_client_explorer.ExplorerText.md#quit)
 - [retrieveTestingInfo](testing_client_explorer.ExplorerText.md#retrievetestinginfo)
-- [runStep](testing_client_explorer.ExplorerText.md#runstep)
 - [skipAll](testing_client_explorer.ExplorerText.md#skipall)
 - [skipLayer](testing_client_explorer.ExplorerText.md#skiplayer)
 - [skipNext](testing_client_explorer.ExplorerText.md#skipnext)
@@ -77,7 +76,7 @@ for all subtests
 
 #### Defined in
 
-[testing/client/explorer.ts:21](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L21)
+[testing/client/explorer.ts:21](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L21)
 
 ## Properties
 
@@ -87,7 +86,7 @@ for all subtests
 
 #### Defined in
 
-[testing/client/explorer.ts:16](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L16)
+[testing/client/explorer.ts:16](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L16)
 
 ___
 
@@ -97,7 +96,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:18](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L18)
+[testing/client/explorer.ts:18](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L18)
 
 ___
 
@@ -107,7 +106,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:17](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L17)
+[testing/client/explorer.ts:17](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L17)
 
 ___
 
@@ -117,7 +116,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L19)
+[testing/client/explorer.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L19)
 
 ___
 
@@ -127,7 +126,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:12](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L12)
+[testing/client/explorer.ts:12](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L12)
 
 ___
 
@@ -137,7 +136,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:9](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L9)
+[testing/client/explorer.ts:9](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L9)
 
 ___
 
@@ -147,7 +146,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:13](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L13)
+[testing/client/explorer.ts:13](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L13)
 
 ___
 
@@ -157,7 +156,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L15)
+[testing/client/explorer.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L15)
 
 ___
 
@@ -167,7 +166,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:11](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L11)
+[testing/client/explorer.ts:11](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L11)
 
 ___
 
@@ -177,7 +176,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:10](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L10)
+[testing/client/explorer.ts:10](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L10)
 
 ## Methods
 
@@ -198,7 +197,7 @@ use for cleanup
 
 #### Defined in
 
-[testing/client/explorer.ts:241](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L241)
+[testing/client/explorer.ts:164](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L164)
 
 ___
 
@@ -220,7 +219,7 @@ well
 
 #### Defined in
 
-[testing/client/explorer.ts:36](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L36)
+[testing/client/explorer.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L36)
 
 ___
 
@@ -240,7 +239,7 @@ Build a brand new instance
 
 #### Defined in
 
-[testing/index.ts:71](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L71)
+[testing/index.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L98)
 
 ___
 
@@ -267,7 +266,7 @@ Define a new test
 
 #### Defined in
 
-[testing/index.ts:114](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L114)
+[testing/index.ts:141](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L141)
 
 ___
 
@@ -287,13 +286,15 @@ Executes during just after before has been executed
 
 #### Defined in
 
-[testing/client/explorer.ts:75](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L75)
+[testing/client/explorer.ts:74](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L74)
 
 ___
 
 ### info
 
 ▸ **info**(`txt`): `WarnHandle`
+
+Provides information during the test
 
 #### Parameters
 
@@ -311,7 +312,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:162](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L162)
+[testing/index.ts:211](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L211)
 
 ___
 
@@ -338,7 +339,7 @@ Define a new assertion
 
 #### Defined in
 
-[testing/index.ts:129](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L129)
+[testing/index.ts:157](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L157)
 
 ___
 
@@ -358,7 +359,7 @@ Quits this test
 
 #### Defined in
 
-[testing/index.ts:220](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L220)
+[testing/index.ts:278](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L278)
 
 ___
 
@@ -372,21 +373,7 @@ ___
 
 #### Defined in
 
-[testing/client/explorer.ts:63](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L63)
-
-___
-
-### runStep
-
-▸ **runStep**(): `Promise`\<`void`\>
-
-#### Returns
-
-`Promise`\<`void`\>
-
-#### Defined in
-
-[testing/client/explorer.ts:70](https://github.com/onzag/itemize/blob/59702dd5/testing/client/explorer.ts#L70)
+[testing/client/explorer.ts:63](https://github.com/onzag/itemize/blob/73e0c39e/testing/client/explorer.ts#L63)
 
 ___
 
@@ -395,7 +382,7 @@ ___
 ▸ **skipAll**(): `void`
 
 Skips all the following IT tests
-and by all it means all of them
+regardless of layer
 
 #### Returns
 
@@ -407,7 +394,7 @@ and by all it means all of them
 
 #### Defined in
 
-[testing/index.ts:186](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L186)
+[testing/index.ts:236](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L236)
 
 ___
 
@@ -416,8 +403,10 @@ ___
 ▸ **skipLayer**(): `void`
 
 Skip all the tests that are
-on the same layer following
-this
+on the same layer only
+
+because .it and .step can be nested
+inside others, and they count as their own child layer
 
 #### Returns
 
@@ -429,7 +418,7 @@ this
 
 #### Defined in
 
-[testing/index.ts:201](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L201)
+[testing/index.ts:253](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L253)
 
 ___
 
@@ -439,6 +428,7 @@ ___
 
 Skip all the next IT tests
 they should be on the same layer
+it will not skip what's on a deeper layer
 
 #### Returns
 
@@ -450,13 +440,17 @@ they should be on the same layer
 
 #### Defined in
 
-[testing/index.ts:172](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L172)
+[testing/index.ts:222](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L222)
 
 ___
 
 ### step
 
 ▸ **step**(`fn?`): `ItHandle`
+
+Defines a new step, works similar
+to defining an assertion but it has no label
+and is just a singular hidden step
 
 #### Parameters
 
@@ -474,13 +468,15 @@ ___
 
 #### Defined in
 
-[testing/index.ts:141](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L141)
+[testing/index.ts:178](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L178)
 
 ___
 
 ### wait
 
 ▸ **wait**(`ms`): `Promise`\<`void`\>
+
+Helper function to wait
 
 #### Parameters
 
@@ -498,13 +494,15 @@ ___
 
 #### Defined in
 
-[testing/index.ts:211](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L211)
+[testing/index.ts:269](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L269)
 
 ___
 
 ### warn
 
 ▸ **warn**(`txt`): `WarnHandle`
+
+Warns during the test
 
 #### Parameters
 
@@ -522,4 +520,4 @@ ___
 
 #### Defined in
 
-[testing/index.ts:152](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L152)
+[testing/index.ts:195](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L195)

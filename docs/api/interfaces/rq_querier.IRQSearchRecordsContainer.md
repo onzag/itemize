@@ -28,7 +28,7 @@ when it returns a bunch of records
 
 #### Defined in
 
-[rq-querier.ts:49](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L49)
+[rq-querier.ts:49](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L49)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:52](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L52)
+[rq-querier.ts:52](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L52)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:48](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L48)
+[rq-querier.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L48)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:50](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L50)
+[rq-querier.ts:50](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L50)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:54](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L54)
+[rq-querier.ts:54](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L54)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:51](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L51)
+[rq-querier.ts:51](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L51)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:53](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L53)
+[rq-querier.ts:53](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L53)
 
 ___
 
@@ -98,4 +98,4 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:47](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L47)
+[rq-querier.ts:47](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L47)

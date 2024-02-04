@@ -66,7 +66,7 @@ React.PureComponent\&lt;IReadManyVarProps\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/ReadManyVar.tsx:12](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadManyVar.tsx#L12)
+[client/components/util/ReadManyVar.tsx:12](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadManyVar.tsx#L12)
 
 ## Properties
 
@@ -106,7 +106,7 @@ ___
 
 #### Defined in
 
-[client/components/util/ReadManyVar.tsx:11](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadManyVar.tsx#L11)
+[client/components/util/ReadManyVar.tsx:11](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadManyVar.tsx#L11)
 
 ___
 
@@ -361,7 +361,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/components/util/ReadManyVar.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadManyVar.tsx#L22)
+[client/components/util/ReadManyVar.tsx:22](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadManyVar.tsx#L22)
 
 ___
 
@@ -385,7 +385,7 @@ React.PureComponent.componentDidUpdate
 
 #### Defined in
 
-[client/components/util/ReadManyVar.tsx:27](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadManyVar.tsx#L27)
+[client/components/util/ReadManyVar.tsx:27](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadManyVar.tsx#L27)
 
 ___
 
@@ -479,7 +479,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/ReadManyVar.tsx:40](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadManyVar.tsx#L40)
+[client/components/util/ReadManyVar.tsx:40](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadManyVar.tsx#L40)
 
 ___
 
@@ -591,7 +591,7 @@ ___
 
 #### Defined in
 
-[client/components/util/ReadManyVar.tsx:17](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadManyVar.tsx#L17)
+[client/components/util/ReadManyVar.tsx:17](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadManyVar.tsx#L17)
 
 ___
 
@@ -609,7 +609,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/util/ReadManyVar.tsx:43](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadManyVar.tsx#L43)
+[client/components/util/ReadManyVar.tsx:43](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadManyVar.tsx#L43)
 
 ___
 

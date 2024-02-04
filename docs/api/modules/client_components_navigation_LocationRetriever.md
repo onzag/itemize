@@ -27,7 +27,7 @@
 
 #### Defined in
 
-[client/components/navigation/LocationRetriever.tsx:8](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationRetriever.tsx#L8)
+[client/components/navigation/LocationRetriever.tsx:8](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationRetriever.tsx#L8)
 
 ___
 
@@ -41,4 +41,4 @@ ___
 
 #### Defined in
 
-[client/components/navigation/LocationRetriever.tsx:13](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationRetriever.tsx#L13)
+[client/components/navigation/LocationRetriever.tsx:13](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationRetriever.tsx#L13)

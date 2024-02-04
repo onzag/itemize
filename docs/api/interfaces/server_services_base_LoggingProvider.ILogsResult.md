@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:24](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/LoggingProvider.ts#L24)
+[server/services/base/LoggingProvider.ts:24](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/LoggingProvider.ts#L24)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:25](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/LoggingProvider.ts#L25)
+[server/services/base/LoggingProvider.ts:25](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/LoggingProvider.ts#L25)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/LoggingProvider.ts#L26)
+[server/services/base/LoggingProvider.ts:26](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/LoggingProvider.ts#L26)

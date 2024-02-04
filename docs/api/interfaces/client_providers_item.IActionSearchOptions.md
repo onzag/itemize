@@ -79,6 +79,7 @@ The options for searching
 - [unpokeAfterSuccess](client_providers_item.IActionSearchOptions.md#unpokeaftersuccess)
 - [until](client_providers_item.IActionSearchOptions.md#until)
 - [useSearchEngine](client_providers_item.IActionSearchOptions.md#usesearchengine)
+- [useSearchEngineFullHighlights](client_providers_item.IActionSearchOptions.md#usesearchenginefullhighlights)
 - [versionFilter](client_providers_item.IActionSearchOptions.md#versionfilter)
 - [versionFilterOut](client_providers_item.IActionSearchOptions.md#versionfilterout)
 - [waitAndMerge](client_providers_item.IActionSearchOptions.md#waitandmerge)
@@ -95,7 +96,7 @@ even if that means using volatile memory
 
 #### Defined in
 
-[client/providers/item.tsx:856](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L856)
+[client/providers/item.tsx:857](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L857)
 
 ___
 
@@ -111,7 +112,7 @@ by default
 
 #### Defined in
 
-[client/providers/item.tsx:838](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L838)
+[client/providers/item.tsx:839](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L839)
 
 ___
 
@@ -134,7 +135,7 @@ due to this and the soft rules
 
 #### Defined in
 
-[client/providers/item.tsx:877](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L877)
+[client/providers/item.tsx:878](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L878)
 
 ___
 
@@ -147,7 +148,7 @@ perform further invalidation, even invalidation based on singular attributes
 
 #### Defined in
 
-[client/providers/item.tsx:882](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L882)
+[client/providers/item.tsx:883](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L883)
 
 ___
 
@@ -161,7 +162,7 @@ but it may take forever due to batching, specially if the user has a lot of data
 
 #### Defined in
 
-[client/providers/item.tsx:844](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L844)
+[client/providers/item.tsx:845](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L845)
 
 ___
 
@@ -181,7 +182,7 @@ by-property          will use a trackable property in order to cache, note that 
 
 #### Defined in
 
-[client/providers/item.tsx:830](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L830)
+[client/providers/item.tsx:831](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L831)
 
 ___
 
@@ -200,7 +201,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L323)
+[client/providers/item.tsx:324](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L324)
 
 ___
 
@@ -219,7 +220,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:330](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L330)
+[client/providers/item.tsx:331](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L331)
 
 ___
 
@@ -238,7 +239,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:316](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L316)
+[client/providers/item.tsx:317](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L317)
 
 ___
 
@@ -262,7 +263,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:381](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L381)
+[client/providers/item.tsx:382](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L382)
 
 ___
 
@@ -286,7 +287,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L369)
+[client/providers/item.tsx:370](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L370)
 
 ___
 
@@ -310,7 +311,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L357)
+[client/providers/item.tsx:358](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L358)
 
 ___
 
@@ -327,7 +328,7 @@ still retain consistency during render
 
 #### Defined in
 
-[client/providers/item.tsx:651](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L651)
+[client/providers/item.tsx:652](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L652)
 
 ___
 
@@ -344,7 +345,7 @@ this however takes priority and will override that
 
 #### Defined in
 
-[client/providers/item.tsx:766](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L766)
+[client/providers/item.tsx:767](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L767)
 
 ___
 
@@ -360,7 +361,7 @@ has considerations with permissions
 
 #### Defined in
 
-[client/providers/item.tsx:1009](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1009)
+[client/providers/item.tsx:1016](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1016)
 
 ___
 
@@ -376,7 +377,7 @@ has considerations with permissions
 
 #### Defined in
 
-[client/providers/item.tsx:1000](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1000)
+[client/providers/item.tsx:1007](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1007)
 
 ___
 
@@ -397,7 +398,7 @@ null itself will match, or a lack of username
 
 #### Defined in
 
-[client/providers/item.tsx:948](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L948)
+[client/providers/item.tsx:949](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L949)
 
 ___
 
@@ -409,7 +410,7 @@ Only allow items of a specific ids
 
 #### Defined in
 
-[client/providers/item.tsx:986](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L986)
+[client/providers/item.tsx:993](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L993)
 
 ___
 
@@ -421,7 +422,7 @@ Blacklist ids
 
 #### Defined in
 
-[client/providers/item.tsx:991](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L991)
+[client/providers/item.tsx:998](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L998)
 
 ___
 
@@ -442,7 +443,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:273](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L273)
+[client/providers/item.tsx:274](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L274)
 
 ___
 
@@ -463,7 +464,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:282](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L282)
+[client/providers/item.tsx:283](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L283)
 
 ___
 
@@ -484,7 +485,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:264](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L264)
+[client/providers/item.tsx:265](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L265)
 
 ___
 
@@ -498,7 +499,7 @@ search
 
 #### Defined in
 
-[client/providers/item.tsx:927](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L927)
+[client/providers/item.tsx:928](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L928)
 
 ___
 
@@ -520,7 +521,7 @@ but not recommended to use without as it will perform a brand new search every t
 
 #### Defined in
 
-[client/providers/item.tsx:896](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L896)
+[client/providers/item.tsx:897](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L897)
 
 ___
 
@@ -533,7 +534,7 @@ this is not recommended to use, values update each minute more or less
 
 #### Defined in
 
-[client/providers/item.tsx:901](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L901)
+[client/providers/item.tsx:902](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L902)
 
 ___
 
@@ -547,7 +548,7 @@ it should therefore have a cache policy
 
 #### Defined in
 
-[client/providers/item.tsx:907](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L907)
+[client/providers/item.tsx:908](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L908)
 
 ___
 
@@ -560,7 +561,7 @@ the search elements
 
 #### Defined in
 
-[client/providers/item.tsx:912](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L912)
+[client/providers/item.tsx:913](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L913)
 
 ___
 
@@ -572,7 +573,7 @@ The offset to use during this search
 
 #### Defined in
 
-[client/providers/item.tsx:931](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L931)
+[client/providers/item.tsx:932](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L932)
 
 ___
 
@@ -602,7 +603,7 @@ to sort, and later the property for the username will be used for sorting
 
 #### Defined in
 
-[client/providers/item.tsx:757](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L757)
+[client/providers/item.tsx:758](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L758)
 
 ___
 
@@ -618,7 +619,7 @@ has considerations with permissions
 
 #### Defined in
 
-[client/providers/item.tsx:1036](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1036)
+[client/providers/item.tsx:1043](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1043)
 
 ___
 
@@ -634,7 +635,7 @@ has considerations with permissions
 
 #### Defined in
 
-[client/providers/item.tsx:1045](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1045)
+[client/providers/item.tsx:1052](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1052)
 
 ___
 
@@ -650,7 +651,7 @@ has considerations with permissions
 
 #### Defined in
 
-[client/providers/item.tsx:1018](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1018)
+[client/providers/item.tsx:1025](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1025)
 
 ___
 
@@ -666,7 +667,7 @@ has considerations with permissions
 
 #### Defined in
 
-[client/providers/item.tsx:1027](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1027)
+[client/providers/item.tsx:1034](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1034)
 
 ___
 
@@ -688,7 +689,7 @@ items given a parent
 
 #### Defined in
 
-[client/providers/item.tsx:789](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L789)
+[client/providers/item.tsx:790](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L790)
 
 ___
 
@@ -701,7 +702,7 @@ by searching while searching, passing a boolean puts things in a queue where the
 
 #### Defined in
 
-[client/providers/item.tsx:1051](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1051)
+[client/providers/item.tsx:1058](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1058)
 
 ___
 
@@ -717,7 +718,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:224](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L224)
+[client/providers/item.tsx:225](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L225)
 
 ___
 
@@ -733,7 +734,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:228](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L228)
+[client/providers/item.tsx:229](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L229)
 
 ___
 
@@ -749,7 +750,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:220](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L220)
+[client/providers/item.tsx:221](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L221)
 
 ___
 
@@ -761,7 +762,7 @@ Uses a progresses to check the process of the search by a percentage
 
 #### Defined in
 
-[client/providers/item.tsx:961](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L961)
+[client/providers/item.tsx:962](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L962)
 
 ___
 
@@ -782,7 +783,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:246](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L246)
+[client/providers/item.tsx:247](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L247)
 
 ___
 
@@ -803,7 +804,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L255)
+[client/providers/item.tsx:256](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L256)
 
 ___
 
@@ -824,7 +825,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:237](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L237)
+[client/providers/item.tsx:238](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L238)
 
 ___
 
@@ -840,7 +841,7 @@ The requested includes and the sinking properties related to these includes
 
 #### Defined in
 
-[client/providers/item.tsx:672](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L672)
+[client/providers/item.tsx:673](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L673)
 
 ___
 
@@ -856,7 +857,7 @@ but you also need the profile_picture, you will put username and profile_picture
 
 #### Defined in
 
-[client/providers/item.tsx:659](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L659)
+[client/providers/item.tsx:660](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L660)
 
 ___
 
@@ -873,7 +874,7 @@ given action completes
 
 #### Defined in
 
-[client/providers/item.tsx:340](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L340)
+[client/providers/item.tsx:341](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L341)
 
 ___
 
@@ -890,7 +891,7 @@ given action, completes and FAILED
 
 #### Defined in
 
-[client/providers/item.tsx:345](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L345)
+[client/providers/item.tsx:346](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L346)
 
 ___
 
@@ -907,7 +908,7 @@ given action, completes and SUCCEEDS
 
 #### Defined in
 
-[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L335)
+[client/providers/item.tsx:336](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L336)
 
 ___
 
@@ -923,7 +924,7 @@ The includes to be used to search with
 
 #### Defined in
 
-[client/providers/item.tsx:735](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L735)
+[client/providers/item.tsx:736](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L736)
 
 ___
 
@@ -986,7 +987,7 @@ year         from, to (disableRangedSearch=false) exact (disableRangedSearch=tru
 
 #### Defined in
 
-[client/providers/item.tsx:731](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L731)
+[client/providers/item.tsx:732](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L732)
 
 ___
 
@@ -1002,7 +1003,7 @@ over the since property that exists within the search mode
 
 #### Defined in
 
-[client/providers/item.tsx:774](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L774)
+[client/providers/item.tsx:775](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L775)
 
 ___
 
@@ -1021,7 +1022,7 @@ It will not work otherwise
 
 #### Defined in
 
-[client/providers/item.tsx:817](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L817)
+[client/providers/item.tsx:818](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L818)
 
 ___
 
@@ -1035,7 +1036,7 @@ is marked like this it cannot be requested via the client
 
 #### Defined in
 
-[client/providers/item.tsx:850](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L850)
+[client/providers/item.tsx:851](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L851)
 
 ___
 
@@ -1051,7 +1052,7 @@ Similar to ssrRequestedProperties but for includes
 
 #### Defined in
 
-[client/providers/item.tsx:676](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L676)
+[client/providers/item.tsx:677](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L677)
 
 ___
 
@@ -1068,7 +1069,7 @@ by the client side once it is mounted, similar to the case of cache policies
 
 #### Defined in
 
-[client/providers/item.tsx:668](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L668)
+[client/providers/item.tsx:669](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L669)
 
 ___
 
@@ -1081,7 +1082,7 @@ can later be loaded with loadSearchResultsFromNavigation
 
 #### Defined in
 
-[client/providers/item.tsx:953](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L953)
+[client/providers/item.tsx:954](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L954)
 
 ___
 
@@ -1095,7 +1096,7 @@ or such where special characters are not allowed
 
 #### Defined in
 
-[client/providers/item.tsx:862](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L862)
+[client/providers/item.tsx:863](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L863)
 
 ___
 
@@ -1112,7 +1113,7 @@ traditional is better for single page views, but worse for paginations
 
 #### Defined in
 
-[client/providers/item.tsx:921](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L921)
+[client/providers/item.tsx:922](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L922)
 
 ___
 
@@ -1124,7 +1125,7 @@ Types to search as, only truly usable on module based search
 
 #### Defined in
 
-[client/providers/item.tsx:935](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L935)
+[client/providers/item.tsx:936](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L936)
 
 ___
 
@@ -1145,7 +1146,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:300](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L300)
+[client/providers/item.tsx:301](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L301)
 
 ___
 
@@ -1166,7 +1167,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L309)
+[client/providers/item.tsx:310](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L310)
 
 ___
 
@@ -1187,7 +1188,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L291)
+[client/providers/item.tsx:292](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L292)
 
 ___
 
@@ -1203,7 +1204,7 @@ over the since property that exists within the search mode
 
 #### Defined in
 
-[client/providers/item.tsx:782](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L782)
+[client/providers/item.tsx:783](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L783)
 
 ___
 
@@ -1221,7 +1222,20 @@ The item must be search engine enabled or otherwise this will cause an error
 
 #### Defined in
 
-[client/providers/item.tsx:971](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L971)
+[client/providers/item.tsx:972](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L972)
+
+___
+
+### useSearchEngineFullHighlights
+
+• `Optional` **useSearchEngineFullHighlights**: `number`
+
+Uses the full highlights during a search engine query, the number specified should be
+between 1 and 50 as it highlights (10 recommended)
+
+#### Defined in
+
+[client/providers/item.tsx:978](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L978)
 
 ___
 
@@ -1233,7 +1247,7 @@ Only allow items of a specific version
 
 #### Defined in
 
-[client/providers/item.tsx:976](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L976)
+[client/providers/item.tsx:983](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L983)
 
 ___
 
@@ -1245,7 +1259,7 @@ Blacklist a specific version
 
 #### Defined in
 
-[client/providers/item.tsx:981](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L981)
+[client/providers/item.tsx:988](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L988)
 
 ___
 
@@ -1257,4 +1271,4 @@ uses wait and merge to merge with other searches
 
 #### Defined in
 
-[client/providers/item.tsx:957](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L957)
+[client/providers/item.tsx:958](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L958)

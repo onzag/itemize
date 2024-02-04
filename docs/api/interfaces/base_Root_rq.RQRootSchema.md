@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[base/Root/rq.ts:20](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L20)
+[base/Root/rq.ts:20](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L20)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:17](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L17)
+[base/Root/rq.ts:17](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L17)

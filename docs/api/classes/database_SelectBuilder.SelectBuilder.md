@@ -68,7 +68,7 @@ Builds a new select query builder
 
 #### Defined in
 
-[database/SelectBuilder.ts:36](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L36)
+[database/SelectBuilder.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L36)
 
 ## Properties
 
@@ -78,7 +78,7 @@ Builds a new select query builder
 
 #### Defined in
 
-[database/SelectBuilder.ts:23](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L23)
+[database/SelectBuilder.ts:23](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L23)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[database/SelectBuilder.ts:26](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L26)
+[database/SelectBuilder.ts:26](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L26)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 #### Defined in
 
-[database/SelectBuilder.ts:27](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L27)
+[database/SelectBuilder.ts:27](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L27)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 #### Defined in
 
-[database/SelectBuilder.ts:30](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L30)
+[database/SelectBuilder.ts:30](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L30)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 #### Defined in
 
-[database/SelectBuilder.ts:31](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L31)
+[database/SelectBuilder.ts:31](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L31)
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 #### Defined in
 
-[database/SelectBuilder.ts:24](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L24)
+[database/SelectBuilder.ts:24](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L24)
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 #### Defined in
 
-[database/SelectBuilder.ts:28](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L28)
+[database/SelectBuilder.ts:28](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L28)
 
 ___
 
@@ -150,7 +150,7 @@ The expressions that we are selecting
 
 #### Defined in
 
-[database/SelectBuilder.ts:21](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L21)
+[database/SelectBuilder.ts:21](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L21)
 
 ___
 
@@ -160,7 +160,7 @@ ___
 
 #### Defined in
 
-[database/SelectBuilder.ts:25](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L25)
+[database/SelectBuilder.ts:25](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L25)
 
 ## Methods
 
@@ -186,7 +186,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L69)
 
 ___
 
@@ -212,7 +212,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L77)
 
 ___
 
@@ -230,7 +230,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:122](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L122)
+[database/SelectBuilder.ts:122](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L122)
 
 ___
 
@@ -250,7 +250,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L105)
 
 ___
 
@@ -269,7 +269,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:104](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L104)
+[database/SelectBuilder.ts:104](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L104)
 
 ___
 
@@ -291,7 +291,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/SelectBuilder.ts:161](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L161)
+[database/SelectBuilder.ts:161](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L161)
 
 ___
 
@@ -314,7 +314,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L168)
 
 ___
 
@@ -338,7 +338,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:134](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L134)
+[database/SelectBuilder.ts:134](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L134)
 
 ___
 
@@ -362,7 +362,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:148](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L148)
+[database/SelectBuilder.ts:148](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L148)
 
 ___
 
@@ -382,7 +382,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L112)
 
 ___
 
@@ -406,7 +406,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:65](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L65)
+[database/SelectBuilder.ts:65](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L65)
 
 ___
 
@@ -430,7 +430,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:54](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L54)
+[database/SelectBuilder.ts:54](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L54)
 
 ___
 
@@ -455,7 +455,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:78](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L78)
+[database/SelectBuilder.ts:78](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L78)
 
 ___
 
@@ -480,7 +480,7 @@ itself
 
 #### Defined in
 
-[database/SelectBuilder.ts:90](https://github.com/onzag/itemize/blob/59702dd5/database/SelectBuilder.ts#L90)
+[database/SelectBuilder.ts:90](https://github.com/onzag/itemize/blob/73e0c39e/database/SelectBuilder.ts#L90)
 
 ___
 
@@ -507,7 +507,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L89)
 
 ___
 
@@ -534,7 +534,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L98)
 
 ___
 
@@ -556,4 +556,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L129)

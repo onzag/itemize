@@ -2,89 +2,123 @@
 
 # Module: client/fast-prototyping/components/slate/wrapper
 
-This file contains the fast prototyping wrapper that uses the material UI elements
-in order to create the slate editor for the PropertyViewText
-
-The wrapper component is added as a property to the slate editor itself so other wrappers
-can be added as replacement, you can also design your own wrapper based on this one
-
 ## Table of contents
 
-### Classes
+### Namespaces
 
-- [MaterialUISlateWrapper](../classes/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md)
+- [MaterialUISlateWrapper](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md)
 
 ### Interfaces
 
-- [IDrawerConfiguratorElement](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerConfiguratorElement.md)
-- [IDrawerContainerProps](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerContainerProps.md)
-- [IDrawerUIHandlerElementConfigBoolean](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigBoolean.md)
-- [IDrawerUIHandlerElementConfigCustom](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustom.md)
-- [IDrawerUIHandlerElementConfigCustomProps](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md)
-- [IDrawerUIHandlerElementConfigInput](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigInput.md)
-- [IDrawerUIHandlerElementConfigSelect](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigSelect.md)
+- [IMUIToolbarButtonProps](../interfaces/client_fast_prototyping_components_slate_wrapper.IMUIToolbarButtonProps.md)
 - [IMaterialUISlateWrapperProps](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)
-- [IToolbarPrescenseElement](../interfaces/client_fast_prototyping_components_slate_wrapper.IToolbarPrescenseElement.md)
-- [MaterialUISlateWrapperState](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)
-- [RichTextEditorToolbarProps](../interfaces/client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md)
 
-### Type Aliases
+### Functions
 
-- [SlateEditorWrapperCustomToolbarElement](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelement)
-- [SlateEditorWrapperCustomToolbarElementBaseForm](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
-- [SlateEditorWrapperCustomToolbarElementFnForm](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementfnform)
-- [SlateEditorWrapperCustomToolbarIdentifiedElement](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbaridentifiedelement)
+- [MaterialUISlateWrapper](client_fast_prototyping_components_slate_wrapper.md#materialuislatewrapper)
+- [WrapperDrawerCheckboxField](client_fast_prototyping_components_slate_wrapper.md#wrapperdrawercheckboxfield)
+- [WrapperDrawerMultiSelectField](client_fast_prototyping_components_slate_wrapper.md#wrapperdrawermultiselectfield)
+- [WrapperDrawerSelectField](client_fast_prototyping_components_slate_wrapper.md#wrapperdrawerselectfield)
+- [WrapperDrawerTextField](client_fast_prototyping_components_slate_wrapper.md#wrapperdrawertextfield)
 
-## Type Aliases
+## Functions
 
-### SlateEditorWrapperCustomToolbarElement
+### MaterialUISlateWrapper
 
-Ƭ **SlateEditorWrapperCustomToolbarElement**: [`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform) \| [`SlateEditorWrapperCustomToolbarElementFnForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementfnform)
+▸ **MaterialUISlateWrapper**(`props`): `ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\>
 
-#### Defined in
+**NOTE**: Exotic components are not callable.
 
-[client/fast-prototyping/components/slate/wrapper.tsx:415](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L415)
-
-___
-
-### SlateEditorWrapperCustomToolbarElementBaseForm
-
-Ƭ **SlateEditorWrapperCustomToolbarElementBaseForm**: [`IToolbarPrescenseElement`](../interfaces/client_fast_prototyping_components_slate_wrapper.IToolbarPrescenseElement.md) \| [`SlateEditorWrapperCustomToolbarIdentifiedElement`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbaridentifiedelement)
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:408](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L408)
-
-___
-
-### SlateEditorWrapperCustomToolbarElementFnForm
-
-Ƭ **SlateEditorWrapperCustomToolbarElementFnForm**: (`toolbarProps`: `any`) => [`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
-
-#### Type declaration
-
-▸ (`toolbarProps`): [`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
-
-##### Parameters
+#### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `toolbarProps` | `any` |
+| `props` | [`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md) & `RefAttributes`\<`unknown`\> |
 
-##### Returns
+#### Returns
 
-[`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
+`ReactElement`\<`any`, `string` \| `JSXElementConstructor`\<`any`\>\>
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:412](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L412)
+node_modules/@types/react/index.d.ts:354
 
 ___
 
-### SlateEditorWrapperCustomToolbarIdentifiedElement
+### WrapperDrawerCheckboxField
 
-Ƭ **SlateEditorWrapperCustomToolbarIdentifiedElement**: ``"bold"`` \| ``"italic"`` \| ``"underline"`` \| ``"link"`` \| ``"title"`` \| ``"bulleted-list"`` \| ``"numbered-list"`` \| ``"image"`` \| ``"video"`` \| ``"file"`` \| ``"quote"`` \| ``"container"`` \| ``"table"`` \| ``"template-text"`` \| ``"template-html"`` \| ``"extras"`` \| ``"none"`` \| ``"divider"`` \| ``"hdivider"``
+▸ **WrapperDrawerCheckboxField**(`props`): `Element`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `IWrapperDrawerCheckBoxProps` |
+
+#### Returns
+
+`Element`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:387](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/slate/wrapper.tsx#L387)
+[client/fast-prototyping/components/slate/wrapper.tsx:576](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L576)
+
+___
+
+### WrapperDrawerMultiSelectField
+
+▸ **WrapperDrawerMultiSelectField**(`props`): `Element`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `IWrapperDrawerMultiSelectFieldProps` |
+
+#### Returns
+
+`Element`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:479](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L479)
+
+___
+
+### WrapperDrawerSelectField
+
+▸ **WrapperDrawerSelectField**(`props`): `Element`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `IWrapperDrawerSelectFieldProps` |
+
+#### Returns
+
+`Element`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:517](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L517)
+
+___
+
+### WrapperDrawerTextField
+
+▸ **WrapperDrawerTextField**(`props`): `Element`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `IWrapperDrawerTextFieldProps` |
+
+#### Returns
+
+`Element`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:596](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/slate/wrapper.tsx#L596)

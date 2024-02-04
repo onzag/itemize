@@ -64,8 +64,7 @@ The styles of the renderer
 | `autosuggestSuggestionsList` | {} |
 | `chip` | \{ `margin`: `string` = "10px 10px 0 10px" } |
 | `chip.margin` | `string` |
-| `container` | \{ `paddingBottom`: `string` = "1.3rem"; `width`: `string` = "100%" } |
-| `container.paddingBottom` | `string` |
+| `container` | \{ `width`: `string` = "100%" } |
 | `container.width` | `string` |
 | `description` | \{ `width`: `string` = "100%" } |
 | `description.width` | `string` |
@@ -91,13 +90,26 @@ The styles of the renderer
 | `fieldInput.paddingBottom` | `string` |
 | `fieldInput.paddingLeft` | `string` |
 | `fieldInput.paddingTop` | `string` |
+| `fieldInputOutlined` | \{ `& > input`: \{ `flex`: `string` = "1 0 auto"; `marginBottom`: `string` = "-10px"; `padding`: `string` = "7px 0 13px 0"; `width`: `string` = "200px" } ; `alignItems`: `string` = "center"; `display`: `string` = "flex"; `flexWrap`: `string` = "wrap"; `paddingBottom`: `string` = '12px'; `paddingLeft`: `string` = '14px'; `paddingRight`: `string` = '14px'; `paddingTop`: `string` = '10px' } |
+| `fieldInputOutlined.& > input` | \{ `flex`: `string` = "1 0 auto"; `marginBottom`: `string` = "-10px"; `padding`: `string` = "7px 0 13px 0"; `width`: `string` = "200px" } |
+| `fieldInputOutlined.& > input.flex` | `string` |
+| `fieldInputOutlined.& > input.marginBottom` | `string` |
+| `fieldInputOutlined.& > input.padding` | `string` |
+| `fieldInputOutlined.& > input.width` | `string` |
+| `fieldInputOutlined.alignItems` | `string` |
+| `fieldInputOutlined.display` | `string` |
+| `fieldInputOutlined.flexWrap` | `string` |
+| `fieldInputOutlined.paddingBottom` | `string` |
+| `fieldInputOutlined.paddingLeft` | `string` |
+| `fieldInputOutlined.paddingRight` | `string` |
+| `fieldInputOutlined.paddingTop` | `string` |
 | `icon` | \{ `color`: `string` = "#424242" } |
 | `icon.color` | `string` |
 | `label` | (`isInvalid`: `boolean`) => \{ `&.focused`: \{ `color`: `string`  } ; `color`: `string`  } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L32)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:34](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L34)
 
 ## Functions
 
@@ -124,4 +136,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:159](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L159)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:176](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L176)

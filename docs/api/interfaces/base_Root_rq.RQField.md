@@ -35,7 +35,7 @@ RQBase.array
 
 #### Defined in
 
-[base/Root/rq.ts:41](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L41)
+[base/Root/rq.ts:41](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L41)
 
 ___
 
@@ -49,7 +49,7 @@ RQBase.description
 
 #### Defined in
 
-[base/Root/rq.ts:51](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L51)
+[base/Root/rq.ts:51](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L51)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L48)
+[base/Root/rq.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L48)
 
 ___
 
@@ -77,7 +77,7 @@ RQBase.recordsObj
 
 #### Defined in
 
-[base/Root/rq.ts:31](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L31)
+[base/Root/rq.ts:31](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L31)
 
 ___
 
@@ -91,7 +91,7 @@ RQBase.required
 
 #### Defined in
 
-[base/Root/rq.ts:44](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L44)
+[base/Root/rq.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L44)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:45](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L45)
+[base/Root/rq.ts:45](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L45)
 
 ___
 
@@ -119,7 +119,7 @@ RQBase.type
 
 #### Defined in
 
-[base/Root/rq.ts:42](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L42)
+[base/Root/rq.ts:42](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L42)
 
 ___
 
@@ -133,4 +133,4 @@ RQBase.values
 
 #### Defined in
 
-[base/Root/rq.ts:43](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L43)
+[base/Root/rq.ts:43](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L43)

@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[server/user/rest.ts:23](https://github.com/onzag/itemize/blob/59702dd5/server/user/rest.ts#L23)
+[server/user/rest.ts:23](https://github.com/onzag/itemize/blob/73e0c39e/server/user/rest.ts#L23)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[server/user/rest.ts:21](https://github.com/onzag/itemize/blob/59702dd5/server/user/rest.ts#L21)
+[server/user/rest.ts:21](https://github.com/onzag/itemize/blob/73e0c39e/server/user/rest.ts#L21)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[server/user/rest.ts:22](https://github.com/onzag/itemize/blob/59702dd5/server/user/rest.ts#L22)
+[server/user/rest.ts:22](https://github.com/onzag/itemize/blob/73e0c39e/server/user/rest.ts#L22)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[server/user/rest.ts:24](https://github.com/onzag/itemize/blob/59702dd5/server/user/rest.ts#L24)
+[server/user/rest.ts:24](https://github.com/onzag/itemize/blob/73e0c39e/server/user/rest.ts#L24)

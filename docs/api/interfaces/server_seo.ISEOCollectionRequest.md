@@ -23,7 +23,7 @@ By default only the base version is collected, if you wish you can collect all t
 
 #### Defined in
 
-[server/seo/index.ts:33](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L33)
+[server/seo/index.ts:33](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/index.ts#L33)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:29](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L29)
+[server/seo/index.ts:29](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/index.ts#L29)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:28](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L28)
+[server/seo/index.ts:28](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/index.ts#L28)
 
 ___
 
@@ -67,4 +67,4 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:27](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L27)
+[server/seo/index.ts:27](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/index.ts#L27)

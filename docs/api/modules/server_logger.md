@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[server/logger.ts:121](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L121)
+[server/logger.ts:121](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L121)
 
 ## Variables
 
@@ -48,7 +48,7 @@
 
 #### Defined in
 
-[server/logger.ts:115](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L115)
+[server/logger.ts:115](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L115)
 
 ## Functions
 
@@ -68,4 +68,4 @@
 
 #### Defined in
 
-[server/logger.ts:148](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L148)
+[server/logger.ts:148](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L148)

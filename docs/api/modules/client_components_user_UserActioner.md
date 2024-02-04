@@ -45,4 +45,4 @@ a react element
 
 #### Defined in
 
-[client/components/user/UserActioner.tsx:522](https://github.com/onzag/itemize/blob/59702dd5/client/components/user/UserActioner.tsx#L522)
+[client/components/user/UserActioner.tsx:522](https://github.com/onzag/itemize/blob/73e0c39e/client/components/user/UserActioner.tsx#L522)

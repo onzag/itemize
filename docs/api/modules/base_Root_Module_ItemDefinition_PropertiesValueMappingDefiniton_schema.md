@@ -37,4 +37,4 @@ The default property value mapping definition schema
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/schema.ts:14](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/schema.ts#L14)
+[base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/schema.ts:14](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/schema.ts#L14)

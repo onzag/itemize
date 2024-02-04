@@ -45,7 +45,7 @@ Dismiss the current login error
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:111](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L111)
+[client/internal/providers/token-provider.tsx:111](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L111)
 
 ___
 
@@ -61,7 +61,7 @@ An error that occured during login
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:37](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L37)
+[client/internal/providers/token-provider.tsx:37](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L37)
 
 ___
 
@@ -77,7 +77,7 @@ The user id
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L29)
+[client/internal/providers/token-provider.tsx:29](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L29)
 
 ___
 
@@ -93,7 +93,7 @@ Whether it's currently logging in
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L41)
+[client/internal/providers/token-provider.tsx:41](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L41)
 
 ___
 
@@ -115,7 +115,7 @@ the token
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:51](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L51)
+[client/internal/providers/token-provider.tsx:51](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L51)
 
 ___
 
@@ -145,7 +145,7 @@ a promise with the id, role and a possible error
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:102](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L102)
+[client/internal/providers/token-provider.tsx:102](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L102)
 
 ___
 
@@ -166,7 +166,7 @@ the token provider only manages simple functionality about the current app state
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:107](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L107)
+[client/internal/providers/token-provider.tsx:107](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L107)
 
 ___
 
@@ -182,7 +182,7 @@ The user role
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L33)
+[client/internal/providers/token-provider.tsx:33](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L33)
 
 ___
 
@@ -198,4 +198,4 @@ The token we have got now
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/token-provider.tsx#L25)
+[client/internal/providers/token-provider.tsx:25](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/token-provider.tsx#L25)

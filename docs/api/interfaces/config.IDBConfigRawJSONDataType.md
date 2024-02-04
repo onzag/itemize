@@ -27,7 +27,7 @@ The database config
 
 #### Defined in
 
-[config.ts:308](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L308)
+[config.ts:308](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L308)
 
 ___
 
@@ -44,7 +44,7 @@ you might specify only unregionalized versions, eg instead of en-GB en-US only e
 
 #### Defined in
 
-[config.ts:313](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L313)
+[config.ts:313](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L313)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[config.ts:319](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L319)
+[config.ts:319](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L319)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[config.ts:320](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L320)
+[config.ts:320](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L320)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-[config.ts:304](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L304)
+[config.ts:304](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L304)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[config.ts:307](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L307)
+[config.ts:307](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L307)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 #### Defined in
 
-[config.ts:305](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L305)
+[config.ts:305](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L305)
 
 ___
 
@@ -108,4 +108,4 @@ ___
 
 #### Defined in
 
-[config.ts:306](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L306)
+[config.ts:306](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L306)

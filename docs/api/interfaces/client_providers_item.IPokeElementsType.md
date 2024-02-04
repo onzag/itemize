@@ -28,7 +28,7 @@ includes that are poked with their list of properties
 
 #### Defined in
 
-[client/providers/item.tsx:1065](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1065)
+[client/providers/item.tsx:1072](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1072)
 
 ___
 
@@ -40,7 +40,7 @@ policies that are poked
 
 #### Defined in
 
-[client/providers/item.tsx:1069](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1069)
+[client/providers/item.tsx:1076](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1076)
 
 ___
 
@@ -52,4 +52,4 @@ properties that are poked as a list of string
 
 #### Defined in
 
-[client/providers/item.tsx:1061](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1061)
+[client/providers/item.tsx:1068](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1068)

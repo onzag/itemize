@@ -26,4 +26,4 @@ All errors
 
 #### Defined in
 
-[base/errors.ts:70](https://github.com/onzag/itemize/blob/59702dd5/base/errors.ts#L70)
+[base/errors.ts:70](https://github.com/onzag/itemize/blob/73e0c39e/base/errors.ts#L70)

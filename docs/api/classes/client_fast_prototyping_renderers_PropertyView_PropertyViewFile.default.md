@@ -18,7 +18,7 @@ supported args:
 
 ## Hierarchy
 
-- `Component`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md), `IPropertyViewFileRendererState`\>
+- `Component`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>
 
   ↳ **`default`**
 
@@ -31,10 +31,7 @@ supported args:
 ### Properties
 
 - [context](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#context)
-- [io](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#io)
-- [isScrollEventAttached](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#isscrolleventattached)
 - [props](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#props)
-- [refImg](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#refimg)
 - [refs](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#refs)
 - [state](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#state)
 - [contextType](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#contexttype)
@@ -44,8 +41,6 @@ supported args:
 - [UNSAFE\_componentWillMount](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#unsafe_componentwillmount)
 - [UNSAFE\_componentWillReceiveProps](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#unsafe_componentwillreceiveprops)
 - [UNSAFE\_componentWillUpdate](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#unsafe_componentwillupdate)
-- [attachScrollEvent](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#attachscrollevent)
-- [checkWhetherInViewOldSchool](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#checkwhetherinviewoldschool)
 - [componentDidCatch](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#componentdidcatch)
 - [componentDidMount](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#componentdidmount)
 - [componentDidUpdate](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#componentdidupdate)
@@ -55,11 +50,8 @@ supported args:
 - [componentWillUpdate](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#componentwillupdate)
 - [forceUpdate](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#forceupdate)
 - [getSnapshotBeforeUpdate](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#getsnapshotbeforeupdate)
-- [removeIntersectionObserver](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#removeintersectionobserver)
-- [removeScrollEvent](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#removescrollevent)
 - [render](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#render)
 - [setState](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#setstate)
-- [setupIntersectionObserver](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#setupintersectionobserver)
 - [shouldComponentUpdate](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md#shouldcomponentupdate)
 
 ## Constructors
@@ -68,25 +60,50 @@ supported args:
 
 • **new default**(`props`): [`default`](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md)
 
-Builds the renderer
-
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `props` | [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md) | the handler passed props |
+| Name | Type |
+| :------ | :------ |
+| `props` | [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md) \| `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
 
 #### Returns
 
 [`default`](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md)
 
-#### Overrides
+#### Inherited from
 
-React.Component\&lt;IPropertyViewFileRendererProps, IPropertyViewFileRendererState\&gt;.constructor
+React.Component\<IPropertyViewFileRendererProps\>.constructor
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:56](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L56)
+node_modules/@types/react/index.d.ts:475
+
+• **new default**(`props`, `context`): [`default`](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md) |
+| `context` | `any` |
+
+#### Returns
+
+[`default`](client_fast_prototyping_renderers_PropertyView_PropertyViewFile.default.md)
+
+**`Deprecated`**
+
+**`See`**
+
+https://legacy.reactjs.org/docs/legacy-context.html
+
+#### Inherited from
+
+React.Component\<IPropertyViewFileRendererProps\>.constructor
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:480
 
 ## Properties
 
@@ -120,30 +137,6 @@ node_modules/@types/react/index.d.ts:473
 
 ___
 
-### io
-
-• `Private` **io**: `IntersectionObserver`
-
-Intersection observer to see when the element pops into view, if necessary
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:50](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L50)
-
-___
-
-### isScrollEventAttached
-
-• `Private` **isScrollEventAttached**: `boolean` = `false`
-
-whether the scroll event is actually attached
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:42](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L42)
-
-___
-
 ### props
 
 • `Readonly` **props**: `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> & `Readonly`\<\{ `children?`: `ReactNode`  }\>
@@ -155,18 +148,6 @@ React.Component.props
 #### Defined in
 
 node_modules/@types/react/index.d.ts:498
-
-___
-
-### refImg
-
-• `Private` **refImg**: `RefObject`\<`HTMLImageElement`\>
-
-The image reference
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:46](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L46)
 
 ___
 
@@ -194,7 +175,7 @@ ___
 
 ### state
 
-• **state**: `Readonly`\<`IPropertyViewFileRendererState`\>
+• **state**: `Readonly`\<{}\>
 
 #### Inherited from
 
@@ -339,7 +320,7 @@ prevents this from being invoked.
 | Name | Type |
 | :------ | :------ |
 | `nextProps` | `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
-| `nextState` | `Readonly`\<`IPropertyViewFileRendererState`\> |
+| `nextState` | `Readonly`\<{}\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -362,39 +343,6 @@ React.Component.UNSAFE\_componentWillUpdate
 #### Defined in
 
 node_modules/@types/react/index.d.ts:771
-
-___
-
-### attachScrollEvent
-
-▸ **attachScrollEvent**(): `void`
-
-Attach the scroll event, only necessary for traditional
-lazyloading
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:73](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L73)
-
-___
-
-### checkWhetherInViewOldSchool
-
-▸ **checkWhetherInViewOldSchool**(): `void`
-
-Old school way to check if an element is in view
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:95](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L95)
 
 ___
 
@@ -430,43 +378,49 @@ ___
 
 ▸ **componentDidMount**(): `void`
 
-Now when the element mounts
+Called immediately after a component is mounted. Setting state here will trigger re-rendering.
 
 #### Returns
 
 `void`
 
-#### Overrides
+#### Inherited from
 
 React.Component.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:153](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L153)
+node_modules/@types/react/index.d.ts:619
 
 ___
 
 ### componentDidUpdate
 
-▸ **componentDidUpdate**(`prevProps`): `void`
+▸ **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
+
+Called immediately after updating occurs. Not called for the initial render.
+
+The snapshot is only present if getSnapshotBeforeUpdate is present and returns non-null.
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md) |
+| `prevProps` | `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
+| `prevState` | `Readonly`\<{}\> |
+| `snapshot?` | `any` |
 
 #### Returns
 
 `void`
 
-#### Overrides
+#### Inherited from
 
 React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:172](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L172)
+node_modules/@types/react/index.d.ts:682
 
 ___
 
@@ -550,17 +504,20 @@ ___
 
 ▸ **componentWillUnmount**(): `void`
 
+Called immediately before a component is destroyed. Perform any necessary cleanup in this method, such as
+cancelled network requests, or cleaning up any DOM elements created in `componentDidMount`.
+
 #### Returns
 
 `void`
 
-#### Overrides
+#### Inherited from
 
 React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:182](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L182)
+node_modules/@types/react/index.d.ts:635
 
 ___
 
@@ -580,7 +537,7 @@ prevents this from being invoked.
 | Name | Type |
 | :------ | :------ |
 | `nextProps` | `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
-| `nextState` | `Readonly`\<`IPropertyViewFileRendererState`\> |
+| `nextState` | `Readonly`\<{}\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -646,7 +603,7 @@ lifecycle events from running.
 | Name | Type |
 | :------ | :------ |
 | `prevProps` | `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
-| `prevState` | `Readonly`\<`IPropertyViewFileRendererState`\> |
+| `prevState` | `Readonly`\<{}\> |
 
 #### Returns
 
@@ -659,39 +616,6 @@ React.Component.getSnapshotBeforeUpdate
 #### Defined in
 
 node_modules/@types/react/index.d.ts:676
-
-___
-
-### removeIntersectionObserver
-
-▸ **removeIntersectionObserver**(): `void`
-
-Remove the intersection observer if it exist
-it might have never been triggered
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:144](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L144)
-
-___
-
-### removeScrollEvent
-
-▸ **removeScrollEvent**(): `void`
-
-Removes the attached scroll event for lazyloading
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:85](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L85)
 
 ___
 
@@ -709,7 +633,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:186](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L186)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:25](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L25)
 
 ___
 
@@ -721,13 +645,13 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `K` | extends ``"loaded"`` |
+| `K` | extends `never` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `IPropertyViewFileRendererState` \| (`prevState`: `Readonly`\<`IPropertyViewFileRendererState`\>, `props`: `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>) => `IPropertyViewFileRendererState` \| `Pick`\<`IPropertyViewFileRendererState`, `K`\> \| `Pick`\<`IPropertyViewFileRendererState`, `K`\> |
+| `state` | {} \| (`prevState`: `Readonly`\<{}\>, `props`: `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>) => {} \| `Pick`\<{}, `K`\> \| `Pick`\<{}, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -741,22 +665,6 @@ React.Component.setState
 #### Defined in
 
 node_modules/@types/react/index.d.ts:485
-
-___
-
-### setupIntersectionObserver
-
-▸ **setupIntersectionObserver**(): `void`
-
-Intersection observer way to check if the image is in view
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:116](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L116)
 
 ___
 
@@ -778,7 +686,7 @@ and `componentDidUpdate` will not be called.
 | Name | Type |
 | :------ | :------ |
 | `nextProps` | `Readonly`\<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
-| `nextState` | `Readonly`\<`IPropertyViewFileRendererState`\> |
+| `nextState` | `Readonly`\<{}\> |
 | `nextContext` | `any` |
 
 #### Returns

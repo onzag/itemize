@@ -31,7 +31,7 @@ The id that was used
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:446](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L446)
+[base/Root/Module/ItemDefinition/index.ts:447](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L447)
 
 ___
 
@@ -43,7 +43,7 @@ The version that was used
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:450](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L450)
+[base/Root/Module/ItemDefinition/index.ts:451](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L451)
 
 ___
 
@@ -55,7 +55,7 @@ All the state of the includes within itself
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:430](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L430)
+[base/Root/Module/ItemDefinition/index.ts:431](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L431)
 
 ___
 
@@ -67,7 +67,7 @@ The name of the item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:426](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L426)
+[base/Root/Module/ItemDefinition/index.ts:427](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L427)
 
 ___
 
@@ -79,7 +79,7 @@ The qualified name of the item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:422](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L422)
+[base/Root/Module/ItemDefinition/index.ts:423](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L423)
 
 ___
 
@@ -91,7 +91,7 @@ The module this item definition resides (name only)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:418](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L418)
+[base/Root/Module/ItemDefinition/index.ts:419](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L419)
 
 ___
 
@@ -103,7 +103,7 @@ All the policies state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:438](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L438)
+[base/Root/Module/ItemDefinition/index.ts:439](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L439)
 
 ___
 
@@ -115,7 +115,7 @@ All the states of the properties included
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:434](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L434)
+[base/Root/Module/ItemDefinition/index.ts:435](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L435)
 
 ___
 
@@ -127,7 +127,7 @@ The original rq flattened value that was applied (if any)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:442](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L442)
+[base/Root/Module/ItemDefinition/index.ts:443](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L443)
 
 ___
 
@@ -142,4 +142,4 @@ might be assigned to this state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:457](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L457)
+[base/Root/Module/ItemDefinition/index.ts:458](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L458)

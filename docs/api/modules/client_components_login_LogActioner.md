@@ -36,4 +36,4 @@ a react component
 
 #### Defined in
 
-[client/components/login/LogActioner.tsx:291](https://github.com/onzag/itemize/blob/59702dd5/client/components/login/LogActioner.tsx#L291)
+[client/components/login/LogActioner.tsx:291](https://github.com/onzag/itemize/blob/73e0c39e/client/components/login/LogActioner.tsx#L291)

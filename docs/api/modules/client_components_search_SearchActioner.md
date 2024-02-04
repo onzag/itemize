@@ -39,4 +39,4 @@ a react element
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:102](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L102)
+[client/components/search/SearchActioner.tsx:102](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L102)

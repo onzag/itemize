@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[imported-resources/index.ts:42](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L42)
+[imported-resources/index.ts:42](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L42)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:45](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L45)
+[imported-resources/index.ts:45](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L45)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:43](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L43)
+[imported-resources/index.ts:43](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L43)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:44](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L44)
+[imported-resources/index.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L44)

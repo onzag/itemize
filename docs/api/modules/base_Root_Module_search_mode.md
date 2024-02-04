@@ -34,4 +34,4 @@ a raw module
 
 #### Defined in
 
-[base/Root/Module/search-mode.ts:20](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/search-mode.ts#L20)
+[base/Root/Module/search-mode.ts:20](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/search-mode.ts#L20)

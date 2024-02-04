@@ -21,7 +21,7 @@ A conditition for conditional values
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:66](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L66)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:66](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L66)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:65](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L65)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:65](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L65)

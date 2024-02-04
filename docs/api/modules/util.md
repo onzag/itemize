@@ -10,12 +10,6 @@ Contains general utility functions to be used within the itemize app
 
 - [Moment](util.Moment.md)
 
-### Variables
-
-- [DOMPurify](util.md#dompurify)
-- [DOMWindow](util.md#domwindow)
-- [JSDOM](util.md#jsdom)
-
 ### Functions
 
 - [Moment](util.md#moment)
@@ -63,36 +57,6 @@ Contains general utility functions to be used within the itemize app
 - [prettySize](util.md#prettysize)
 - [processAccepts](util.md#processaccepts)
 - [transferrableToBlob](util.md#transferrabletoblob)
-
-## Variables
-
-### DOMPurify
-
-• `Const` **DOMPurify**: `DOMPurifyI`
-
-#### Defined in
-
-[util.ts:933](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L933)
-
-___
-
-### DOMWindow
-
-• `Const` **DOMWindow**: `Window` & typeof `globalThis` \| `DOMWindow`
-
-#### Defined in
-
-[util.ts:932](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L932)
-
-___
-
-### JSDOM
-
-• `Const` **JSDOM**: typeof `JSDOM` = `JSDOMDef`
-
-#### Defined in
-
-[util.ts:26](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L26)
 
 ## Functions
 
@@ -172,7 +136,7 @@ Converts a blob back into the json transferrable form
 
 #### Defined in
 
-[util.ts:138](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L138)
+[util.ts:135](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L135)
 
 ___
 
@@ -194,7 +158,7 @@ capitalizes a string
 
 #### Defined in
 
-[util.ts:215](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L215)
+[util.ts:212](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L212)
 
 ___
 
@@ -217,7 +181,7 @@ Checks whether the file type exists in the accept property
 
 #### Defined in
 
-[util.ts:359](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L359)
+[util.ts:356](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L356)
 
 ___
 
@@ -237,7 +201,7 @@ ___
 
 #### Defined in
 
-[util.ts:800](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L800)
+[util.ts:797](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L797)
 
 ___
 
@@ -259,7 +223,7 @@ ___
 
 #### Defined in
 
-[util.ts:825](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L825)
+[util.ts:822](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L822)
 
 ___
 
@@ -280,7 +244,7 @@ ___
 
 #### Defined in
 
-[util.ts:804](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L804)
+[util.ts:801](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L801)
 
 ___
 
@@ -303,7 +267,7 @@ Creates a currency value to use with prefills and setters
 
 #### Defined in
 
-[util.ts:655](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L655)
+[util.ts:652](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L652)
 
 ___
 
@@ -325,7 +289,7 @@ Creates a datetime value to be used with prefills and setters
 
 #### Defined in
 
-[util.ts:674](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L674)
+[util.ts:671](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L671)
 
 ___
 
@@ -347,7 +311,7 @@ Creates a date value to be used with prefills and setters
 
 #### Defined in
 
-[util.ts:666](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L666)
+[util.ts:663](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L663)
 
 ___
 
@@ -374,7 +338,7 @@ you can use this to setup a placeholder of sorts
 
 #### Defined in
 
-[util.ts:729](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L729)
+[util.ts:726](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L726)
 
 ___
 
@@ -400,7 +364,7 @@ Creates an location value to be used with prefills and setters
 
 #### Defined in
 
-[util.ts:710](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L710)
+[util.ts:707](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L707)
 
 ___
 
@@ -429,7 +393,7 @@ values that can be submitted
 
 #### Defined in
 
-[util.ts:748](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L748)
+[util.ts:745](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L745)
 
 ___
 
@@ -451,7 +415,7 @@ Creates a time value to be used with prefills and setters
 
 #### Defined in
 
-[util.ts:682](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L682)
+[util.ts:679](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L679)
 
 ___
 
@@ -475,7 +439,7 @@ Creates an unit value to be used with prefills and setters
 
 #### Defined in
 
-[util.ts:692](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L692)
+[util.ts:689](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L689)
 
 ___
 
@@ -502,7 +466,7 @@ a function without parameters
 
 #### Defined in
 
-[util.ts:198](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L198)
+[util.ts:195](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L195)
 
 ___
 
@@ -522,7 +486,7 @@ ___
 
 #### Defined in
 
-[util.ts:264](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L264)
+[util.ts:261](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L261)
 
 ___
 
@@ -546,7 +510,7 @@ a string that is regex ready
 
 #### Defined in
 
-[util.ts:260](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L260)
+[util.ts:257](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L257)
 
 ___
 
@@ -568,7 +532,7 @@ Gives the mime type based on a extension
 
 #### Defined in
 
-[util.ts:382](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L382)
+[util.ts:379](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L379)
 
 ___
 
@@ -601,7 +565,7 @@ a new array of files
 
 #### Defined in
 
-[util.ts:627](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L627)
+[util.ts:624](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L624)
 
 ___
 
@@ -635,7 +599,7 @@ a new IRQFile but absolute
 
 #### Defined in
 
-[util.ts:535](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L535)
+[util.ts:532](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L532)
 
 ___
 
@@ -656,7 +620,7 @@ ___
 
 #### Defined in
 
-[util.ts:492](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L492)
+[util.ts:489](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L489)
 
 ___
 
@@ -677,7 +641,7 @@ ___
 
 #### Defined in
 
-[util.ts:502](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L502)
+[util.ts:499](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L499)
 
 ___
 
@@ -698,7 +662,7 @@ ___
 
 #### Defined in
 
-[util.ts:497](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L497)
+[util.ts:494](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L494)
 
 ___
 
@@ -721,7 +685,7 @@ Provides the container id for a given matching region
 
 #### Defined in
 
-[util.ts:783](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L783)
+[util.ts:780](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L780)
 
 ___
 
@@ -743,7 +707,7 @@ Gets the extension from a given file name
 
 #### Defined in
 
-[util.ts:394](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L394)
+[util.ts:391](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L391)
 
 ___
 
@@ -763,7 +727,7 @@ ___
 
 #### Defined in
 
-[util.ts:482](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L482)
+[util.ts:479](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L479)
 
 ___
 
@@ -783,7 +747,7 @@ ___
 
 #### Defined in
 
-[util.ts:488](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L488)
+[util.ts:485](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L485)
 
 ___
 
@@ -803,7 +767,7 @@ ___
 
 #### Defined in
 
-[util.ts:476](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L476)
+[util.ts:473](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L473)
 
 ___
 
@@ -819,7 +783,7 @@ Provides now
 
 #### Defined in
 
-[util.ts:240](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L240)
+[util.ts:237](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L237)
 
 ___
 
@@ -835,7 +799,7 @@ Provides time
 
 #### Defined in
 
-[util.ts:247](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L247)
+[util.ts:244](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L244)
 
 ___
 
@@ -851,7 +815,7 @@ Provides today
 
 #### Defined in
 
-[util.ts:233](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L233)
+[util.ts:230](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L230)
 
 ___
 
@@ -871,7 +835,7 @@ ___
 
 #### Defined in
 
-[util.ts:924](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L924)
+[util.ts:921](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L921)
 
 ___
 
@@ -893,7 +857,7 @@ Specifies whether the given mime type is of a supported image
 
 #### Defined in
 
-[util.ts:404](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L404)
+[util.ts:401](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L401)
 
 ___
 
@@ -914,7 +878,7 @@ ___
 
 #### Defined in
 
-[util.ts:911](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L911)
+[util.ts:908](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L908)
 
 ___
 
@@ -936,7 +900,7 @@ ___
 
 #### Defined in
 
-[util.ts:869](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L869)
+[util.ts:866](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L866)
 
 ___
 
@@ -966,7 +930,7 @@ a string
 
 #### Defined in
 
-[util.ts:429](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L429)
+[util.ts:426](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L426)
 
 ___
 
@@ -997,7 +961,7 @@ a an array
 
 #### Defined in
 
-[util.ts:453](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L453)
+[util.ts:450](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L450)
 
 ___
 
@@ -1021,7 +985,7 @@ an extension or txt if it doesn't know
 
 #### Defined in
 
-[util.ts:369](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L369)
+[util.ts:366](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L366)
 
 ___
 
@@ -1041,7 +1005,7 @@ ___
 
 #### Defined in
 
-[util.ts:507](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L507)
+[util.ts:504](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L504)
 
 ___
 
@@ -1061,7 +1025,7 @@ ___
 
 #### Defined in
 
-[util.ts:515](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L515)
+[util.ts:512](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L512)
 
 ___
 
@@ -1081,7 +1045,7 @@ ___
 
 #### Defined in
 
-[util.ts:511](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L511)
+[util.ts:508](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L508)
 
 ___
 
@@ -1103,7 +1067,7 @@ Basically an extension to pretty bytes
 
 #### Defined in
 
-[util.ts:413](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L413)
+[util.ts:410](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L410)
 
 ___
 
@@ -1124,7 +1088,7 @@ ___
 
 #### Defined in
 
-[util.ts:347](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L347)
+[util.ts:344](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L344)
 
 ___
 
@@ -1149,4 +1113,4 @@ a blob that contains everything
 
 #### Defined in
 
-[util.ts:110](https://github.com/onzag/itemize/blob/59702dd5/util.ts#L110)
+[util.ts:107](https://github.com/onzag/itemize/blob/73e0c39e/util.ts#L107)

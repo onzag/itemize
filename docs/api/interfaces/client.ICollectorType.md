@@ -48,7 +48,7 @@ the collection results
 
 #### Defined in
 
-[client/index.tsx:153](https://github.com/onzag/itemize/blob/59702dd5/client/index.tsx#L153)
+[client/index.tsx:153](https://github.com/onzag/itemize/blob/73e0c39e/client/index.tsx#L153)
 
 ___
 
@@ -77,4 +77,4 @@ a string, this string is added as the value of the <SSRHEAD> to the index.html t
 
 #### Defined in
 
-[client/index.tsx:163](https://github.com/onzag/itemize/blob/59702dd5/client/index.tsx#L163)
+[client/index.tsx:163](https://github.com/onzag/itemize/blob/73e0c39e/client/index.tsx#L163)

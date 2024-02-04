@@ -94,7 +94,7 @@ Writable.constructor
 
 #### Defined in
 
-[server/fs-capacitor.ts:108](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L108)
+[server/fs-capacitor.ts:108](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L108)
 
 ## Properties
 
@@ -104,7 +104,7 @@ Writable.constructor
 
 #### Defined in
 
-[server/fs-capacitor.ts:102](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L102)
+[server/fs-capacitor.ts:102](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L102)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:103](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L103)
+[server/fs-capacitor.ts:103](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L103)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:104](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L104)
+[server/fs-capacitor.ts:104](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L104)
 
 ___
 
@@ -134,7 +134,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:105](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L105)
+[server/fs-capacitor.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L105)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:106](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L106)
+[server/fs-capacitor.ts:106](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L106)
 
 ___
 
@@ -342,7 +342,7 @@ node_modules/@types/node/events.d.ts:37
 
 #### Defined in
 
-[server/fs-capacitor.ts:143](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L143)
+[server/fs-capacitor.ts:143](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L143)
 
 ___
 
@@ -356,7 +356,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:169](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L169)
+[server/fs-capacitor.ts:169](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L169)
 
 ___
 
@@ -381,7 +381,7 @@ Writable.\_destroy
 
 #### Defined in
 
-[server/fs-capacitor.ts:232](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L232)
+[server/fs-capacitor.ts:232](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L232)
 
 ___
 
@@ -405,7 +405,7 @@ Writable.\_final
 
 #### Defined in
 
-[server/fs-capacitor.ts:190](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L190)
+[server/fs-capacitor.ts:190](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L190)
 
 ___
 
@@ -431,7 +431,7 @@ Writable.\_write
 
 #### Defined in
 
-[server/fs-capacitor.ts:198](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L198)
+[server/fs-capacitor.ts:198](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L198)
 
 ___
 
@@ -654,7 +654,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:260](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L260)
+[server/fs-capacitor.ts:260](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L260)
 
 ___
 
@@ -1676,7 +1676,7 @@ ___
 
 #### Defined in
 
-[server/fs-capacitor.ts:227](https://github.com/onzag/itemize/blob/59702dd5/server/fs-capacitor.ts#L227)
+[server/fs-capacitor.ts:227](https://github.com/onzag/itemize/blob/73e0c39e/server/fs-capacitor.ts#L227)
 
 ___
 

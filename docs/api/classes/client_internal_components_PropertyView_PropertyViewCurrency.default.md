@@ -64,7 +64,7 @@ React.Component\&lt;IPropertyViewHandlerProps\&lt;IPropertyDefinitionSupportedCu
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L59)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:59](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L59)
 
 ## Properties
 
@@ -594,7 +594,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:76](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L76)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:76](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L76)
 
 ___
 
@@ -649,4 +649,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewCurrency.tsx:62](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L62)
+[client/internal/components/PropertyView/PropertyViewCurrency.tsx:62](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L62)

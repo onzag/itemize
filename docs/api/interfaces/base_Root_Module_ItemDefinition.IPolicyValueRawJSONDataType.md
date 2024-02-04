@@ -28,7 +28,7 @@ this is the form they have deep in after the name
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:96](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L96)
+[base/Root/Module/ItemDefinition/index.ts:97](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L97)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:94](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L94)
+[base/Root/Module/ItemDefinition/index.ts:95](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L95)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:95](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L95)
+[base/Root/Module/ItemDefinition/index.ts:96](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L96)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:109](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L109)
+[base/Root/Module/ItemDefinition/index.ts:110](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L110)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:108](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L108)
+[base/Root/Module/ItemDefinition/index.ts:109](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L109)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:107](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L107)
+[base/Root/Module/ItemDefinition/index.ts:108](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L108)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:91](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L91)
+[base/Root/Module/ItemDefinition/index.ts:92](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L92)
 
 ___
 
@@ -98,4 +98,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:90](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L90)
+[base/Root/Module/ItemDefinition/index.ts:91](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L91)

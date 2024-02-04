@@ -98,7 +98,7 @@ React.PureComponent\&lt;ITotalPagedSearchLoaderProps, ITotalPagedSearchLoaderSta
 
 #### Defined in
 
-[client/components/search/TotalPagedSearchLoader.tsx:323](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/TotalPagedSearchLoader.tsx#L323)
+[client/components/search/TotalPagedSearchLoader.tsx:323](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/TotalPagedSearchLoader.tsx#L323)
 
 ## Properties
 
@@ -628,7 +628,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/search/TotalPagedSearchLoader.tsx:343](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/TotalPagedSearchLoader.tsx#L343)
+[client/components/search/TotalPagedSearchLoader.tsx:343](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/TotalPagedSearchLoader.tsx#L343)
 
 ___
 
@@ -653,7 +653,7 @@ ___
 
 #### Defined in
 
-[client/components/search/TotalPagedSearchLoader.tsx:330](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/TotalPagedSearchLoader.tsx#L330)
+[client/components/search/TotalPagedSearchLoader.tsx:330](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/TotalPagedSearchLoader.tsx#L330)
 
 ___
 

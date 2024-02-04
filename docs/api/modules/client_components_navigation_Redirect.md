@@ -34,4 +34,4 @@ a react component
 
 #### Defined in
 
-[client/components/navigation/Redirect.tsx:17](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Redirect.tsx#L17)
+[client/components/navigation/Redirect.tsx:17](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Redirect.tsx#L17)

@@ -30,8 +30,12 @@ extends the conditional builder since it's basically a nesting condition
 - [andWhere](database_WhereBuilder.WhereBuilder.md#andwhere)
 - [andWhereBooleanProperty](database_WhereBuilder.WhereBuilder.md#andwherebooleanproperty)
 - [andWhereColumn](database_WhereBuilder.WhereBuilder.md#andwherecolumn)
+- [andWhereColumnIn](database_WhereBuilder.WhereBuilder.md#andwherecolumnin)
 - [andWhereColumnNotNull](database_WhereBuilder.WhereBuilder.md#andwherecolumnnotnull)
 - [andWhereColumnNull](database_WhereBuilder.WhereBuilder.md#andwherecolumnnull)
+- [andWhereColumnOverlaps](database_WhereBuilder.WhereBuilder.md#andwherecolumnoverlaps)
+- [andWhereColumnSubset](database_WhereBuilder.WhereBuilder.md#andwherecolumnsubset)
+- [andWhereColumnSuperset](database_WhereBuilder.WhereBuilder.md#andwherecolumnsuperset)
 - [andWhereExists](database_WhereBuilder.WhereBuilder.md#andwhereexists)
 - [andWhereMany](database_WhereBuilder.WhereBuilder.md#andwheremany)
 - [andWhereNotExists](database_WhereBuilder.WhereBuilder.md#andwherenotexists)
@@ -79,7 +83,7 @@ Creates a new where builder instance
 
 #### Defined in
 
-[database/WhereBuilder.ts:21](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L21)
+[database/WhereBuilder.ts:21](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L21)
 
 ## Properties
 
@@ -96,7 +100,7 @@ you fancy
 
 #### Defined in
 
-[database/base.ts:241](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L241)
+[database/base.ts:241](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L241)
 
 ## Methods
 
@@ -122,7 +126,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L69)
 
 ___
 
@@ -148,7 +152,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L77)
 
 ___
 
@@ -173,7 +177,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:209](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L209)
+[database/WhereBuilder.ts:281](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L281)
 
 ___
 
@@ -194,7 +198,7 @@ ___
 
 #### Defined in
 
-[database/WhereBuilder.ts:223](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L223)
+[database/WhereBuilder.ts:295](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L295)
 
 ___
 
@@ -220,7 +224,31 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L112)
+[database/WhereBuilder.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L112)
+
+___
+
+### andWhereColumnIn
+
+▸ **andWhereColumnIn**(`column`, `values`, `type`): [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+Specifies whether the column is within any of the given values in the array
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `column` | `string` |
+| `values` | (`string` \| `number`)[] |
+| `type` | ``"TEXT"`` \| ``"INTEGER"`` \| ``"BIGINT"`` \| ``"DATE"`` \| ``"TIME"`` \| ``"TIMESTAMP"`` |
+
+#### Returns
+
+[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+#### Defined in
+
+[database/WhereBuilder.ts:141](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L141)
 
 ___
 
@@ -244,7 +272,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:178](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L178)
+[database/WhereBuilder.ts:250](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L250)
 
 ___
 
@@ -268,7 +296,79 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L168)
+[database/WhereBuilder.ts:240](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L240)
+
+___
+
+### andWhereColumnOverlaps
+
+▸ **andWhereColumnOverlaps**(`column`, `values`, `type`): [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+Specifies whether the column is a subset of the given array
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `column` | `string` |
+| `values` | (`string` \| `number`)[] |
+| `type` | ``"TEXT"`` \| ``"INTEGER"`` \| ``"BIGINT"`` \| ``"DATE"`` \| ``"TIME"`` \| ``"TIMESTAMP"`` |
+
+#### Returns
+
+[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+#### Defined in
+
+[database/WhereBuilder.ts:195](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L195)
+
+___
+
+### andWhereColumnSubset
+
+▸ **andWhereColumnSubset**(`column`, `values`, `type`): [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+Specifies whether the column is a subset of the given array
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `column` | `string` |
+| `values` | (`string` \| `number`)[] |
+| `type` | ``"TEXT"`` \| ``"INTEGER"`` \| ``"BIGINT"`` \| ``"DATE"`` \| ``"TIME"`` \| ``"TIMESTAMP"`` |
+
+#### Returns
+
+[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+#### Defined in
+
+[database/WhereBuilder.ts:177](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L177)
+
+___
+
+### andWhereColumnSuperset
+
+▸ **andWhereColumnSuperset**(`column`, `values`, `type`): [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+Specifies whether the column is a subset of the given array
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `column` | `string` |
+| `values` | (`string` \| `number`)[] |
+| `type` | ``"TEXT"`` \| ``"INTEGER"`` \| ``"BIGINT"`` \| ``"DATE"`` \| ``"TIME"`` \| ``"TIMESTAMP"`` |
+
+#### Returns
+
+[`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)
+
+#### Defined in
+
+[database/WhereBuilder.ts:159](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L159)
 
 ___
 
@@ -292,7 +392,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:38](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L38)
+[database/WhereBuilder.ts:38](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L38)
 
 ___
 
@@ -316,7 +416,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:86](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L86)
+[database/WhereBuilder.ts:86](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L86)
 
 ___
 
@@ -340,7 +440,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:50](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L50)
+[database/WhereBuilder.ts:50](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L50)
 
 ___
 
@@ -362,7 +462,7 @@ itself
 
 #### Defined in
 
-[database/base.ts:352](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L352)
+[database/base.ts:352](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L352)
 
 ___
 
@@ -382,7 +482,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L105)
 
 ___
 
@@ -404,7 +504,7 @@ a string that represents the condition
 
 #### Defined in
 
-[database/base.ts:362](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L362)
+[database/base.ts:362](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L362)
 
 ___
 
@@ -435,7 +535,7 @@ itself
 
 #### Defined in
 
-[database/base.ts:291](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L291)
+[database/base.ts:291](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L291)
 
 ___
 
@@ -458,7 +558,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L168)
 
 ___
 
@@ -479,7 +579,7 @@ whatsoever
 
 #### Defined in
 
-[database/base.ts:259](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L259)
+[database/base.ts:259](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L259)
 
 ___
 
@@ -504,7 +604,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:219](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L219)
+[database/WhereBuilder.ts:291](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L291)
 
 ___
 
@@ -525,7 +625,7 @@ ___
 
 #### Defined in
 
-[database/WhereBuilder.ts:233](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L233)
+[database/WhereBuilder.ts:305](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L305)
 
 ___
 
@@ -551,7 +651,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:141](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L141)
+[database/WhereBuilder.ts:213](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L213)
 
 ___
 
@@ -575,7 +675,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:198](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L198)
+[database/WhereBuilder.ts:270](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L270)
 
 ___
 
@@ -599,7 +699,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:188](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L188)
+[database/WhereBuilder.ts:260](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L260)
 
 ___
 
@@ -623,7 +723,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:62](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L62)
+[database/WhereBuilder.ts:62](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L62)
 
 ___
 
@@ -647,7 +747,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L98)
+[database/WhereBuilder.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L98)
 
 ___
 
@@ -671,7 +771,7 @@ itself
 
 #### Defined in
 
-[database/WhereBuilder.ts:74](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L74)
+[database/WhereBuilder.ts:74](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L74)
 
 ___
 
@@ -691,7 +791,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L112)
 
 ___
 
@@ -718,7 +818,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L89)
 
 ___
 
@@ -745,7 +845,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L98)
 
 ___
 
@@ -767,7 +867,7 @@ a new subcondition instance parented by this one
 
 #### Defined in
 
-[database/WhereBuilder.ts:29](https://github.com/onzag/itemize/blob/59702dd5/database/WhereBuilder.ts#L29)
+[database/WhereBuilder.ts:29](https://github.com/onzag/itemize/blob/73e0c39e/database/WhereBuilder.ts#L29)
 
 ___
 
@@ -789,4 +889,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/59702dd5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/73e0c39e/database/base.ts#L129)

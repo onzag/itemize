@@ -8,22 +8,11 @@
 
 ### Properties
 
-- [mountedExplorers](client_internal_testing.IGlobalTestingType.md#mountedexplorers)
 - [mountedItems](client_internal_testing.IGlobalTestingType.md#mounteditems)
 - [mountedModules](client_internal_testing.IGlobalTestingType.md#mountedmodules)
 - [socket](client_internal_testing.IGlobalTestingType.md#socket)
 
 ## Properties
-
-### mountedExplorers
-
-• **mountedExplorers**: [`IMountedExplorers`](client_internal_testing.IMountedExplorers.md)[]
-
-#### Defined in
-
-[client/internal/testing.ts:123](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L123)
-
-___
 
 ### mountedItems
 
@@ -31,7 +20,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:121](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L121)
+[client/internal/testing.ts:115](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/testing.ts#L115)
 
 ___
 
@@ -41,7 +30,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:122](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L122)
+[client/internal/testing.ts:116](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/testing.ts#L116)
 
 ___
 
@@ -71,4 +60,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:124](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L124)
+[client/internal/testing.ts:117](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/testing.ts#L117)

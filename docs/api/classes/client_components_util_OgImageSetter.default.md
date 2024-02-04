@@ -624,7 +624,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/OgImageSetter.tsx:27](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/OgImageSetter.tsx#L27)
+[client/components/util/OgImageSetter.tsx:27](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/OgImageSetter.tsx#L27)
 
 ___
 

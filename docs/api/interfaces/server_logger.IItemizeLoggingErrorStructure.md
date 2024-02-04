@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[server/logger.ts:28](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L28)
+[server/logger.ts:28](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L28)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:32](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L32)
+[server/logger.ts:32](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L32)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:31](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L31)
+[server/logger.ts:31](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L31)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:37](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L37)
+[server/logger.ts:37](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L37)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:30](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L30)
+[server/logger.ts:30](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L30)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L26)
+[server/logger.ts:26](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L26)
 
 ___
 
@@ -122,7 +122,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:29](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L29)
+[server/logger.ts:29](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L29)
 
 ___
 
@@ -132,7 +132,7 @@ ___
 
 #### Defined in
 
-[server/logger.ts:38](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L38)
+[server/logger.ts:38](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L38)
 
 ___
 
@@ -142,4 +142,4 @@ ___
 
 #### Defined in
 
-[server/logger.ts:36](https://github.com/onzag/itemize/blob/59702dd5/server/logger.ts#L36)
+[server/logger.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/server/logger.ts#L36)

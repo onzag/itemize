@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:10](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/LocalStorageReader.tsx#L10)
+[client/components/util/LocalStorageReader.tsx:10](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/LocalStorageReader.tsx#L10)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:11](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/LocalStorageReader.tsx#L11)
+[client/components/util/LocalStorageReader.tsx:11](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/LocalStorageReader.tsx#L11)

@@ -26,7 +26,7 @@ The flattened value without DATA fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:484](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L484)
+[base/Root/Module/ItemDefinition/index.ts:485](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L485)
 
 ___
 
@@ -38,7 +38,7 @@ The value as it came from rq endpoint
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:480](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L480)
+[base/Root/Module/ItemDefinition/index.ts:481](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L481)
 
 ___
 
@@ -50,4 +50,4 @@ The requested fields that were used
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:488](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L488)
+[base/Root/Module/ItemDefinition/index.ts:489](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L489)

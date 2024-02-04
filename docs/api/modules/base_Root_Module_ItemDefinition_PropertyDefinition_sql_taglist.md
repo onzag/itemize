@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:68](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L68)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:68](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L68)
 
 ___
 
@@ -55,7 +55,7 @@ for where many
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:121](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L121)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:121](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L121)
 
 ___
 
@@ -80,7 +80,7 @@ the partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:13](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L13)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:13](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L13)
 
 ___
 
@@ -107,7 +107,7 @@ a boolean on whether it equals
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:147](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L147)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:147](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L147)
 
 ___
 
@@ -131,4 +131,4 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:43](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L43)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:43](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L43)

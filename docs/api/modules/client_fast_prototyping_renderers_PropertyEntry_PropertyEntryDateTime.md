@@ -46,7 +46,7 @@ The styles for the date time entry
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L33)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:33](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L33)
 
 ## Functions
 
@@ -74,4 +74,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:102](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L102)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:102](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L102)

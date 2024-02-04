@@ -36,7 +36,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L47)
+[server/resolvers/actions/search.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L48)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:1025](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L1025)
+[server/resolvers/actions/search.ts:1056](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L1056)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:2016](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L2016)
+[server/resolvers/actions/search.ts:2069](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L2069)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:1017](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L1017)
+[server/resolvers/actions/search.ts:1048](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L1048)
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:2024](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L2024)
+[server/resolvers/actions/search.ts:2077](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L2077)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:68](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L68)
+[server/resolvers/actions/search.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L69)
 
 ___
 
@@ -168,7 +168,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:2020](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L2020)
+[server/resolvers/actions/search.ts:2073](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L2073)
 
 ___
 
@@ -190,7 +190,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:60](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L60)
+[server/resolvers/actions/search.ts:61](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L61)
 
 ___
 
@@ -210,4 +210,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:2028](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/actions/search.ts#L2028)
+[server/resolvers/actions/search.ts:2081](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/actions/search.ts#L2081)

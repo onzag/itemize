@@ -20,4 +20,4 @@
 
 #### Defined in
 
-[client/components/accessibility/AltPriorityShifter.tsx:4](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltPriorityShifter.tsx#L4)
+[client/components/accessibility/AltPriorityShifter.tsx:4](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltPriorityShifter.tsx#L4)

@@ -58,7 +58,7 @@ as the product interfaces for these queries
 
 #### Defined in
 
-[rq-querier.ts:170](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L170)
+[rq-querier.ts:170](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L170)
 
 ___
 
@@ -70,7 +70,7 @@ Single arg, can take many shapes
 
 #### Defined in
 
-[rq-querier.ts:128](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L128)
+[rq-querier.ts:128](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L128)
 
 ## Functions
 
@@ -95,7 +95,7 @@ a rq query class instance
 
 #### Defined in
 
-[rq-querier.ts:702](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L702)
+[rq-querier.ts:702](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L702)
 
 ___
 
@@ -120,7 +120,7 @@ a rq query class instance
 
 #### Defined in
 
-[rq-querier.ts:693](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L693)
+[rq-querier.ts:693](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L693)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:720](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L720)
+[rq-querier.ts:720](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L720)
 
 ___
 
@@ -172,4 +172,4 @@ a promise for a rq endpoint value
 
 #### Defined in
 
-[rq-querier.ts:772](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L772)
+[rq-querier.ts:772](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L772)

@@ -21,6 +21,12 @@ The class that does the magic
 ### Properties
 
 - [context](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#context)
+- [currentElementWrappers](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#currentelementwrappers)
+- [currentElementWrappersArgs](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#currentelementwrappersargs)
+- [currentElementWrappersArgsSrc](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#currentelementwrappersargssrc)
+- [currentElementWrappersSrc](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#currentelementwrapperssrc)
+- [currentFeatures](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#currentfeatures)
+- [currentFeaturesSrc](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#currentfeaturessrc)
 - [props](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#props)
 - [refs](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#refs)
 - [state](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#state)
@@ -69,7 +75,7 @@ React.PureComponent\&lt;IPropertyEntryTextRendererProps, IPropertyEntryTextRende
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:129](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L129)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:143](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L143)
 
 ## Properties
 
@@ -100,6 +106,66 @@ React.PureComponent.context
 #### Defined in
 
 node_modules/@types/react/index.d.ts:473
+
+___
+
+### currentElementWrappers
+
+• `Private` **currentElementWrappers**: `ISlateEditorElementWrappers` = `null`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:134](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L134)
+
+___
+
+### currentElementWrappersArgs
+
+• `Private` **currentElementWrappersArgs**: `any` = `null`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:137](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L137)
+
+___
+
+### currentElementWrappersArgsSrc
+
+• `Private` **currentElementWrappersArgsSrc**: `any` = `null`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:138](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L138)
+
+___
+
+### currentElementWrappersSrc
+
+• `Private` **currentElementWrappersSrc**: `any` = `null`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:135](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L135)
+
+___
+
+### currentFeatures
+
+• `Private` **currentFeatures**: `IFeatureSupportOptions` = `null`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:140](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L140)
+
+___
+
+### currentFeaturesSrc
+
+• `Private` **currentFeaturesSrc**: `IFeatureSupportOptions` = `null`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
 
 ___
 
@@ -595,7 +661,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:146](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L146)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:160](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L160)
 
 ___
 
@@ -616,7 +682,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:152](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L152)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:166](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L166)
 
 ___
 
@@ -630,7 +696,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:155](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L155)
 
 ___
 
@@ -648,7 +714,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:163](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L163)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:177](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L177)
 
 ___
 

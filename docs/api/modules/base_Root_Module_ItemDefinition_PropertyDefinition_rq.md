@@ -40,7 +40,7 @@ the partial rq fields definition for the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts:89](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts#L89)
+[base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts:89](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts#L89)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts:13](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts#L13)
+[base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts:13](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/rq.ts#L13)

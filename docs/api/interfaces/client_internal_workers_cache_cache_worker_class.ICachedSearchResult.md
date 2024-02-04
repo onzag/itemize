@@ -30,7 +30,7 @@ to be rechecked an update
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:119](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L119)
+[client/internal/workers/cache/cache.worker.class.ts:119](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.class.ts#L119)
 
 ___
 
@@ -42,7 +42,7 @@ When was this last search modified
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:123](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L123)
+[client/internal/workers/cache/cache.worker.class.ts:123](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.class.ts#L123)
 
 ___
 
@@ -56,7 +56,7 @@ to polyfill was allowed
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:141](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L141)
+[client/internal/workers/cache/cache.worker.class.ts:141](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.class.ts#L141)
 
 ___
 
@@ -68,7 +68,7 @@ The rq value that it emulates from the server side
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:114](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L114)
+[client/internal/workers/cache/cache.worker.class.ts:114](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.class.ts#L114)
 
 ___
 
@@ -82,7 +82,7 @@ requested, this list may be very large
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:129](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L129)
+[client/internal/workers/cache/cache.worker.class.ts:129](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.class.ts#L129)
 
 ___
 
@@ -96,4 +96,4 @@ and matching data that was available
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.class.ts:135](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.class.ts#L135)
+[client/internal/workers/cache/cache.worker.class.ts:135](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.class.ts#L135)

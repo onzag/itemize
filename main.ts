@@ -5,6 +5,29 @@
  * @module
  */
 
+// COPY OF SERVER-RESOLVE file
+//
+const replacers = {
+  "@onzag/itemize-text-engine": "@onzag/itemize-text-engine/nodejs",
+  "@onzag/itemize": "@onzag/itemize/nodejs",
+};
+
+const replacersKeys = Object.keys(replacers);
+
+const Module = require("module");
+const originalResolveFilename = Module._resolveFilename;
+Module._resolveFilename = function (request: string, _parent: any) {
+  for (let key of replacersKeys) {
+    if (request.startsWith(key)) {
+      const replaced = request.replace(key, replacers[key]);
+      const modifiedArguments = [replaced, ...[].slice.call(arguments, 1)];
+      return originalResolveFilename.apply(this, modifiedArguments);  
+    }
+  }
+  return originalResolveFilename.apply(this, arguments);
+};
+//
+
 import setup from "./setup";
 import { start, stop } from "./dev-environment";
 import colors from "colors";

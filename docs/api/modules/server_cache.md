@@ -52,7 +52,7 @@ a simple boolean
 
 #### Defined in
 
-[server/cache.ts:169](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L169)
+[server/cache.ts:169](https://github.com/onzag/itemize/blob/73e0c39e/server/cache.ts#L169)
 
 ___
 
@@ -78,4 +78,4 @@ a list of modules
 
 #### Defined in
 
-[server/cache.ts:138](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L138)
+[server/cache.ts:138](https://github.com/onzag/itemize/blob/73e0c39e/server/cache.ts#L138)

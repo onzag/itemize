@@ -24,7 +24,7 @@ A redis single connection configuration
 
 #### Defined in
 
-[config.ts:332](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L332)
+[config.ts:332](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L332)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[config.ts:329](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L329)
+[config.ts:329](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L329)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[config.ts:333](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L333)
+[config.ts:333](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L333)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[config.ts:331](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L331)
+[config.ts:331](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L331)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[config.ts:330](https://github.com/onzag/itemize/blob/59702dd5/config.ts#L330)
+[config.ts:330](https://github.com/onzag/itemize/blob/73e0c39e/config.ts#L330)

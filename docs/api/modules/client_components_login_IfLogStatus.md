@@ -34,4 +34,4 @@ a react node
 
 #### Defined in
 
-[client/components/login/IfLogStatus.tsx:79](https://github.com/onzag/itemize/blob/59702dd5/client/components/login/IfLogStatus.tsx#L79)
+[client/components/login/IfLogStatus.tsx:79](https://github.com/onzag/itemize/blob/73e0c39e/client/components/login/IfLogStatus.tsx#L79)

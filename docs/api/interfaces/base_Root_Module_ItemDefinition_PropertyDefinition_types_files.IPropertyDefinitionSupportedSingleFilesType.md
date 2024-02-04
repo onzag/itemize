@@ -39,7 +39,7 @@ an unique id
 
 #### Defined in
 
-[rq-querier.ts:87](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L87)
+[rq-querier.ts:87](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L87)
 
 ___
 
@@ -59,7 +59,7 @@ dimensions, large, small and medium do not count
 
 #### Defined in
 
-[rq-querier.ts:103](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L103)
+[rq-querier.ts:103](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L103)
 
 ___
 
@@ -75,7 +75,7 @@ the name of the file
 
 #### Defined in
 
-[rq-querier.ts:79](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L79)
+[rq-querier.ts:79](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L79)
 
 ___
 
@@ -91,7 +91,7 @@ The size of the file in bytes
 
 #### Defined in
 
-[rq-querier.ts:95](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L95)
+[rq-querier.ts:95](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L95)
 
 ___
 
@@ -107,7 +107,7 @@ A source, either a File, Blob or a read stream
 
 #### Defined in
 
-[rq-querier.ts:107](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L107)
+[rq-querier.ts:107](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L107)
 
 ___
 
@@ -123,7 +123,7 @@ The mime type
 
 #### Defined in
 
-[rq-querier.ts:83](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L83)
+[rq-querier.ts:83](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L83)
 
 ___
 
@@ -139,4 +139,4 @@ the url where it is stored
 
 #### Defined in
 
-[rq-querier.ts:91](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L91)
+[rq-querier.ts:91](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L91)

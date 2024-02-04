@@ -37,4 +37,4 @@ than using the default
 
 #### Defined in
 
-[client/fast-prototyping/components/avatar.tsx:464](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/avatar.tsx#L464)
+[client/fast-prototyping/components/avatar.tsx:464](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/avatar.tsx#L464)

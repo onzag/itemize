@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[base/Root/rq.ts:55](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L55)
+[base/Root/rq.ts:55](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L55)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:61](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L61)
+[base/Root/rq.ts:61](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L61)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:64](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L64)
+[base/Root/rq.ts:64](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L64)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:58](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L58)
+[base/Root/rq.ts:58](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L58)

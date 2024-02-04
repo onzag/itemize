@@ -24,7 +24,7 @@ within an item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:466](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L466)
+[base/Root/Module/ItemDefinition/index.ts:467](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L467)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:468](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L468)
+[base/Root/Module/ItemDefinition/index.ts:469](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L469)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:467](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L467)
+[base/Root/Module/ItemDefinition/index.ts:468](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L468)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:465](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/index.ts#L465)
+[base/Root/Module/ItemDefinition/index.ts:466](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/index.ts#L466)

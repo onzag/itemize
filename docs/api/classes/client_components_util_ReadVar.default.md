@@ -67,7 +67,7 @@ React.PureComponent\&lt;IReadVarProps\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:14](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L14)
+[client/components/util/ReadVar.tsx:14](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L14)
 
 ## Properties
 
@@ -107,7 +107,7 @@ ___
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:12](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L12)
+[client/components/util/ReadVar.tsx:12](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L12)
 
 ___
 
@@ -117,7 +117,7 @@ ___
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:13](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L13)
+[client/components/util/ReadVar.tsx:13](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L13)
 
 ___
 
@@ -372,7 +372,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L24)
+[client/components/util/ReadVar.tsx:24](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L24)
 
 ___
 
@@ -396,7 +396,7 @@ React.PureComponent.componentDidUpdate
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:37](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L37)
+[client/components/util/ReadVar.tsx:37](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L37)
 
 ___
 
@@ -490,7 +490,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L44)
+[client/components/util/ReadVar.tsx:44](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L44)
 
 ___
 
@@ -602,7 +602,7 @@ ___
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:19](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L19)
+[client/components/util/ReadVar.tsx:19](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L19)
 
 ___
 
@@ -620,7 +620,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/ReadVar.tsx#L47)
+[client/components/util/ReadVar.tsx:47](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/ReadVar.tsx#L47)
 
 ___
 

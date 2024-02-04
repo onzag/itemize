@@ -38,7 +38,7 @@ This file contains the sql server side functions for the string type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:36](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L36)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L36)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:165](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L165)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:165](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L165)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:277](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L277)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:279](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L279)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:12](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L12)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:12](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L12)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:63](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L63)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:63](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L63)
 
 ___
 
@@ -142,7 +142,7 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:83](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L83)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:83](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L83)
 
 ___
 
@@ -166,4 +166,4 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:253](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L253)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:255](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L255)

@@ -11,6 +11,7 @@
 
 ### Functions
 
+- [checkFullHighlights](server_resolvers_basic.md#checkfullhighlights)
 - [checkLanguage](server_resolvers_basic.md#checklanguage)
 - [checkLimit](server_resolvers_basic.md#checklimit)
 - [checkLimiters](server_resolvers_basic.md#checklimiters)
@@ -40,6 +41,28 @@
 
 ## Functions
 
+### checkFullHighlights
+
+▸ **checkFullHighlights**(`value`): `void`
+
+Checks that the value for full highlights is valid
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `number` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/resolvers/basic.ts:829](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L829)
+
+___
+
 ### checkLanguage
 
 ▸ **checkLanguage**(`appData`, `args`): `void`
@@ -60,7 +83,7 @@ by the rq resolver
 
 #### Defined in
 
-[server/resolvers/basic.ts:716](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L716)
+[server/resolvers/basic.ts:771](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L771)
 
 ___
 
@@ -85,13 +108,13 @@ defintion allows
 
 #### Defined in
 
-[server/resolvers/basic.ts:675](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L675)
+[server/resolvers/basic.ts:730](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L730)
 
 ___
 
 ### checkLimiters
 
-▸ **checkLimiters**(`args`, `idefOrMod`): `void`
+▸ **checkLimiters**(`args`, `idefOrMod`, `rolesManager`, `tokenData`, `ownerToCheckAgainst`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -99,14 +122,17 @@ ___
 | :------ | :------ |
 | `args` | [`IRQArgs`](../interfaces/rq_querier.IRQArgs.md) |
 | `idefOrMod` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) \| [`default`](../classes/base_Root_Module.default.md) |
+| `rolesManager` | [`ICustomRoleManager`](../interfaces/base_Root.ICustomRoleManager.md) |
+| `tokenData` | [`IServerSideTokenDataType`](../interfaces/server_resolvers_basic.IServerSideTokenDataType.md) |
+| `ownerToCheckAgainst` | `string` |
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
 
 #### Defined in
 
-[server/resolvers/basic.ts:463](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L463)
+[server/resolvers/basic.ts:472](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L472)
 
 ___
 
@@ -127,7 +153,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:686](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L686)
+[server/resolvers/basic.ts:741](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L741)
 
 ___
 
@@ -152,7 +178,7 @@ as it was requested
 
 #### Defined in
 
-[server/resolvers/basic.ts:743](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L743)
+[server/resolvers/basic.ts:798](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L798)
 
 ___
 
@@ -173,7 +199,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:858](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L858)
+[server/resolvers/basic.ts:942](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L942)
 
 ___
 
@@ -195,7 +221,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L46)
+[server/resolvers/basic.ts:47](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L47)
 
 ___
 
@@ -217,7 +243,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:61](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L61)
+[server/resolvers/basic.ts:62](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L62)
 
 ___
 
@@ -239,7 +265,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:76](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L76)
+[server/resolvers/basic.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L77)
 
 ___
 
@@ -253,7 +279,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:57](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L57)
+[server/resolvers/basic.ts:58](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L58)
 
 ___
 
@@ -276,7 +302,7 @@ in order to ensure they match the shape
 
 #### Defined in
 
-[server/resolvers/basic.ts:902](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L902)
+[server/resolvers/basic.ts:986](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L986)
 
 ___
 
@@ -310,7 +336,7 @@ the form comes with the DATA and the externalized fields
 
 #### Defined in
 
-[server/resolvers/basic.ts:950](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L950)
+[server/resolvers/basic.ts:1034](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L1034)
 
 ___
 
@@ -337,7 +363,7 @@ in order to ensure they match the shape
 
 #### Defined in
 
-[server/resolvers/basic.ts:922](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L922)
+[server/resolvers/basic.ts:1006](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L1006)
 
 ___
 
@@ -361,7 +387,7 @@ and the language of choice
 
 #### Defined in
 
-[server/resolvers/basic.ts:775](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L775)
+[server/resolvers/basic.ts:859](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L859)
 
 ___
 
@@ -385,7 +411,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:109](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L109)
+[server/resolvers/basic.ts:110](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L110)
 
 ___
 
@@ -405,7 +431,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:432](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L432)
+[server/resolvers/basic.ts:433](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L433)
 
 ___
 
@@ -425,7 +451,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:447](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L447)
+[server/resolvers/basic.ts:448](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L448)
 
 ___
 
@@ -463,7 +489,7 @@ Runs a policy check on the requested information
 
 #### Defined in
 
-[server/resolvers/basic.ts:1225](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L1225)
+[server/resolvers/basic.ts:1309](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L1309)
 
 ___
 
@@ -494,7 +520,7 @@ you should run itemDefinition.applyValue(rqArgValue);
 
 #### Defined in
 
-[server/resolvers/basic.ts:1049](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L1049)
+[server/resolvers/basic.ts:1133](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L1133)
 
 ___
 
@@ -519,7 +545,7 @@ that are used within the query
 
 #### Defined in
 
-[server/resolvers/basic.ts:1172](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L1172)
+[server/resolvers/basic.ts:1256](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L1256)
 
 ___
 
@@ -543,7 +569,7 @@ to store data in
 
 #### Defined in
 
-[server/resolvers/basic.ts:786](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L786)
+[server/resolvers/basic.ts:870](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L870)
 
 ___
 
@@ -563,7 +589,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:92](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L92)
+[server/resolvers/basic.ts:93](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L93)
 
 ___
 
@@ -583,7 +609,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:100](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L100)
+[server/resolvers/basic.ts:101](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L101)
 
 ___
 
@@ -615,7 +641,7 @@ in question that wants to be created
 
 #### Defined in
 
-[server/resolvers/basic.ts:195](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L195)
+[server/resolvers/basic.ts:196](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L196)
 
 ___
 
@@ -639,7 +665,7 @@ for use in the system
 
 #### Defined in
 
-[server/resolvers/basic.ts:150](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L150)
+[server/resolvers/basic.ts:151](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L151)
 
 ___
 
@@ -663,4 +689,4 @@ by the rules of the session id, user is removed, or invalid credentials
 
 #### Defined in
 
-[server/resolvers/basic.ts:809](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L809)
+[server/resolvers/basic.ts:893](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L893)

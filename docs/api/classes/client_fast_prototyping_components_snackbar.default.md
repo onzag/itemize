@@ -66,7 +66,7 @@ React.PureComponent\&lt;ISnackbarProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/snackbar.tsx:93](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/snackbar.tsx#L93)
+[client/fast-prototyping/components/snackbar.tsx:93](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/snackbar.tsx#L93)
 
 ## Properties
 
@@ -477,7 +477,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/components/snackbar.tsx:96](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/snackbar.tsx#L96)
+[client/fast-prototyping/components/snackbar.tsx:96](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/snackbar.tsx#L96)
 
 ___
 
@@ -593,7 +593,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/snackbar.tsx:101](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/snackbar.tsx#L101)
+[client/fast-prototyping/components/snackbar.tsx:101](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/snackbar.tsx#L101)
 
 ___
 

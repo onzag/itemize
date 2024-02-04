@@ -39,7 +39,7 @@ item definition and alternative property that is used during searches
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:295](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L295)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:295](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L295)
 
 ___
 
@@ -65,7 +65,7 @@ an array of property definitions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:433](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L433)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:433](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L433)
 
 ___
 
@@ -90,7 +90,7 @@ an array of string for the ids in search mode for the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:204](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L204)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:204](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L204)
 
 ___
 
@@ -113,7 +113,7 @@ during a limited request for a property that is request limited
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:105](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L105)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L105)
 
 ___
 
@@ -133,4 +133,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:25](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L25)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:25](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L25)

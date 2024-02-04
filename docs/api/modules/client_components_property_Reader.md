@@ -64,7 +64,7 @@ Reads a boolean value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:95](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L95)
+[client/components/property/Reader.tsx:95](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L95)
 
 ___
 
@@ -86,7 +86,7 @@ Reads a currency value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:170](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L170)
+[client/components/property/Reader.tsx:170](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L170)
 
 ___
 
@@ -108,7 +108,7 @@ Reads a date value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:295](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L295)
+[client/components/property/Reader.tsx:295](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L295)
 
 ___
 
@@ -130,7 +130,7 @@ Reads a timestamp value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:344](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L344)
+[client/components/property/Reader.tsx:344](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L344)
 
 ___
 
@@ -152,7 +152,7 @@ Reads a file value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:393](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L393)
+[client/components/property/Reader.tsx:393](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L393)
 
 ___
 
@@ -174,7 +174,7 @@ Reads a files array value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:418](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L418)
+[client/components/property/Reader.tsx:418](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L418)
 
 ___
 
@@ -196,7 +196,7 @@ Reads an integer value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:120](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L120)
+[client/components/property/Reader.tsx:120](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L120)
 
 ___
 
@@ -218,7 +218,7 @@ Reads a location coordinates value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:369](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L369)
+[client/components/property/Reader.tsx:369](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L369)
 
 ___
 
@@ -240,7 +240,7 @@ Reads a numeric value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:145](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L145)
+[client/components/property/Reader.tsx:145](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L145)
 
 ___
 
@@ -262,7 +262,7 @@ Reads a payment value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:443](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L443)
+[client/components/property/Reader.tsx:443](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L443)
 
 ___
 
@@ -284,7 +284,7 @@ Reads a string value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:220](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L220)
+[client/components/property/Reader.tsx:220](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L220)
 
 ___
 
@@ -306,7 +306,7 @@ Reads a taglist (array of string) value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:468](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L468)
+[client/components/property/Reader.tsx:468](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L468)
 
 ___
 
@@ -328,7 +328,7 @@ Reads a textual value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:245](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L245)
+[client/components/property/Reader.tsx:245](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L245)
 
 ___
 
@@ -350,7 +350,7 @@ Reads a time value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:319](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L319)
+[client/components/property/Reader.tsx:319](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L319)
 
 ___
 
@@ -372,7 +372,7 @@ Reads a unit value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:195](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L195)
+[client/components/property/Reader.tsx:195](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L195)
 
 ___
 
@@ -394,7 +394,7 @@ Reads a year value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:270](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L270)
+[client/components/property/Reader.tsx:270](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L270)
 
 ___
 
@@ -439,7 +439,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Reader.tsx:55](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L55)
+[client/components/property/Reader.tsx:55](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L55)
 
 ___
 
@@ -461,7 +461,7 @@ Reads a boolean value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:105](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L105)
+[client/components/property/Reader.tsx:105](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L105)
 
 ___
 
@@ -483,7 +483,7 @@ Reads a currency value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:180](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L180)
+[client/components/property/Reader.tsx:180](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L180)
 
 ___
 
@@ -505,7 +505,7 @@ Reads a year value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:305](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L305)
+[client/components/property/Reader.tsx:305](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L305)
 
 ___
 
@@ -527,7 +527,7 @@ Reads a timestamp value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:354](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L354)
+[client/components/property/Reader.tsx:354](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L354)
 
 ___
 
@@ -549,7 +549,7 @@ Reads a file value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:403](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L403)
+[client/components/property/Reader.tsx:403](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L403)
 
 ___
 
@@ -571,7 +571,7 @@ Reads a files array value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:428](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L428)
+[client/components/property/Reader.tsx:428](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L428)
 
 ___
 
@@ -593,7 +593,7 @@ Reads an integer value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:130](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L130)
+[client/components/property/Reader.tsx:130](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L130)
 
 ___
 
@@ -615,7 +615,7 @@ Reads a location coordinates value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:379](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L379)
+[client/components/property/Reader.tsx:379](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L379)
 
 ___
 
@@ -637,7 +637,7 @@ Reads a numeric value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:155](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L155)
+[client/components/property/Reader.tsx:155](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L155)
 
 ___
 
@@ -659,7 +659,7 @@ Reads a payment value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:453](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L453)
+[client/components/property/Reader.tsx:453](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L453)
 
 ___
 
@@ -707,7 +707,7 @@ useTaglistReader
 
 #### Defined in
 
-[client/components/property/Reader.tsx:85](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L85)
+[client/components/property/Reader.tsx:85](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L85)
 
 ___
 
@@ -729,7 +729,7 @@ Reads a string value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:230](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L230)
+[client/components/property/Reader.tsx:230](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L230)
 
 ___
 
@@ -751,7 +751,7 @@ Reads a taglist (array of string)  value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:478](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L478)
+[client/components/property/Reader.tsx:478](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L478)
 
 ___
 
@@ -773,7 +773,7 @@ Reads a textual value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:255](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L255)
+[client/components/property/Reader.tsx:255](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L255)
 
 ___
 
@@ -795,7 +795,7 @@ Reads a time value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:329](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L329)
+[client/components/property/Reader.tsx:329](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L329)
 
 ___
 
@@ -817,7 +817,7 @@ Reads a unit value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:205](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L205)
+[client/components/property/Reader.tsx:205](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L205)
 
 ___
 
@@ -839,4 +839,4 @@ Reads a year value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:280](https://github.com/onzag/itemize/blob/59702dd5/client/components/property/Reader.tsx#L280)
+[client/components/property/Reader.tsx:280](https://github.com/onzag/itemize/blob/73e0c39e/client/components/property/Reader.tsx#L280)

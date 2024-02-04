@@ -40,7 +40,7 @@ third argument.
 
 | Name | Type |
 | :------ | :------ |
-| `req` | `Request`\<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`\<`string`, `any`\>\> \| `IncomingMessage` |
+| `req` | `IncomingMessage` \| `Request`\<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`\<`string`, `any`\>\> |
 | `res` | `ServerResponse` \| `Response`\<`any`, `Record`\<`string`, `any`\>, `number`\> |
 
 #### Returns
@@ -92,7 +92,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:281](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L281)
+[server/index.ts:281](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L281)
 
 ___
 
@@ -116,4 +116,4 @@ Initializes the itemize server with its custom configuration
 
 #### Defined in
 
-[server/index.ts:384](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L384)
+[server/index.ts:384](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L384)

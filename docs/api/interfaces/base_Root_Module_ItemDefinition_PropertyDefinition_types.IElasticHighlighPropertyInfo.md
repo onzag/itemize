@@ -8,10 +8,22 @@
 
 ### Properties
 
+- [full](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlighPropertyInfo.md#full)
 - [highlights](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlighPropertyInfo.md#highlights)
+- [lang](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlighPropertyInfo.md#lang)
 - [match](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlighPropertyInfo.md#match)
 
 ## Properties
+
+### full
+
+• **full**: `boolean`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:152](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L152)
+
+___
 
 ### highlights
 
@@ -19,7 +31,17 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:137](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L137)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:150](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L150)
+
+___
+
+### lang
+
+• **lang**: `string`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:149](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L149)
 
 ___
 
@@ -29,4 +51,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:138](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L138)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:151](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L151)

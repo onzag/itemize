@@ -28,7 +28,7 @@ The context that provides the configuration
 
 #### Defined in
 
-[client/internal/providers/config-provider.tsx:12](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/config-provider.tsx#L12)
+[client/internal/providers/config-provider.tsx:12](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/config-provider.tsx#L12)
 
 ## Functions
 
@@ -52,4 +52,4 @@ as the config is static
 
 #### Defined in
 
-[client/internal/providers/config-provider.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/internal/providers/config-provider.tsx#L28)
+[client/internal/providers/config-provider.tsx:28](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/providers/config-provider.tsx#L28)

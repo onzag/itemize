@@ -37,7 +37,7 @@ and process an item definition, from the definition to how it must be queried
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/rq.ts:35](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/rq.ts#L35)
+[base/Root/Module/ItemDefinition/rq.ts:35](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/rq.ts#L35)
 
 ___
 
@@ -64,7 +64,7 @@ a partial rq fields definition that only contains the policies
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/rq.ts:145](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/rq.ts#L145)
+[base/Root/Module/ItemDefinition/rq.ts:145](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/rq.ts#L145)
 
 ___
 
@@ -91,4 +91,4 @@ all the fields definition for the module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/rq.ts:185](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/rq.ts#L185)
+[base/Root/Module/ItemDefinition/rq.ts:185](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/rq.ts#L185)

@@ -111,16 +111,9 @@ export interface IParentedSearchRecordsAddedEventWithTime extends IParentedSearc
   time: string;
 }
 
-export interface IMountedExplorers {
-  id: string;
-  label: string;
-  time: string;
-}
-
 export interface IGlobalTestingType {
   mountedItems: IMountedItem[];
   mountedModules: IMountedModule[];
-  mountedExplorers: IMountedExplorers[];
   socket: {
     errors: IErrorEventWithTime[];
 
@@ -149,7 +142,6 @@ export function setupTesting() {
     window.TESTING = {
       mountedItems: [],
       mountedModules: [],
-      mountedExplorers: [],
       socket: {
         errors: [],
         identifyRequests: [],

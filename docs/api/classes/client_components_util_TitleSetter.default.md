@@ -10,6 +10,12 @@ If set in the og mode it will not do anything and it does not update the og
 dinamically, only the document or both mode does it; the og mode is for server
 use only
 
+The title is set and then left to what it was last set, it does not revert it other than
+unless another instance overrides it
+
+NOTE: Due to a bug in google chrome, you should always have a title setter, the title settter
+sets the title and doesn't turn it back once you unload it
+
 ## Hierarchy
 
 - `Component`\<`ITitleSetterProps`, {}\>
@@ -70,7 +76,7 @@ React.Component\&lt;ITitleSetterProps, \{}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:106](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/TitleSetter.tsx#L106)
+[client/components/util/TitleSetter.tsx:116](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/TitleSetter.tsx#L116)
 
 ## Properties
 
@@ -600,7 +606,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:109](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/TitleSetter.tsx#L109)
+[client/components/util/TitleSetter.tsx:119](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/TitleSetter.tsx#L119)
 
 ___
 

@@ -57,7 +57,7 @@
 
 #### Defined in
 
-[client/providers/item.tsx:6298](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6298)
+[client/providers/item.tsx:6322](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L6322)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:6297](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6297)
+[client/providers/item.tsx:6321](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L6321)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:211](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L211)
+[client/providers/item.tsx:212](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L212)
 
 ## Variables
 
@@ -91,7 +91,7 @@ are synchronized as the state is held centrally in the item definition
 
 #### Defined in
 
-[client/providers/item.tsx:1491](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1491)
+[client/providers/item.tsx:1502](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1502)
 
 ___
 
@@ -104,7 +104,7 @@ through other item contexts, this is the new way that deprecates the injectParen
 
 #### Defined in
 
-[client/providers/item.tsx:1497](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1497)
+[client/providers/item.tsx:1508](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1508)
 
 ___
 
@@ -116,7 +116,7 @@ The search item value context is what is used to inject the currently being sear
 
 #### Defined in
 
-[client/providers/item.tsx:1502](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1502)
+[client/providers/item.tsx:1513](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1513)
 
 ## Functions
 
@@ -167,7 +167,7 @@ In this case both contexts are phased in
 
 #### Defined in
 
-[client/providers/item.tsx:6555](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6555)
+[client/providers/item.tsx:6579](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L6579)
 
 ___
 
@@ -190,7 +190,7 @@ that was previously phased with ItemContextPhase
 
 #### Defined in
 
-[client/providers/item.tsx:6583](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6583)
+[client/providers/item.tsx:6607](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L6607)
 
 ___
 
@@ -237,7 +237,7 @@ and therefore it is cheaper
 
 #### Defined in
 
-[client/providers/item.tsx:6456](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6456)
+[client/providers/item.tsx:6480](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L6480)
 
 ___
 
@@ -264,4 +264,4 @@ please use ItemContextPhase and ItemContextRetrieve instead
 
 #### Defined in
 
-[client/providers/item.tsx:6494](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L6494)
+[client/providers/item.tsx:6518](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L6518)

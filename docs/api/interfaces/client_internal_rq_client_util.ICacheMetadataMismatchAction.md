@@ -23,7 +23,7 @@ REFETCH will retrieve the record again from the server
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:83](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L83)
+[client/internal/rq-client-util.ts:83](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L83)
 
 ___
 
@@ -35,7 +35,7 @@ The condition to use when REFETCH is used
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:94](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L94)
+[client/internal/rq-client-util.ts:94](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L94)
 
 ___
 
@@ -50,4 +50,4 @@ IF_CONDITION_SUCCEEDS is only useful when it is set to REFETCH_RECORDS
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:90](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L90)
+[client/internal/rq-client-util.ts:90](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L90)

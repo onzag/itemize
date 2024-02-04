@@ -33,7 +33,7 @@ IActualAppLanguageRetrieverProps.availableLanguages
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:21](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L21)
+[client/components/localization/AppLanguageRetriever.tsx:21](https://github.com/onzag/itemize/blob/73e0c39e/client/components/localization/AppLanguageRetriever.tsx#L21)
 
 ___
 
@@ -47,7 +47,7 @@ IActualAppLanguageRetrieverProps.changeLanguageTo
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:23](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L23)
+[client/components/localization/AppLanguageRetriever.tsx:23](https://github.com/onzag/itemize/blob/73e0c39e/client/components/localization/AppLanguageRetriever.tsx#L23)
 
 ___
 
@@ -61,7 +61,7 @@ IActualAppLanguageRetrieverProps.currentLanguage
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:20](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L20)
+[client/components/localization/AppLanguageRetriever.tsx:20](https://github.com/onzag/itemize/blob/73e0c39e/client/components/localization/AppLanguageRetriever.tsx#L20)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L32)
+[client/components/localization/AppLanguageRetriever.tsx:32](https://github.com/onzag/itemize/blob/73e0c39e/client/components/localization/AppLanguageRetriever.tsx#L32)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:31](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L31)
+[client/components/localization/AppLanguageRetriever.tsx:31](https://github.com/onzag/itemize/blob/73e0c39e/client/components/localization/AppLanguageRetriever.tsx#L31)
 
 ___
 
@@ -103,4 +103,4 @@ IActualAppLanguageRetrieverProps.rtl
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/AppLanguageRetriever.tsx#L22)
+[client/components/localization/AppLanguageRetriever.tsx:22](https://github.com/onzag/itemize/blob/73e0c39e/client/components/localization/AppLanguageRetriever.tsx#L22)

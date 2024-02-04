@@ -68,7 +68,7 @@ React.Component\&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:69](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L69)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:69](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L69)
 
 ## Properties
 
@@ -598,7 +598,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:87](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L87)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:87](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L87)
 
 ___
 
@@ -653,4 +653,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:73](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L73)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:73](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L73)

@@ -22,7 +22,7 @@ rather than passing four args
 
 #### Defined in
 
-[base/Root/rq.ts:72](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L72)
+[base/Root/rq.ts:72](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L72)
 
 ___
 
@@ -32,4 +32,4 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:73](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L73)
+[base/Root/rq.ts:73](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L73)

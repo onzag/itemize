@@ -33,7 +33,7 @@ IBaseCollectionResult.lastModified
 
 #### Defined in
 
-[server/ssr/collect.ts:35](https://github.com/onzag/itemize/blob/59702dd5/server/ssr/collect.ts#L35)
+[server/ssr/collect.ts:35](https://github.com/onzag/itemize/blob/73e0c39e/server/ssr/collect.ts#L35)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[server/ssr/collect.ts:79](https://github.com/onzag/itemize/blob/59702dd5/server/ssr/collect.ts#L79)
+[server/ssr/collect.ts:79](https://github.com/onzag/itemize/blob/73e0c39e/server/ssr/collect.ts#L79)
 
 ___
 
@@ -61,7 +61,7 @@ IBaseCollectionResult.signature
 
 #### Defined in
 
-[server/ssr/collect.ts:41](https://github.com/onzag/itemize/blob/59702dd5/server/ssr/collect.ts#L41)
+[server/ssr/collect.ts:41](https://github.com/onzag/itemize/blob/73e0c39e/server/ssr/collect.ts#L41)
 
 ___
 
@@ -75,4 +75,4 @@ IBaseCollectionResult.type
 
 #### Defined in
 
-[server/ssr/collect.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/ssr/collect.ts#L80)
+[server/ssr/collect.ts:80](https://github.com/onzag/itemize/blob/73e0c39e/server/ssr/collect.ts#L80)

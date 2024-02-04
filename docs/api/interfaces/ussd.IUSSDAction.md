@@ -28,7 +28,7 @@ The label for such value
 
 #### Defined in
 
-[ussd/index.ts:25](https://github.com/onzag/itemize/blob/59702dd5/ussd/index.ts#L25)
+[ussd/index.ts:25](https://github.com/onzag/itemize/blob/73e0c39e/ussd/index.ts#L25)
 
 ___
 
@@ -40,7 +40,7 @@ Represents the label of the given action
 
 #### Defined in
 
-[ussd/index.ts:15](https://github.com/onzag/itemize/blob/59702dd5/ussd/index.ts#L15)
+[ussd/index.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/ussd/index.ts#L15)
 
 ___
 
@@ -68,7 +68,7 @@ if a string is returned it will redirect
 
 #### Defined in
 
-[ussd/index.ts:31](https://github.com/onzag/itemize/blob/59702dd5/ussd/index.ts#L31)
+[ussd/index.ts:31](https://github.com/onzag/itemize/blob/73e0c39e/ussd/index.ts#L31)
 
 ___
 
@@ -80,4 +80,4 @@ Whether to request input value
 
 #### Defined in
 
-[ussd/index.ts:20](https://github.com/onzag/itemize/blob/59702dd5/ussd/index.ts#L20)
+[ussd/index.ts:20](https://github.com/onzag/itemize/blob/73e0c39e/ussd/index.ts#L20)

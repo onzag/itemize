@@ -6,6 +6,7 @@
 
 ## Indexable
 
-▪ [fieldName: `string`]: \{ `match`: `string` ; `name`: `string`  }
+▪ [fieldName: `string`]: [`IElasticHighlight`](base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlight.md)
 
 The eleasticsearch field that will be highlighted
+the field name is the real name for the highlight

@@ -37,4 +37,4 @@ Setups a redis client to be an itemize redis client
 
 #### Defined in
 
-[server/redis.ts:174](https://github.com/onzag/itemize/blob/59702dd5/server/redis.ts#L174)
+[server/redis.ts:174](https://github.com/onzag/itemize/blob/73e0c39e/server/redis.ts#L174)

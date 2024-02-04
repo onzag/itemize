@@ -28,7 +28,7 @@ uses an instance of the same property type input
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:18](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L18)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:18](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L18)
 
 ___
 
@@ -41,7 +41,7 @@ provides either an exact value or a range
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:23](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L23)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:23](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L23)
 
 ___
 
@@ -53,7 +53,7 @@ uses location and radius for searching
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:36](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L36)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L36)
 
 ___
 
@@ -65,7 +65,7 @@ payment search interface
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:40](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L40)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:40](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L40)
 
 ___
 
@@ -78,7 +78,7 @@ for multiple matches as a taglist using IN
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:32](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L32)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:32](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L32)
 
 ___
 
@@ -90,7 +90,7 @@ tags search interface
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:44](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L44)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L44)
 
 ___
 
@@ -102,4 +102,4 @@ full text search, uses a simple raw string as search
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:27](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:27](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L27)

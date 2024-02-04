@@ -27,7 +27,7 @@
 
 #### Defined in
 
-[server/resolvers/triggers.ts:12](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L12)
+[server/resolvers/triggers.ts:12](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L12)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:14](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L14)
+[server/resolvers/triggers.ts:14](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L14)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:13](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L13)
+[server/resolvers/triggers.ts:13](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L13)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:18](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L18)
+[server/resolvers/triggers.ts:18](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L18)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:20](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L20)
+[server/resolvers/triggers.ts:20](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L20)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:19](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L19)
+[server/resolvers/triggers.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L19)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:15](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L15)
+[server/resolvers/triggers.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L15)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:17](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L17)
+[server/resolvers/triggers.ts:17](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L17)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:16](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L16)
+[server/resolvers/triggers.ts:16](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L16)
 
 ___
 
@@ -117,4 +117,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:21](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/triggers.ts#L21)
+[server/resolvers/triggers.ts:21](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/triggers.ts#L21)

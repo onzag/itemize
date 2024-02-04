@@ -29,4 +29,4 @@ the cache worker can be accessed easily as such
 
 #### Defined in
 
-[client/internal/workers/cache/index.ts:77](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/index.ts#L77)
+[client/internal/workers/cache/index.ts:77](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/index.ts#L77)

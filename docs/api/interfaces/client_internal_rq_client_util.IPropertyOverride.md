@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:172](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L172)
+[client/internal/rq-client-util.ts:172](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L172)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:173](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L173)
+[client/internal/rq-client-util.ts:173](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L173)

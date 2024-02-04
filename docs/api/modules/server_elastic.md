@@ -13,4 +13,5 @@
 
 - [IElasticChildrenRule](../interfaces/server_elastic.IElasticChildrenRule.md)
 - [IElasticPing](../interfaces/server_elastic.IElasticPing.md)
+- [IElasticSelectBuilderArg](../interfaces/server_elastic.IElasticSelectBuilderArg.md)
 - [IPingEvent](../interfaces/server_elastic.IPingEvent.md)

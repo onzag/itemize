@@ -69,7 +69,7 @@ it can be async
 
 #### Defined in
 
-[server/seo/index.ts:94](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L94)
+[server/seo/index.ts:94](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/index.ts#L94)
 
 ___
 
@@ -82,7 +82,7 @@ false, depending on you
 
 #### Defined in
 
-[server/seo/index.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L44)
+[server/seo/index.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/index.ts#L44)
 
 ___
 
@@ -114,4 +114,4 @@ collect
 
 #### Defined in
 
-[server/seo/index.ts:101](https://github.com/onzag/itemize/blob/59702dd5/server/seo/index.ts#L101)
+[server/seo/index.ts:101](https://github.com/onzag/itemize/blob/73e0c39e/server/seo/index.ts#L101)

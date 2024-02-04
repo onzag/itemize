@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[server/cache.ts:73](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L73)
+[server/cache.ts:73](https://github.com/onzag/itemize/blob/73e0c39e/server/cache.ts#L73)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:74](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L74)
+[server/cache.ts:74](https://github.com/onzag/itemize/blob/73e0c39e/server/cache.ts#L74)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[server/cache.ts:75](https://github.com/onzag/itemize/blob/59702dd5/server/cache.ts#L75)
+[server/cache.ts:75](https://github.com/onzag/itemize/blob/73e0c39e/server/cache.ts#L75)

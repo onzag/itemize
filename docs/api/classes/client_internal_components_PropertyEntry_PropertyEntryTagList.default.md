@@ -70,7 +70,7 @@ React.Component\&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L30)
+[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:30](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L30)
 
 ## Properties
 
@@ -540,7 +540,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:62](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L62)
+[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:62](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L62)
 
 ___
 
@@ -614,7 +614,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:67](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L67)
+[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:67](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L67)
 
 ___
 
@@ -670,4 +670,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:40](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L40)
+[client/internal/components/PropertyEntry/PropertyEntryTagList.tsx:40](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/PropertyEntryTagList.tsx#L40)

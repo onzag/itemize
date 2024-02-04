@@ -26,7 +26,7 @@ A rq endpoint output
 
 #### Defined in
 
-[rq-querier.ts:153](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L153)
+[rq-querier.ts:153](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L153)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:156](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L156)
+[rq-querier.ts:156](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L156)
 
 ___
 
@@ -46,4 +46,4 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:161](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L161)
+[rq-querier.ts:161](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L161)

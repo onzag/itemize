@@ -22,4 +22,4 @@ Contains the property view file renderer
 
 #### Defined in
 
-[client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewFile.tsx:10](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewFile.tsx#L10)
+[client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewFile.tsx:10](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewFile.tsx#L10)

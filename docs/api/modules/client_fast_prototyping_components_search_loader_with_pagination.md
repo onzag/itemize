@@ -6,6 +6,10 @@ Contains the search loader with an already paginated component
 
 ## Table of contents
 
+### Interfaces
+
+- [ISearchLoaderWithPaginationProps](../interfaces/client_fast_prototyping_components_search_loader_with_pagination.ISearchLoaderWithPaginationProps.md)
+
 ### Functions
 
 - [SearchLoaderWithPagination](client_fast_prototyping_components_search_loader_with_pagination.md#searchloaderwithpagination)
@@ -24,7 +28,7 @@ page so it means that it builds history in it
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | `ISearchLoaderWithPaginationProps` | the search loader props |
+| `props` | [`ISearchLoaderWithPaginationProps`](../interfaces/client_fast_prototyping_components_search_loader_with_pagination.ISearchLoaderWithPaginationProps.md) | the search loader props |
 
 #### Returns
 
@@ -32,4 +36,4 @@ page so it means that it builds history in it
 
 #### Defined in
 
-[client/fast-prototyping/components/search-loader-with-pagination.tsx:108](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/components/search-loader-with-pagination.tsx#L108)
+[client/fast-prototyping/components/search-loader-with-pagination.tsx:108](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/components/search-loader-with-pagination.tsx#L108)

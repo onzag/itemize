@@ -42,4 +42,4 @@ cache, this is a heavy process
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.search.ts:39](https://github.com/onzag/itemize/blob/59702dd5/client/internal/workers/cache/cache.worker.search.ts#L39)
+[client/internal/workers/cache/cache.worker.search.ts:39](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/workers/cache/cache.worker.search.ts#L39)

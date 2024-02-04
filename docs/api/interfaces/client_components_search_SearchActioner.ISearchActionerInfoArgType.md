@@ -45,7 +45,7 @@ clean function from the context
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:52](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L52)
+[client/components/search/SearchActioner.tsx:52](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L52)
 
 ___
 
@@ -65,7 +65,7 @@ Dismiss the search error
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L36)
+[client/components/search/SearchActioner.tsx:36](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L36)
 
 ___
 
@@ -85,7 +85,7 @@ Dissmiss the search results
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L32)
+[client/components/search/SearchActioner.tsx:32](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L32)
 
 ___
 
@@ -111,7 +111,7 @@ search frunction from the context
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:48](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L48)
+[client/components/search/SearchActioner.tsx:48](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L48)
 
 ___
 
@@ -123,7 +123,7 @@ An error that occured during the last search (whole context)
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:28](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L28)
+[client/components/search/SearchActioner.tsx:28](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L28)
 
 ___
 
@@ -135,7 +135,7 @@ Search records (whole context)
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L44)
+[client/components/search/SearchActioner.tsx:44](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L44)
 
 ___
 
@@ -147,4 +147,4 @@ Currently searching (this is true for the whole context)
 
 #### Defined in
 
-[client/components/search/SearchActioner.tsx:40](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchActioner.tsx#L40)
+[client/components/search/SearchActioner.tsx:40](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchActioner.tsx#L40)

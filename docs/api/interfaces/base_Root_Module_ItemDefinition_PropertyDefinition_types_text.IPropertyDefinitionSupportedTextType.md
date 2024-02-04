@@ -24,7 +24,7 @@ processed with
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:42](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L42)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:42](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L42)
 
 ___
 
@@ -36,4 +36,4 @@ The text itself
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:36](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L36)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L36)

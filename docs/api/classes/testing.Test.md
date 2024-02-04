@@ -79,11 +79,11 @@ for all subtests
 
 ### currentStep
 
-• `Private` **currentStep**: ``"it"`` \| ``"after"`` \| ``"describe"`` \| ``"before"`` = `null`
+• `Private` **currentStep**: ``"it"`` \| ``"after"`` \| ``"before"`` \| ``"describe"`` = `null`
 
 #### Defined in
 
-[testing/index.ts:66](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L66)
+[testing/index.ts:93](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L93)
 
 ___
 
@@ -91,9 +91,12 @@ ___
 
 • `Private` **describeQueue**: \{ `label`: `string` ; `test`: [`Test`](testing.Test.md)  }[]
 
+This queue contains the description of subtests
+that are added to the test
+
 #### Defined in
 
-[testing/index.ts:57](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L57)
+[testing/index.ts:67](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L67)
 
 ___
 
@@ -101,9 +104,12 @@ ___
 
 • `Private` **doSkipAll**: `boolean` = `false`
 
+Specifies that all subsequent step from the itQueue
+should be cancelled
+
 #### Defined in
 
-[testing/index.ts:63](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L63)
+[testing/index.ts:90](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L90)
 
 ___
 
@@ -113,7 +119,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:64](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L64)
+[testing/index.ts:91](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L91)
 
 ___
 
@@ -121,9 +127,12 @@ ___
 
 • `Private` **doSkipNext**: `boolean` = `false`
 
+Specifies that the next step from the itQueue
+should be cancelled
+
 #### Defined in
 
-[testing/index.ts:62](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L62)
+[testing/index.ts:84](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L84)
 
 ___
 
@@ -133,7 +142,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:65](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L65)
+[testing/index.ts:92](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L92)
 
 ___
 
@@ -141,9 +150,13 @@ ___
 
 • `Private` **itQueue**: `ItHandle`[]
 
+This queue contains in order
+all the it definitions as well as steps
+to execute during the test
+
 #### Defined in
 
-[testing/index.ts:56](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L56)
+[testing/index.ts:61](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L61)
 
 ___
 
@@ -151,9 +164,14 @@ ___
 
 • `Private` **warningQueue**: `WarnHandle`[]
 
+This queue contains the list of warnings added
+during the execution of the test, the warnings
+are reset each time a new step from the
+itQueue is executed
+
 #### Defined in
 
-[testing/index.ts:61](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L61)
+[testing/index.ts:78](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L78)
 
 ## Methods
 
@@ -170,7 +188,7 @@ use for cleanup
 
 #### Defined in
 
-[testing/index.ts:105](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L105)
+[testing/index.ts:132](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L132)
 
 ___
 
@@ -188,7 +206,7 @@ well
 
 #### Defined in
 
-[testing/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L88)
+[testing/index.ts:115](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L115)
 
 ___
 
@@ -204,7 +222,7 @@ Build a brand new instance
 
 #### Defined in
 
-[testing/index.ts:71](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L71)
+[testing/index.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L98)
 
 ___
 
@@ -227,7 +245,7 @@ Define a new test
 
 #### Defined in
 
-[testing/index.ts:114](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L114)
+[testing/index.ts:141](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L141)
 
 ___
 
@@ -243,7 +261,7 @@ Executes during just after before has been executed
 
 #### Defined in
 
-[testing/index.ts:96](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L96)
+[testing/index.ts:123](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L123)
 
 ___
 
@@ -265,7 +283,7 @@ Executes the test
 
 #### Defined in
 
-[testing/index.ts:340](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L340)
+[testing/index.ts:433](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L433)
 
 ___
 
@@ -273,11 +291,14 @@ ___
 
 ▸ **executeIts**(`level`): `Promise`\<\{ `passed`: `number` ; `total`: `number` ; `warnings`: `number`  }\>
 
+Executes all the it available from
+the it queue
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `level` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `level` | `number` | basically the number of tabs to use |
 
 #### Returns
 
@@ -285,13 +306,15 @@ ___
 
 #### Defined in
 
-[testing/index.ts:224](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L224)
+[testing/index.ts:289](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L289)
 
 ___
 
 ### info
 
 ▸ **info**(`txt`): `WarnHandle`
+
+Provides information during the test
 
 #### Parameters
 
@@ -305,7 +328,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:162](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L162)
+[testing/index.ts:211](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L211)
 
 ___
 
@@ -328,7 +351,7 @@ Define a new assertion
 
 #### Defined in
 
-[testing/index.ts:129](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L129)
+[testing/index.ts:157](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L157)
 
 ___
 
@@ -344,7 +367,7 @@ Quits this test
 
 #### Defined in
 
-[testing/index.ts:220](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L220)
+[testing/index.ts:278](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L278)
 
 ___
 
@@ -353,7 +376,7 @@ ___
 ▸ **skipAll**(): `void`
 
 Skips all the following IT tests
-and by all it means all of them
+regardless of layer
 
 #### Returns
 
@@ -361,7 +384,7 @@ and by all it means all of them
 
 #### Defined in
 
-[testing/index.ts:186](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L186)
+[testing/index.ts:236](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L236)
 
 ___
 
@@ -370,8 +393,10 @@ ___
 ▸ **skipLayer**(): `void`
 
 Skip all the tests that are
-on the same layer following
-this
+on the same layer only
+
+because .it and .step can be nested
+inside others, and they count as their own child layer
 
 #### Returns
 
@@ -379,7 +404,7 @@ this
 
 #### Defined in
 
-[testing/index.ts:201](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L201)
+[testing/index.ts:253](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L253)
 
 ___
 
@@ -389,6 +414,7 @@ ___
 
 Skip all the next IT tests
 they should be on the same layer
+it will not skip what's on a deeper layer
 
 #### Returns
 
@@ -396,13 +422,17 @@ they should be on the same layer
 
 #### Defined in
 
-[testing/index.ts:172](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L172)
+[testing/index.ts:222](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L222)
 
 ___
 
 ### step
 
 ▸ **step**(`fn?`): `ItHandle`
+
+Defines a new step, works similar
+to defining an assertion but it has no label
+and is just a singular hidden step
 
 #### Parameters
 
@@ -416,13 +446,15 @@ ___
 
 #### Defined in
 
-[testing/index.ts:141](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L141)
+[testing/index.ts:178](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L178)
 
 ___
 
 ### wait
 
 ▸ **wait**(`ms`): `Promise`\<`void`\>
+
+Helper function to wait
 
 #### Parameters
 
@@ -436,13 +468,15 @@ ___
 
 #### Defined in
 
-[testing/index.ts:211](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L211)
+[testing/index.ts:269](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L269)
 
 ___
 
 ### warn
 
 ▸ **warn**(`txt`): `WarnHandle`
+
+Warns during the test
 
 #### Parameters
 
@@ -456,4 +490,4 @@ ___
 
 #### Defined in
 
-[testing/index.ts:152](https://github.com/onzag/itemize/blob/59702dd5/testing/index.ts#L152)
+[testing/index.ts:195](https://github.com/onzag/itemize/blob/73e0c39e/testing/index.ts#L195)

@@ -19,4 +19,4 @@ contains all the components that take form for the renderer context for fast pro
 
 #### Defined in
 
-[client/fast-prototyping/renderers/index.ts:30](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/index.ts#L30)
+[client/fast-prototyping/renderers/index.ts:30](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/index.ts#L30)

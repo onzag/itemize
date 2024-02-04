@@ -36,4 +36,4 @@ a react component
 
 #### Defined in
 
-[client/components/item/DifferingIncludesRetriever.tsx:80](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DifferingIncludesRetriever.tsx#L80)
+[client/components/item/DifferingIncludesRetriever.tsx:80](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DifferingIncludesRetriever.tsx#L80)

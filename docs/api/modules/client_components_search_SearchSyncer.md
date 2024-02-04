@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[client/components/search/SearchSyncer.tsx:95](https://github.com/onzag/itemize/blob/59702dd5/client/components/search/SearchSyncer.tsx#L95)
+[client/components/search/SearchSyncer.tsx:95](https://github.com/onzag/itemize/blob/73e0c39e/client/components/search/SearchSyncer.tsx#L95)

@@ -41,7 +41,7 @@ The prefixes for every location search interface
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:50](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L50)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:50](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L50)
 
 ___
 
@@ -55,4 +55,4 @@ array of arrays
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:101](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L101)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:101](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L101)

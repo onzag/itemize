@@ -100,7 +100,7 @@ Builds a new instance of the change informer
 
 #### Defined in
 
-[server/raw-db.ts:124](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L124)
+[server/raw-db.ts:124](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L124)
 
 ## Properties
 
@@ -114,7 +114,7 @@ Builds a new instance of the change informer
 
 #### Defined in
 
-[server/raw-db.ts:95](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L95)
+[server/raw-db.ts:95](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L95)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:116](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L116)
+[server/raw-db.ts:116](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L116)
 
 ___
 
@@ -134,7 +134,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:89](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L89)
+[server/raw-db.ts:89](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L89)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:93](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L93)
+[server/raw-db.ts:93](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L93)
 
 ___
 
@@ -154,7 +154,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:86](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L86)
+[server/raw-db.ts:86](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L86)
 
 ___
 
@@ -168,7 +168,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:107](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L107)
+[server/raw-db.ts:107](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L107)
 
 ___
 
@@ -178,7 +178,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:84](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L84)
+[server/raw-db.ts:84](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L84)
 
 ___
 
@@ -188,7 +188,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:82](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L82)
+[server/raw-db.ts:82](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L82)
 
 ___
 
@@ -198,7 +198,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:83](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L83)
+[server/raw-db.ts:83](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L83)
 
 ___
 
@@ -208,7 +208,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:88](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L88)
+[server/raw-db.ts:88](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L88)
 
 ___
 
@@ -218,7 +218,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:92](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L92)
+[server/raw-db.ts:92](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L92)
 
 ___
 
@@ -228,7 +228,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:91](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L91)
+[server/raw-db.ts:91](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L91)
 
 ## Methods
 
@@ -251,7 +251,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1986](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1986)
+[server/raw-db.ts:1987](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1987)
 
 ___
 
@@ -272,7 +272,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:2027](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2027)
+[server/raw-db.ts:2028](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2028)
 
 ___
 
@@ -296,7 +296,7 @@ redis
 
 #### Defined in
 
-[server/raw-db.ts:2454](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2454)
+[server/raw-db.ts:2455](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2455)
 
 ___
 
@@ -325,7 +325,7 @@ of given properties
 
 #### Defined in
 
-[server/raw-db.ts:1399](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1399)
+[server/raw-db.ts:1400](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1400)
 
 ___
 
@@ -351,7 +351,7 @@ the transaction time
 
 #### Defined in
 
-[server/raw-db.ts:491](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L491)
+[server/raw-db.ts:492](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L492)
 
 ___
 
@@ -373,7 +373,7 @@ Removes a given cursor
 
 #### Defined in
 
-[server/raw-db.ts:2135](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2135)
+[server/raw-db.ts:2136](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2136)
 
 ___
 
@@ -399,7 +399,7 @@ the entire row data
 
 #### Defined in
 
-[server/raw-db.ts:362](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L362)
+[server/raw-db.ts:363](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L363)
 
 ___
 
@@ -420,7 +420,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:172](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L172)
+[server/raw-db.ts:173](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L173)
 
 ___
 
@@ -472,7 +472,7 @@ use doNotProbe if you want to create it regardless which will considerably speed
 
 #### Defined in
 
-[server/raw-db.ts:2372](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2372)
+[server/raw-db.ts:2373](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2373)
 
 ___
 
@@ -500,7 +500,7 @@ Declares a new cursor agains a select statment and does nothing about it
 
 #### Defined in
 
-[server/raw-db.ts:2045](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2045)
+[server/raw-db.ts:2046](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2046)
 
 ___
 
@@ -520,7 +520,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:2579](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2579)
+[server/raw-db.ts:2580](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2580)
 
 ___
 
@@ -543,7 +543,7 @@ in the cache
 
 #### Defined in
 
-[server/raw-db.ts:2550](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2550)
+[server/raw-db.ts:2551](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2551)
 
 ___
 
@@ -566,7 +566,7 @@ Fetches from a cursor that was already declared
 
 #### Defined in
 
-[server/raw-db.ts:2106](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2106)
+[server/raw-db.ts:2107](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2107)
 
 ___
 
@@ -587,7 +587,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:2609](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2609)
+[server/raw-db.ts:2610](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2610)
 
 ___
 
@@ -614,7 +614,7 @@ a new instance of raw db
 
 #### Defined in
 
-[server/raw-db.ts:209](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L209)
+[server/raw-db.ts:210](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L210)
 
 ___
 
@@ -640,7 +640,7 @@ row
 
 #### Defined in
 
-[server/raw-db.ts:645](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L645)
+[server/raw-db.ts:646](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L646)
 
 ___
 
@@ -664,7 +664,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:518](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L518)
+[server/raw-db.ts:519](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L519)
 
 ___
 
@@ -692,7 +692,7 @@ the clients that are related to those rows
 
 #### Defined in
 
-[server/raw-db.ts:771](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L771)
+[server/raw-db.ts:772](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L772)
 
 ___
 
@@ -715,7 +715,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:733](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L733)
+[server/raw-db.ts:734](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L734)
 
 ___
 
@@ -756,7 +756,7 @@ for the database for the value
 
 #### Defined in
 
-[server/raw-db.ts:1380](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1380)
+[server/raw-db.ts:1381](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1381)
 
 ___
 
@@ -778,7 +778,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1383](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1383)
+[server/raw-db.ts:1384](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1384)
 
 ___
 
@@ -815,7 +815,7 @@ last_modified
 
 #### Defined in
 
-[server/raw-db.ts:1345](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1345)
+[server/raw-db.ts:1346](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1346)
 
 ___
 
@@ -835,7 +835,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1350](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1350)
+[server/raw-db.ts:1351](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1351)
 
 ___
 
@@ -881,7 +881,7 @@ for the database for an updated value.
 
 #### Defined in
 
-[server/raw-db.ts:1318](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1318)
+[server/raw-db.ts:1319](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1319)
 
 ___
 
@@ -903,7 +903,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1321](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1321)
+[server/raw-db.ts:1322](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1322)
 
 ___
 
@@ -926,7 +926,7 @@ Moves from a cursor that was already declared
 
 #### Defined in
 
-[server/raw-db.ts:2121](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2121)
+[server/raw-db.ts:2122](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2122)
 
 ___
 
@@ -953,7 +953,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1475](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1475)
+[server/raw-db.ts:1476](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1476)
 
 ___
 
@@ -998,7 +998,7 @@ NOTE a raw db update is unable to trigger side effects
 
 #### Defined in
 
-[server/raw-db.ts:2663](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2663)
+[server/raw-db.ts:2664](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2664)
 
 ___
 
@@ -1030,7 +1030,7 @@ advanced method
 
 #### Defined in
 
-[server/raw-db.ts:3206](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L3206)
+[server/raw-db.ts:3207](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L3207)
 
 ___
 
@@ -1066,7 +1066,7 @@ the cursor will remain in the database hogging memory
 
 #### Defined in
 
-[server/raw-db.ts:2155](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2155)
+[server/raw-db.ts:2156](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2156)
 
 ___
 
@@ -1095,7 +1095,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1446](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1446)
+[server/raw-db.ts:1447](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1447)
 
 ___
 
@@ -1131,7 +1131,7 @@ NOTE a raw db insert is unable to trigger side effects
 
 #### Defined in
 
-[server/raw-db.ts:1878](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L1878)
+[server/raw-db.ts:1879](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L1879)
 
 ___
 
@@ -1158,7 +1158,7 @@ Provides a db query builder for the given item or a module
 
 #### Defined in
 
-[server/raw-db.ts:2255](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2255)
+[server/raw-db.ts:2256](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2256)
 
 ___
 
@@ -1178,7 +1178,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:2240](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2240)
+[server/raw-db.ts:2241](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2241)
 
 ___
 
@@ -1211,7 +1211,7 @@ lead to race conditions, otherwise stay by updating through the cache
 
 #### Defined in
 
-[server/raw-db.ts:3435](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L3435)
+[server/raw-db.ts:3436](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L3436)
 
 ___
 
@@ -1251,7 +1251,7 @@ an object which contains the total or partial values of the row to be inserted o
 
 #### Defined in
 
-[server/raw-db.ts:311](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L311)
+[server/raw-db.ts:312](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L312)
 
 ___
 
@@ -1276,7 +1276,7 @@ a url safe v5 uuid
 
 #### Defined in
 
-[server/raw-db.ts:286](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L286)
+[server/raw-db.ts:287](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L287)
 
 ___
 
@@ -1297,7 +1297,7 @@ a url safe v4 uuid
 
 #### Defined in
 
-[server/raw-db.ts:276](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L276)
+[server/raw-db.ts:277](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L277)
 
 ___
 
@@ -1322,7 +1322,7 @@ provide the select results from that query
 
 #### Defined in
 
-[server/raw-db.ts:2511](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2511)
+[server/raw-db.ts:2512](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2512)
 
 ___
 
@@ -1347,7 +1347,7 @@ Retrieves a raw db select query in order to be used to assign values in updates
 
 #### Defined in
 
-[server/raw-db.ts:2331](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L2331)
+[server/raw-db.ts:2332](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L2332)
 
 ___
 
@@ -1370,7 +1370,7 @@ elastic instance, as such elastic adds itself in here when initialized
 
 #### Defined in
 
-[server/raw-db.ts:168](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L168)
+[server/raw-db.ts:169](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L169)
 
 ___
 
@@ -1404,7 +1404,7 @@ whatever is returned in the transactional function
 
 #### Defined in
 
-[server/raw-db.ts:252](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L252)
+[server/raw-db.ts:253](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L253)
 
 ___
 
@@ -1436,7 +1436,7 @@ whatever is returned in the transactional function
 
 #### Defined in
 
-[server/raw-db.ts:228](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L228)
+[server/raw-db.ts:229](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L229)
 
 ___
 
@@ -1459,4 +1459,4 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:3036](https://github.com/onzag/itemize/blob/59702dd5/server/raw-db.ts#L3036)
+[server/raw-db.ts:3037](https://github.com/onzag/itemize/blob/73e0c39e/server/raw-db.ts#L3037)

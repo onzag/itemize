@@ -623,7 +623,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:364](https://github.com/onzag/itemize/blob/59702dd5/client/components/localization/I18nRead.tsx#L364)
+[client/components/localization/I18nRead.tsx:368](https://github.com/onzag/itemize/blob/73e0c39e/client/components/localization/I18nRead.tsx#L368)
 
 ___
 

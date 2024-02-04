@@ -27,17 +27,17 @@ of traditional searches rather than records based search
 
 #### Defined in
 
-[rq-querier.ts:63](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L63)
+[rq-querier.ts:63](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L63)
 
 ___
 
 ### highlights
 
-• **highlights**: `string`
+• **highlights**: `any`
 
 #### Defined in
 
-[rq-querier.ts:67](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L67)
+[rq-querier.ts:67](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L67)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:66](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L66)
+[rq-querier.ts:66](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L66)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:64](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L64)
+[rq-querier.ts:64](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L64)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:68](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L68)
+[rq-querier.ts:68](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L68)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:65](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L65)
+[rq-querier.ts:65](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L65)
 
 ___
 
@@ -87,4 +87,4 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:62](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L62)
+[rq-querier.ts:62](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L62)

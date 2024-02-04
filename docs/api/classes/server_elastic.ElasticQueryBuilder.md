@@ -32,10 +32,12 @@
 - [getHighlightInfo](server_elastic.ElasticQueryBuilder.md#gethighlightinfo)
 - [getRequest](server_elastic.ElasticQueryBuilder.md#getrequest)
 - [must](server_elastic.ElasticQueryBuilder.md#must)
+- [mustBeCreatedBy](server_elastic.ElasticQueryBuilder.md#mustbecreatedby)
 - [mustMatch](server_elastic.ElasticQueryBuilder.md#mustmatch)
 - [mustMatchPhrase](server_elastic.ElasticQueryBuilder.md#mustmatchphrase)
 - [mustMatchPhrasePrefix](server_elastic.ElasticQueryBuilder.md#mustmatchphraseprefix)
 - [mustNot](server_elastic.ElasticQueryBuilder.md#mustnot)
+- [mustNotBeBlocked](server_elastic.ElasticQueryBuilder.md#mustnotbeblocked)
 - [mustNotMatch](server_elastic.ElasticQueryBuilder.md#mustnotmatch)
 - [mustNotMatchPhrase](server_elastic.ElasticQueryBuilder.md#mustnotmatchphrase)
 - [mustNotMatchPhrasePrefix](server_elastic.ElasticQueryBuilder.md#mustnotmatchphraseprefix)
@@ -47,6 +49,7 @@
 - [removeAggregations](server_elastic.ElasticQueryBuilder.md#removeaggregations)
 - [removeAllChildrenForGroupId](server_elastic.ElasticQueryBuilder.md#removeallchildrenforgroupid)
 - [removeAllChildrenForPropertyId](server_elastic.ElasticQueryBuilder.md#removeallchildrenforpropertyid)
+- [removeChild](server_elastic.ElasticQueryBuilder.md#removechild)
 - [removeChildForUniqueId](server_elastic.ElasticQueryBuilder.md#removechildforuniqueid)
 - [removeHighlights](server_elastic.ElasticQueryBuilder.md#removehighlights)
 - [setFrom](server_elastic.ElasticQueryBuilder.md#setfrom)
@@ -85,7 +88,7 @@
 
 #### Defined in
 
-[server/elastic.ts:2923](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2923)
+[server/elastic.ts:2982](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L2982)
 
 ## Properties
 
@@ -95,7 +98,7 @@
 
 #### Defined in
 
-[server/elastic.ts:2920](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2920)
+[server/elastic.ts:2979](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L2979)
 
 ___
 
@@ -105,7 +108,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2921](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2921)
+[server/elastic.ts:2980](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L2980)
 
 ___
 
@@ -115,7 +118,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2919](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2919)
+[server/elastic.ts:2978](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L2978)
 
 ## Methods
 
@@ -137,7 +140,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3045](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3045)
+[server/elastic.ts:3112](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3112)
 
 ___
 
@@ -160,7 +163,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3406](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3406)
+[server/elastic.ts:3473](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3473)
 
 ___
 
@@ -183,7 +186,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3369](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3369)
+[server/elastic.ts:3436](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3436)
 
 ___
 
@@ -203,7 +206,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3361](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3361)
+[server/elastic.ts:3428](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3428)
 
 ___
 
@@ -217,7 +220,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3429](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3429)
+[server/elastic.ts:3496](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3496)
 
 ___
 
@@ -237,7 +240,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3308](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3308)
+[server/elastic.ts:3371](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3371)
 
 ___
 
@@ -257,7 +260,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3312](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3312)
+[server/elastic.ts:3375](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3375)
 
 ___
 
@@ -281,7 +284,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3345](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3345)
+[server/elastic.ts:3412](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3412)
 
 ___
 
@@ -305,7 +308,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3332](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3332)
+[server/elastic.ts:3399](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3399)
 
 ___
 
@@ -319,7 +322,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3357](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3357)
+[server/elastic.ts:3424](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3424)
 
 ___
 
@@ -339,7 +342,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3316](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3316)
+[server/elastic.ts:3379](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3379)
 
 ___
 
@@ -359,7 +362,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3279](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3279)
+[server/elastic.ts:3342](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3342)
 
 ___
 
@@ -379,7 +382,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2930](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L2930)
+[server/elastic.ts:2989](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L2989)
 
 ___
 
@@ -400,7 +403,27 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3094](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3094)
+[server/elastic.ts:3145](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3145)
+
+___
+
+### mustBeCreatedBy
+
+▸ **mustBeCreatedBy**(`userid`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `userid` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/elastic.ts:3309](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3309)
 
 ___
 
@@ -421,7 +444,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3139](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3139)
+[server/elastic.ts:3190](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3190)
 
 ___
 
@@ -442,7 +465,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3153](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3153)
+[server/elastic.ts:3204](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3204)
 
 ___
 
@@ -463,7 +486,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3167](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3167)
+[server/elastic.ts:3218](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3218)
 
 ___
 
@@ -484,7 +507,21 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3098](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3098)
+[server/elastic.ts:3149](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3149)
+
+___
+
+### mustNotBeBlocked
+
+▸ **mustNotBeBlocked**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/elastic.ts:3303](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3303)
 
 ___
 
@@ -505,7 +542,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3146](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3146)
+[server/elastic.ts:3197](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3197)
 
 ___
 
@@ -526,7 +563,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3160](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3160)
+[server/elastic.ts:3211](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3211)
 
 ___
 
@@ -547,7 +584,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3174](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3174)
+[server/elastic.ts:3225](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3225)
 
 ___
 
@@ -568,7 +605,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3118](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3118)
+[server/elastic.ts:3169](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3169)
 
 ___
 
@@ -589,7 +626,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3132](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3132)
+[server/elastic.ts:3183](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3183)
 
 ___
 
@@ -610,7 +647,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3110](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3110)
+[server/elastic.ts:3161](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3161)
 
 ___
 
@@ -631,7 +668,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3125](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3125)
+[server/elastic.ts:3176](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3176)
 
 ___
 
@@ -651,7 +688,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3417](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3417)
+[server/elastic.ts:3484](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3484)
 
 ___
 
@@ -665,7 +702,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3421](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3421)
+[server/elastic.ts:3488](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3488)
 
 ___
 
@@ -685,7 +722,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3320](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3320)
+[server/elastic.ts:3383](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3383)
 
 ___
 
@@ -705,7 +742,27 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3324](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3324)
+[server/elastic.ts:3387](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3387)
+
+___
+
+### removeChild
+
+▸ **removeChild**(`q`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `q` | [`ElasticQueryBuilder`](server_elastic.ElasticQueryBuilder.md) \| `QueryDslQueryContainer` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/elastic.ts:3395](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3395)
 
 ___
 
@@ -725,7 +782,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3328](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3328)
+[server/elastic.ts:3391](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3391)
 
 ___
 
@@ -739,7 +796,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3425](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3425)
+[server/elastic.ts:3492](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3492)
 
 ___
 
@@ -759,7 +816,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3264](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3264)
+[server/elastic.ts:3327](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3327)
 
 ___
 
@@ -779,7 +836,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3270](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3270)
+[server/elastic.ts:3333](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3333)
 
 ___
 
@@ -799,7 +856,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3260](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3260)
+[server/elastic.ts:3323](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3323)
 
 ___
 
@@ -819,7 +876,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3252](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3252)
+[server/elastic.ts:3315](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3315)
 
 ___
 
@@ -840,7 +897,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3102](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3102)
+[server/elastic.ts:3153](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3153)
 
 ___
 
@@ -861,7 +918,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3210](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3210)
+[server/elastic.ts:3261](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3261)
 
 ___
 
@@ -882,7 +939,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3224](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3224)
+[server/elastic.ts:3275](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3275)
 
 ___
 
@@ -903,7 +960,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3238](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3238)
+[server/elastic.ts:3289](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3289)
 
 ___
 
@@ -924,7 +981,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3106](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3106)
+[server/elastic.ts:3157](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3157)
 
 ___
 
@@ -945,7 +1002,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3217](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3217)
+[server/elastic.ts:3268](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3268)
 
 ___
 
@@ -966,7 +1023,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3231](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3231)
+[server/elastic.ts:3282](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3282)
 
 ___
 
@@ -987,7 +1044,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3245](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3245)
+[server/elastic.ts:3296](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3296)
 
 ___
 
@@ -1008,7 +1065,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3189](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3189)
+[server/elastic.ts:3240](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3240)
 
 ___
 
@@ -1029,7 +1086,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3203](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3203)
+[server/elastic.ts:3254](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3254)
 
 ___
 
@@ -1050,7 +1107,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3181](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3181)
+[server/elastic.ts:3232](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3232)
 
 ___
 
@@ -1071,7 +1128,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3196](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3196)
+[server/elastic.ts:3247](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3247)
 
 ___
 
@@ -1091,4 +1148,4 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:3256](https://github.com/onzag/itemize/blob/59702dd5/server/elastic.ts#L3256)
+[server/elastic.ts:3319](https://github.com/onzag/itemize/blob/73e0c39e/server/elastic.ts#L3319)

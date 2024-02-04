@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[server/index.ts:276](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L276)
+[server/index.ts:276](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L276)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:273](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L273)
+[server/index.ts:273](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L273)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:271](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L271)
+[server/index.ts:271](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L271)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:270](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L270)
+[server/index.ts:270](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L270)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:274](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L274)
+[server/index.ts:274](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L274)
 
 ___
 
@@ -102,7 +102,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:272](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L272)
+[server/index.ts:272](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L272)
 
 ___
 
@@ -112,4 +112,4 @@ ___
 
 #### Defined in
 
-[server/index.ts:278](https://github.com/onzag/itemize/blob/59702dd5/server/index.ts#L278)
+[server/index.ts:278](https://github.com/onzag/itemize/blob/73e0c39e/server/index.ts#L278)

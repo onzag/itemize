@@ -29,7 +29,7 @@ check [[IPropertySearchRecordsEvent]]
 
 #### Defined in
 
-[base/remote-protocol.ts:448](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L448)
+[base/remote-protocol.ts:448](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L448)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:449](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L449)
+[base/remote-protocol.ts:449](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L449)
 
 ___
 
@@ -53,4 +53,4 @@ IBaseSearchRegisterRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L327)
+[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L327)

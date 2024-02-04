@@ -35,7 +35,7 @@ this represents rules that are built for includes
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
 
 ___
 
@@ -63,7 +63,7 @@ and the name just doesn't include the numeral
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:101](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L101)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:101](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L101)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
 
 ___
 
@@ -89,7 +89,7 @@ the inclusion state expected for the conditional rule to apply
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:105](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L105)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:105](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L105)
 
 ___
 
@@ -103,4 +103,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:56](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L56)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:56](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L56)

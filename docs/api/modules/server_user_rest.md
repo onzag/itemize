@@ -32,4 +32,4 @@
 
 #### Defined in
 
-[server/user/rest.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/user/rest.ts#L48)
+[server/user/rest.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/server/user/rest.ts#L48)

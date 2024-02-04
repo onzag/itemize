@@ -65,7 +65,7 @@ A function to use for the mismatch action
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:123](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L123)
+[client/internal/rq-client-util.ts:123](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L123)
 
 ___
 
@@ -92,7 +92,7 @@ A function to use for the mismatch action
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:128](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L128)
+[client/internal/rq-client-util.ts:128](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L128)
 
 ## Functions
 
@@ -115,7 +115,7 @@ A function to use for the mismatch action
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:130](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L130)
+[client/internal/rq-client-util.ts:130](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L130)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1161](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1161)
+[client/internal/rq-client-util.ts:1161](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1161)
 
 ___
 
@@ -174,7 +174,7 @@ ___
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1374](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1374)
+[client/internal/rq-client-util.ts:1374](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1374)
 
 ___
 
@@ -226,7 +226,7 @@ to create a query
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:253](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L253)
+[client/internal/rq-client-util.ts:253](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L253)
 
 ___
 
@@ -246,7 +246,7 @@ ___
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:216](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L216)
+[client/internal/rq-client-util.ts:216](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L216)
 
 ___
 
@@ -267,7 +267,7 @@ ___
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:182](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L182)
+[client/internal/rq-client-util.ts:182](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L182)
 
 ___
 
@@ -287,7 +287,7 @@ ___
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1578](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1578)
+[client/internal/rq-client-util.ts:1579](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1579)
 
 ___
 
@@ -307,7 +307,7 @@ ___
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1665](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1665)
+[client/internal/rq-client-util.ts:1669](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1669)
 
 ___
 
@@ -341,7 +341,7 @@ regarding these files
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:607](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L607)
+[client/internal/rq-client-util.ts:607](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L607)
 
 ___
 
@@ -370,7 +370,7 @@ to specify a blob this function will do such job
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:553](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L553)
+[client/internal/rq-client-util.ts:553](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L553)
 
 ___
 
@@ -408,7 +408,7 @@ query, and the value that was retrieved
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1308](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1308)
+[client/internal/rq-client-util.ts:1308](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1308)
 
 ___
 
@@ -440,7 +440,7 @@ a promise with an error on whether it succeed or not
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1093](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1093)
+[client/internal/rq-client-util.ts:1093](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1093)
 
 ___
 
@@ -473,7 +473,7 @@ Runs an edit query for a given item definition
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1427](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1427)
+[client/internal/rq-client-util.ts:1427](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1427)
 
 ___
 
@@ -514,7 +514,7 @@ a promise with a bunch of information
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:820](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L820)
+[client/internal/rq-client-util.ts:820](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L820)
 
 ___
 
@@ -541,4 +541,4 @@ be equal to the limit, and the offset given
 
 #### Defined in
 
-[client/internal/rq-client-util.ts:1755](https://github.com/onzag/itemize/blob/59702dd5/client/internal/rq-client-util.ts#L1755)
+[client/internal/rq-client-util.ts:1759](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/rq-client-util.ts#L1759)

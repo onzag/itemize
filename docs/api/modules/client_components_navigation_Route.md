@@ -32,4 +32,4 @@ and considers the root to be the language source
 
 #### Defined in
 
-[client/components/navigation/Route.tsx:16](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/Route.tsx#L16)
+[client/components/navigation/Route.tsx:16](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/Route.tsx#L16)

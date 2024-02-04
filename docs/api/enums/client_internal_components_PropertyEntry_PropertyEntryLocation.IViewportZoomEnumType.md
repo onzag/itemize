@@ -25,7 +25,7 @@ Zoomed in the most, show an address
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L30)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:30](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L30)
 
 ___
 
@@ -37,7 +37,7 @@ A default zoom status
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:26](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L26)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:26](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L26)
 
 ___
 
@@ -49,4 +49,4 @@ Should mean the most zoomed out, show an country
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L22)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:22](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L22)

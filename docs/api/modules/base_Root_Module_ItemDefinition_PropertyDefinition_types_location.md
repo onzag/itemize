@@ -24,4 +24,4 @@ The type describes the behaviour of the location in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:66](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L66)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:66](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L66)

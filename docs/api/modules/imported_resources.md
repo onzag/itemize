@@ -45,7 +45,7 @@ https://gist.githubusercontent.com/piraveen/fafd0d984b2236e809d03a0e306c8a4d/raw
 
 #### Defined in
 
-[imported-resources/index.ts:70](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L70)
+[imported-resources/index.ts:70](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L70)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:79](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L79)
+[imported-resources/index.ts:79](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L79)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L88)
+[imported-resources/index.ts:88](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L88)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:67](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L67)
+[imported-resources/index.ts:67](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L67)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:68](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L68)
+[imported-resources/index.ts:68](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L68)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:69](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L69)
+[imported-resources/index.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L69)
 
 ## Functions
 
@@ -115,4 +115,4 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:98](https://github.com/onzag/itemize/blob/59702dd5/imported-resources/index.ts#L98)
+[imported-resources/index.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/imported-resources/index.ts#L98)

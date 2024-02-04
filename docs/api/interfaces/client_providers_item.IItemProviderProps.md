@@ -78,7 +78,7 @@ it should do so
 
 #### Defined in
 
-[client/providers/item.tsx:1573](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1573)
+[client/providers/item.tsx:1584](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1584)
 
 ___
 
@@ -95,7 +95,7 @@ it from being dismissed by using this option
 
 #### Defined in
 
-[client/providers/item.tsx:1613](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1613)
+[client/providers/item.tsx:1624](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1624)
 
 ___
 
@@ -108,7 +108,7 @@ a state
 
 #### Defined in
 
-[client/providers/item.tsx:1578](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1578)
+[client/providers/item.tsx:1589](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1589)
 
 ___
 
@@ -126,7 +126,7 @@ rather than entries with text
 
 #### Defined in
 
-[client/providers/item.tsx:1604](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1604)
+[client/providers/item.tsx:1615](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1615)
 
 ___
 
@@ -139,7 +139,7 @@ a search state
 
 #### Defined in
 
-[client/providers/item.tsx:1594](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1594)
+[client/providers/item.tsx:1605](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1605)
 
 ___
 
@@ -151,7 +151,7 @@ Makes automatic search happen only on mount
 
 #### Defined in
 
-[client/providers/item.tsx:1589](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1589)
+[client/providers/item.tsx:1600](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1600)
 
 ___
 
@@ -166,7 +166,7 @@ disabling the grace time ensures that it is always checked against the database
 
 #### Defined in
 
-[client/providers/item.tsx:1585](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1585)
+[client/providers/item.tsx:1596](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1596)
 
 ___
 
@@ -178,7 +178,7 @@ avoids running loadValue
 
 #### Defined in
 
-[client/providers/item.tsx:1724](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1724)
+[client/providers/item.tsx:1735](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1735)
 
 ___
 
@@ -190,7 +190,7 @@ children that will be feed into the context
 
 #### Defined in
 
-[client/providers/item.tsx:1511](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1511)
+[client/providers/item.tsx:1522](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1522)
 
 ___
 
@@ -205,7 +205,7 @@ loaders between themselves
 
 #### Defined in
 
-[client/providers/item.tsx:1662](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1662)
+[client/providers/item.tsx:1673](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1673)
 
 ___
 
@@ -219,7 +219,7 @@ the moment they are to connect, use this to disable that
 
 #### Defined in
 
-[client/providers/item.tsx:1544](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1544)
+[client/providers/item.tsx:1555](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1555)
 
 ___
 
@@ -233,7 +233,7 @@ the moment they are to connect, use this to disable that
 
 #### Defined in
 
-[client/providers/item.tsx:1550](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1550)
+[client/providers/item.tsx:1561](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1561)
 
 ___
 
@@ -245,7 +245,7 @@ disables using indexed as cache
 
 #### Defined in
 
-[client/providers/item.tsx:1807](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1807)
+[client/providers/item.tsx:1818](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1818)
 
 ___
 
@@ -258,7 +258,7 @@ always be retrieved from the indexed cache or from network
 
 #### Defined in
 
-[client/providers/item.tsx:1802](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1802)
+[client/providers/item.tsx:1813](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1813)
 
 ___
 
@@ -277,7 +277,7 @@ if the item definition has no externally checked properties
 
 #### Defined in
 
-[client/providers/item.tsx:1566](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1566)
+[client/providers/item.tsx:1577](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1577)
 
 ___
 
@@ -289,7 +289,7 @@ the id, specifying an id makes a huge difference
 
 #### Defined in
 
-[client/providers/item.tsx:1528](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1528)
+[client/providers/item.tsx:1539](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1539)
 
 ___
 
@@ -301,7 +301,7 @@ the version
 
 #### Defined in
 
-[client/providers/item.tsx:1532](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1532)
+[client/providers/item.tsx:1543](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1543)
 
 ___
 
@@ -316,7 +316,7 @@ the highlights are passed by the search provider
 
 #### Defined in
 
-[client/providers/item.tsx:1796](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1796)
+[client/providers/item.tsx:1807](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1807)
 
 ___
 
@@ -328,7 +328,7 @@ excludes the policies from being part of the state
 
 #### Defined in
 
-[client/providers/item.tsx:1655](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1655)
+[client/providers/item.tsx:1666](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1666)
 
 ___
 
@@ -344,7 +344,7 @@ only includes the items specified in the list in the state
 
 #### Defined in
 
-[client/providers/item.tsx:1651](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1651)
+[client/providers/item.tsx:1662](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1662)
 
 ___
 
@@ -360,7 +360,7 @@ please use ItemContextPhase and ItemContextRetrieve instead
 
 #### Defined in
 
-[client/providers/item.tsx:1734](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1734)
+[client/providers/item.tsx:1745](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1745)
 
 ___
 
@@ -374,7 +374,7 @@ based on the prop extensions emulated item definition
 
 #### Defined in
 
-[client/providers/item.tsx:1524](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1524)
+[client/providers/item.tsx:1535](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1535)
 
 ___
 
@@ -387,7 +387,7 @@ storeResultsInNavigation and the same identifier
 
 #### Defined in
 
-[client/providers/item.tsx:1618](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1618)
+[client/providers/item.tsx:1629](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1629)
 
 ___
 
@@ -407,7 +407,7 @@ and clearStoredStateIfConnected from submit action
 
 #### Defined in
 
-[client/providers/item.tsx:1702](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1702)
+[client/providers/item.tsx:1713](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1713)
 
 ___
 
@@ -421,7 +421,7 @@ an unversioned primary form
 
 #### Defined in
 
-[client/providers/item.tsx:1538](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1538)
+[client/providers/item.tsx:1549](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1549)
 
 ___
 
@@ -433,7 +433,7 @@ uses long term caching with the worker cache strategy
 
 #### Defined in
 
-[client/providers/item.tsx:1682](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1682)
+[client/providers/item.tsx:1693](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1693)
 
 ___
 
@@ -445,7 +445,7 @@ Cache metadata to push with the long term caching
 
 #### Defined in
 
-[client/providers/item.tsx:1686](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1686)
+[client/providers/item.tsx:1697](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1697)
 
 ___
 
@@ -457,7 +457,7 @@ Cache rules to resolve during a metadata mismatch
 
 #### Defined in
 
-[client/providers/item.tsx:1690](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1690)
+[client/providers/item.tsx:1701](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1701)
 
 ___
 
@@ -469,7 +469,7 @@ marks the item for destruction as the user logs out
 
 #### Defined in
 
-[client/providers/item.tsx:1716](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1716)
+[client/providers/item.tsx:1727](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1727)
 
 ___
 
@@ -481,7 +481,7 @@ marks the item for destruction as the component unmounts
 
 #### Defined in
 
-[client/providers/item.tsx:1720](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1720)
+[client/providers/item.tsx:1731](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1731)
 
 ___
 
@@ -496,7 +496,7 @@ on the literal componentWillUnmount alone
 
 #### Defined in
 
-[client/providers/item.tsx:1518](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1518)
+[client/providers/item.tsx:1529](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1529)
 
 ___
 
@@ -522,7 +522,7 @@ Callback triggers on delete
 
 #### Defined in
 
-[client/providers/item.tsx:1769](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1769)
+[client/providers/item.tsx:1780](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1780)
 
 ___
 
@@ -548,7 +548,7 @@ Callback triggers on load
 
 #### Defined in
 
-[client/providers/item.tsx:1765](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1765)
+[client/providers/item.tsx:1776](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1776)
 
 ___
 
@@ -574,7 +574,7 @@ callback triggers on search with the response
 
 #### Defined in
 
-[client/providers/item.tsx:1742](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1742)
+[client/providers/item.tsx:1753](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1753)
 
 ___
 
@@ -602,7 +602,7 @@ also when memory data has been fetched or from location
 
 #### Defined in
 
-[client/providers/item.tsx:1748](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1748)
+[client/providers/item.tsx:1759](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1759)
 
 ___
 
@@ -629,7 +629,7 @@ memory rather than a search action
 
 #### Defined in
 
-[client/providers/item.tsx:1753](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1753)
+[client/providers/item.tsx:1764](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1764)
 
 ___
 
@@ -658,7 +658,7 @@ it makes the execution slower
 
 #### Defined in
 
-[client/providers/item.tsx:1775](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1775)
+[client/providers/item.tsx:1786](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1786)
 
 ___
 
@@ -687,7 +687,7 @@ from a cache worker
 
 #### Defined in
 
-[client/providers/item.tsx:1780](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1780)
+[client/providers/item.tsx:1791](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1791)
 
 ___
 
@@ -713,7 +713,7 @@ Runs when the state was attempted to store but failed to store
 
 #### Defined in
 
-[client/providers/item.tsx:1788](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1788)
+[client/providers/item.tsx:1799](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1799)
 
 ___
 
@@ -739,7 +739,7 @@ Runs when the state was stored for whatever reason
 
 #### Defined in
 
-[client/providers/item.tsx:1784](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1784)
+[client/providers/item.tsx:1795](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1795)
 
 ___
 
@@ -765,7 +765,7 @@ Callback triggers on submit
 
 #### Defined in
 
-[client/providers/item.tsx:1757](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1757)
+[client/providers/item.tsx:1768](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1768)
 
 ___
 
@@ -785,7 +785,7 @@ Triggers if it will load for whatever reason
 
 #### Defined in
 
-[client/providers/item.tsx:1761](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1761)
+[client/providers/item.tsx:1772](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1772)
 
 ___
 
@@ -805,7 +805,7 @@ Triggers if it will search for whatever reason
 
 #### Defined in
 
-[client/providers/item.tsx:1738](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1738)
+[client/providers/item.tsx:1749](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1749)
 
 ___
 
@@ -819,7 +819,7 @@ of the component
 
 #### Defined in
 
-[client/providers/item.tsx:1629](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1629)
+[client/providers/item.tsx:1640](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1640)
 
 ___
 
@@ -832,7 +832,7 @@ in the state
 
 #### Defined in
 
-[client/providers/item.tsx:1647](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1647)
+[client/providers/item.tsx:1658](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1658)
 
 ___
 
@@ -849,7 +849,7 @@ values representing serializable objects can be tracked
 
 #### Defined in
 
-[client/providers/item.tsx:1638](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1638)
+[client/providers/item.tsx:1649](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1649)
 
 ___
 
@@ -861,7 +861,7 @@ When using the query string sync it will replace the current history state
 
 #### Defined in
 
-[client/providers/item.tsx:1642](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1642)
+[client/providers/item.tsx:1653](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1653)
 
 ___
 
@@ -874,7 +874,7 @@ with searches, this opens a whole can of worms
 
 #### Defined in
 
-[client/providers/item.tsx:1555](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1555)
+[client/providers/item.tsx:1566](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1566)
 
 ___
 
@@ -887,7 +887,7 @@ itself, useful not to depend on mounting at time
 
 #### Defined in
 
-[client/providers/item.tsx:1623](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1623)
+[client/providers/item.tsx:1634](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1634)
 
 ___
 
@@ -903,7 +903,7 @@ It's not recommended to use this
 
 #### Defined in
 
-[client/providers/item.tsx:1678](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1678)
+[client/providers/item.tsx:1689](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1689)
 
 ___
 
@@ -919,7 +919,7 @@ it displays what it initially gets, wherever it comes from
 
 #### Defined in
 
-[client/providers/item.tsx:1670](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1670)
+[client/providers/item.tsx:1681](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1681)
 
 ___
 
@@ -931,7 +931,7 @@ stores the state whenever the state changes
 
 #### Defined in
 
-[client/providers/item.tsx:1706](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1706)
+[client/providers/item.tsx:1717](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1717)
 
 ___
 
@@ -945,7 +945,7 @@ with setters, or Setter or otherwise enforced
 
 #### Defined in
 
-[client/providers/item.tsx:1712](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1712)
+[client/providers/item.tsx:1723](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1723)
 
 ___
 
@@ -958,4 +958,4 @@ as it will load values with a timeout
 
 #### Defined in
 
-[client/providers/item.tsx:1729](https://github.com/onzag/itemize/blob/59702dd5/client/providers/item.tsx#L1729)
+[client/providers/item.tsx:1740](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/item.tsx#L1740)

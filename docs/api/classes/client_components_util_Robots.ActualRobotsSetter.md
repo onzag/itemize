@@ -70,7 +70,7 @@ React.Component\&lt;\{children: string}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/Robots.tsx:31](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Robots.tsx#L31)
+[client/components/util/Robots.tsx:31](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Robots.tsx#L31)
 
 ## Properties
 
@@ -355,7 +355,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/Robots.tsx:34](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Robots.tsx#L34)
+[client/components/util/Robots.tsx:34](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Robots.tsx#L34)
 
 ___
 
@@ -380,7 +380,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/components/util/Robots.tsx:50](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Robots.tsx#L50)
+[client/components/util/Robots.tsx:50](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Robots.tsx#L50)
 
 ___
 
@@ -474,7 +474,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/Robots.tsx:57](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Robots.tsx#L57)
+[client/components/util/Robots.tsx:57](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Robots.tsx#L57)
 
 ___
 
@@ -590,7 +590,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/Robots.tsx:63](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Robots.tsx#L63)
+[client/components/util/Robots.tsx:63](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Robots.tsx#L63)
 
 ___
 

@@ -15,6 +15,7 @@ can be able to communicate with an itemize server easily
 - [jwtDecode](server_token.md#jwtdecode)
 - [jwtSign](server_token.md#jwtsign)
 - [jwtVerify](server_token.md#jwtverify)
+- [jwtVerifyRequest](server_token.md#jwtverifyrequest)
 - [jwtVerifyWithAlt](server_token.md#jwtverifywithalt)
 
 ## Functions
@@ -44,7 +45,7 @@ Decode a JWT token and does not verify whether it's valid
 
 #### Defined in
 
-[server/token.ts:96](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L96)
+[server/token.ts:101](https://github.com/onzag/itemize/blob/73e0c39e/server/token.ts#L101)
 
 ___
 
@@ -68,7 +69,7 @@ Sign a payload
 
 #### Defined in
 
-[server/token.ts:18](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L18)
+[server/token.ts:23](https://github.com/onzag/itemize/blob/73e0c39e/server/token.ts#L23)
 
 ___
 
@@ -98,7 +99,28 @@ Verify and decode a key
 
 #### Defined in
 
-[server/token.ts:40](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L40)
+[server/token.ts:45](https://github.com/onzag/itemize/blob/73e0c39e/server/token.ts#L45)
+
+___
+
+### jwtVerifyRequest
+
+▸ **jwtVerifyRequest**(`appData`, `req`): `Promise`\<\{ `err`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `info`: [`IServerSideTokenDataType`](../interfaces/server_resolvers_basic.IServerSideTokenDataType.md) ; `verified`: `boolean`  }\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `req` | `Request`\<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`\<`string`, `any`\>\> |
+
+#### Returns
+
+`Promise`\<\{ `err`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `info`: [`IServerSideTokenDataType`](../interfaces/server_resolvers_basic.IServerSideTokenDataType.md) ; `verified`: `boolean`  }\>
+
+#### Defined in
+
+[server/token.ts:108](https://github.com/onzag/itemize/blob/73e0c39e/server/token.ts#L108)
 
 ___
 
@@ -129,4 +151,4 @@ Verify and decode a key using two keys
 
 #### Defined in
 
-[server/token.ts:63](https://github.com/onzag/itemize/blob/59702dd5/server/token.ts#L63)
+[server/token.ts:68](https://github.com/onzag/itemize/blob/73e0c39e/server/token.ts#L68)

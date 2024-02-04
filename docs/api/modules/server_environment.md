@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[server/environment.ts:65](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L65)
+[server/environment.ts:65](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L65)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:133](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L133)
+[server/environment.ts:133](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L133)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:134](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L134)
+[server/environment.ts:134](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L134)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:131](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L131)
+[server/environment.ts:131](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L131)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:132](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L132)
+[server/environment.ts:132](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L132)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:73](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L73)
+[server/environment.ts:73](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L73)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L47)
+[server/environment.ts:47](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L47)
 
 ___
 
@@ -136,7 +136,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L46)
+[server/environment.ts:46](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L46)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L48)
+[server/environment.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L48)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:136](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L136)
+[server/environment.ts:136](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L136)
 
 ___
 
@@ -166,7 +166,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:137](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L137)
+[server/environment.ts:137](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L137)
 
 ___
 
@@ -176,7 +176,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:71](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L71)
+[server/environment.ts:71](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L71)
 
 ___
 
@@ -186,7 +186,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:70](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L70)
+[server/environment.ts:70](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L70)
 
 ___
 
@@ -196,7 +196,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:16](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L16)
+[server/environment.ts:16](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L16)
 
 ___
 
@@ -206,7 +206,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:17](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L17)
+[server/environment.ts:17](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L17)
 
 ___
 
@@ -216,7 +216,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:23](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L23)
+[server/environment.ts:23](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L23)
 
 ___
 
@@ -226,7 +226,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:14](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L14)
+[server/environment.ts:14](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L14)
 
 ___
 
@@ -236,7 +236,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:25](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L25)
+[server/environment.ts:25](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L25)
 
 ___
 
@@ -246,7 +246,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:24](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L24)
+[server/environment.ts:24](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L24)
 
 ___
 
@@ -256,7 +256,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:15](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L15)
+[server/environment.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L15)
 
 ___
 
@@ -266,7 +266,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:18](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L18)
+[server/environment.ts:18](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L18)
 
 ___
 
@@ -276,7 +276,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:49](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L49)
+[server/environment.ts:49](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L49)
 
 ___
 
@@ -286,7 +286,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:8](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L8)
+[server/environment.ts:8](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L8)
 
 ___
 
@@ -296,7 +296,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:66](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L66)
+[server/environment.ts:66](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L66)
 
 ___
 
@@ -306,7 +306,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:67](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L67)
+[server/environment.ts:67](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L67)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:13](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L13)
+[server/environment.ts:13](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L13)
 
 ___
 
@@ -326,7 +326,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:26](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L26)
+[server/environment.ts:26](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L26)
 
 ___
 
@@ -336,7 +336,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:5](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L5)
+[server/environment.ts:5](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L5)
 
 ___
 
@@ -346,7 +346,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L45)
+[server/environment.ts:45](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L45)
 
 ## Functions
 
@@ -368,4 +368,4 @@ ___
 
 #### Defined in
 
-[server/environment.ts:98](https://github.com/onzag/itemize/blob/59702dd5/server/environment.ts#L98)
+[server/environment.ts:98](https://github.com/onzag/itemize/blob/73e0c39e/server/environment.ts#L98)

@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[client/components/ussd/USSDOption.tsx:11](https://github.com/onzag/itemize/blob/59702dd5/client/components/ussd/USSDOption.tsx#L11)
+[client/components/ussd/USSDOption.tsx:11](https://github.com/onzag/itemize/blob/73e0c39e/client/components/ussd/USSDOption.tsx#L11)

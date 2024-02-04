@@ -47,7 +47,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L19)
 
 ___
 
@@ -62,7 +62,7 @@ the current's user currency
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L59)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:59](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L59)
 
 ___
 
@@ -75,7 +75,7 @@ to match the user's locale
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:52](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L52)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:52](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L52)
 
 ___
 
@@ -89,7 +89,7 @@ otherwise null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L47)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:47](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L47)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:24](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L24)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:24](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L24)
 
 ___
 
@@ -111,7 +111,7 @@ The current status of the payment as expected to be visualized for the user
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:23](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L23)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:23](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L23)
 
 ___
 
@@ -123,7 +123,7 @@ The current type of the payment as expected to be visualized for the user
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:19](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L19)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:19](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L19)
 
 ___
 
@@ -139,7 +139,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -153,7 +153,7 @@ is null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L41)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:41](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L41)
 
 ___
 
@@ -167,7 +167,7 @@ if the currency value itself is null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:35](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L35)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:35](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L35)
 
 ___
 
@@ -180,7 +180,7 @@ if the value itself is null
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewPayment.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewPayment.tsx#L29)
+[client/internal/components/PropertyView/PropertyViewPayment.tsx:29](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewPayment.tsx#L29)
 
 ___
 
@@ -196,4 +196,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/59702dd5/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/renderer.ts#L15)

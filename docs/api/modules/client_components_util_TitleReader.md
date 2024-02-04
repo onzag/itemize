@@ -31,4 +31,4 @@ mantains sync with the title property
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:59](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/TitleReader.tsx#L59)
+[client/components/util/TitleReader.tsx:59](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/TitleReader.tsx#L59)

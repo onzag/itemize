@@ -24,6 +24,7 @@
 - [awaitingPropertySearchFeedbacks](server_listener.Listener.md#awaitingpropertysearchfeedbacks)
 - [buildnumber](server_listener.Listener.md#buildnumber)
 - [cache](server_listener.Listener.md#cache)
+- [config](server_listener.Listener.md#config)
 - [customRoles](server_listener.Listener.md#customroles)
 - [io](server_listener.Listener.md#io)
 - [listeners](server_listener.Listener.md#listeners)
@@ -85,7 +86,7 @@
 
 ### constructor
 
-• **new Listener**(`buildnumber`, `redisGlobalSub`, `redisGlobalPub`, `redisLocalSub`, `redisLocalPub`, `registry`, `root`, `cache`, `rawDB`, `server`, `customRoles`, `sensitiveConfig`): [`Listener`](server_listener.Listener.md)
+• **new Listener**(`buildnumber`, `redisGlobalSub`, `redisGlobalPub`, `redisLocalSub`, `redisLocalPub`, `registry`, `root`, `cache`, `rawDB`, `server`, `customRoles`, `config`, `sensitiveConfig`): [`Listener`](server_listener.Listener.md)
 
 #### Parameters
 
@@ -102,6 +103,7 @@
 | `rawDB` | [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md) |
 | `server` | `Server` |
 | `customRoles` | [`ICustomRoleType`](../interfaces/server_resolvers_roles.ICustomRoleType.md)[] |
+| `config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
 | `sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
 
 #### Returns
@@ -110,7 +112,7 @@
 
 #### Defined in
 
-[server/listener.ts:203](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L203)
+[server/listener.ts:203](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L203)
 
 ## Properties
 
@@ -124,7 +126,7 @@
 
 #### Defined in
 
-[server/listener.ts:190](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L190)
+[server/listener.ts:190](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L190)
 
 ___
 
@@ -138,7 +140,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:196](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L196)
+[server/listener.ts:196](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L196)
 
 ___
 
@@ -152,7 +154,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:192](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L192)
+[server/listener.ts:192](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L192)
 
 ___
 
@@ -166,7 +168,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:198](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L198)
+[server/listener.ts:198](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L198)
 
 ___
 
@@ -180,7 +182,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:191](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L191)
+[server/listener.ts:191](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L191)
 
 ___
 
@@ -194,7 +196,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:197](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L197)
+[server/listener.ts:197](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L197)
 
 ___
 
@@ -208,7 +210,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:193](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L193)
+[server/listener.ts:193](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L193)
 
 ___
 
@@ -222,7 +224,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:199](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L199)
+[server/listener.ts:199](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L199)
 
 ___
 
@@ -236,7 +238,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:194](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L194)
+[server/listener.ts:194](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L194)
 
 ___
 
@@ -250,7 +252,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:200](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L200)
+[server/listener.ts:200](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L200)
 
 ___
 
@@ -260,7 +262,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:181](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L181)
+[server/listener.ts:180](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L180)
 
 ___
 
@@ -270,7 +272,17 @@ ___
 
 #### Defined in
 
-[server/listener.ts:184](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L184)
+[server/listener.ts:183](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L183)
+
+___
+
+### config
+
+• `Private` **config**: [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md)
+
+#### Defined in
+
+[server/listener.ts:184](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L184)
 
 ___
 
@@ -280,17 +292,17 @@ ___
 
 #### Defined in
 
-[server/listener.ts:188](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L188)
+[server/listener.ts:188](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L188)
 
 ___
 
 ### io
 
-• `Private` **io**: `Server`
+• `Private` **io**: `Server`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\>
 
 #### Defined in
 
-[server/listener.ts:172](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L172)
+[server/listener.ts:171](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L171)
 
 ___
 
@@ -300,7 +312,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:174](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L174)
+[server/listener.ts:173](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L173)
 
 ___
 
@@ -310,7 +322,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:175](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L175)
+[server/listener.ts:174](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L174)
 
 ___
 
@@ -320,7 +332,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:183](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L183)
+[server/listener.ts:182](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L182)
 
 ___
 
@@ -330,7 +342,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:178](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L178)
+[server/listener.ts:177](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L177)
 
 ___
 
@@ -340,7 +352,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:177](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L177)
+[server/listener.ts:176](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L176)
 
 ___
 
@@ -350,7 +362,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:180](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L180)
+[server/listener.ts:179](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L179)
 
 ___
 
@@ -360,7 +372,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:179](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L179)
+[server/listener.ts:178](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L178)
 
 ___
 
@@ -370,7 +382,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:186](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L186)
+[server/listener.ts:186](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L186)
 
 ___
 
@@ -380,7 +392,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:182](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L182)
+[server/listener.ts:181](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L181)
 
 ___
 
@@ -390,7 +402,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:185](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L185)
+[server/listener.ts:185](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L185)
 
 ___
 
@@ -400,7 +412,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:187](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L187)
+[server/listener.ts:187](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L187)
 
 ## Methods
 
@@ -412,7 +424,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 
 #### Returns
 
@@ -420,7 +432,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:335](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L335)
+[server/listener.ts:369](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L369)
 
 ___
 
@@ -434,7 +446,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:255](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L255)
+[server/listener.ts:257](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L257)
 
 ___
 
@@ -446,7 +458,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `message` | `string` |
 | `request` | `any` |
 
@@ -456,7 +468,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:345](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L345)
+[server/listener.ts:379](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L379)
 
 ___
 
@@ -468,7 +480,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IFeedbackRequest`](../interfaces/base_remote_protocol.IFeedbackRequest.md) |
 
 #### Returns
@@ -477,7 +489,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2653](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2653)
+[server/listener.ts:2687](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L2687)
 
 ___
 
@@ -498,7 +510,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3411](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3411)
+[server/listener.ts:3445](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3445)
 
 ___
 
@@ -510,7 +522,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IIdentifyRequest`](../interfaces/base_remote_protocol.IIdentifyRequest.md) |
 
 #### Returns
@@ -519,7 +531,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:400](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L400)
+[server/listener.ts:434](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L434)
 
 ___
 
@@ -533,7 +545,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3644](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3644)
+[server/listener.ts:3678](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3678)
 
 ___
 
@@ -547,7 +559,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:236](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L236)
+[server/listener.ts:238](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L238)
 
 ___
 
@@ -559,7 +571,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 
 #### Returns
 
@@ -567,7 +579,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:385](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L385)
+[server/listener.ts:419](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L419)
 
 ___
 
@@ -588,7 +600,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3539](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3539)
+[server/listener.ts:3573](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3573)
 
 ___
 
@@ -602,7 +614,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3616](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3616)
+[server/listener.ts:3650](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3650)
 
 ___
 
@@ -622,7 +634,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:374](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L374)
+[server/listener.ts:408](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L408)
 
 ___
 
@@ -634,7 +646,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IOwnedParentedSearchFeedbackRequest`](../interfaces/base_remote_protocol.IOwnedParentedSearchFeedbackRequest.md) |
 
 #### Returns
@@ -643,7 +655,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2321](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2321)
+[server/listener.ts:2355](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L2355)
 
 ___
 
@@ -655,7 +667,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IOwnedParentedSearchRegisterRequest`](../interfaces/base_remote_protocol.IOwnedParentedSearchRegisterRequest.md) |
 
 #### Returns
@@ -664,7 +676,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1213](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1213)
+[server/listener.ts:1247](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L1247)
 
 ___
 
@@ -676,7 +688,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IOwnedParentedSearchUnregisterRequest`](../interfaces/base_remote_protocol.IOwnedParentedSearchUnregisterRequest.md) |
 
 #### Returns
@@ -685,7 +697,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3087](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3087)
+[server/listener.ts:3121](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3121)
 
 ___
 
@@ -697,7 +709,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IOwnedSearchFeedbackRequest`](../interfaces/base_remote_protocol.IOwnedSearchFeedbackRequest.md) |
 
 #### Returns
@@ -706,7 +718,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1356](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1356)
+[server/listener.ts:1390](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L1390)
 
 ___
 
@@ -718,7 +730,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IOwnedSearchRegisterRequest`](../interfaces/base_remote_protocol.IOwnedSearchRegisterRequest.md) |
 
 #### Returns
@@ -727,7 +739,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:752](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L752)
+[server/listener.ts:786](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L786)
 
 ___
 
@@ -739,7 +751,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IOwnedSearchUnregisterRequest`](../interfaces/base_remote_protocol.IOwnedSearchUnregisterRequest.md) |
 
 #### Returns
@@ -748,7 +760,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2970](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2970)
+[server/listener.ts:3004](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3004)
 
 ___
 
@@ -760,7 +772,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IParentedSearchFeedbackRequest`](../interfaces/base_remote_protocol.IParentedSearchFeedbackRequest.md) |
 
 #### Returns
@@ -769,7 +781,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1994](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1994)
+[server/listener.ts:2028](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L2028)
 
 ___
 
@@ -781,7 +793,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IParentedSearchRegisterRequest`](../interfaces/base_remote_protocol.IParentedSearchRegisterRequest.md) |
 
 #### Returns
@@ -790,7 +802,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1070](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1070)
+[server/listener.ts:1104](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L1104)
 
 ___
 
@@ -802,7 +814,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IParentedSearchUnregisterRequest`](../interfaces/base_remote_protocol.IParentedSearchUnregisterRequest.md) |
 
 #### Returns
@@ -811,7 +823,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3047](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3047)
+[server/listener.ts:3081](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3081)
 
 ___
 
@@ -832,7 +844,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3366](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3366)
+[server/listener.ts:3400](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3400)
 
 ___
 
@@ -844,7 +856,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IPropertySearchFeedbackRequest`](../interfaces/base_remote_protocol.IPropertySearchFeedbackRequest.md) |
 
 #### Returns
@@ -853,7 +865,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1630](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L1630)
+[server/listener.ts:1664](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L1664)
 
 ___
 
@@ -865,7 +877,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IPropertySearchRegisterRequest`](../interfaces/base_remote_protocol.IPropertySearchRegisterRequest.md) |
 
 #### Returns
@@ -874,7 +886,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:890](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L890)
+[server/listener.ts:924](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L924)
 
 ___
 
@@ -886,7 +898,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IPropertySearchUnregisterRequest`](../interfaces/base_remote_protocol.IPropertySearchUnregisterRequest.md) |
 
 #### Returns
@@ -895,7 +907,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3008](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3008)
+[server/listener.ts:3042](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3042)
 
 ___
 
@@ -907,7 +919,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IRegisterRequest`](../interfaces/base_remote_protocol.IRegisterRequest.md) |
 
 #### Returns
@@ -916,7 +928,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:588](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L588)
+[server/listener.ts:622](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L622)
 
 ___
 
@@ -936,7 +948,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:525](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L525)
+[server/listener.ts:559](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L559)
 
 ___
 
@@ -948,7 +960,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `mergedIndexIdentifier` | `string` |
 
 #### Returns
@@ -957,7 +969,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2895](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2895)
+[server/listener.ts:2929](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L2929)
 
 ___
 
@@ -977,7 +989,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2878](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2878)
+[server/listener.ts:2912](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L2912)
 
 ___
 
@@ -989,7 +1001,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 
 #### Returns
 
@@ -997,7 +1009,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3576](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3576)
+[server/listener.ts:3610](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3610)
 
 ___
 
@@ -1011,7 +1023,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:258](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L258)
+[server/listener.ts:260](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L260)
 
 ___
 
@@ -1031,7 +1043,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:359](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L359)
+[server/listener.ts:393](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L393)
 
 ___
 
@@ -1045,7 +1057,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:274](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L274)
+[server/listener.ts:276](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L276)
 
 ___
 
@@ -1069,7 +1081,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3128](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3128)
+[server/listener.ts:3162](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3162)
 
 ___
 
@@ -1092,7 +1104,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3319](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3319)
+[server/listener.ts:3353](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3353)
 
 ___
 
@@ -1115,7 +1127,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3183](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3183)
+[server/listener.ts:3217](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3217)
 
 ___
 
@@ -1138,7 +1150,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3273](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3273)
+[server/listener.ts:3307](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3307)
 
 ___
 
@@ -1161,7 +1173,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:3228](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L3228)
+[server/listener.ts:3262](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L3262)
 
 ___
 
@@ -1173,7 +1185,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `socket` | `Socket` |
+| `socket` | `Socket`\<`DefaultEventsMap`, `DefaultEventsMap`, `DefaultEventsMap`, `any`\> |
 | `request` | [`IUnregisterRequest`](../interfaces/base_remote_protocol.IUnregisterRequest.md) |
 
 #### Returns
@@ -1182,7 +1194,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2931](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2931)
+[server/listener.ts:2965](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L2965)
 
 ___
 
@@ -1204,4 +1216,4 @@ This method only reasonable gets called by the CLUSTER_MANAGER or in absolute mo
 
 #### Defined in
 
-[server/listener.ts:2918](https://github.com/onzag/itemize/blob/59702dd5/server/listener.ts#L2918)
+[server/listener.ts:2952](https://github.com/onzag/itemize/blob/73e0c39e/server/listener.ts#L2952)

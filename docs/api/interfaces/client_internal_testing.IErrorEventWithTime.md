@@ -32,7 +32,7 @@ The shape of the error itself
 
 #### Defined in
 
-[base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L47)
+[base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L47)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L48)
+[base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L48)
 
 ___
 
@@ -56,4 +56,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/59702dd5/client/internal/testing.ts#L55)
+[client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/testing.ts#L55)

@@ -18,4 +18,4 @@
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L43)
+[server/services/base/MailProvider.ts:46](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L46)

@@ -23,7 +23,7 @@ to be used in the item definition for properties in common
 
 ### buildElasticQueryForModule
 
-▸ **buildElasticQueryForModule**(`serverData`, `appData`, `mod`, `args`, `elasticQueryBuilder`, `language`, `dictionary`, `search`, `orderBy`): [`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
+▸ **buildElasticQueryForModule**(`serverData`, `appData`, `mod`, `args`, `elasticQueryBuilder`, `language`, `dictionary`, `search`, `orderBy`, `fullHighlights`): [`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
 
 Builds a sql query specific for this module to search
 within itself in the database
@@ -41,6 +41,7 @@ within itself in the database
 | `dictionary` | `string` | the dictionary used |
 | `search` | `string` | the search |
 | `orderBy` | [`IOrderByRuleType`](../interfaces/constants.IOrderByRuleType.md) | the order by rule |
+| `fullHighlights` | `number` | - |
 
 #### Returns
 
@@ -48,7 +49,7 @@ within itself in the database
 
 #### Defined in
 
-[base/Root/Module/sql.ts:499](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L499)
+[base/Root/Module/sql.ts:499](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L499)
 
 ___
 
@@ -80,7 +81,7 @@ within itself in the database
 
 #### Defined in
 
-[base/Root/Module/sql.ts:389](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L389)
+[base/Root/Module/sql.ts:389](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L389)
 
 ___
 
@@ -114,7 +115,7 @@ the composed row value with the consume streams function
 
 #### Defined in
 
-[base/Root/Module/sql.ts:247](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L247)
+[base/Root/Module/sql.ts:247](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L247)
 
 ___
 
@@ -137,7 +138,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/sql.ts:347](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L347)
+[base/Root/Module/sql.ts:347](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L347)
 
 ___
 
@@ -168,7 +169,7 @@ a rq value
 
 #### Defined in
 
-[base/Root/Module/sql.ts:315](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L315)
+[base/Root/Module/sql.ts:315](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L315)
 
 ___
 
@@ -190,7 +191,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/sql.ts:36](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L36)
+[base/Root/Module/sql.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L36)
 
 ___
 
@@ -215,7 +216,7 @@ a whole table schema for the module table
 
 #### Defined in
 
-[base/Root/Module/sql.ts:84](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L84)
+[base/Root/Module/sql.ts:84](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L84)
 
 ___
 
@@ -241,4 +242,4 @@ a partial database schema for the module itself, all the child modules, and the 
 
 #### Defined in
 
-[base/Root/Module/sql.ts:208](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/sql.ts#L208)
+[base/Root/Module/sql.ts:208](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/sql.ts#L208)

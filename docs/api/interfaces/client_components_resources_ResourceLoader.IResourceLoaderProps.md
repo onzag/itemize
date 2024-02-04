@@ -49,7 +49,7 @@ To define how the data is to be used
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:56](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L56)
+[client/components/resources/ResourceLoader.tsx:56](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L56)
 
 ___
 
@@ -77,7 +77,7 @@ does not support binary types
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:47](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L47)
+[client/components/resources/ResourceLoader.tsx:47](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L47)
 
 ___
 
@@ -89,7 +89,7 @@ Includes the token in the header for usage in validation as token
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L29)
+[client/components/resources/ResourceLoader.tsx:29](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L29)
 
 ___
 
@@ -103,7 +103,7 @@ screen does not blink
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:78](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L78)
+[client/components/resources/ResourceLoader.tsx:78](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L78)
 
 ___
 
@@ -115,7 +115,7 @@ the source path as a string, by default it is /rest/resource/
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:33](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L33)
+[client/components/resources/ResourceLoader.tsx:33](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L33)
 
 ___
 
@@ -127,7 +127,7 @@ Causes the resource to be requested with pooling
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:72](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L72)
+[client/components/resources/ResourceLoader.tsx:72](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L72)
 
 ___
 
@@ -158,7 +158,7 @@ does not support binary types
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:41](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L41)
+[client/components/resources/ResourceLoader.tsx:41](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L41)
 
 ___
 
@@ -171,7 +171,7 @@ defined in the path
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:52](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L52)
+[client/components/resources/ResourceLoader.tsx:52](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L52)
 
 ___
 
@@ -183,7 +183,7 @@ sw cacheable flag, defaults to true
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:60](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L60)
+[client/components/resources/ResourceLoader.tsx:60](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L60)
 
 ___
 
@@ -195,7 +195,7 @@ sw network first flag, defaults to false
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:64](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L64)
+[client/components/resources/ResourceLoader.tsx:64](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L64)
 
 ___
 
@@ -207,7 +207,7 @@ sw recheck flag, rechecks the content after done, defaults to false
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:68](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L68)
+[client/components/resources/ResourceLoader.tsx:68](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L68)
 
 ___
 
@@ -219,4 +219,4 @@ Type to load
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:82](https://github.com/onzag/itemize/blob/59702dd5/client/components/resources/ResourceLoader.tsx#L82)
+[client/components/resources/ResourceLoader.tsx:82](https://github.com/onzag/itemize/blob/73e0c39e/client/components/resources/ResourceLoader.tsx#L82)

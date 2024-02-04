@@ -135,7 +135,7 @@ global mode, even if specified
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:256](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L256)
+[server/services/base/MailProvider.ts:262](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L262)
 
 ## Properties
 
@@ -149,7 +149,7 @@ global mode, even if specified
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L35)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L35)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L37)
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L37)
 
 ___
 
@@ -177,7 +177,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L38)
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L38)
 
 ___
 
@@ -191,7 +191,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L36)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L36)
 
 ___
 
@@ -205,7 +205,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:33](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L33)
+[server/services/index.ts:33](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L33)
 
 ___
 
@@ -223,7 +223,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L48)
 
 ___
 
@@ -237,7 +237,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L40)
 
 ___
 
@@ -251,7 +251,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L55)
 
 ___
 
@@ -265,7 +265,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L46)
 
 ___
 
@@ -279,7 +279,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L47)
 
 ___
 
@@ -293,7 +293,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L44)
 
 ___
 
@@ -307,7 +307,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L43)
 
 ___
 
@@ -321,7 +321,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L41)
 
 ___
 
@@ -335,7 +335,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L42)
 
 ___
 
@@ -349,7 +349,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L45)
 
 ___
 
@@ -363,7 +363,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L54)
 
 ___
 
@@ -377,7 +377,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L52)
 
 ___
 
@@ -391,7 +391,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L56)
 
 ___
 
@@ -405,7 +405,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:34](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L34)
+[server/services/index.ts:34](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L34)
 
 ## Methods
 
@@ -435,13 +435,13 @@ SPAM for when to mark it as spam, REJECT for rejecting the message entirely, ACC
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1543](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1543)
+[server/services/base/MailProvider.ts:1557](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1557)
 
 ___
 
 ### allowUserToSendEmail
 
-▸ **allowUserToSendEmail**(`user`, `target`): `Promise`\<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+▸ **allowUserToSendEmail**(`user`, `target`, `value`): `Promise`\<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
 
 to filter spam and unwanted emails
 triggers when an user is trying to send an email to another, when the target is a sql value
@@ -450,10 +450,11 @@ is a plain string, it means it's trying to solve
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
-| `target` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the user SQL value |
+| `target` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | if a string it refers to an external email, if a SQL row value it refers to an internal user |
+| `value` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
 
 #### Returns
 
@@ -468,13 +469,15 @@ REJECT will not send the message on its entirety, and ACCEPT will send the messa
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1555](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1555)
+[server/services/base/MailProvider.ts:1572](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1572)
 
 ___
 
 ### allowUserToSendEmailToItem
 
-▸ **allowUserToSendEmailToItem**(`user`, `target`, `targetType`): `Promise`\<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+▸ **allowUserToSendEmailToItem**(`user`, `target`, `targetType`, `value`): `Promise`\<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+
+to filter unwatned emails to objects
 
 #### Parameters
 
@@ -483,6 +486,7 @@ ___
 | `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
 | `target` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
 | `targetType` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `value` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
 
 #### Returns
 
@@ -494,24 +498,34 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1563](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1563)
+[server/services/base/MailProvider.ts:1609](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1609)
 
 ___
 
 ### allowUserToSendEmailToItemType
 
-▸ **allowUserToSendEmailToItemType**(`user`, `target`): `Promise`\<`boolean`\>
+▸ **allowUserToSendEmailToItemType**(`user`, `id`, `target`): `Promise`\<`boolean`\>
+
+When using the syntax id$QUALIFIED_NAME to send an email it will validate to an object type
+to send to a target object rather than an user as id$MOD_users__IDEF_user is the default
+
+This is useful to create mailing lists or groups of many users, create an object and say allow users
+to join by adding some sort of reference then resolve them via the resolveUsersForEmailToItem function
+so that such users get the emails internally routed
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
-| `target` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the user trying to send |
+| `id` | `string` | the id the user is trying to set as target |
+| `target` | [`default`](base_Root_Module_ItemDefinition.default.md) | the target item |
 
 #### Returns
 
 `Promise`\<`boolean`\>
+
+false by default
 
 #### Inherited from
 
@@ -519,7 +533,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1559](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1559)
+[server/services/base/MailProvider.ts:1593](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1593)
 
 ___
 
@@ -549,7 +563,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:327](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L327)
+[server/services/base/MailProvider.ts:333](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L333)
 
 ___
 
@@ -580,7 +594,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:350](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L350)
+[server/services/base/MailProvider.ts:356](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L356)
 
 ___
 
@@ -610,13 +624,15 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:287](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L287)
+[server/services/base/MailProvider.ts:293](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L293)
 
 ___
 
 ### escapeUserName
 
 ▸ **escapeUserName**(`name`): `string`
+
+escape username for usage in the email subject user
 
 #### Parameters
 
@@ -634,7 +650,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:527](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L527)
+[server/services/base/MailProvider.ts:538](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L538)
 
 ___
 
@@ -655,7 +671,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:170](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L170)
+[server/services/index.ts:170](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L170)
 
 ___
 
@@ -679,7 +695,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:116](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L116)
+[server/services/index.ts:116](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L116)
 
 ___
 
@@ -708,7 +724,7 @@ This formats a forwarded message for when it's sent to an external target
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2728](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2728)
+[server/services/base/MailProvider.ts:2794](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2794)
 
 ___
 
@@ -732,7 +748,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2853](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2853)
+[server/services/base/MailProvider.ts:2919](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2919)
 
 ___
 
@@ -750,7 +766,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:510](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L510)
+[server/services/base/MailProvider.ts:516](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L516)
 
 ___
 
@@ -774,7 +790,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2841](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2841)
+[server/services/base/MailProvider.ts:2907](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2907)
 
 ___
 
@@ -798,7 +814,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2825](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2825)
+[server/services/base/MailProvider.ts:2891](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2891)
 
 ___
 
@@ -822,7 +838,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2829](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2829)
+[server/services/base/MailProvider.ts:2895](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2895)
 
 ___
 
@@ -846,7 +862,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2849](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2849)
+[server/services/base/MailProvider.ts:2915](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2915)
 
 ___
 
@@ -870,7 +886,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2833](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2833)
+[server/services/base/MailProvider.ts:2899](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2899)
 
 ___
 
@@ -894,7 +910,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2845](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2845)
+[server/services/base/MailProvider.ts:2911](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2911)
 
 ___
 
@@ -921,7 +937,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2808](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2808)
+[server/services/base/MailProvider.ts:2874](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2874)
 
 ___
 
@@ -945,7 +961,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2837](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2837)
+[server/services/base/MailProvider.ts:2903](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2903)
 
 ___
 
@@ -969,7 +985,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2821](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2821)
+[server/services/base/MailProvider.ts:2887](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2887)
 
 ___
 
@@ -994,7 +1010,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2816](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2816)
+[server/services/base/MailProvider.ts:2882](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2882)
 
 ___
 
@@ -1012,7 +1028,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:80](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L80)
+[server/services/index.ts:80](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L80)
 
 ___
 
@@ -1038,7 +1054,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2862](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2862)
+[server/services/base/MailProvider.ts:2928](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2928)
 
 ___
 
@@ -1062,7 +1078,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2804](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2804)
+[server/services/base/MailProvider.ts:2870](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2870)
 
 ___
 
@@ -1086,7 +1102,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2812](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2812)
+[server/services/base/MailProvider.ts:2878](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2878)
 
 ___
 
@@ -1112,7 +1128,7 @@ Provides the name of an object for the user
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2160](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2160)
+[server/services/base/MailProvider.ts:2226](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2226)
 
 ___
 
@@ -1142,7 +1158,7 @@ The router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/fake-mail.ts:29](https://github.com/onzag/itemize/blob/59702dd5/server/services/fake-mail.ts#L29)
+[server/services/fake-mail.ts:29](https://github.com/onzag/itemize/blob/73e0c39e/server/services/fake-mail.ts#L29)
 
 ___
 
@@ -1163,7 +1179,7 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:239](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L239)
+[server/services/index.ts:239](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L239)
 
 ___
 
@@ -1183,7 +1199,7 @@ The maximum message size in bytes that you are capable of sending
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2874](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2874)
+[server/services/base/MailProvider.ts:2940](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2940)
 
 ___
 
@@ -1204,7 +1220,7 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2227](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2227)
+[server/services/base/MailProvider.ts:2293](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2293)
 
 ___
 
@@ -1232,7 +1248,7 @@ provides the user name for a given user
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2151](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2151)
+[server/services/base/MailProvider.ts:2217](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2217)
 
 ___
 
@@ -1257,7 +1273,7 @@ this function executes
 
 #### Defined in
 
-[server/services/fake-mail.ts:10](https://github.com/onzag/itemize/blob/59702dd5/server/services/fake-mail.ts#L10)
+[server/services/fake-mail.ts:10](https://github.com/onzag/itemize/blob/73e0c39e/server/services/fake-mail.ts#L10)
 
 ___
 
@@ -1275,7 +1291,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:84](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L84)
+[server/services/index.ts:84](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L84)
 
 ___
 
@@ -1293,7 +1309,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:88](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L88)
+[server/services/index.ts:88](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L88)
 
 ___
 
@@ -1323,7 +1339,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:96](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L96)
+[server/services/index.ts:96](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L96)
 
 ___
 
@@ -1353,7 +1369,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:100](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L100)
+[server/services/index.ts:100](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L100)
 
 ___
 
@@ -1383,7 +1399,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:92](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L92)
+[server/services/index.ts:92](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L92)
 
 ___
 
@@ -1410,7 +1426,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:277](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L277)
+[server/services/base/MailProvider.ts:283](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L283)
 
 ___
 
@@ -1439,7 +1455,7 @@ are very specific to the
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1584](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1584)
+[server/services/base/MailProvider.ts:1645](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1645)
 
 ___
 
@@ -1472,7 +1488,7 @@ in the global context
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1085](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1085)
+[server/services/base/MailProvider.ts:1099](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1099)
 
 ___
 
@@ -1504,7 +1520,7 @@ unless marked as spam
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1599](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1599)
+[server/services/base/MailProvider.ts:1660](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1660)
 
 ___
 
@@ -1537,7 +1553,7 @@ be used to render a message clone and send it to the targets real email
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:2004](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L2004)
+[server/services/base/MailProvider.ts:2070](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L2070)
 
 ___
 
@@ -1561,7 +1577,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:389](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L389)
+[server/services/base/MailProvider.ts:395](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L395)
 
 ___
 
@@ -1598,7 +1614,7 @@ are specified that will deny such event
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1805](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1805)
+[server/services/base/MailProvider.ts:1865](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1865)
 
 ___
 
@@ -1634,7 +1650,7 @@ a modified message
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1743](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1743)
+[server/services/base/MailProvider.ts:1803](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1803)
 
 ___
 
@@ -1668,7 +1684,7 @@ Given the external email this will convert it into the expected sql row value to
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1688](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1688)
+[server/services/base/MailProvider.ts:1749](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1749)
 
 ___
 
@@ -1676,13 +1692,15 @@ ___
 
 ▸ **resolveUsersForEmailToItem**(`user`, `target`, `targetType`): `Promise`\<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
 
+to resolve messages aimed to object types
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
-| `target` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
-| `targetType` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |  |
+| `target` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |  |
+| `targetType` | [`default`](base_Root_Module_ItemDefinition.default.md) | The returned users should contain the properties id username real_name or actual_name if available container_id app_country email e_notifications if available e_validated if available |
 
 #### Returns
 
@@ -1694,7 +1712,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:1573](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L1573)
+[server/services/base/MailProvider.ts:1634](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L1634)
 
 ___
 
@@ -1714,7 +1732,7 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:247](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L247)
+[server/services/index.ts:247](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L247)
 
 ___
 
@@ -1741,7 +1759,7 @@ needs to send an email
 
 #### Defined in
 
-[server/services/fake-mail.ts:19](https://github.com/onzag/itemize/blob/59702dd5/server/services/fake-mail.ts#L19)
+[server/services/fake-mail.ts:19](https://github.com/onzag/itemize/blob/73e0c39e/server/services/fake-mail.ts#L19)
 
 ___
 
@@ -1785,7 +1803,7 @@ such messages, so this is the best way to send emails
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:811](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L811)
+[server/services/base/MailProvider.ts:825](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L825)
 
 ___
 
@@ -1823,7 +1841,7 @@ will not filter any of these users
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:549](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L549)
+[server/services/base/MailProvider.ts:560](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L560)
 
 ___
 
@@ -1847,7 +1865,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:76](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L76)
+[server/services/index.ts:76](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L76)
 
 ___
 
@@ -1876,7 +1894,7 @@ for the given email
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:418](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/MailProvider.ts#L418)
+[server/services/base/MailProvider.ts:424](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/MailProvider.ts#L424)
 
 ___
 
@@ -1907,7 +1925,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:124](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L124)
+[server/services/index.ts:124](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L124)
 
 ___
 
@@ -1931,7 +1949,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:148](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L148)
+[server/services/index.ts:148](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L148)
 
 ___
 
@@ -1955,7 +1973,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:120](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L120)
+[server/services/index.ts:120](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L120)
 
 ___
 
@@ -1989,7 +2007,7 @@ the router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:283](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L283)
+[server/services/index.ts:283](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L283)
 
 ___
 
@@ -2012,7 +2030,7 @@ This gets attached if a class is used rather than per instance
 
 #### Defined in
 
-[server/services/index.ts:305](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L305)
+[server/services/index.ts:305](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L305)
 
 ___
 
@@ -2036,7 +2054,7 @@ it will instead have access to the global resources
 
 #### Defined in
 
-[server/services/fake-mail.ts:7](https://github.com/onzag/itemize/blob/59702dd5/server/services/fake-mail.ts#L7)
+[server/services/fake-mail.ts:7](https://github.com/onzag/itemize/blob/73e0c39e/server/services/fake-mail.ts#L7)
 
 ___
 
@@ -2066,7 +2084,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:108](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L108)
+[server/services/index.ts:108](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L108)
 
 ___
 
@@ -2096,7 +2114,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:112](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L112)
+[server/services/index.ts:112](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L112)
 
 ___
 
@@ -2126,4 +2144,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:104](https://github.com/onzag/itemize/blob/59702dd5/server/services/index.ts#L104)
+[server/services/index.ts:104](https://github.com/onzag/itemize/blob/73e0c39e/server/services/index.ts#L104)

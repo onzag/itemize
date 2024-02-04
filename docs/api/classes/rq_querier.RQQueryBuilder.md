@@ -64,7 +64,7 @@ Build a rq query
 
 #### Defined in
 
-[rq-querier.ts:214](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L214)
+[rq-querier.ts:214](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L214)
 
 ## Properties
 
@@ -76,7 +76,7 @@ Files that have been found that are unprocessed
 
 #### Defined in
 
-[rq-querier.ts:189](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L189)
+[rq-querier.ts:189](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L189)
 
 ___
 
@@ -88,7 +88,7 @@ list of listeners
 
 #### Defined in
 
-[rq-querier.ts:193](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L193)
+[rq-querier.ts:193](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L193)
 
 ___
 
@@ -100,7 +100,7 @@ All the processed queries from the query list
 
 #### Defined in
 
-[rq-querier.ts:180](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L180)
+[rq-querier.ts:180](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L180)
 
 ___
 
@@ -112,7 +112,7 @@ list of progress listeners
 
 #### Defined in
 
-[rq-querier.ts:197](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L197)
+[rq-querier.ts:197](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L197)
 
 ___
 
@@ -124,7 +124,7 @@ The current known reply for the query
 
 #### Defined in
 
-[rq-querier.ts:202](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L202)
+[rq-querier.ts:202](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L202)
 
 ___
 
@@ -136,7 +136,7 @@ The rq schema used
 
 #### Defined in
 
-[rq-querier.ts:207](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L207)
+[rq-querier.ts:207](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L207)
 
 ___
 
@@ -148,7 +148,7 @@ The type of this query
 
 #### Defined in
 
-[rq-querier.ts:185](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L185)
+[rq-querier.ts:185](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L185)
 
 ___
 
@@ -158,7 +158,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:181](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L181)
+[rq-querier.ts:181](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L181)
 
 ## Methods
 
@@ -180,7 +180,7 @@ add a listener for when a reply is informed
 
 #### Defined in
 
-[rq-querier.ts:413](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L413)
+[rq-querier.ts:413](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L413)
 
 ___
 
@@ -200,7 +200,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:393](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L393)
+[rq-querier.ts:393](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L393)
 
 ___
 
@@ -226,7 +226,7 @@ new processed args
 
 #### Defined in
 
-[rq-querier.ts:453](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L453)
+[rq-querier.ts:453](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L453)
 
 ___
 
@@ -242,7 +242,7 @@ Provides all the attached files
 
 #### Defined in
 
-[rq-querier.ts:442](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L442)
+[rq-querier.ts:442](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L442)
 
 ___
 
@@ -262,7 +262,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:397](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L397)
+[rq-querier.ts:397](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L397)
 
 ___
 
@@ -285,7 +285,7 @@ Provides a processed query given an index
 
 #### Defined in
 
-[rq-querier.ts:406](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L406)
+[rq-querier.ts:406](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L406)
 
 ___
 
@@ -299,7 +299,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:431](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L431)
+[rq-querier.ts:431](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L431)
 
 ___
 
@@ -323,7 +323,7 @@ parsed, rather than a client side version
 
 #### Defined in
 
-[rq-querier.ts:424](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L424)
+[rq-querier.ts:424](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L424)
 
 ___
 
@@ -337,7 +337,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:435](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L435)
+[rq-querier.ts:435](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L435)
 
 ___
 
@@ -357,7 +357,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:389](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L389)
+[rq-querier.ts:389](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L389)
 
 ___
 
@@ -379,7 +379,7 @@ inform a reply to the query in case this has event listeners to that
 
 #### Defined in
 
-[rq-querier.ts:384](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L384)
+[rq-querier.ts:384](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L384)
 
 ___
 
@@ -399,7 +399,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:272](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L272)
+[rq-querier.ts:272](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L272)
 
 ___
 
@@ -421,7 +421,7 @@ Check whether it's mergable
 
 #### Defined in
 
-[rq-querier.ts:242](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L242)
+[rq-querier.ts:242](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L242)
 
 ___
 
@@ -442,7 +442,7 @@ ___
 
 #### Defined in
 
-[rq-querier.ts:296](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L296)
+[rq-querier.ts:296](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L296)
 
 ___
 
@@ -466,4 +466,4 @@ a list of aliases to remap the results from to the given name
 
 #### Defined in
 
-[rq-querier.ts:316](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L316)
+[rq-querier.ts:316](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L316)

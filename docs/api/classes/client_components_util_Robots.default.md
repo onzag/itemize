@@ -624,7 +624,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/Robots.tsx:74](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/Robots.tsx#L74)
+[client/components/util/Robots.tsx:74](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/Robots.tsx#L74)
 
 ___
 

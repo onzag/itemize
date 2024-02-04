@@ -12,6 +12,7 @@ typescript, this file acts as a registry of sorts
 
 - [IArgInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IArgInfo.md)
 - [IElasticHighlighPropertyInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlighPropertyInfo.md)
+- [IElasticHighlight](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlight.md)
 - [IElasticHighlightRecordInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightRecordInfo.md)
 - [IElasticHighlightReply](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
 - [IElasticHighlightSingleRecordInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightSingleRecordInfo.md)
@@ -55,7 +56,7 @@ All the supported types combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:561](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L561)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:575](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L575)
 
 ___
 
@@ -67,7 +68,7 @@ All the supported property types
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:40](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L40)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:40](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L40)
 
 ___
 
@@ -80,7 +81,7 @@ how they are supposed to be managed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:507](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L507)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:521](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L521)
 
 ## Variables
 
@@ -92,4 +93,4 @@ The standard definition and registry of all types in itemize
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:513](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L513)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:527](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L527)

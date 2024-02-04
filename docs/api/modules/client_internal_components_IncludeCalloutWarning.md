@@ -33,4 +33,4 @@ is supposed to be shown
 
 #### Defined in
 
-[client/internal/components/IncludeCalloutWarning/index.tsx:86](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/IncludeCalloutWarning/index.tsx#L86)
+[client/internal/components/IncludeCalloutWarning/index.tsx:86](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/IncludeCalloutWarning/index.tsx#L86)

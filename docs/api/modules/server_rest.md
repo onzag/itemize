@@ -38,7 +38,7 @@ by returning a router that holds them inside the
 
 #### Defined in
 
-[server/rest.ts:62](https://github.com/onzag/itemize/blob/59702dd5/server/rest.ts#L62)
+[server/rest.ts:74](https://github.com/onzag/itemize/blob/73e0c39e/server/rest.ts#L74)
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 #### Defined in
 
-[server/rest.ts:21](https://github.com/onzag/itemize/blob/59702dd5/server/rest.ts#L21)
+[server/rest.ts:21](https://github.com/onzag/itemize/blob/73e0c39e/server/rest.ts#L21)

@@ -27,7 +27,7 @@ The id of the row where it is located
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:195](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L195)
+[server/services/base/PaymentProvider.ts:195](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/PaymentProvider.ts#L195)
 
 ___
 
@@ -39,7 +39,7 @@ The include where it is located at that item
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:207](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L207)
+[server/services/base/PaymentProvider.ts:207](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/PaymentProvider.ts#L207)
 
 ___
 
@@ -51,7 +51,7 @@ The item where it is located at
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:203](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L203)
+[server/services/base/PaymentProvider.ts:203](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/PaymentProvider.ts#L203)
 
 ___
 
@@ -63,7 +63,7 @@ And the property itself
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:211](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L211)
+[server/services/base/PaymentProvider.ts:211](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/PaymentProvider.ts#L211)
 
 ___
 
@@ -75,4 +75,4 @@ The version of the row where it is located
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:199](https://github.com/onzag/itemize/blob/59702dd5/server/services/base/PaymentProvider.ts#L199)
+[server/services/base/PaymentProvider.ts:199](https://github.com/onzag/itemize/blob/73e0c39e/server/services/base/PaymentProvider.ts#L199)

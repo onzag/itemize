@@ -24,4 +24,4 @@ The description of the unit type as it behaves in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:42](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L42)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:42](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L42)

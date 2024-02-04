@@ -28,7 +28,7 @@
 
 #### Defined in
 
-[client/internal/app/destruction-markers.ts:4](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/destruction-markers.ts#L4)
+[client/internal/app/destruction-markers.ts:4](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/app/destruction-markers.ts#L4)
 
 ___
 
@@ -49,4 +49,4 @@ ___
 
 #### Defined in
 
-[client/internal/app/destruction-markers.ts:53](https://github.com/onzag/itemize/blob/59702dd5/client/internal/app/destruction-markers.ts#L53)
+[client/internal/app/destruction-markers.ts:53](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/app/destruction-markers.ts#L53)

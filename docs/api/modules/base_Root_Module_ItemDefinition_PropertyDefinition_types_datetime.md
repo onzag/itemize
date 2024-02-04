@@ -24,7 +24,7 @@ A datetime is represented as a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts:44](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts#L44)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts#L44)
 
 ## Variables
 
@@ -36,4 +36,4 @@ The behaviour of a datetime as how it behaves in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts:49](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts#L49)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts:49](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime.ts#L49)

@@ -45,7 +45,7 @@ clean function, also a mirror from the item definition one
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:55](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L55)
+[client/components/item/DeleteActioner.tsx:55](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L55)
 
 ___
 
@@ -72,7 +72,7 @@ item definition provider one
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:51](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L51)
+[client/components/item/DeleteActioner.tsx:51](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L51)
 
 ___
 
@@ -85,7 +85,7 @@ item definition slot
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:29](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L29)
+[client/components/item/DeleteActioner.tsx:29](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L29)
 
 ___
 
@@ -97,7 +97,7 @@ Whether it deleted, sucesfully
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:38](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L38)
+[client/components/item/DeleteActioner.tsx:38](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L38)
 
 ___
 
@@ -110,7 +110,7 @@ as you cannot really delete while deleting
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:34](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L34)
+[client/components/item/DeleteActioner.tsx:34](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L34)
 
 ___
 
@@ -130,7 +130,7 @@ dismiss the deleted state and make it clean
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:46](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L46)
+[client/components/item/DeleteActioner.tsx:46](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L46)
 
 ___
 
@@ -150,4 +150,4 @@ Dismiss the error state, and make it clean
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:42](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L42)
+[client/components/item/DeleteActioner.tsx:42](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L42)

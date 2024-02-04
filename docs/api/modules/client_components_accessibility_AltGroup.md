@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[client/components/accessibility/AltGroup.tsx:22](https://github.com/onzag/itemize/blob/59702dd5/client/components/accessibility/AltGroup.tsx#L22)
+[client/components/accessibility/AltGroup.tsx:22](https://github.com/onzag/itemize/blob/73e0c39e/client/components/accessibility/AltGroup.tsx#L22)

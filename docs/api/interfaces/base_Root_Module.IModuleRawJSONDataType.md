@@ -43,7 +43,7 @@ search
 
 #### Defined in
 
-[base/Root/Module/index.ts:191](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L191)
+[base/Root/Module/index.ts:191](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L191)
 
 ___
 
@@ -55,7 +55,7 @@ The internationalization data
 
 #### Defined in
 
-[base/Root/Module/index.ts:160](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L160)
+[base/Root/Module/index.ts:160](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L160)
 
 ___
 
@@ -68,7 +68,7 @@ i18n properties file
 
 #### Defined in
 
-[base/Root/Module/index.ts:128](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L128)
+[base/Root/Module/index.ts:128](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L128)
 
 ___
 
@@ -81,7 +81,7 @@ and represents the file location the file is
 
 #### Defined in
 
-[base/Root/Module/index.ts:123](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L123)
+[base/Root/Module/index.ts:123](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L123)
 
 ___
 
@@ -95,7 +95,7 @@ MAX_SEARCH_RECORDS_DEFAULT
 
 #### Defined in
 
-[base/Root/Module/index.ts:210](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L210)
+[base/Root/Module/index.ts:210](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L210)
 
 ___
 
@@ -111,7 +111,7 @@ this value is MAX_SEARCH_RESULTS_DEFAULT
 
 #### Defined in
 
-[base/Root/Module/index.ts:204](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L204)
+[base/Root/Module/index.ts:204](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L204)
 
 ___
 
@@ -125,7 +125,7 @@ modding only exist at module level as well
 
 #### Defined in
 
-[base/Root/Module/index.ts:177](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L177)
+[base/Root/Module/index.ts:177](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L177)
 
 ___
 
@@ -137,7 +137,7 @@ The name of the file that now becomes a property
 
 #### Defined in
 
-[base/Root/Module/index.ts:156](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L156)
+[base/Root/Module/index.ts:156](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L156)
 
 ___
 
@@ -150,7 +150,7 @@ after built and it's used to create tracebacks from the raw data
 
 #### Defined in
 
-[base/Root/Module/index.ts:133](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L133)
+[base/Root/Module/index.ts:133](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L133)
 
 ___
 
@@ -162,7 +162,7 @@ The prop extensions file location for the module, also stripped
 
 #### Defined in
 
-[base/Root/Module/index.ts:142](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L142)
+[base/Root/Module/index.ts:142](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L142)
 
 ___
 
@@ -175,7 +175,7 @@ the build process, stripped down after done
 
 #### Defined in
 
-[base/Root/Module/index.ts:151](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L151)
+[base/Root/Module/index.ts:151](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L151)
 
 ___
 
@@ -187,7 +187,7 @@ The prop extensions raw file source, stripped down as well
 
 #### Defined in
 
-[base/Root/Module/index.ts:146](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L146)
+[base/Root/Module/index.ts:146](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L146)
 
 ___
 
@@ -199,7 +199,7 @@ The prop extensions properties that this modules gives to all the item definitio
 
 #### Defined in
 
-[base/Root/Module/index.ts:195](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L195)
+[base/Root/Module/index.ts:195](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L195)
 
 ___
 
@@ -212,7 +212,7 @@ stripped after built is done
 
 #### Defined in
 
-[base/Root/Module/index.ts:138](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L138)
+[base/Root/Module/index.ts:138](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L138)
 
 ___
 
@@ -224,7 +224,7 @@ The read role access
 
 #### Defined in
 
-[base/Root/Module/index.ts:165](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L165)
+[base/Root/Module/index.ts:165](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L165)
 
 ___
 
@@ -236,7 +236,7 @@ Wether it is to be indexed by elastic
 
 #### Defined in
 
-[base/Root/Module/index.ts:186](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L186)
+[base/Root/Module/index.ts:186](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L186)
 
 ___
 
@@ -254,7 +254,7 @@ And AND index will ensure to add an ordered btree index to these
 
 #### Defined in
 
-[base/Root/Module/index.ts:220](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L220)
+[base/Root/Module/index.ts:220](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L220)
 
 ___
 
@@ -266,7 +266,7 @@ The search role access
 
 #### Defined in
 
-[base/Root/Module/index.ts:170](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L170)
+[base/Root/Module/index.ts:170](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L170)
 
 ___
 
@@ -279,7 +279,7 @@ is searchable
 
 #### Defined in
 
-[base/Root/Module/index.ts:182](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L182)
+[base/Root/Module/index.ts:182](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L182)
 
 ___
 
@@ -291,4 +291,4 @@ The type is module
 
 #### Defined in
 
-[base/Root/Module/index.ts:117](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/index.ts#L117)
+[base/Root/Module/index.ts:117](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/index.ts#L117)

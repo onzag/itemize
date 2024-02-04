@@ -35,7 +35,7 @@ a WeChat icon
 
 #### Defined in
 
-[client/fast-prototyping/icons/social-icons.tsx:32](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/icons/social-icons.tsx#L32)
+[client/fast-prototyping/icons/social-icons.tsx:32](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/icons/social-icons.tsx#L32)
 
 ___
 
@@ -60,4 +60,4 @@ a WeChat icon
 
 #### Defined in
 
-[client/fast-prototyping/icons/social-icons.tsx:19](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/icons/social-icons.tsx#L19)
+[client/fast-prototyping/icons/social-icons.tsx:19](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/icons/social-icons.tsx#L19)

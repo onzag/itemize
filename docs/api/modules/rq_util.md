@@ -36,7 +36,7 @@ new merged request fields
 
 #### Defined in
 
-[rq-util.ts:61](https://github.com/onzag/itemize/blob/59702dd5/rq-util.ts#L61)
+[rq-util.ts:61](https://github.com/onzag/itemize/blob/73e0c39e/rq-util.ts#L61)
 
 ___
 
@@ -59,7 +59,7 @@ into the flattened form without the DATA but all data free
 
 #### Defined in
 
-[rq-util.ts:100](https://github.com/onzag/itemize/blob/59702dd5/rq-util.ts#L100)
+[rq-util.ts:100](https://github.com/onzag/itemize/blob/73e0c39e/rq-util.ts#L100)
 
 ___
 
@@ -85,4 +85,4 @@ a boolean
 
 #### Defined in
 
-[rq-util.ts:17](https://github.com/onzag/itemize/blob/59702dd5/rq-util.ts#L17)
+[rq-util.ts:17](https://github.com/onzag/itemize/blob/73e0c39e/rq-util.ts#L17)

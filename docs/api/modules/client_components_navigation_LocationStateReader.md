@@ -45,7 +45,7 @@ a react component
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:171](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L171)
+[client/components/navigation/LocationStateReader.tsx:171](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationStateReader.tsx#L171)
 
 ___
 
@@ -71,4 +71,4 @@ ___
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:49](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L49)
+[client/components/navigation/LocationStateReader.tsx:49](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationStateReader.tsx#L49)

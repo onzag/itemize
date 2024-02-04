@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/services/ipstack.ts:36](https://github.com/onzag/itemize/blob/59702dd5/server/services/ipstack.ts#L36)
+[server/services/ipstack.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/server/services/ipstack.ts#L36)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[server/services/ipstack.ts:37](https://github.com/onzag/itemize/blob/59702dd5/server/services/ipstack.ts#L37)
+[server/services/ipstack.ts:37](https://github.com/onzag/itemize/blob/73e0c39e/server/services/ipstack.ts#L37)

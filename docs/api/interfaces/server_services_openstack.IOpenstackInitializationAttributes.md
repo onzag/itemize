@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[server/services/openstack.ts:17](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L17)
+[server/services/openstack.ts:17](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L17)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:14](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L14)
+[server/services/openstack.ts:14](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L14)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:15](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L15)
+[server/services/openstack.ts:15](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L15)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:12](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L12)
+[server/services/openstack.ts:12](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L12)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:16](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L16)
+[server/services/openstack.ts:16](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L16)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:10](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L10)
+[server/services/openstack.ts:10](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L10)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:13](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L13)
+[server/services/openstack.ts:13](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L13)
 
 ___
 
@@ -95,4 +95,4 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:11](https://github.com/onzag/itemize/blob/59702dd5/server/services/openstack.ts#L11)
+[server/services/openstack.ts:11](https://github.com/onzag/itemize/blob/73e0c39e/server/services/openstack.ts#L11)

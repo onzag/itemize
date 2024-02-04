@@ -40,4 +40,4 @@ a react component
 
 #### Defined in
 
-[client/components/item/DeleteActioner.tsx:105](https://github.com/onzag/itemize/blob/59702dd5/client/components/item/DeleteActioner.tsx#L105)
+[client/components/item/DeleteActioner.tsx:105](https://github.com/onzag/itemize/blob/73e0c39e/client/components/item/DeleteActioner.tsx#L105)

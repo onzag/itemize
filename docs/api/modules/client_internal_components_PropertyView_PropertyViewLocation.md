@@ -42,4 +42,4 @@ a boolean on whether it is for all intents and purposes an equal location
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:54](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L54)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:54](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewLocation.tsx#L54)

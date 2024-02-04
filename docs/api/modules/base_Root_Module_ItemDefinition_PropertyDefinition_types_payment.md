@@ -32,7 +32,7 @@ The type of a curreny type specifies how it behaves in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:66](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L66)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:66](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L66)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:33](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L33)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:33](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L33)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:31](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L31)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:31](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L31)
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:32](https://github.com/onzag/itemize/blob/59702dd5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L32)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:32](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L32)

@@ -93,4 +93,4 @@ The styles for the text entry
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:38](https://github.com/onzag/itemize/blob/59702dd5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L38)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:43](https://github.com/onzag/itemize/blob/73e0c39e/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L43)

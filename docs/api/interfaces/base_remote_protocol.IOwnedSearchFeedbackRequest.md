@@ -32,7 +32,7 @@ The feedback version of [[IParentedSearchRegisterRequest]]
 
 #### Defined in
 
-[base/remote-protocol.ts:639](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L639)
+[base/remote-protocol.ts:639](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L639)
 
 ___
 
@@ -50,7 +50,7 @@ IBaseSearchFeedbackRequest.lastModified
 
 #### Defined in
 
-[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L628)
+[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L628)
 
 ___
 
@@ -67,4 +67,4 @@ IBaseSearchFeedbackRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/59702dd5/base/remote-protocol.ts#L622)
+[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/73e0c39e/base/remote-protocol.ts#L622)

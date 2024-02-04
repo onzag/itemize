@@ -28,7 +28,7 @@ The id for the pg id
 
 #### Defined in
 
-[rq-querier.ts:31](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L31)
+[rq-querier.ts:31](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L31)
 
 ___
 
@@ -40,7 +40,7 @@ Whent he record was created
 
 #### Defined in
 
-[rq-querier.ts:39](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L39)
+[rq-querier.ts:39](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L39)
 
 ___
 
@@ -52,7 +52,7 @@ The type of the search record, basically a qualified name
 
 #### Defined in
 
-[rq-querier.ts:27](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L27)
+[rq-querier.ts:27](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L27)
 
 ___
 
@@ -64,4 +64,4 @@ The version for the pg version
 
 #### Defined in
 
-[rq-querier.ts:35](https://github.com/onzag/itemize/blob/59702dd5/rq-querier.ts#L35)
+[rq-querier.ts:35](https://github.com/onzag/itemize/blob/73e0c39e/rq-querier.ts#L35)

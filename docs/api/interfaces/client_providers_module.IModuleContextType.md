@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/providers/module.tsx:10](https://github.com/onzag/itemize/blob/59702dd5/client/providers/module.tsx#L10)
+[client/providers/module.tsx:10](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/module.tsx#L10)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/providers/module.tsx:11](https://github.com/onzag/itemize/blob/59702dd5/client/providers/module.tsx#L11)
+[client/providers/module.tsx:11](https://github.com/onzag/itemize/blob/73e0c39e/client/providers/module.tsx#L11)

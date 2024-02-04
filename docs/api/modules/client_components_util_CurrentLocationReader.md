@@ -27,7 +27,7 @@
 
 #### Defined in
 
-[client/components/util/CurrentLocationReader.tsx:173](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/CurrentLocationReader.tsx#L173)
+[client/components/util/CurrentLocationReader.tsx:173](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/CurrentLocationReader.tsx#L173)
 
 ___
 
@@ -47,4 +47,4 @@ ___
 
 #### Defined in
 
-[client/components/util/CurrentLocationReader.tsx:39](https://github.com/onzag/itemize/blob/59702dd5/client/components/util/CurrentLocationReader.tsx#L39)
+[client/components/util/CurrentLocationReader.tsx:39](https://github.com/onzag/itemize/blob/73e0c39e/client/components/util/CurrentLocationReader.tsx#L39)

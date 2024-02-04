@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[server/resolvers/basic.ts:888](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L888)
+[server/resolvers/basic.ts:972](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L972)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:889](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L889)
+[server/resolvers/basic.ts:973](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L973)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:887](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/basic.ts#L887)
+[server/resolvers/basic.ts:971](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/basic.ts#L971)

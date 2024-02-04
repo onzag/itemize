@@ -51,7 +51,7 @@ of functions
 
 #### Defined in
 
-[base/Root/rq.ts:76](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L76)
+[base/Root/rq.ts:76](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L76)
 
 ___
 
@@ -79,7 +79,7 @@ be defined
 
 #### Defined in
 
-[base/Root/rq.ts:84](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L84)
+[base/Root/rq.ts:84](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L84)
 
 ___
 
@@ -106,7 +106,7 @@ This is how a module resolver is supposed to be defined
 
 #### Defined in
 
-[base/Root/rq.ts:92](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L92)
+[base/Root/rq.ts:92](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L92)
 
 ## Functions
 
@@ -132,7 +132,7 @@ a RQ schema with all the resolvers applied
 
 #### Defined in
 
-[base/Root/rq.ts:120](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L120)
+[base/Root/rq.ts:120](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L120)
 
 ___
 
@@ -152,4 +152,4 @@ ___
 
 #### Defined in
 
-[base/Root/rq.ts:143](https://github.com/onzag/itemize/blob/59702dd5/base/Root/rq.ts#L143)
+[base/Root/rq.ts:143](https://github.com/onzag/itemize/blob/73e0c39e/base/Root/rq.ts#L143)

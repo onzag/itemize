@@ -66,7 +66,7 @@ React.Component\&lt;IPropertyViewHandlerProps\&lt;IPropertyDefinitionSupportedTe
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:46](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewText.tsx#L46)
+[client/internal/components/PropertyView/PropertyViewText.tsx:47](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewText.tsx#L47)
 
 ## Properties
 
@@ -596,7 +596,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:64](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewText.tsx#L64)
+[client/internal/components/PropertyView/PropertyViewText.tsx:65](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewText.tsx#L65)
 
 ___
 
@@ -651,4 +651,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:49](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewText.tsx#L49)
+[client/internal/components/PropertyView/PropertyViewText.tsx:50](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewText.tsx#L50)

@@ -66,7 +66,7 @@ React.Component\&lt;IPropertyViewHandlerProps\&lt;any, IPropertyViewSimpleRender
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:36](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L36)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:36](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewSimple.tsx#L36)
 
 ## Properties
 
@@ -596,7 +596,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:54](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L54)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:54](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewSimple.tsx#L54)
 
 ___
 
@@ -651,4 +651,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:39](https://github.com/onzag/itemize/blob/59702dd5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L39)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:39](https://github.com/onzag/itemize/blob/73e0c39e/client/internal/components/PropertyView/PropertyViewSimple.tsx#L39)

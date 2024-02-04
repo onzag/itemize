@@ -34,7 +34,7 @@
 
 #### Defined in
 
-[server/resolvers/roles.ts:37](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L37)
+[server/resolvers/roles.ts:37](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L37)
 
 ___
 
@@ -46,7 +46,7 @@ When creating, if a custom id is given this field will contain it
 
 #### Defined in
 
-[server/resolvers/roles.ts:64](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L64)
+[server/resolvers/roles.ts:64](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L64)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:38](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L38)
+[server/resolvers/roles.ts:38](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L38)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:45](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L45)
+[server/resolvers/roles.ts:45](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L45)
 
 ___
 
@@ -79,7 +79,7 @@ useful when adding children and needing to know who is adding such children
 
 #### Defined in
 
-[server/resolvers/roles.ts:69](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L69)
+[server/resolvers/roles.ts:69](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L69)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:43](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L43)
+[server/resolvers/roles.ts:43](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L43)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:40](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L40)
+[server/resolvers/roles.ts:40](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L40)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:41](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L41)
+[server/resolvers/roles.ts:41](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L41)
 
 ___
 
@@ -122,7 +122,7 @@ and it's affected by executing actions in behalf of someone else
 
 #### Defined in
 
-[server/resolvers/roles.ts:51](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L51)
+[server/resolvers/roles.ts:51](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L51)
 
 ___
 
@@ -142,7 +142,7 @@ The known or expected parent of the item
 
 #### Defined in
 
-[server/resolvers/roles.ts:56](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L56)
+[server/resolvers/roles.ts:56](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L56)
 
 ___
 
@@ -152,7 +152,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:39](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L39)
+[server/resolvers/roles.ts:39](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L39)
 
 ___
 
@@ -162,7 +162,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:46](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L46)
+[server/resolvers/roles.ts:46](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L46)
 
 ___
 
@@ -172,7 +172,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:52](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L52)
+[server/resolvers/roles.ts:52](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L52)
 
 ___
 
@@ -189,7 +189,7 @@ use user instead
 
 #### Defined in
 
-[server/resolvers/roles.ts:28](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L28)
+[server/resolvers/roles.ts:28](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L28)
 
 ___
 
@@ -205,7 +205,7 @@ instead and it can vary when performing actions in behalf of someone else
 
 #### Defined in
 
-[server/resolvers/roles.ts:36](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L36)
+[server/resolvers/roles.ts:36](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L36)
 
 ___
 
@@ -215,7 +215,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:42](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L42)
+[server/resolvers/roles.ts:42](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L42)
 
 ___
 
@@ -225,4 +225,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:44](https://github.com/onzag/itemize/blob/59702dd5/server/resolvers/roles.ts#L44)
+[server/resolvers/roles.ts:44](https://github.com/onzag/itemize/blob/73e0c39e/server/resolvers/roles.ts#L44)

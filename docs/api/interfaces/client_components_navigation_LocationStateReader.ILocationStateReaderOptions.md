@@ -36,7 +36,7 @@ The default state of the reader
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:19](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L19)
+[client/components/navigation/LocationStateReader.tsx:19](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationStateReader.tsx#L19)
 
 ___
 
@@ -49,7 +49,7 @@ state is kept for the children
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:30](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L30)
+[client/components/navigation/LocationStateReader.tsx:30](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationStateReader.tsx#L30)
 
 ___
 
@@ -63,4 +63,4 @@ only support strings as values
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:25](https://github.com/onzag/itemize/blob/59702dd5/client/components/navigation/LocationStateReader.tsx#L25)
+[client/components/navigation/LocationStateReader.tsx:25](https://github.com/onzag/itemize/blob/73e0c39e/client/components/navigation/LocationStateReader.tsx#L25)
