@@ -26,7 +26,7 @@ tsConfig.compilerOptions.esModuleInterop = true;
 
 // we use this to monkeypatch an issue with the global value used in the commons import
 const GLOBAL_UUID = "$8a5c6e45304947ab980e35f38bfbb085";
-const GLOBAL_UUID_REGEXP = /\$8a5c6e45304947ab980e35f38bfbb085/g;
+const GLOBAL_UUID_REGEXP = /\\$8a5c6e45304947ab980e35f38bfbb085/g;
 
 // this function patches a given file for the actual global value
 function patchFile(location) {
@@ -69,15 +69,18 @@ const IGNORES = [
     resourceRegExp: /^form-data$/,
   },
   {
+    resourceRegExp: /^form-data$/,
+  },
+  {
     resourceRegExp: /database.ts$/,
-    contextRegExp: /node_modules\/@onzag\/itemize/
+    contextRegExp: /node_modules\\/@onzag\\/itemize/
   },
   {
-    resourceRegExp: /\/sql/,
-    contextRegExp: /node_modules\/@onzag\/itemize/,
+    resourceRegExp: /\\/sql/,
+    contextRegExp: /node_modules\\/@onzag\\/itemize/,
   },
   {
-    resourceRegExp: /^\.\/server\/request$/
+    resourceRegExp: /^\\.\\/server\\/request$/
   },
 ];
 

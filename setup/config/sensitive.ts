@@ -277,13 +277,6 @@ export async function sensitiveConfigSetup(
         nullifyFalseValues: true,
       },
       {
-        variableName: "seoContainerID",
-        message: "of all the previous containers id which one is used for storing SEO and sitemap information",
-        defaultValue: "MAIN",
-        hidden: false,
-        nullifyFalseValues: true,
-      },
-      {
         variableName: "devKey",
         message: "a development key that is used to obtain development javascript files in production settings when set as a cookie",
         defaultValue: genToken(16),

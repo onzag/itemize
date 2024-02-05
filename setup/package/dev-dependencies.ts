@@ -9,6 +9,5 @@ export default {
   "esbuild-sass-plugin": "^2.16.0",
 
   // puppeteer for testing
-  "@types/puppeteer": "^3.0.2",
-  "puppeteer": "^5.3.1",
+  "puppeteer": "^22.0.0",
 };

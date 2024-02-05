@@ -6,7 +6,7 @@
 
 export default {
   // builder typescript that is ran after npm install
-  "typescript": "4.3.5",
+  "typescript": "^5.3.3",
 
   // peer dependencies
   "@types/react-dom": "^17.0.11",

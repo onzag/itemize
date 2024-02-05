@@ -71,7 +71,7 @@ async function resetPassword(
 		await actioner.resetPasswordWithToken(token, true);
 	if (!result.error) {
 		// we give the reset_password_success message from the root message
-		localizedRedirectTo("/?msg=reset_password_success&msgtitle=reset_password", null, true);
+		localizedRedirectTo("/?msg=reset_password_success&msgtitle=reset_password", {replace: true});
 	}
 }
 

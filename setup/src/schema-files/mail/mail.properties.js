@@ -43,7 +43,6 @@ properties.target.error.TOO_LARGE = too many recepients at once
 
 properties.content.label = content
 properties.content.placeholder = write your email here...
-properties.content.error.TOO_LARGE = you have written too much
 properties.content.search.label = search
 properties.content.search.placeholder = search in content
 properties.content.error.TOO_LARGE = content is too long
