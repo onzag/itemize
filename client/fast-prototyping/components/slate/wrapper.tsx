@@ -488,7 +488,7 @@ export function WrapperDrawerMultiSelectField(props: IWrapperDrawerMultiSelectFi
         id={"slate-wrapper-entry-for-" + props.id}
         fullWidth={true}
         multiple={true}
-        value={props.values}
+        value={props.values || []}
         onChange={onChange}
         input={<FilledInput id={"slate-wrapper-entry-for-chip-" + props.id} />}
         renderValue={(selected: string[]) => (
@@ -538,7 +538,7 @@ export function WrapperDrawerSelectField(props: IWrapperDrawerSelectFieldProps) 
             {props.label}
           </InputLabel>
           <Select
-            value={props.value}
+            value={props.value || ""}
             onChange={onChange}
             displayEmpty={props.displayEmpty}
             variant="filled"
@@ -774,12 +774,12 @@ function ToolbarButtonBadged(props: IMUIToolbarButtonProps) {
       <ElementFastKey
         priority={1}
         useTransform={props.disjointedMode || props.useStyleTransform}
-        altBadgedChildren={badged}
+        altBadgedChildren={button}
         triggerAltAfterAction={props.useTriggerAltAfterAction}
         fastKey={fastKey}
         disabled={props.disabled}
       >
-        {button}
+        {badged}
       </ElementFastKey>
     )
   } else {

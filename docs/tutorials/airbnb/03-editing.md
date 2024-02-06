@@ -13,7 +13,9 @@ We want to turn it into something that is more usable first, as this is rather m
 We will need more imports:
 
 ```tsx
-import { List, ListItemText, ListItem } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 ```
 
 And now we add this to our code

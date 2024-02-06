@@ -1,5 +1,5 @@
 import { initializeServer } from "@onzag/itemize/server";
-import { capitalize, localeReplacer } from "@onzag/itemize/util";
+import { localeReplacer } from "@onzag/itemize/util";
 
 // Check the client for info on these, we are replicating what is used in the client somewhat
 import React from "react";
@@ -7,7 +7,6 @@ import App from "../client/app";
 import { rendererContext } from "@onzag/itemize/client/fast-prototyping/renderers";
 import { appWrapper, mainWrapper } from "@onzag/itemize/client/fast-prototyping/wrappers";
 import { styleCollector } from "@onzag/itemize/client/fast-prototyping/collectors";
-import { fileURLAbsoluter } from "@onzag/itemize/util";
 
 // Itemize server isn't hot, it won't refresh in realtime and it
 // isn't recommended to attempt to set it up that way

@@ -30,7 +30,7 @@ Itemize currently only works under a linux system, it was tested under WSL with 
 
 4. run the command to install the dependencies
 
-`npm install --save react@^17.0.2 react-dom@^17.0.2 @types/react@^17.0.38 @types/react-dom@^17.0.11 @mui/icons-material@^5.3.1 @mui/lab@^5.0.0-alpha.66 @mui/material@^5.3.1 @mui/styles@^5.3.0 @emotion/css@^11.7.1 @emotion/react@^11.7.1 @emotion/server@^11.4.0 @emotion/styled@^11.6.0 @onzag/itemize-text-engine`
+`npm install --save react@^17.0.2 react-dom@^17.0.2 @types/react@^17.0.38 @types/react-dom@^17.0.11 @mui/icons-material@^5.3.1 @mui/lab@5.0.0-alpha.66 @mui/material@5.3.1 @mui/styles@5.3.0 @emotion/css@^11.7.1 @emotion/react@^11.7.1 @emotion/server@^11.4.0 @emotion/styled@^11.6.0 @onzag/itemize-text-engine`
 
 5. Install itemize
 

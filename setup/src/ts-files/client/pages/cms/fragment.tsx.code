@@ -22,7 +22,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import { ITemplateArgContextDefinition } from "@onzag/itemize/client/internal/text/serializer/template-args";
+import { ITemplateArgContextDefinition } from "@onzag/itemize-text-engine/serializer/template-args";
 import Route from "@onzag/itemize/client/components/navigation/Route";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";

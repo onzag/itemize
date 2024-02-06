@@ -1156,7 +1156,7 @@ export function userRestServices(appData: IAppDataType) {
     noRedirect ? res.status(200).end() : res.redirect(`/${user.app_language}/?msg=unsubscribe_success&msgtitle=unsubscribe_success_title`);
   });
 
-  router.post("send-validate", async (req, res) => {
+  router.post("/send-validate", async (req, res) => {
     const type = req.body.type as string;
     const token = req.headers.token as string;
 
@@ -1514,7 +1514,7 @@ export function userRestServices(appData: IAppDataType) {
     }
   });
 
-  router.post("send-reset-password", async (req, res) => {
+  router.post("/send-reset-password", async (req, res) => {
     const email = req.body.email;
     const phone = req.body.phone;
 
@@ -1812,7 +1812,7 @@ export function userRestServices(appData: IAppDataType) {
     }
   });
 
-  router.post("reset-password", async (req, res) => {
+  router.post("/reset-password", async (req, res) => {
     const token = req.body.token as string;
     const phone = req.body.phone as string;
     const email = req.body.email as string;

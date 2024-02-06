@@ -74,7 +74,7 @@ First we want to create the request schema at `hosting/request.json`, that will 
             "editRoleAccess": ["OWNER_OF_UNIT"]
         }
     ],
-    "requestLimiters": {
+    "searchLimiters": {
         "condition": "OR",
         "parenting": true,
         "createdBy": true
@@ -86,11 +86,22 @@ First we want to create the request schema at `hosting/request.json`, that will 
             "item": "unit"
         }
     ],
-    "parentingRoleAccess": ["&ANYONE_LOGGED"],
     "ownerReadRoleAccess": ["&OWNER", "OWNER_OF_UNIT"],
     "editRoleAccess": ["OWNER_OF_UNIT"]
 }
 ```
+
+Because now we are parenting this to a housing unit object we must specify that we are allowing this at `hosting/unit.json` by adding
+
+```json
+{
+    "parentingRoleAccess": {
+        "hosting/request": ["&ANYONE_LOGGED"]
+    }
+}
+```
+
+This means that anyone logged can create a request and parent it by the given unit.
 
 Remembering to add it to the `hosting/index.json` module as a children
 
@@ -287,13 +298,11 @@ import { IActionSubmitResponse, ItemProvider } from "@onzag/itemize/client/provi
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
-import { Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import Typography from "@mui/material/Typography";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { TextReader } from "@onzag/itemize/client/components/property/Reader";
-
-import Typography from "@mui/material/Typography";
 
 interface IReserveHostingProps {
     match: {
@@ -632,7 +641,6 @@ import { IActionSubmitResponse, ItemProvider } from "@onzag/itemize/client/provi
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
-import { Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
