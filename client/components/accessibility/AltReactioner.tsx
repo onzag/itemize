@@ -1306,6 +1306,12 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
 
   public register(props: IAltBaseProps = this.props) {
     if (!ALT_REGISTRY.all.find((e) => e === this)) {
+      const sameReactionerMatch = ALT_REGISTRY.all.find((e) => e.getElement() === this.getElement());
+
+      if (sameReactionerMatch) {
+        console.error("Detected two reactioners pointing at the same element, this will cause errors", this.getElement());
+      }
+
       ALT_REGISTRY.all.push(this);
     }
 
