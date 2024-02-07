@@ -279,6 +279,17 @@ export function findReactComponentFromElement(element: HTMLElement) {
   return ALT_REGISTRY.all.find((e) => e.getElement() === element) || null;
 }
 
+/**
+ * Provides the entire registry for advanced usage
+ * 
+ * Use it to analyze the page
+ * 
+ * @returns 
+ */
+export function getRegistry() {
+  return ALT_REGISTRY;
+}
+
 export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
   // hide the scroller too
   if (butKeycodes.length === 0) {
