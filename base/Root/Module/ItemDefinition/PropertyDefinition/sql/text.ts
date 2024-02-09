@@ -15,6 +15,19 @@ import type { IPropertyDefinitionSupportedTextType } from "../types/text";
  * @returns a partial row definition
  */
 export function textSQL(arg: ISQLArgInfo) {
+  if (arg.property.getConfigValue("nosqlindex")) {
+    return {
+      [arg.prefix + arg.id]: {
+        type: "TEXT",
+      },
+      [arg.prefix + arg.id + "_PLAIN"]: {
+        type: "TEXT",
+      },
+      [arg.prefix + arg.id + "_LANGUAGE"]: {
+        type: "TEXT",
+      },
+    };
+  }
   return {
     [arg.prefix + arg.id]: {
       type: "TEXT",
@@ -174,11 +187,18 @@ export function textSQLIn(arg: ISQLInInfo) {
 
   // for null
   if (arg.value === null) {
+    if (arg.property.getConfigValue("nosqlindex")) {
+      return {
+        [arg.prefix + arg.id]: null,
+        [arg.prefix + arg.id + "_PLAIN"]: null,
+        [arg.prefix + arg.id + "_LANGUAGE"]: language || null,
+      };
+    }
     return {
       [arg.prefix + arg.id]: null,
       [arg.prefix + arg.id + "_PLAIN"]: null,
       [arg.prefix + arg.id + "_VECTOR"]: null,
-      [arg.prefix + arg.id + "_LANGUAGE"]: language,
+      [arg.prefix + arg.id + "_LANGUAGE"]: language || null,
       [arg.prefix + arg.id + "_DICTIONARY"]: dictionary,
     };
   }
@@ -208,6 +228,14 @@ export function textSQLIn(arg: ISQLInInfo) {
     });
   }
 
+  if (arg.property.getConfigValue("nosqlindex")) {
+    return {
+      [arg.prefix + arg.id]: purifiedText,
+      [arg.prefix + arg.id + "_PLAIN"]: arg.property.isRichText() ? escapedText : null,
+      [arg.prefix + arg.id + "_LANGUAGE"]: language || null,
+    };
+  }
+
   // now we set the value
   return {
     [arg.prefix + arg.id]: purifiedText,
@@ -230,6 +258,9 @@ export function textSQLIn(arg: ISQLInInfo) {
  * @returns a partial row value
  */
 export function textSqlRedoDictionaryIndex(arg: ISQLRedoDictionaryBasedIndex) {
+  if (arg.property.getConfigValue("nosqlindex")) {
+    throw new Error("Cant redo a dictionary on a property that has no sql index for text");
+  }
   const plainLocation = arg.property.isRichText() ? arg.prefix + arg.id + "_PLAIN" : arg.prefix + arg.id;
   return {
     [arg.prefix + arg.id + "_DICTIONARY"]: arg.newDictionary,
@@ -250,6 +281,11 @@ export function textSqlRedoDictionaryIndex(arg: ISQLRedoDictionaryBasedIndex) {
  */
 export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+
+  // does not support sql search
+  if (arg.property.getConfigValue("nosqlindex")) {
+    return false;
+  }
 
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     // this only matches exact words
@@ -368,8 +404,10 @@ export function textElasticIn(arg: ISQLOutInfo) {
  * @returns a boolean on whether it was searched by it, and a complementary column order by in case it needs it
  */
 export function textSQLStrSearch(arg: ISQLStrSearchInfo): boolean | [string, any[]] {
-  // TODO improve, this only matches exact words
-  // maybe https://github.com/zombodb/zombodb
+  // cannot search by this property it does not support the sql index
+  if (arg.property.getConfigValue("nosqlindex")) {
+    return false;
+  }
 
   arg.whereBuilder && arg.whereBuilder.andWhere(
     JSON.stringify(arg.prefix + arg.id + "_VECTOR") + " @@ to_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)",

@@ -16,8 +16,10 @@ const serverFlags = ["CREATE_ONLY", "EDIT_ONLY", "SEARCH_ONLY"];
  * The comparators we support
  */
 const comparators = ["equals", "not-equal", "greater-than", "less-than",
-  "greater-or-equal-than", "less-or-equal-than"];
-/**
+  "greater-or-equal-than", "less-or-equal-than", "includes", "excludes",
+  "includes-one-of", "excludes-one-of", "includes-all-of", "excludes-all-of"];
+
+  /**
  * The gates
  */
 const gates = ["and", "or", "xor"];
@@ -45,7 +47,7 @@ export default {
           pattern: "^[a-z_]+$|^&this$",
         },
         // attribute
-        attribute: {type: "string"},
+        attribute: { type: "string" },
         // comparator
         comparator: {
           type: "string",
@@ -78,7 +80,7 @@ export default {
           ],
         },
         // value attribute
-        valueAttribute: {type: "string"},
+        valueAttribute: { type: "string" },
         // gate
         gate: {
           type: "string",
@@ -123,8 +125,8 @@ export default {
     },
     {
       properties: {
-        component: {type: "string"},
-        isIncluded: {type: "boolean"},
+        component: { type: "string" },
+        isIncluded: { type: "boolean" },
         gate: {
           type: "string",
           enum: gates,

@@ -169,19 +169,29 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTe
     // word matching, eg. if this is a title or short text
     // "this is a title" it will ensure that it matches
     {
+      // uses match phrase prefix when resolving elasticsearch
       name: "elasticSearchUsesMatchPhrasePrefix",
       type: "boolean",
     },
     {
+      // uses match phrase prefix when resolving elasticsearch
       name: "elasticSearchUsesMatchPhrase",
       type: "boolean",
     },
     {
+      // disable from general based searches
+      // that is when search is specified
       name: "generalSearchDisabled",
       type: "boolean",
     },
+
+    // function for not being capable of using sql indexes
+    // this will mean that searches with this property cannot be resolved
+    // this means that values are handled more efficiently
+    // but cannot be searched by, recommended to use, searchengine is far more effective
+    // than sql text indexes
     {
-      name: "generalElasticSearchProduceMetadata",
+      name: "nosqlindex",
       type: "boolean",
     },
   ],

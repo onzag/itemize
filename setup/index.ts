@@ -13,7 +13,6 @@ import configSetup from "./config";
 import equals from "deep-equal";
 import gitSetup from "./git";
 import packageSetup from "./package";
-import babelSetup from "./babel";
 import esbuildSetup from "./esbuild";
 import itemizeConfigSetup from "./itemize";
 import srcSetup from "./src";
@@ -71,10 +70,6 @@ const stepsInOrder: IStepType[] = [
   {
     fn: packageSetup,
     name: "package",
-  },
-  {
-    fn: babelSetup,
-    name: "babel",
   },
   {
     fn: typescriptSetup,

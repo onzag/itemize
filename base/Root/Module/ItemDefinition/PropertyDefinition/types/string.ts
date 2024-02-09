@@ -254,12 +254,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     },
 
     // disable from general based searches
+    // that is when search is specified
     {
       name: "generalSearchDisabled",
-      type: "boolean",
-    },
-    {
-      name: "generalElasticSearchProduceMetadata",
       type: "boolean",
     },
   ],

@@ -586,7 +586,10 @@ export default class PropertyDefinition {
         return PropertyInvalidReason.INVALID_VALUE;
       } else if (
         definition.rq.array &&
-        !(value as any[]).every((v) => propertyDefinitionRaw.values.includes(v))
+        (
+          !Array.isArray(value) ||
+          !(value as any[]).every((v) => propertyDefinitionRaw.values.includes(v))
+        )
       ) {
         return PropertyInvalidReason.INVALID_VALUE;
       }
@@ -1474,7 +1477,7 @@ export default class PropertyDefinition {
     ) {
       // setting super enforceds with the same value as one established
       // it is okay and acceptable now
-      if (equals(this.stateSuperEnforcedValue[mergedID].value, value, {strict: true})) {
+      if (equals(this.stateSuperEnforcedValue[mergedID].value, value, { strict: true })) {
         this.stateSuperEnforcedValue[mergedID].owners.push(actualOwner);
         return;
       }
@@ -1586,7 +1589,7 @@ export default class PropertyDefinition {
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
     const actualValue = !(value instanceof PropertyDefinition) ? (definition.isNull && definition.isNull(value) ?
-    ((definition.getNullValue && definition.getNullValue(value)) || null) : value) : value;
+      ((definition.getNullValue && definition.getNullValue(value)) || null) : value) : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
       // we run some very basic validations, if this is a number and you put in
@@ -1986,7 +1989,7 @@ export default class PropertyDefinition {
    */
   public async isValidValue(
     id: string,
-    version: string, 
+    version: string,
     value: PropertyDefinitionSupportedType,
   ): Promise<PropertyInvalidReason | string> {
     // first we just run the standard without external checking, note how we are

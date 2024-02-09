@@ -16,6 +16,7 @@ import PropertyDefinition, {
 import ItemDefinition from "..";
 import Include from "../Include";
 import Module from "../../../Module";
+import equals from "deep-equal";
 
 /**
  * This function is a copy of that one at util
@@ -36,7 +37,8 @@ function getToday() {
  * Types for the conditions
  */
 export type ConditionalRuleComparatorType = "equals" | "not-equal" |
-  "greater-than" | "less-than" | "greater-or-equal-than" | "less-or-equal-than";
+  "greater-than" | "less-than" | "greater-or-equal-than" | "less-or-equal-than" |
+  "includes" | "excludes" | "includes-one-of" | "includes-all-of" | "excludes-one-of" | "excludes-all-of";
 /**
  * Types for the gates that are available
  */
@@ -317,6 +319,12 @@ export default class ConditionalRuleSet {
         "less-than",
         "greater-or-equal-than",
         "less-or-equal-than",
+        "includes",
+        "excludes",
+        "includes-one-of",
+        "includes-all-of",
+        "excludes-one-of",
+        "excludes-all-of"
       ];
 
       // so we check if we have one of those
@@ -362,10 +370,10 @@ export default class ConditionalRuleSet {
         // lets fiddle with the comparator
         switch (rawDataAsProperty.comparator) {
           case "equals":
-            result = actualPropertyValue === actualComparedValue;
+            result = equals(actualPropertyValue, actualComparedValue, { strict: true });
             break;
           case "not-equal":
-            result = actualPropertyValue !== actualComparedValue;
+            result = !equals(actualPropertyValue, actualComparedValue, { strict: true });
             break;
           case "greater-than":
             result = actualPropertyValue > actualComparedValue;
@@ -379,13 +387,51 @@ export default class ConditionalRuleSet {
           case "less-or-equal-than":
             result = actualPropertyValue <= actualComparedValue;
             break;
+          case "includes":
+          case "includes-one-of":
+            result = Array.isArray(actualPropertyValue) ? (
+              Array.isArray(actualComparedValue) ? actualPropertyValue.some((v) => {
+                return (actualComparedValue as any).some((v2) => equals(v, v2, { strict: true }))
+              }) : actualPropertyValue.some((v) => {
+                return equals(v, actualComparedValue, { strict: true })
+              })
+            ) : false;
+            break;
+          case "excludes":
+          case "excludes-one-of":
+            result = Array.isArray(actualPropertyValue) ? (
+              Array.isArray(actualComparedValue) ? actualPropertyValue.every((v) => {
+                return (actualComparedValue as any).every((v2) => !equals(v, v2, { strict: true }))
+              }) : actualPropertyValue.every((v) => {
+                return !equals(v, actualComparedValue, { strict: true })
+              })
+            ) : true;
+            break;
+          case "includes-all-of":
+            result = Array.isArray(actualPropertyValue) ? (
+              Array.isArray(actualComparedValue) ? actualComparedValue.every((v) => {
+                return (actualPropertyValue as any).some((v2) => equals(v, v2, { strict: true }))
+              }) : actualPropertyValue.some((v) => {
+                return equals(v, actualComparedValue, { strict: true })
+              })
+            ) : false;
+            break;
+          case "excludes-all-of":
+            result = Array.isArray(actualPropertyValue) ? (
+              Array.isArray(actualComparedValue) ? actualComparedValue.every((v) => {
+                return (actualPropertyValue as any).some((v2) => !equals(v, v2, { strict: true }))
+              }) : actualPropertyValue.every((v) => {
+                return !equals(v, actualComparedValue, { strict: true })
+              })
+            ) : false;
+            break;
         }
       }
     }
-    
+
     // Otherwise in case it's a component based one
     const rawDataAsComponent: IConditionalRuleSetRawJSONDataIncludeType =
-        this.rawData as IConditionalRuleSetRawJSONDataIncludeType;
+      this.rawData as IConditionalRuleSetRawJSONDataIncludeType;
     if (rawDataAsComponent.include) {
       resolved = true;
       // let's check whether there is an item instance for that

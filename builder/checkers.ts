@@ -143,19 +143,66 @@ export function checkConditionalRuleSet(
       if (rawDataAsProperty.valueAttribute) {
         exactValue = exactValue[rawDataAsProperty.valueAttribute];
       }
-      // let's check if this value is valid
-      const invalidReason = PropertyDefinition.isValidValue(
-        propDef,
-        exactValue,
-        true,
-      );
-      // throw the error if it's invalid
-      if (invalidReason) {
-        throw new CheckUpError(
-          "Conditional rule set value invalid, reason " +
-          rawDataAsProperty.property + ": " + invalidReason,
-          traceback.newTraceToBit("value").newTraceToBit("exactValue"),
+
+      const comparator = (rawData as IConditionalRuleSetRawJSONDataPropertyType).comparator;
+      if (
+        comparator &&
+        (
+          comparator.startsWith("excludes") ||
+          comparator.startsWith("includes")
+        )
+      ) {
+        const propertyChecked = ItemDefinition.getPropertyDefinitionRawFor(
+          parentItemDefinition,
+          parentModule,
+          rawDataAsProperty.property,
+          true,
         );
+        const isArray = Array.isArray(exactValue);
+        const exactValueToCompareArr = isArray ? exactValue : [exactValue];
+        const isTaglist = propertyChecked.type === "taglist";
+
+        if (!isTaglist) {
+          throw new CheckUpError(
+            "Conditional rule set invalid, used an array comparator against non array-value, the property is not taglist",
+            traceback.newTraceToBit("comparator"),
+          );
+        } else if (propertyChecked.subtype !== "arbitrary-tags") {
+          const arrValues = propertyChecked.values;
+
+          if (!arrValues) {
+            throw new CheckUpError(
+              "Conditional rule set invalid, used an array comparator against non array-value, the property does not hold values",
+              traceback.newTraceToBit("property"),
+            );
+          }
+
+          exactValueToCompareArr.forEach((v, index) => {
+            if (!arrValues.includes(v)) {
+              throw new CheckUpError(
+                "Conditional rule set invalid, the value to compare is not found in the list of potential values for the taglist",
+                isArray ?
+                  traceback.newTraceToBit("value").newTraceToBit("exactValue").newTraceToBit(index) :
+                  traceback.newTraceToBit("value").newTraceToBit("exactValue"),
+              );
+            }
+          });
+        }
+      } else {
+        // let's check if this value is valid
+        const invalidReason = PropertyDefinition.isValidValue(
+          propDef,
+          exactValue,
+          true,
+        );
+        // throw the error if it's invalid
+        if (invalidReason) {
+          throw new CheckUpError(
+            "Conditional rule set value invalid, reason " +
+            rawDataAsProperty.property + ": " + invalidReason,
+            traceback.newTraceToBit("value").newTraceToBit("exactValue"),
+          );
+        }
       }
     }
   }
@@ -328,7 +375,7 @@ export function checkItemDefinition(
         if (!item.parentingRoleAccess || !item.parentingRoleAccess[absPathStr]) {
           throw new CheckUpError(
             "One of the items (" + item.name +
-              ") in question does not have parenting rule for (" + absPathStr + ") specify who can use it as parent and a result it cannot be parented",
+            ") in question does not have parenting rule for (" + absPathStr + ") specify who can use it as parent and a result it cannot be parented",
             actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("module"),
           );
         }
