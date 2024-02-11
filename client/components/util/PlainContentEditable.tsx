@@ -10,7 +10,33 @@ interface IPlainContentEditableProps {
   children: string;
   autoFocus?: boolean;
   lang?: string;
+
+  onKeyDown?: (ev: KeyboardEvent) => void;
+  onKeyUp?: (ev: KeyboardEvent) => void;
+  onMouseDown?: (ev: MouseEvent) => void;
+  onMouseUp?: (ev: MouseEvent) => void;
+  onMouseOver?: (ev: MouseEvent) => void;
+  onMouseEnter?: (ev: MouseEvent) => void;
+  onMouseLeave?: (ev: MouseEvent) => void;
+  onMouseMove?: (ev: MouseEvent) => void;
+  onTouchStart?: (ev: TouchEvent) => void;
+  onTouchMove?: (ev: TouchEvent) => void;
+  onTouchEnd?: (ev: TouchEvent) => void;
 }
+
+const eventMap = {
+  keydown: "onKeyDown",
+  keyup: "onKeyUp",
+  mousedown: "onMouseDown",
+  mouseup: "onMouseUp",
+  mousemove: "onMouseMove",
+  mouseover: "onMouseOver",
+  mouseenter: "onMouseEnter",
+  mouseleave: "onMouseLeave",
+  touchstart: "onTouchStart",
+  touchmove: "onTouchMove",
+  touchend: "onTouchEnd",
+};
 
 export default class PlainContentEditable extends React.Component<IPlainContentEditableProps> {
   private elemRef: React.RefObject<HTMLElement>;
@@ -52,6 +78,14 @@ export default class PlainContentEditable extends React.Component<IPlainContentE
         this.elemRef.current.setAttribute("contenteditable", "true");
       }
     }
+    
+    Object.keys(eventMap).forEach(eventType => {
+      const prop = eventMap[eventType];
+      if (nextProps[prop] !== this.props[prop]) {
+        this.props[prop] && this.elemRef.current.removeEventListener(eventType, this.props[prop]);
+        nextProps[prop] && this.elemRef.current.addEventListener(eventType, nextProps[prop]);
+      }
+    });
 
     if (nextProps.children !== this.elemRef.current.textContent) {
       this.elemRef.current.textContent = nextProps.children;
