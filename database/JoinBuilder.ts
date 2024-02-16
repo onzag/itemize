@@ -156,10 +156,10 @@ export class JoinBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     if (!this.builders.length) {
       return "";
     }
-    return this.builders.map(b => b.compile()).join(" ");
+    return this.builders.map(b => b.compile(this)).join(" ");
   }
 }

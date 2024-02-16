@@ -19,6 +19,7 @@ export class SelectBuilder extends QueryBuilder {
    * The expressions that we are selecting
    */
   private selectedExpressions: string[] = [];
+  private distinctOnExpressions: string[] = [];
 
   public fromBuilder: FromBuilder;
   public joinBuilder: JoinBuilder;
@@ -91,8 +92,32 @@ export class SelectBuilder extends QueryBuilder {
     this.selectedExpressions.unshift(expression);
     
     if (bindings) {
+      this.insertBindingSourcesAt(this.distinctOnExpressions.length, bindings);
+    }
+
+    return this;
+  }
+
+  public rowsMustBeDistinctOn(...columns: string[]) {
+    columns.forEach((column) => {
+      this.rowsMustBeDistinctOnColumnForTable(null, column);
+    });
+    return this;
+  }
+
+  public rowsMustBeDistinctOnColumnForTable(tableName: string, column: string) {
+    const tableNameProper = tableName ? JSON.stringify(tableName) + "." : "";
+    const expression = tableNameProper + JSON.stringify(column);
+    return this.rowsMustBeDistinctOnExpression(expression);
+  }
+
+  public rowsMustBeDistinctOnExpression(expression: string, bindings?: BasicBindingType[]) {
+    this.distinctOnExpressions.unshift(expression);
+
+    if (bindings) {
       this.shiftBindingSources(bindings);
     }
+
     return this;
   }
 
@@ -158,19 +183,23 @@ export class SelectBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile(): string {
-    if (!this.selectedExpressions.length) {
+  public compile(parent: QueryBuilder): string {
+    if (!this.selectedExpressions.length && !this.distinctOnExpressions.length) {
       return "";
     }
 
-    const fromRule = this.fromBuilder.compile();
-    const joinRule = this.joinBuilder.compile();
-    const whereRule = this.whereBuilder.compile();
-    const groupByRule = this.groupByBuilder.compile();
-    const havingRule = this.havingBuilder.compile();
-    const orderByRule = this.orderByBuilder.compile();
+    const fromRule = this.fromBuilder.compile(this);
+    const joinRule = this.joinBuilder.compile(this);
+    const whereRule = this.whereBuilder.compile(this);
+    const groupByRule = this.groupByBuilder.compile(this);
+    const havingRule = this.havingBuilder.compile(this);
+    const orderByRule = this.orderByBuilder.compile(this);
 
-    return "SELECT " + this.selectedExpressions.join(", ") +
+    return "SELECT " +
+      (this.distinctOnExpressions.length ? (
+        "DISTINCT ON (" + this.distinctOnExpressions.join(", ") + ") "
+      ) : "") +
+      this.selectedExpressions.join(", ") +
       (fromRule ? " " + fromRule : "") +
       (joinRule ? " " + joinRule : "") +
       (whereRule ? " " + whereRule : "") +

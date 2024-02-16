@@ -92,15 +92,15 @@ export class UpdateBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     if (!this.tableName) {
       return null;
     }
 
-    const setRule = this.setBuilder.compile();
-    const fromRule = this.fromBuilder.compile();
-    const whereRule = this.whereBuilder.compile();
-    const returningRule = this.returningBuilder.compile();
+    const setRule = this.setBuilder.compile(this);
+    const fromRule = this.fromBuilder.compile(this);
+    const whereRule = this.whereBuilder.compile(this);
+    const returningRule = this.returningBuilder.compile(this);
 
     return "UPDATE " + (this.isOnly ? "ONLY " : "") + JSON.stringify(this.tableName) +
       (this.tableAlias ? "AS " + JSON.stringify(this.tableAlias) : "") +

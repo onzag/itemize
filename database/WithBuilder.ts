@@ -79,10 +79,10 @@ export class WithBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     return "WITH " + this.withs.map((w) => {
-      return JSON.stringify(w.name) + " AS (" + w.asWhat.compile() + ")"
-    }).join(", ") + " " + this.query.compile();
+      return JSON.stringify(w.name) + " AS (" + w.asWhat.compile(this) + ")"
+    }).join(", ") + " " + this.query.compile(this);
   }
 
   /**

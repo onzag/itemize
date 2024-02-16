@@ -83,7 +83,7 @@ export class FetchOrMoveFromCursorBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile(): string {
+  public compile(parent: QueryBuilder): string {
     if (typeof this.directionCount === "number") {
       return this.type + " " + this.direction + " " + this.directionCount + " FROM " + JSON.stringify(this.name);
     }

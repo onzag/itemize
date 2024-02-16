@@ -2339,7 +2339,7 @@ export class ItemizeRawDB {
     const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, options);
 
     return [
-      "(" + builder.compile() + ")",
+      "(" + builder.compile(null) + ")",
       builder.getBindings(),
     ];
   }

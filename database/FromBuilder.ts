@@ -49,7 +49,7 @@ export class FromBuilder extends QueryBuilder {
   public clear() {
     this.tables = [];
     this.clearBindingSources();
-    this.selectBuilder.clearBindingSources();
+    this.selectBuilder?.clearBindingSources();
     this.selectBuilder = null;
     this.selectBuilderAlias = null;
     return this;
@@ -59,12 +59,14 @@ export class FromBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     if (!this.tables.length && !this.selectBuilder) {
       return "";
     }
     if (this.selectBuilder) {
-      return "FROM (" + this.selectBuilder.compile() + ") " + JSON.stringify(this.selectBuilderAlias);
+      return "FROM (" + this.selectBuilder.compile(this) + ") " + (
+        parent instanceof SelectBuilder ? "AS " : ""
+      ) + JSON.stringify(this.selectBuilderAlias);
     }
     return "FROM " + this.tables.map((t) =>
       typeof t === "string" ?

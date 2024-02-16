@@ -63,11 +63,11 @@ export class DeclareCursorBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile(): string {
+  public compile(parent: QueryBuilder): string {
     return "DECLARE " + JSON.stringify(this.name) +
       (this.scrollState ? " " + this.scrollState : "") +
       " CURSOR" +
       (this.isWithHold ? " WITH HOLD" : " WITHOUT HOLD") +
-      " FOR " + this.forQuery.compile();
+      " FOR " + this.forQuery.compile(this);
   }
 }

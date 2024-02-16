@@ -36,7 +36,7 @@ export class RawBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     return this.raw;
   }
 }

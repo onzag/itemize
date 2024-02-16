@@ -27,7 +27,7 @@ export class CloseCursorBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile(): string {
+  public compile(parent: QueryBuilder): string {
     return "CLOSE " + JSON.stringify(this.name);
   }
 }

@@ -55,13 +55,13 @@ export class DeleteBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     if (!this.tableDeleteFromExpression) {
       return "";
     }
 
-    const whereRule = this.whereBuilder.compile();
-    const returningRule = this.returningBuilder.compile();
+    const whereRule = this.whereBuilder.compile(this);
+    const returningRule = this.returningBuilder.compile(this);
 
     return "DELETE FROM " + this.tableDeleteFromExpression +
       (whereRule ? " " + whereRule : "") +

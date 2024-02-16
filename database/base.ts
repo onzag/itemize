@@ -100,6 +100,26 @@ export class QueryBuilder {
   }
 
   /**
+   * Adds a single binding source at the given index provided
+   * will push the element in such index forwards
+   * @param index 
+   * @param value 
+   */
+  public insertBindingSourceAt(index: number, value: ExtendedBindingType) {
+    this.bindingSources.splice(index, 0, value);
+  }
+
+  /**
+   * Adds a many binding source at the given index provided
+   * will push the element in such index forwards
+   * @param index 
+   * @param value 
+   */
+  public insertBindingSourcesAt(index: number, values: ExtendedBindingType[]) {
+    this.bindingSources.splice(index, 0, ...values);
+  }
+
+  /**
    * Removes all binding sources
    */
   public clearBindingSources() {
@@ -116,9 +136,11 @@ export class QueryBuilder {
   /**
    * Returns the result of the compilation of the query
    * this function needs to be overriden
+   * @param parent the parent that generated this
+   * execution could be null
    * @override
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     return "";
   }
 
@@ -128,7 +150,7 @@ export class QueryBuilder {
    */
   public toSQL(): IQueryBuilderSQLResult {
     // we compile the string result
-    const stringResult = this.compile();
+    const stringResult = this.compile(null);
     // now split for the binding holes
     const bindingHoles = stringResult.split("?");
     // get the bindings for this same query
@@ -359,7 +381,7 @@ export class ConditionalBuilder extends QueryBuilder {
    * Compiles the condition
    * @returns a string that represents the condition
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     // no conditions, nothing to compile
     if (this.conditions.length === 0) {
       return "";
@@ -383,10 +405,10 @@ export class ConditionalBuilder extends QueryBuilder {
       } else {
         if (c.condition instanceof ConditionalBuilder) {
           // otherwise compile
-          result += c.condition.compile();
+          result += c.condition.compile(this);
         } else {
           // otherwise compile as a subquery that is embedded
-          result += "(" + c.condition.compile() + ")";
+          result += "(" + c.condition.compile(this) + ")";
         }
       }
     });

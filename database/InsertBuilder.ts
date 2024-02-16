@@ -228,12 +228,12 @@ export class InsertBuilder extends QueryBuilder {
    * Converts this from query to a pseudo SQL query that uses ?
    * @returns a string that represents the compiled result
    */
-  public compile() {
+  public compile(parent: QueryBuilder) {
     if (!this.tableName || !this.valuesToInsert.length) {
       return "";
     }
 
-    const returningRule = this.returningBuilder.compile();
+    const returningRule = this.returningBuilder.compile(this);
 
     return "INSERT INTO " + JSON.stringify(this.tableName) +
       " (" + this.columnSignature + ") VALUES (" +
@@ -242,8 +242,8 @@ export class InsertBuilder extends QueryBuilder {
       (this.doOnConflictRows ? "(" + this.doOnConflictRows.join(", ") + ")" : "") +
       (this.doOnConflictConstraint ? " ON CONSTRAINT " + this.doOnConflictConstraint : "") +
       (this.doOnConflict ? " DO " + this.doOnConflict : "") +
-      (this.upsertSetBuilder ? " " + this.upsertSetBuilder.compile() : "") +
-      (this.upsertWhereBuilder ? " " + this.upsertWhereBuilder.compile() : "") +
+      (this.upsertSetBuilder ? " " + this.upsertSetBuilder.compile(this) : "") +
+      (this.upsertWhereBuilder ? " " + this.upsertWhereBuilder.compile(this) : "") +
       (returningRule ? " " + returningRule : "");
   }
 }
