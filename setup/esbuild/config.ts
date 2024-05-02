@@ -154,6 +154,24 @@ const build = esbuild.build({
                 path: args.path, namespace: 'ignore'
               }
             } else {
+              const filePath = path.resolve(args.resolveDir, args.path);
+              for (let ending of ["", ".js", ".ts", ".tsx"]) {
+                const exists = fs.existsSync(filePath + ending);
+                if (exists) {
+                  return {
+                    path: filePath + ending,
+                  }
+                }
+
+                const indexCheck = path.join(filePath, "index") + ending;
+                const existsAsIndex = fs.existsSync(indexCheck);
+                if (existsAsIndex) {
+                  return {
+                    path: existsAsIndex,
+                  }
+                }
+              }
+              
               return {
                 path: args.path
               }

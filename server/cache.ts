@@ -76,9 +76,28 @@ export interface IDeleteOptions {
 }
 
 export interface IWritingOptions extends IBasicOptions {
+  /**
+   * prevents an already existing value from throwing an error
+   */
   ignoreAlreadyExists?: boolean;
+  /**
+   * ignore already exists must be set, and specifies what to return
+   * in that case
+   */
   ifAlreadyExistsReturn?: "null" | "current";
+  /**
+   * ignore already exists must be set and it's a callback that occurs
+   * with the value
+   * @param v 
+   * @returns 
+   */
   ifAlreadyExistsCall?: (v: ISQLTableRowValue) => void;
+  /**
+   * Dangerous, optimization option to use not to check for the deleted
+   * registry can actually corrupt the database, use this if you are 100% sure
+   * the ids are unique every time
+   */
+  doNotCheckForDeletedRegistry?: boolean;
 }
 
 export interface ICreationOptions extends IWritingOptions {
@@ -1004,6 +1023,44 @@ export class Cache {
       },
     );
 
+    if (options.forId && !options.doNotCheckForDeletedRegistry) {
+      try {
+        const deletedResult = await this.databaseConnection.queryRows(
+          `SELECT "id" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
+          `WHERE "type" = $1 AND "id" = $2 AND "version" = $3 LIMIT 1`,
+          [
+            itemDefinition.getQualifiedPathName(),
+            options.forId,
+            options.version || "",
+          ],
+        );
+        if (deletedResult && deletedResult.length) {
+          throw new EndpointError({
+            message: "The item for " + itemDefinition.getQualifiedPathName() + " for the id " + options.forId +
+              " and version " + (options.version || "null") +
+              " has already been deleted before",
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        }
+      } catch (err) {
+        logger.error(
+          {
+            className: "Cache",
+            methodName: "requestCreation",
+            serious: true,
+            message: "Failed to request from deleted registry",
+            err,
+            data: {
+              itemDefinition: itemDefinition.getQualifiedPathName(),
+              id: options.forId,
+              version: options.version || null,
+            },
+          },
+        );
+        return;
+      }
+    }
+
     const isSQLType = !!value.MODULE_ID;
 
     const rqValue = isSQLType ? (
@@ -1151,13 +1208,27 @@ export class Cache {
       sqlModData.id = options.forId;
 
       // let's find if such a value exists already
+
+      // optimize, if ignoreAlreadyExists is set and ifAlreadyExistsCall does not
+      // exist, we shouldn't use the cache, we could use doNotEnsure and doNotFallbackToDb
+      // and if not we run through the database and get the non-unique constraint fail
+      const doesNeedCurrentValue = options.ignoreAlreadyExists && (options.ifAlreadyExistsCall || options.ifAlreadyExistsReturn === "current");
+
       const currentValue = await this.requestValue(
         itemDefinition,
         options.forId,
         options.version || null,
+        {
+          // we do not need to ensure or fallback to db if we do not need the current
+          // value to continue
+          doNotEnsure: !doesNeedCurrentValue,
+          doNotFallbackToDb: !doesNeedCurrentValue,
+        }
       );
 
       // if there's one it's a forbidden action
+
+      // note that the value may be missing
       if (currentValue) {
         if (options.ignoreAlreadyExists) {
           if (options.ifAlreadyExistsCall) {
@@ -1259,6 +1330,25 @@ export class Cache {
         }),
       );
     } catch (err) {
+
+      // check that it's about id and version constraint
+      if (
+        options.ignoreAlreadyExists &&
+        err.code === "23505" &&
+        err.constraint === "PRIMARY_KEY"
+      ) {
+        if (options.ifAlreadyExistsCall || options.ifAlreadyExistsReturn === "current") {
+          const value = await this.requestValue(
+            itemDefinition,
+            options.forId,
+            options.version || null,
+          );
+          options.ifAlreadyExistsCall && options.ifAlreadyExistsCall(value);
+          return value;
+        }
+        return null;
+      }
+
       logger.error(
         {
           className: "Cache",
@@ -3145,8 +3235,14 @@ export class Cache {
       useMemoryCacheMs?: number,
       doNotEnsure?: boolean,
       forceRefresh?: boolean,
+      doNotFallbackToDb?: boolean,
+      onNotFallenBackToDbAndNotFound?: () => void,
     } = {},
   ): Promise<ISQLTableRowValue> {
+    if (options.forceRefresh && options.doNotFallbackToDb) {
+      throw new Error("forceRefresh and doNotFallback to db cannot be used at the same time since they are contradictory");
+    }
+
     const memCache = options.useMemoryCache;
 
     const itemDefinition = typeof item === "string" ?
@@ -3239,6 +3335,21 @@ export class Cache {
       }
     } else {
       refresh = true;
+    }
+
+    // we do not fall back to DB
+    if (options.doNotFallbackToDb) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Cache",
+          methodName: "requestValue",
+          message: "Not found in memory or refresh expected; but doNotFallbackToDb is set",
+        },
+      );
+
+      options.onNotFallenBackToDbAndNotFound && options.onNotFallenBackToDbAndNotFound();
+
+      return null;
     }
 
     CAN_LOG_DEBUG && logger.debug(

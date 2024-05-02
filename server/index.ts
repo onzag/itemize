@@ -56,7 +56,6 @@ import { FakeSMSService } from "./services/fake-sms";
 import {
   INSTANCE_MODE,
   NODE_ENV,
-  USING_DOCKER,
   FAKE_EMAILS,
   FAKE_SMS,
   PORT,
@@ -452,33 +451,6 @@ export async function initializeServer(
       redisConfig,
     };
 
-    // We change the hosts depending to whether we are using docker or not
-    // and if our hosts are set to the local
-    if (USING_DOCKER) {
-      if (redisConfig.cache.host === "127.0.0.1" || redisConfig.cache.host === "localhost") {
-        redisConfig.cache.host = "redis";
-      }
-      if (redisConfig.pubSub.host === "127.0.0.1" || redisConfig.pubSub.host === "localhost") {
-        redisConfig.pubSub.host = "redis";
-      }
-      if (redisConfig.global.host === "127.0.0.1" || redisConfig.global.host === "localhost") {
-        redisConfig.global.host = "redis";
-      }
-      if (dbConfig.host === "127.0.0.1" || dbConfig.host === "localhost") {
-        dbConfig.host = "pgsql";
-      }
-      if (
-        dbConfig.elastic &&
-        dbConfig.elastic.node &&
-        (
-          dbConfig.elastic.node.includes("localhost") ||
-          dbConfig.elastic.node.includes("127.0.0.1")
-        )
-      ) {
-        dbConfig.elastic.node = dbConfig.elastic.node.replace("localhost", "elastic").replace("127.0.0.1", "elastic");
-      }
-    }
-
     const mayUseLoggerService =
       INSTANCE_MODE !== "CLEAN_STORAGE";
 
@@ -510,13 +482,6 @@ export async function initializeServer(
         delete redisConfig.global[key];
       }
     });
-
-    logger.info(
-      {
-        functionName: "initializeServer",
-        message: "Using docker " + USING_DOCKER,
-      },
-    );
 
     // this shouldn't be necessary but we do it anyway
     buildnumber = buildnumber.replace("\n", "").trim();

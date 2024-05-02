@@ -1872,6 +1872,10 @@ export class ItemizeRawDB {
    * 
    * NOTE a raw db insert is unable to trigger side effects
    * 
+   * NOTE a raw db insert does not check for the values violating the deleted registry
+   * and can corrupt the database, be careful when inserting value with a given specific
+   * id that you don't recreate things that have already existed before
+   * 
    * @param item 
    * @param inserter 
    * @returns 

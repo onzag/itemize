@@ -1,0 +1,20 @@
+[Unit]
+Description=Global manager general service, can be further configured into subservices
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=$USER
+WorkingDirectory=$WORKDIR
+ExecStart=$APPEXEC
+Environment="NODE_ENV=$NODE_ENV"
+Environment="LOG_LEVEL=info"
+Environment="FORCE_CONSOLE_LOGS=false"
+Environment="INSTANCE_MODE=GLOBAL_MANAGER"
+Environment="INSTANCE_GROUP_ID=$INSTANCE_GROUP_ID"
+
+[Install]
+WantedBy=multi-user.target

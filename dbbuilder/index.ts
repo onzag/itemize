@@ -22,8 +22,6 @@ import { postprocessIdTriggers, prepareIdTrigger } from "./id";
 import { DatabaseConnection } from "../database";
 import read from "read";
 
-const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
-
 const fsAsync = fs.promises;
 
 /**
@@ -65,10 +63,6 @@ export default async function build(version: string, action: "build" | "dump" | 
     password: dbConfig.password,
     database: dbConfig.database,
   };
-
-  if (USING_DOCKER && (dbConnectionConfig.host === "localhost" || dbConnectionConfig.host === "127.0.0.1")) {
-    dbConnectionConfig.host = "pgsql";
-  }
 
   // parse the data
   let data: any;

@@ -5,7 +5,7 @@
  */
 
 import colors from "colors";
-import dockerSetup from "./docker";
+import deploymentSetup from "./deployment";
 import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IDumpConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import fs from "fs";
 import path from "path";
@@ -60,8 +60,8 @@ const stepsInOrder: IStepType[] = [
     name: "config",
   },
   {
-    fn: dockerSetup,
-    name: "docker",
+    fn: deploymentSetup,
+    name: "deployment",
   },
   {
     fn: gitSetup,

@@ -30,7 +30,7 @@ const urlsToCache = [
   isDevelopment ? "/rest/resource/index.development.css?buildnumber=" + buildnumber : "/rest/resource/index.production.css?buildnumber=" + buildnumber,
   isDevelopment ? "/rest/resource/cache.worker.development.js" : "/rest/resource/cache.worker.production.js",
   config.fontUrl,
-  ...config.cachedResources.map((r) => "/rest/resource/" + r),
+  ...config.cachedResources.map((r) => "/rest/resource/" + r.replace("[MODE]", isDevelopment ? "development" : "production")),
   ...config.cachedExtUrls,
 ];
 let CACHE_NAME = "ITEMIZEV" + buildnumber;

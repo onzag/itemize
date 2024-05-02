@@ -1,0 +1,22 @@
+[Unit]
+Description=Extended NodeJS server, this service provides the http functionality and is the one that listens to incoming requests
+After=network.target nginx.service redis.service cluster-manager.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=$USER
+WorkingDirectory=$WORKDIR
+ExecStart=$APPEXEC
+Environment="INSTANCE_GROUP_ID=$INSTANCE_GROUP_ID"
+Environment="PORT=$PORT"
+Environment="NODE_ENV=$NODE_ENV"
+Environment="LOG_LEVEL=info"
+Environment="FORCE_CONSOLE_LOGS=false"
+Environment="INSTANCE_MODE=EXTENDED"
+Environment="INSTANCE_GROUP_ID=$INSTANCE_GROUP_ID"
+
+[Install]
+WantedBy=multi-user.target
