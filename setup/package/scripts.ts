@@ -14,6 +14,7 @@ export default {
   "test-development": "NODE_ENV=development node -r ./node_modules/@onzag/itemize/server-resolve.js ./tests/index.js",
   "test-production": "NODE_ENV=production node -r ./node_modules/@onzag/itemize/server-resolve.js ./tests/index.js",
   "start-production-server": "NODE_ENV=production node -r ./node_modules/@onzag/itemize/server-resolve.js ./dist/server/index.js",
+  "connection-test": "itemize connection-test",
 
   "setup": "itemize setup",
   "build-data": "itemize build-data",

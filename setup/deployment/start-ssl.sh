@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# usage "bash start-ssl.sh [scale]"
+
+# use this script to start the cluster using the nginx-ssl.conf that is configured to use a SSL configuration
+# make sure that the key and certificate are present as determined by the configuration, the script will check
+# for them and refuse to proceed if not found
+
 # this script needs one parameter for the server scale, as how many extended instances are to be used
 if [ -z "$1" ]
     then

@@ -18,6 +18,11 @@ const filesToConfirm = [
   "nginx.conf",
   "nginx-ssl.conf",
   "waf.json",
+  "start.sh",
+  "stop.sh",
+  "start-ssl.sh",
+  "run.sh",
+  "restart.sh",
 ];
 
 const filesToConfirmInServices = [

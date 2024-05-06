@@ -78,8 +78,7 @@
     "typescript": "^5.3.3",
     "uuid": "^3.3.3",
     "winston": "^3.3.3",
-    "winston-transport": "^4.5.0",
-    "yaml": "^1.10.2"
+    "winston-transport": "^4.5.0"
   },
   "peerDependencies": {
     "@emotion/css": "^11.7.1",

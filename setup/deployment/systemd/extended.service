@@ -1,6 +1,6 @@
 [Unit]
 Description=Extended NodeJS server, this service provides the http functionality and is the one that listens to incoming requests
-After=network.target nginx.service redis.service cluster-manager.service
+After=network.target nginx.service redis.service clustermgr.service
 StartLimitIntervalSec=0
 
 [Service]
@@ -16,7 +16,6 @@ Environment="NODE_ENV=$NODE_ENV"
 Environment="LOG_LEVEL=info"
 Environment="FORCE_CONSOLE_LOGS=false"
 Environment="INSTANCE_MODE=EXTENDED"
-Environment="INSTANCE_GROUP_ID=$INSTANCE_GROUP_ID"
 
 [Install]
 WantedBy=multi-user.target

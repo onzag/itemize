@@ -34,6 +34,7 @@ import colors from "colors";
 import buildData from "./builder";
 import buildDatabase from "./dbbuilder";
 import getDeployable from "./getdeployable";
+import runConTest from "./general/connection-test";
 
 // the action we are asked to execute is the thrird argument 0 is node, 1 is itemize
 const action = process.argv[2];
@@ -92,6 +93,12 @@ const actionRegistry: {
     usage: "itemize build-database [development|production] (build|dump|load-dump)",
     needsArgs: 1,
     arbitraryArgs: true,
+  },
+  "connection-test": {
+    fn: runConTest,
+    description: "Runs a connection test to the databases specified by the configuration",
+    usage: "itemize connection-test [development|production]",
+    needsArgs: 1,
   },
 };
 
