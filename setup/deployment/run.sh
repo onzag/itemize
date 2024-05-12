@@ -64,7 +64,12 @@ case $EXITCODE in
 esac
 
 # run connection test
-npm run connection-test;
+CHECKENV="development";
+if [[ -f "./config/db.production.sensitive.json" ]]; then
+    CHECKENV="production";    
+fi
+
+npm run connection-test "$CHECKENV";
 EXITCODE=$?;
 
 case $EXITCODE in

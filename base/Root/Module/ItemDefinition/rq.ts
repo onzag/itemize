@@ -40,6 +40,7 @@ export function getRQDefinitionForItemDefinition(
     optionalForm: boolean;
     onlyTextFilters: boolean;
     includePolicy: string | string[];
+    excludeExtensions?: boolean;
   },
 ): RQField {
   const stdFields: { [id: string]: RQField } = {};
@@ -62,7 +63,7 @@ export function getRQDefinitionForItemDefinition(
   }
 
   // now we get all prop extensions of this module
-  itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((propDef) => {
+  (options.excludeExtensions ? itemDefinition.getAllPropertyDefinitions() : itemDefinition.getAllPropertyDefinitionsAndExtensions()).forEach((propDef) => {
     if (options.retrievalMode && propDef.isRetrievalDisabled()) {
       return;
     }

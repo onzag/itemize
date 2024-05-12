@@ -65,6 +65,7 @@ import { evalRawJSON } from "./evaler";
 import { buildBuildNumber } from "./buildnumber";
 import { buildManifest } from "./manifest";
 import { propertiesReader } from "./properties-reader";
+import { rootTypesBuilder } from "./types";
 
 // Refuse to run in production mode
 if (process.env.NODE_ENV === "production") {
@@ -288,6 +289,8 @@ async function buildData(rawDataConfig: IBuilderBasicConfigType): Promise<IRootR
       JSON.stringify(resultingBuild),
     );
   }));
+
+  await rootTypesBuilder(resultJSON);
 
   return resultJSON;
 }
