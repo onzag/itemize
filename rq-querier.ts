@@ -58,8 +58,8 @@ export interface IRQSearchRecordsContainer {
  * The search container represents the results for the case
  * of traditional searches rather than records based search
  */
-export interface IRQSearchResultsContainer {
-  results: IRQValue[];
+export interface IRQSearchResultsContainer<TRQ = IRQValue> {
+  results: TRQ[];
   count: number;
   limit: number;
   offset: number;

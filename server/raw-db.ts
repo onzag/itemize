@@ -690,6 +690,7 @@ export class ItemizeRawDB {
     // and set into the deleted registry if we don't have it
     const lastModified = row.last_modified;
     // the last modified will now be the transaction_time but will be done during the transaction
+    // this was commented out now as now the deleted registry gets built by performRawDBDelete
     // if (action === "deleted") {
     //   lastModified = await this.storeInDeleteRegistry(row, moduleName, tracked);
     // }
@@ -2257,7 +2258,7 @@ export class ItemizeRawDB {
    * that are in the module table, like id, parents, creators, and prop extensions
    * then you can prevent the join from happening
    */
-  public async performRawDBSelect(
+  public async performRawDBSelect<T = ISQLTableRowValue>(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     selecter: (builder: SelectBuilder) => void,
     options: {
@@ -2265,7 +2266,7 @@ export class ItemizeRawDB {
       useMemoryCache?: string,
       useMemoryCacheMs?: number,
     } = {}
-  ): Promise<ISQLTableRowValue[]> {
+  ): Promise<T[]> {
     let waitingPromiseResolve: () => void = null;
     if (options.useMemoryCache && this.memCachedSelects[options.useMemoryCache]) {
       if (this.memCachedSelects[options.useMemoryCache].waitingPromise) {
@@ -2276,7 +2277,7 @@ export class ItemizeRawDB {
         throw this.memCachedSelects[options.useMemoryCache].err;
       }
 
-      return this.memCachedSelects[options.useMemoryCache].value;
+      return this.memCachedSelects[options.useMemoryCache].value as T[];
     } else if (options.useMemoryCache) {
       this.memCachedSelects[options.useMemoryCache] = {
         ready: false,
@@ -2323,7 +2324,7 @@ export class ItemizeRawDB {
       }
     }
 
-    return value;
+    return value as T[];
   }
 
   /**
@@ -2513,7 +2514,7 @@ export class ItemizeRawDB {
    * @param options 
    * @returns 
    */
-  public async retrieveGloballyCachedRawDBSelect(uniqueID: string, options?: { returnNullOnError?: boolean }): Promise<ISQLTableRowValue[]> {
+  public async retrieveGloballyCachedRawDBSelect<T = ISQLTableRowValue>(uniqueID: string, options?: { returnNullOnError?: boolean }): Promise<T[]> {
     try {
       const valueRaw: string = await this.redisGlobal.hget(CACHED_SELECTS_LOCATION_GLOBAL, uniqueID);
       if (!valueRaw) {
@@ -2528,7 +2529,7 @@ export class ItemizeRawDB {
         return null;
       }
       const valueParsed = JSON.parse(valueRaw);
-      return valueParsed
+      return valueParsed;
     } catch (err) {
       logger.error({
         methodName: "_retrieveCachedSelect",
@@ -3208,7 +3209,7 @@ export class ItemizeRawDB {
    * @param moduleToUpdate 
    * @param updater 
    */
-  public async performModuleBatchRawDBUpdate(
+  public async performModuleBatchRawDBUpdate<T = ISQLTableRowValue>(
     moduleToUpdate: Module | string,
     updater: {
       // you only want to use where in here
@@ -3240,8 +3241,16 @@ export class ItemizeRawDB {
        * instantly
        */
       dangerousSplitIntoItemUpdatesIfTrackedPropertiesPresent?: boolean;
+      /**
+       * By default rows id, version, type, created_by, parent_id, parent_type, parent_version,
+       * last_modified as well as any tracked rows are returned; some properties are marked as OLD_
+       * in this returning mechanism
+       * 
+       * Mark here extra rows that you may want returned if they are not included
+       */
+      returningExtraRows?: string[];
     },
-  ): Promise<ISQLTableRowValue[]> {
+  ): Promise<T[]> {
     if (
       !updater.moduleTableUpdate &&
       !updater.moduleTableUpdater
@@ -3288,7 +3297,7 @@ export class ItemizeRawDB {
         const allChild = mod.getAllChildItemDefinitions();
         return (await Promise.all(allChild.map((v) => {
           return this.performBatchRawDBUpdate(v, updater);
-        }))).flat();
+        }))).flat() as T[];
       }
     }
 
@@ -3324,6 +3333,10 @@ export class ItemizeRawDB {
     moduleUpdateQuery.returningBuilder.returningColumn("parent_type");
     moduleUpdateQuery.returningBuilder.returningColumn("parent_version");
     moduleUpdateQuery.returningBuilder.returningColumn("last_modified");
+
+    if (updater.returningExtraRows && updater.returningExtraRows.length) {
+      updater.returningExtraRows.forEach((r) => moduleUpdateQuery.returningBuilder.returningColumn(r));
+    }
 
     const allTracked = [
       "parent_id",
@@ -3437,7 +3450,7 @@ export class ItemizeRawDB {
    * @param version 
    * @param updater
    */
-  public async performRawDBUpdate(
+  public async performRawDBUpdate<T = ISQLTableRowValue>(
     item: ItemDefinition | string,
     id: string,
     version: string,
@@ -3463,7 +3476,7 @@ export class ItemizeRawDB {
        */
       dangerousForceElasticUpdate?: boolean;
     }
-  ): Promise<ISQLTableRowValue> {
+  ): Promise<T> {
     return (await this.performBatchRawDBUpdate(
       item,
       {
@@ -3472,6 +3485,6 @@ export class ItemizeRawDB {
           arg.andWhereColumn("id", id).andWhereColumn("version", version || "")
         },
       }
-    ))[0] || null;
+    ))[0] as T || null;
   }
 }

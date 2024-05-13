@@ -114,7 +114,7 @@ export interface ICreationOptions extends IWritingOptions {
   };
 }
 
-export interface ICopyOptions extends IWritingOptions {
+export interface ICopyOptions<T = ISQLTableRowValue> extends IWritingOptions {
   targetId?: string;
   targetVersion?: string;
   targetContainerId?: string;
@@ -124,8 +124,8 @@ export interface ICopyOptions extends IWritingOptions {
     type: string;
     version: string;
   },
-  targetOverrides?: ISQLTableRowValue;
-  currentRawValueSQL?: ISQLTableRowValue;
+  targetOverrides?: Partial<T>;
+  currentRawValueSQL?: T;
 }
 
 export interface IUpdateOptions extends IBasicOptions {
@@ -1005,11 +1005,11 @@ export class Cache {
    * @param value the value to create, the value can be partial
    * @param options options as to create, some options are required
    */
-  public async requestCreation(
+  public async requestCreation<T = ISQLTableRowValue>(
     itemDefinition: ItemDefinition,
     value: IRQArgs | IRQValue | ISQLTableRowValue,
     options: ICreationOptions,
-  ): Promise<ISQLTableRowValue> {
+  ): Promise<T> {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
@@ -1061,7 +1061,7 @@ export class Cache {
       }
     }
 
-    const isSQLType = !!value.MODULE_ID;
+    const isSQLType = !!(value as ISQLTableRowValue).MODULE_ID;
 
     const rqValue = isSQLType ? (
       convertSQLValueToRQValueForItemDefinition(
@@ -1159,7 +1159,7 @@ export class Cache {
       this.serverData,
       this.appData,
       itemDefinition,
-      rqValue, // when this is a SQL type it gets converted into the rq type so it can be processed here
+      rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
       containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
@@ -1172,7 +1172,7 @@ export class Cache {
       this.serverData,
       this.appData,
       itemDefinition.getParentModule(),
-      rqValue, // when this is a SQL type it gets converted into the rq type so it can be processed here
+      rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
       containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
@@ -1235,7 +1235,7 @@ export class Cache {
             options.ifAlreadyExistsCall(currentValue);
           }
           if (options.ifAlreadyExistsReturn === "current") {
-            return currentValue;
+            return currentValue as T;
           }
           return null;
         }
@@ -1344,7 +1344,7 @@ export class Cache {
             options.version || null,
           );
           options.ifAlreadyExistsCall && options.ifAlreadyExistsCall(value);
-          return value;
+          return value as T;
         }
         return null;
       }
@@ -1579,7 +1579,7 @@ export class Cache {
       });
     })() : null;
 
-    return sqlValue;
+    return sqlValue as T;
   }
 
   /**
@@ -1597,17 +1597,17 @@ export class Cache {
    * @param currentRawValueSQL the current known value for this source item (if not specified will find it)
    * @param options some options for side effects as this calls the request creation function
    */
-  public async requestCopy(
+  public async requestCopy<T = ISQLTableRowValue>(
     item: ItemDefinition | string,
     id: string,
     version: string,
-    options: ICopyOptions = {},
-  ): Promise<ISQLTableRowValue> {
+    options: ICopyOptions<T> = {},
+  ): Promise<T> {
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
       item;
 
-    const currentValueSrc = options.currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
+    const currentValueSrc: ISQLTableRowValue = options.currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
     const valueToStore = options.targetOverrides ? {
       ...currentValueSrc,
       ...options.targetOverrides,
@@ -1616,7 +1616,7 @@ export class Cache {
     const allModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${id}.${version || ""}`;
     const allItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${id}.${version || ""}`;
 
-    const currentContainerId = valueToStore.container_id;
+    const currentContainerId = (valueToStore as ISQLTableRowValue).container_id;
     const currentStorageClient = this.storageClients[currentContainerId];
     const targetStorageClient = this.storageClients[options.targetContainerId || currentContainerId];
 
@@ -1661,7 +1661,7 @@ export class Cache {
         storedIdefFiles = true;
       }
 
-      return value;
+      return value as T;
     } catch (err) {
       if (storedModuleFiles) {
         (async () => {
@@ -1758,13 +1758,13 @@ export class Cache {
    * listener uuid ensures only those that needs updates will get them
    * @returns a total combined table row value that can be converted into rq
    */
-  public async requestUpdate(
+  public async requestUpdate<T = ISQLTableRowValue>(
     item: ItemDefinition | string,
     id: string,
     version: string,
     update: IRQArgs,
     options: IUpdateOptions,
-  ): Promise<ISQLTableRowValue> {
+  ): Promise<T> {
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
 
     const selfTable = itemDefinition.getQualifiedPathName();
@@ -2524,7 +2524,7 @@ export class Cache {
       })();
     }
 
-    return sqlValue;
+    return sqlValue as T;
   }
 
   /**
@@ -3226,7 +3226,7 @@ export class Cache {
    * might be used consecutively and you don't care about accuraccy that much
    * @returns a whole sql value that can be converted into rq if necessary
    */
-  public async requestValue(
+  public async requestValue<T = ISQLTableRowValue>(
     item: ItemDefinition | string,
     id: string,
     version: string,
@@ -3238,7 +3238,7 @@ export class Cache {
       doNotFallbackToDb?: boolean,
       onNotFallenBackToDbAndNotFound?: () => void,
     } = {},
-  ): Promise<ISQLTableRowValue> {
+  ): Promise<T> {
     if (options.forceRefresh && options.doNotFallbackToDb) {
       throw new Error("forceRefresh and doNotFallback to db cannot be used at the same time since they are contradictory");
     }
@@ -3263,7 +3263,7 @@ export class Cache {
 
     const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
     if (memCache && this.memoryCache[idefQueryIdentifier]) {
-      return this.memoryCache[idefQueryIdentifier].value;
+      return this.memoryCache[idefQueryIdentifier].value as T;
     }
 
     // whether we need to refresh
@@ -3331,7 +3331,7 @@ export class Cache {
           }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
         }
 
-        return currentValue.value;
+        return currentValue.value as T
       }
     } else {
       refresh = true;
@@ -3388,7 +3388,7 @@ export class Cache {
         }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
       }
 
-      return queryValue;
+      return queryValue as T;
     } catch (err) {
       logger.error(
         {
@@ -3415,12 +3415,12 @@ export class Cache {
    * @param records the records to request for
    * @returns a list of whole sql combined table row values
    */
-  public async requestListCache(records: IRQSearchRecord[]): Promise<ISQLTableRowValue[]> {
+  public async requestListCache<T = ISQLTableRowValue>(records: IRQSearchRecord[]): Promise<T[]> {
     const resultValues = await Promise.all(records.map((recordContainer) => {
       const itemDefinition = this.root.registry[recordContainer.type] as ItemDefinition;
       return this.requestValue(itemDefinition, recordContainer.id, recordContainer.version);
     }));
-    return resultValues;
+    return resultValues as T[];
   }
 
   /**

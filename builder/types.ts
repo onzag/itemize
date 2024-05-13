@@ -14,7 +14,11 @@ import path from "path";
 import colors from "colors/safe";
 const fsAsync = fs.promises;
 
-function rqToTypescriptDefinition(id: string, val: RQField, parentModTypeName: string, tabsPlus: number = 0) {
+function typeGenerator(ide) {
+
+}
+
+function rqToTypescriptDefinition(itemOrMod: ItemDefinition | Module, id: string, val: RQField, parentModTypeName: string, tabsPlus: number = 0) {
   let finalTypeDef = (val.description ? (
     "/**" + val.description + "*/\n" + "\t".repeat(tabsPlus)
   ) : "") + id + (val.required ? "" : "?") + ": ";
@@ -30,6 +34,12 @@ function rqToTypescriptDefinition(id: string, val: RQField, parentModTypeName: s
     )
   ) {
     finalTypeDef += "(" + val.values.map((v) => JSON.stringify(v)).join(" | ") + ")";
+  } else if (id === "type" && tabsPlus === 1) {
+    if (itemOrMod instanceof Module) {
+      finalTypeDef += "(" + itemOrMod.getAllChildDefinitionsRecursive().map((v) => JSON.stringify(v.getQualifiedPathName())).join(" | ") + ")";
+    } else {
+      finalTypeDef += JSON.stringify(itemOrMod.getQualifiedPathName());
+    }
   } else if (val.type === "object" && (val.stdFields || val.ownFields)) {
     if (id === "DATA" && parentModTypeName) {
       finalTypeDef += parentModTypeName + "[\"DATA\"] & "
@@ -40,7 +50,7 @@ function rqToTypescriptDefinition(id: string, val: RQField, parentModTypeName: s
       ...val.ownFields,
     };
     Object.keys(properties).forEach((p) => {
-      finalTypeDef += "\t".repeat(tabsPlus + 1) + rqToTypescriptDefinition(p, properties[p], parentModTypeName, tabsPlus + 1) + ";\n";
+      finalTypeDef += "\t".repeat(tabsPlus + 1) + rqToTypescriptDefinition(itemOrMod, p, properties[p], parentModTypeName, tabsPlus + 1) + ";\n";
     });
     finalTypeDef += "\t".repeat(tabsPlus) + "}";
   } else {
@@ -66,7 +76,8 @@ function rqToTypescriptDefinition(id: string, val: RQField, parentModTypeName: s
   return finalTypeDef + (val.array ? "[]" : "");
 }
 
-function sqlToTypescriptDefinition(id: string, val: ISQLColumnDefinitionType, knownRQForm: RQField, tabsPlus: number = 0) {
+function sqlToTypescriptDefinition(itemOrMod: ItemDefinition | Module,
+  id: string, val: ISQLColumnDefinitionType, knownRQForm: RQField, tabsPlus: number = 0) {
   let finalTypeDef = (knownRQForm && knownRQForm.description ? (
     "/**" + knownRQForm.description + "*/\n" + "\t".repeat(tabsPlus)
   ) : "") + id + (knownRQForm ? (knownRQForm.required ? "" : "?") : (val && val.notNull ? "" : "?")) + ": ";
@@ -83,6 +94,12 @@ function sqlToTypescriptDefinition(id: string, val: ISQLColumnDefinitionType, kn
     )
   ) {
     finalTypeDef += "(" + knownRQForm.values.map((v) => JSON.stringify(v)).join(" | ") + ")";
+  } else if (id === "type") {
+    if (itemOrMod instanceof Module) {
+      finalTypeDef += "(" + itemOrMod.getAllChildDefinitionsRecursive().map((v) => JSON.stringify(v.getQualifiedPathName())).join(" | ") + ")";
+    } else {
+      finalTypeDef += JSON.stringify(itemOrMod.getQualifiedPathName());
+    }
   } else {
     switch (val.type.toUpperCase().split("[")[0].split("(")[0]) {
       case "TEXT":
@@ -139,24 +156,42 @@ function sqlToTypescriptDefinition(id: string, val: ISQLColumnDefinitionType, kn
   return finalTypeDef + (val.type.endsWith("[]") ? "[]" : "");
 }
 
+function modTypeNameGetterBase(mod: Module) {
+  let prefix = "";
+  if (mod.getParentModule()) {
+    prefix = modTypeNameGetterBase(mod.getParentModule());
+  }
+  return prefix + "Mod" + mod.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1));
+}
+
+function itemTypeNameGetterBase(item: ItemDefinition) {
+  return modTypeNameGetterBase(item.getParentModule()) +
+    "Idef" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1));
+}
+
+function itemTypeNameGetterBaseOnly(item: ItemDefinition) {
+  return modTypeNameGetterBase(item.getParentModule()) +
+    "IdefOnly" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1));
+}
+
 function modTypeNameGetterRq(mod: Module) {
-  return "Mod" + mod.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)) + "RqType";
+  return modTypeNameGetterBase(mod) + "RqType";
 }
 
 function modTypeNameGetterSQL(mod: Module) {
-  return "Mod" + mod.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)) + "SQLType";
+  return modTypeNameGetterBase(mod) + "SQLType";
 }
 
 function itemTypeNameGetterRq(item: ItemDefinition) {
-  return "Item" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)) + "RqType";
+  return itemTypeNameGetterBase(item) + "RqType";
 }
 
 function itemTypeNameGetterSQL(item: ItemDefinition) {
-  return "Item" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)) + "SQLType";
+  return itemTypeNameGetterBase(item) + "SQLType";
 }
 
 function itemTypeNameGetterOnlySQL(item: ItemDefinition) {
-  return "ItemOnly" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)) + "SQLType";
+  return itemTypeNameGetterBaseOnly(item) + "SQLType";
 }
 
 function itemTypeBuilder(item: ItemDefinition, mod: Module) {
@@ -190,13 +225,13 @@ function itemTypeBuilder(item: ItemDefinition, mod: Module) {
   Object.keys(rqItem).forEach((p) => {
     const rsDef = rqItem[p];
 
-    rsRq += "\t" + rqToTypescriptDefinition(p, rsDef, modTypeNameRq, 1) + ";\n";
+    rsRq += "\t" + rqToTypescriptDefinition(item, p, rsDef, modTypeNameRq, 1) + ";\n";
   });
 
   Object.keys(sqlItem).forEach((p) => {
     const rsDef = sqlItem[p];
 
-    rsSQL += "\t" + sqlToTypescriptDefinition(p, rsDef, rqItem[p], 1) + ";\n";
+    rsSQL += "\t" + sqlToTypescriptDefinition(item, p, rsDef, rqItem[p], 1) + ";\n";
   });
 
   rsRq += "}\n\n";
@@ -236,13 +271,13 @@ function moduleTypeBuilder(mod: Module): string {
   Object.keys(rqModule).forEach((p) => {
     const rsDef = rqModule[p];
 
-    rsRq += "\t" + rqToTypescriptDefinition(p, rsDef, null, 1) + ";\n";
+    rsRq += "\t" + rqToTypescriptDefinition(mod, p, rsDef, null, 1) + ";\n";
   });
 
   Object.keys(sqlModule).forEach((p) => {
     const rsDef = sqlModule[p];
 
-    rsSQL += "\t" + sqlToTypescriptDefinition(p, rsDef, rqModule[p], 1) + ";\n";
+    rsSQL += "\t" + sqlToTypescriptDefinition(mod, p, rsDef, rqModule[p], 1) + ";\n";
   });
 
   rsRq += "}\n\n";

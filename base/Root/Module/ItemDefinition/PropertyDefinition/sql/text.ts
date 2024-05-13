@@ -259,7 +259,7 @@ export function textSQLIn(arg: ISQLInInfo) {
  */
 export function textSqlRedoDictionaryIndex(arg: ISQLRedoDictionaryBasedIndex) {
   if (arg.property.getConfigValue("nosqlindex")) {
-    throw new Error("Cant redo a dictionary on a property that has no sql index for text");
+    return null;
   }
   const plainLocation = arg.property.isRichText() ? arg.prefix + arg.id + "_PLAIN" : arg.prefix + arg.id;
   return {

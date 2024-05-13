@@ -27,7 +27,7 @@ export enum SearchTriggerActions {
   SEARCHED,
 }
 
-export interface IOTriggerArgType {
+export interface IOTriggerArgType<TSQL = ISQLTableRowValue, TRQ = IRQValue, TSQLParent = ISQLTableRowValue> {
   /**
    * The language that was used
    */
@@ -43,11 +43,11 @@ export interface IOTriggerArgType {
   /**
    * the current value that the database is hosting
    */
-  originalValue: IRQValue;
+  originalValue: TRQ;
   /**
    * The original value in sql form
    */
-  originalValueSQL: ISQLTableRowValue;
+  originalValueSQL: TSQL;
   /**
    * whether the original value is blocked
    */
@@ -56,11 +56,11 @@ export interface IOTriggerArgType {
    * the new value that it is hosting usually only available
    * on done requests
    */
-  newValue: IRQValue;
+  newValue: TRQ;
   /**
    * The new value when sql is done
    */
-  newValueSQL: ISQLTableRowValue;
+  newValueSQL: TSQL;
   /**
    * whether the new value is blocked
    */
@@ -87,7 +87,7 @@ export interface IOTriggerArgType {
     id: string;
     version: string;
     type: string;
-    value: ISQLTableRowValue;
+    value: TSQLParent;
   }
   /**
    * Whether the requested update is trying to set the state
@@ -157,7 +157,7 @@ export interface IOTriggerArgType {
   triggerCache: {[key: string]: any};
 }
 
-export interface ISearchTriggerArgType {
+export interface ISearchTriggerArgType<TSQL = ISQLTableRowValue, TRQ = IRQValue> {
   /**
    * The action being ran
    */
@@ -179,16 +179,16 @@ export interface ISearchTriggerArgType {
   usesElastic: boolean;
   whereBuilder: WhereBuilder;
   elasticQueryBuilder: ElasticQueryBuilder;
-  sqlResponse: ISQLTableRowValue[];
+  sqlResponse: TSQL[];
   elasticResponse: SearchResponse;
   traditional: boolean;
   records: IRQSearchRecordsContainer,
-  results: IRQSearchResultsContainer,
+  results: IRQSearchResultsContainer<TRQ>,
   forbid: (message: string, customCode?: string, data?: any) => void;
   setSearchMetadata: (metadata: string) => void;
 }
 
-export interface IOConflictTriggerArgType {
+export interface IOConflictTriggerArgType<TSQL = ISQLTableRowValue> {
   /**
    * Feel free to modify the error this is a modifiable event the prupose
    * of the trigger is to add data into this error before is sent
@@ -198,11 +198,12 @@ export interface IOConflictTriggerArgType {
    * The row, may be available if it was checked against, some errors
    * have no row data
    */
-  row: ISQLTableRowValue;
+  row: TSQL;
 }
 
-export type IOTriggerType = (arg: IOTriggerArgType) => IRQValue | Promise<IRQValue> | IRQArgs | Promise<IRQArgs>;
-export type SearchTriggerType = (arg: ISearchTriggerArgType) => void | Promise<void>;
+export type IOTriggerType<TSQL = ISQLTableRowValue, TRQ = IRQValue, TSQLParent = ISQLTableRowValue> =
+  (arg: IOTriggerArgType<TSQL, TRQ, TSQLParent>) => IRQValue | Promise<IRQValue> | IRQArgs | Promise<IRQArgs>;
+export type SearchTriggerType<TSQL = ISQLTableRowValue> = (arg: ISearchTriggerArgType<TSQL>) => void | Promise<void>;
 
 /**
  * return true to overwrite
