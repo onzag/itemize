@@ -116,6 +116,11 @@ export interface IRootRawJSONDataType {
    * the build
    */
   children: IModuleRawJSONDataType[];
+  /**
+   * A list of extra registries for
+   * outside of the standard registry table
+   */
+  registries?: string[];
 }
 
 /**
@@ -411,6 +416,15 @@ export default class Root {
    */
   public getAllModules() {
     return this.childModules;
+  }
+
+  /**
+   * Provides extra registries that were defined
+   * in the root file
+   * @returns the registry names
+   */
+  public getExtraRegistries(): string[] {
+    return this.rawData.registries;
   }
 
   /**

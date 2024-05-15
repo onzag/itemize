@@ -154,6 +154,46 @@ export function getElasticSchemaForRoot(root: Root, serverData: any, appData: IA
  * @returns a total database schema
  */
 export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType {
+  const registryDefinition = {
+    id: {
+      type: "SERIAL",
+      notNull: true,
+      index: {
+        id: "PRIMARY_KEY",
+        type: "primary",
+        level: 0,
+      },
+    },
+    pkey: {
+      type: "TEXT",
+      notNull: true,
+      index: {
+        id: "UNIQUE_REGISTRY_COMBINATION",
+        type: "unique",
+        level: 0,
+      },
+    },
+    skey: {
+      type: "TEXT",
+      notNull: true,
+      index: {
+        id: "UNIQUE_REGISTRY_COMBINATION",
+        type: "unique",
+        level: 1,
+      },
+    },
+    value: {
+      type: "TEXT",
+    },
+    created_at: {
+      type: "TIMESTAMPTZ",
+      notNull: true,
+    },
+    last_modified: {
+      type: "TIMESTAMPTZ",
+      notNull: true,
+    },
+  };
   let resultSchema: ISQLSchemaDefinitionType = {
     [CURRENCY_FACTORS_IDENTIFIER]: {
       code: {
@@ -294,50 +334,17 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         },
       },
     },
-    [REGISTRY_IDENTIFIER]: {
-      id: {
-        type: "SERIAL",
-        notNull: true,
-        index: {
-          id: "PRIMARY_KEY",
-          type: "primary",
-          level: 0,
-        },
-      },
-      pkey: {
-        type: "TEXT",
-        notNull: true,
-        index: {
-          id: "UNIQUE_REGISTRY_COMBINATION",
-          type: "unique",
-          level: 0,
-        },
-      },
-      skey: {
-        type: "TEXT",
-        notNull: true,
-        index: {
-          id: "UNIQUE_REGISTRY_COMBINATION",
-          type: "unique",
-          level: 1,
-        },
-      },
-      value: {
-        type: "TEXT",
-      },
-      created_at: {
-        type: "TIMESTAMPTZ",
-        notNull: true,
-      },
-      last_modified: {
-        type: "TIMESTAMPTZ",
-        notNull: true,
-      },
-    },
+    [REGISTRY_IDENTIFIER]: registryDefinition,
   };
   root.getAllModules().forEach((cModule) => {
     // add together the schemas of all the modules
     resultSchema = { ...resultSchema, ...getSQLTablesSchemaForModule(cModule) };
+  });
+  root.getExtraRegistries().forEach((rName) => {
+    if (resultSchema[rName]) {
+      throw new Error("Unable to create registry for " + rName + " as such table is already occupied");
+    }
+    resultSchema[rName] = registryDefinition;
   });
   // return that
   return resultSchema;

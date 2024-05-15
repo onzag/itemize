@@ -4,28 +4,31 @@
  * @module
  */
 
-import React from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { DataContext } from "../../internal/providers/appdata-provider";
 import { RemoteListener } from "../../internal/app/remote-listener";
 
 type OfflineStatusCb = (offline: boolean) => React.ReactNode;
 
-/**
- * The props basically takes a children that tells if connected or not
- */
-interface IOfflineStatusRetrieverProps {
-  /**
+interface IOfflineStatusRetrieverOptions {
+   /**
    * By default the retreives starts in an online state and then falls into an offline state
    * if determined, this will do the reverse and asume it's initially offline and go into offline
    * if necessary
    */
-  assumeOfflineFirst?: boolean;
-  /**
-   * Will use the remote listener to retrieve immediate values and do not assume anything
-   * nor leave grace times, NOTE that this mode will break SSR and should only be used in
-   * the client side
-   */
-  immediate_breaksSSR?: boolean;
+   assumeOfflineFirst?: boolean;
+   /**
+    * Will use the remote listener to retrieve immediate values and do not assume anything
+    * nor leave grace times, NOTE that this mode will break SSR and should only be used in
+    * the client side
+    */
+   immediate_breaksSSR?: boolean;
+}
+
+/**
+ * The props basically takes a children that tells if connected or not
+ */
+interface IOfflineStatusRetrieverProps extends IOfflineStatusRetrieverOptions {
   children?: React.ReactNode | OfflineStatusCb;
   onRestoredConnection?: () => void;
   onLostConnection?: () => void;
@@ -154,4 +157,55 @@ export default function OfflineStatusRetriever(props: IOfflineStatusRetrieverPro
       {(data) => (<ActualOfflineStatusRetriever {...props} remoteListener={data.remoteListener} />)}
     </DataContext.Consumer>
   );
+}
+
+/**
+ * Hook version of the offline status retriever
+ * @param options 
+ * @returns 
+ */
+export function useOfflineStatusRetriever(options: IOfflineStatusRetrieverProps) {
+  const dataContext = useContext(DataContext);
+  const [isOffline, setIsOffline] = useState(options.immediate_breaksSSR ? dataContext.remoteListener.isOffline() : (options.assumeOfflineFirst ? true : false));
+  const [canAcceptConclusion, setCanAcceptConclusion] = useState(!!options.immediate_breaksSSR || false);
+
+  const isUnmounted = useRef(false);
+
+  const onConnectionStatusChange = useCallback(() => {
+    setIsOffline(dataContext.remoteListener.isOffline());
+  }, []);
+
+  useEffect(() => {
+    // now we set the actual offline state
+    setIsOffline(dataContext.remoteListener.isOffline());
+
+    if (!options.immediate_breaksSSR) {
+      // if the time it has passed has been more than 3 seconds this is a component
+      // that has been loaded later and the websocket must have had time to setup
+      // so we can accept this conclusion
+      if (TIME_WHEN_SRC_LOADED - (new Date()).getTime() >= 3000) {
+        setCanAcceptConclusion(true);
+      } else {
+        // we first take some time and wait 1 second, for the user
+        // to be connected, since the remote listener is offline until
+        // it is connected, and we don't want offline status retriever to show
+        // when the app is online, we wait 1 second to show
+        setTimeout(() => {
+          if (!isUnmounted.current) {
+            setCanAcceptConclusion(true);
+          }
+        }, 1000);
+      }
+    }
+
+    // and add the listener to listen for changes
+    dataContext.remoteListener.addConnectStatusListener(onConnectionStatusChange);
+
+    return () => {
+      isUnmounted.current = true;
+      dataContext.remoteListener.removeConnectStatusListener(onConnectionStatusChange);
+    }
+  }, []);
+
+  return canAcceptConclusion ? isOffline : (options.assumeOfflineFirst ? true : false);
 }

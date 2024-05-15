@@ -38,11 +38,17 @@ export function setLocalStorageItem(slot: string, value: any) {
   }));
 }
 
+export type LocalStorageManualProcessingFn<T> = (v: string) => T;
+
+function basicJSONParse(v: string) {
+  return JSON.parse(v);
+}
+
 /**
  * Retrieves a local storage item from a specific slot
  * and JSON parses it
  */
-export function getLocalStorageItem(slot: string) {
+export function getLocalStorageItem(slot: string, fn: LocalStorageManualProcessingFn<any> = basicJSONParse) {
   if (forbiddenSlots.includes(slot)) {
     throw new Error("Could not get the slot at " + slot + " because it's a reserved slot");
   }
@@ -50,10 +56,10 @@ export function getLocalStorageItem(slot: string) {
   const valueRaw = window.localStorage.getItem(slot) || null;
   if (valueRaw) {
     try {
-      const value = JSON.parse(valueRaw);
+      const value = fn(valueRaw);
       return value;
     } catch {
-      console.warn("Invalid value in slot " + slot + " for local storage as it cannot be json parsed");
+      console.warn("Invalid value in slot " + slot + " for local storage as it cannot be parsed");
     }
   }
 
@@ -62,14 +68,15 @@ export function getLocalStorageItem(slot: string) {
 
 /**
  * Hooks version for the local storage reader
- * @param slot 
+ * @param slot
+ * @param fn a function to parse the value that is only used when first reading the slot
  * @returns 
  */
-export function useLocalStorageReader<T>(slot: string): [T, (v: T) => void] {
+export function useLocalStorageReader<T>(slot: string, fn?: LocalStorageManualProcessingFn<T>): [T, (v: T) => void] {
   const [currentValue, setCurrentValue] = useState<T>(null as T);
 
   useEffect(() => {
-    setCurrentValue(getLocalStorageItem(slot));
+    setCurrentValue(getLocalStorageItem(slot, fn));
 
     const updateFn = (e: CustomEvent<ILocalStorageEventType>) => {
       if (e.detail.slot === slot) {
@@ -82,6 +89,7 @@ export function useLocalStorageReader<T>(slot: string): [T, (v: T) => void] {
       window.removeEventListener("LOCAL_STORAGE_SLOT_UPDATED", updateFn as any);
     }
   }, [slot]);
+  // only on slot change not when the parsing function changes
 
   const setValue = useCallback((v: T) => {
     if (currentValue === v) {
@@ -98,6 +106,7 @@ export function useLocalStorageReader<T>(slot: string): [T, (v: T) => void] {
 interface ILocalStorageReaderProps<T> {
   slot: string;
   children: (value: T, setValue: (value: T) => void) => React.ReactNode;
+  parsingFn?: LocalStorageManualProcessingFn<T>;
 }
 
 /**
@@ -106,7 +115,7 @@ interface ILocalStorageReaderProps<T> {
  * @returns 
  */
 export default function LocalStorageReader<T>(props: ILocalStorageReaderProps<T>) {
-  const [value, setValue] = useLocalStorageReader<T>(props.slot);
+  const [value, setValue] = useLocalStorageReader<T>(props.slot, props.parsingFn);
 
   return props.children(value, setValue);
 }

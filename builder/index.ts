@@ -77,6 +77,7 @@ interface IFileRootDataRawUntreatedJSONDataType {
   type: "root";
   children: string[];
   i18n: string;
+  registries?: string[];
 }
 
 /**
@@ -239,6 +240,7 @@ async function buildData(rawDataConfig: IBuilderBasicConfigType): Promise<IRootR
     location: actualLocation,
     pointers: fileData.pointers,
     i18nData,
+    registries: fileData.data.registries || [],
     children: fileData.data.children ?
       (await buildChildrenItemDefinitionsOrModules(
         rawDataConfig,

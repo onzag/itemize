@@ -104,7 +104,7 @@ export async function start(version: string) {
         `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfig.password} ` +
         `-e POSTGRES_USER=${dbConfig.user} -e POSTGRES_DB=${dbConfig.database} ` +
         `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
-        `-p ${dbConfig.port}:5432 -d postgis/postgis`,
+        `-p ${dbConfig.port}:5432 -d postgis/postgis:13-3.4`,
         "Itemize Docker Contained PGSQL Postgis Enabled Database",
       );
     } catch (err) {
@@ -152,6 +152,7 @@ export async function start(version: string) {
             );
             await execSudo(
               `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devedb -e ELASTIC_PASSWORD=${password} ` +
+              `-e "ES_JAVA_OPTS=-Xms4g -Xmx4g" ` +
               `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:8.2.0`,
               "Itemize Docker Contained Elasticsearch Database",
             );

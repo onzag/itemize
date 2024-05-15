@@ -7,14 +7,14 @@
 
 import { DatabaseConnection } from "../../database";
 import { ServiceProvider, ServiceProviderType } from ".";
-import { REGISTRY_IDENTIFIER } from "../../constants";
 import crypto from "crypto";
 
 interface IRegistryConfig {
-  databaseConnection: DatabaseConnection,
+  databaseConnection: DatabaseConnection;
+  registryTable: string;
 };
 
-interface IAllKeyResult { [skey: string]: any };
+interface IAllKeyResult<T = any> { [skey: string]: T };
 
 /**
  * The registry service allows services to store critical information
@@ -29,20 +29,65 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
   }
 
   /**
+   * Given a registry array, push the value provided into the registry
+   * 
+   * @param pkey 
+   * @param value
+   * @returns an object with the skeys of a deleted objects to apply to max size and the inserted skey id
+   */
+  public async pushInArrayKey(pkey: string, value: any, options: { maxSize?: number, failIfDeleteFails?: boolean } = {}): Promise<{ deleted: string[]; inserted: string }> {
+    const created = await this.setKey(pkey, value, null, {
+      noMemoryCache: true,
+      createSkey: true,
+    });
+
+    const inserted = created.skey;
+
+    if (options?.maxSize) {
+      try {
+        const deleteOlds = await this.config.databaseConnection.query(`WITH "rows_to_keep" AS (SELECT id FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1 ORDER BY last_modified DESC LIMIT 50)` +
+          ` DELETE FROM ${JSON.stringify(this.config.registryTable)} WHERE "id" NOT IN (SELECT "id" FROM "rows_to_keep") RETURNING skey;`);
+
+        const deleted = deleteOlds.rows.map((d) => d.skey);
+
+        return { deleted, inserted };
+      } catch (err) {
+        this.logError({
+          message: "Failed to resize an array with a max size of " + options.maxSize + " at " + pkey,
+          data: {
+            pkey,
+            value,
+            options,
+          }
+        });
+        if (options.failIfDeleteFails) {
+          throw err;
+        } else {
+          return { deleted: [], inserted };
+        }
+      }
+    }
+
+    return { deleted: [], inserted };
+  }
+
+  /**
    * Sets a key in the given registry
    * @param pkey the primary key name
    * @param value any JSON serializable value
    * @param skey an optional subkey value
+   * @returns the skey
    */
-  public async setKey(pkey: string, value: any, skey?: string) {
+  public async setKey(pkey: string, value: any, skey?: string, options?: { noMemoryCache?: boolean, createSkey?: boolean }) {
     // first we stringify this
     const valueStringified = JSON.stringify(value);
     const actualSkey = skey || "";
 
     // and then do an upsert
-    await this.config.databaseConnection.query(
-      `INSERT INTO ${JSON.stringify(REGISTRY_IDENTIFIER)} ("pkey", "skey", "value", "created_at", "last_modified") VALUES ($1, $2, $3, NOW(), NOW()) ` +
-      `ON CONFLICT ("pkey", "skey") DO UPDATE SET "last_modified" = NOW(), "value" = $3`,
+    const row = await this.config.databaseConnection.queryFirst(
+      `INSERT INTO ${JSON.stringify(this.config.registryTable)} ("pkey", "skey", "value", "created_at", "last_modified") VALUES ($1, ` +
+      `${options?.createSkey ? "uuid_generate_v1()::TEXT" : "$2"}, $3, NOW(), NOW()) ` +
+      `ON CONFLICT ("pkey", "skey") DO UPDATE SET "last_modified" = NOW(), "value" = $3 RETURNING "skey"`,
       [
         pkey,
         actualSkey,
@@ -50,22 +95,30 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
       ]
     );
 
-    const mergedId = pkey + "." + (skey || "");
+    const realSkey = row.skey as string;
+
+    if (options && options.noMemoryCache) {
+      return { skey: realSkey };
+    }
+
+    const mergedId = pkey + "." + (realSkey || "");
     this.memoryCache[mergedId] = value;
 
-    if (skey && this.memoryCache[pkey]) {
-      this.memoryCache[pkey][skey] = value;
+    if (realSkey && this.memoryCache[pkey]) {
+      this.memoryCache[pkey][realSkey] = value;
     }
+
+    return { skey: realSkey };
   }
 
-  public async setKeyDontUpdate(pkey: string, value: any, skey?: string): Promise<any> {
+  public async setKeyDontUpdate(pkey: string, value: any, skey?: string, options?: { noMemoryCache?: boolean }): Promise<{ value: any, skey: string }> {
     // first we stringify this
     const valueStringified = JSON.stringify(value);
     const actualSkey = skey || "";
 
     // and then do an upsert
     const result = await this.config.databaseConnection.queryFirst(
-      `INSERT INTO ${JSON.stringify(REGISTRY_IDENTIFIER)} ("pkey", "skey", "value", "created_at", "last_modified") VALUES ($1, $2, $3, NOW(), NOW()) ` +
+      `INSERT INTO ${JSON.stringify(this.config.registryTable)} ("pkey", "skey", "value", "created_at", "last_modified") VALUES ($1, $2, $3, NOW(), NOW()) ` +
       `ON CONFLICT ("pkey", "skey") DO UPDATE SET "last_modified" = NOW() RETURNING "value"`,
       [
         pkey,
@@ -77,12 +130,16 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
     if (result && result.value) {
       try {
         const value = JSON.stringify(result.value);
+        if (options && options.noMemoryCache) {
+          return { value, skey };
+        }
+
         const mergedId = pkey + "." + (skey || "");
         this.memoryCache[mergedId] = value;
         if (skey && this.memoryCache[pkey]) {
           this.memoryCache[pkey][skey] = value;
         }
-        return value;
+        return { value, skey };
       } catch {
         this.logError(
           {
@@ -99,7 +156,7 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
       }
     }
 
-    return null;
+    return { value, skey };
   }
 
   /**
@@ -107,24 +164,35 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
    * for the given registry key name
    * @param pkey the primary key name
    */
-  public async getAllInPkey(pkey: string): Promise<IAllKeyResult> {
+  public async getAllInPkey<T>(pkey: string, options: {asArray?: boolean, limit?: number, noStoreInMemoryCache?: boolean} = {}): Promise<IAllKeyResult<T> | T[]> {
     // so we selent all rows for the given pkey and select all skey and value
     const rows = await this.config.databaseConnection.queryRows(
-      `SELECT * FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1`,
+      `SELECT * FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1` + (
+        options.asArray ? " ORDER BY \"last_modified\" DESC" : ""
+      ) + (
+        options.limit ? " LIMIT " + options.limit : ""
+      ),
       [
         pkey,
       ],
     );
 
     // now we need to build the result
-    const result: IAllKeyResult = {};
+    const result: IAllKeyResult<T> = {};
+    let resultValuesSorted: T[] = options.asArray ? [] : null;
 
     // per each row
     rows.forEach((r) => {
       try {
-        result[r.skey] = JSON.parse(r.value);
+        const parsed = JSON.parse(r.value);
+        if (resultValuesSorted) {
+          resultValuesSorted.push(parsed)
+        }
+        result[r.skey] = parsed;
         const mergedId = pkey + "." + (r.skey || "");
-        this.memoryCache[mergedId] = result[r.skey];
+        if (options.noStoreInMemoryCache) {
+          this.memoryCache[mergedId] = parsed;
+        }
       } catch {
         this.logError(
           {
@@ -142,10 +210,12 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
       }
     });
 
-    this.memoryCache[pkey] = result;
+    if (!options.noStoreInMemoryCache) {
+      this.memoryCache[pkey] = result;
+    }
 
     // return the result
-    return result;
+    return options.asArray ? resultValuesSorted : result;
   }
 
   /**
@@ -157,7 +227,7 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
   public async getKey(pkey: string, skey?: string) {
     // so we select based on that
     const row = await this.config.databaseConnection.queryFirst(
-      `SELECT "value" FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1 AND "skey" = $2`,
+      `SELECT "value" FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1 AND "skey" = $2`,
       [
         pkey,
         skey ? skey : "",
@@ -194,12 +264,12 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
     return value;
   }
 
-  public async getAllInPkeyWithMemoryCache(pkey: string) {
+  public async getAllInPkeyWithMemoryCache<T>(pkey: string): Promise<IAllKeyResult<T>> {
     if (typeof this.memoryCache[pkey] !== "undefined") {
       return this.memoryCache[pkey];
     }
 
-    return await this.getAllInPkey(pkey);
+    return await this.getAllInPkey<T>(pkey) as IAllKeyResult<T>;
   }
 
   public async getKeyWithMemoryCache(pkey: string, skey?: string) {
@@ -238,7 +308,7 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
     // will return the same secret if race conditions apply from other instances
     // as postgresql will take the first
     const newValue = await this.setKeyDontUpdate(pkey, secret, skey);
-    return newValue;
+    return newValue.value;
   }
 
   public async getJWTSecretFor(pkey: string, skey?: string) {
@@ -275,7 +345,7 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
 
     if (skey) {
       await this.config.databaseConnection.queryFirst(
-        `DELETE FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1 AND "skey" = $2`,
+        `DELETE FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1 AND "skey" = $2`,
         [
           pkey,
           skey ? skey : "",
@@ -283,7 +353,7 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
       );
     } else {
       await this.config.databaseConnection.queryFirst(
-        `DELETE FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1`,
+        `DELETE FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1`,
         [
           pkey,
         ]

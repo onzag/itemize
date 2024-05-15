@@ -10,7 +10,7 @@ import path from "path";
 import fs from "fs";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { types } from "pg";
-import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER } from "../constants";
+import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, REGISTRY_IDENTIFIER } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import { Listener } from "./listener";
@@ -202,6 +202,9 @@ export interface IAppDataType {
   registry: RegistryService;
   customServices: {
     [name: string]: ServiceProvider<any>;
+  };
+  extraRegistries: {
+    [name: string]: RegistryService;
   };
   express: typeof express,
   customRoles: ICustomRoleType[];
@@ -757,6 +760,7 @@ export async function initializeServer(
     );
     const registry = new RegistryService({
       databaseConnection,
+      registryTable: REGISTRY_IDENTIFIER,
     }, null, configsObj);
     await registry.initialize();
 
@@ -1135,6 +1139,20 @@ export async function initializeServer(
       });
     }
 
+    const extraRegistries: {
+      [name: string]: RegistryService,
+    } = {};
+
+    const extraRegList = root.getExtraRegistries();
+    if (extraRegList.length) {
+      extraRegList.forEach((rName) => {
+        extraRegistries[rName] = new RegistryService({
+          databaseConnection,
+          registryTable: rName,
+        }, null, configsObj);
+      });
+    }
+
     const appData: IAppDataType = {
       root,
       rootPool: retrieveRootPool(root.rawData),
@@ -1169,6 +1187,7 @@ export async function initializeServer(
       logger,
       loggingService,
       customServices,
+      extraRegistries,
       registry,
       customRoles: custom.customRoles || [],
       rawDB,
@@ -1214,6 +1233,7 @@ export async function initializeServer(
     paymentService && await paymentService.initialize();
     // the storage clients are a none type and initialize immediately
     await Promise.all(customServicesInstances.map((i) => i.initialize()));
+    await Promise.all(extraRegList.map((i) => extraRegistries[i].initialize()));
 
     logger.info(
       {

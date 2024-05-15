@@ -20,6 +20,12 @@ import {
   ANYONE_METAROLE,
   GUEST_METAROLE,
   USER_EXTRA_CUSTOM_I18N,
+  DELETED_REGISTRY_IDENTIFIER,
+  REGISTRY_IDENTIFIER,
+  LOGS_IDENTIFIER,
+  CURRENCY_FACTORS_IDENTIFIER,
+  SERVER_DATA_IDENTIFIER,
+  TRACKERS_REGISTRY_IDENTIFIER,
 } from "../constants";
 import "source-map-support/register";
 import {
@@ -1775,6 +1781,25 @@ export function checkRoot(
   // we build the traceback and setup the pointers
   const traceback = new Traceback(rawData.location);
   traceback.setupPointers(rawData.pointers, rawData.raw);
+
+  if (rawData.registries.length) {
+    const invalidRegistryNames = [
+      DELETED_REGISTRY_IDENTIFIER,
+      REGISTRY_IDENTIFIER,
+      LOGS_IDENTIFIER,
+      CURRENCY_FACTORS_IDENTIFIER,
+      SERVER_DATA_IDENTIFIER,
+      TRACKERS_REGISTRY_IDENTIFIER,
+    ];
+    rawData.registries.forEach((r, index) => {
+      if (invalidRegistryNames.includes(r) || r.startsWith("ITMZ_")) {
+        throw new CheckUpError(
+          "An extra registry cannot be any of the names " + invalidRegistryNames.join(", ") + " or start with ITMZ_",
+          traceback.newTraceToBit("registries").newTraceToBit(index),
+        );
+      }
+    });
+  }
 
   // and go per children
   if (rawData.children) {

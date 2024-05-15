@@ -25,6 +25,14 @@ export default {
     i18n: {
       type: "string",
     },
+    registries: {
+      type: "array",
+      items: {
+        type: "string",
+        pattern: "^[A-Z_]+$",
+      },
+      minItems: 1,
+    },
   },
   additionalProperties: false,
   required: ["type", "i18n"],

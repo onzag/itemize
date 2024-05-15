@@ -14,7 +14,7 @@ import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { ISQLTableDefinitionType, ISQLTableRowValue } from "../base/Root/sql";
 import { yesno } from ".";
 import { getSQLTableDefinitionForModule } from "../base/Root/Module/sql";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import { getStorageProviders, IServiceCustomizationType } from "../server";
 import StorageProvider from "../server/services/base/StorageProvider";
 import { RegistryService } from "../server/services/registry";
@@ -118,6 +118,7 @@ export default async function loadDump(configVersion: string, databaseConnection
 
   const registry = new RegistryService({
     databaseConnection,
+    registryTable: REGISTRY_IDENTIFIER,
   }, null, {
     config,
     redisConfig,

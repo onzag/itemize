@@ -14,7 +14,7 @@ import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IDumpConfigRawJSONDat
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import Module from "../base/Root/Module";
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, REGISTRY_IDENTIFIER } from "../constants";
 import { yesno } from ".";
 import { getStorageProviders, IServiceCustomizationType } from "../server";
 import StorageProvider, { IStorageProvidersObject } from "../server/services/base/StorageProvider";
@@ -305,6 +305,7 @@ export default async function dump(version: string, databaseConnection: Database
 
   const registry = new RegistryService({
     databaseConnection,
+    registryTable: REGISTRY_IDENTIFIER,
   }, null, {
     config,
     redisConfig,
