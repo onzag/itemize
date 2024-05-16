@@ -46,7 +46,10 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
     if (options?.maxSize) {
       try {
         const deleteOlds = await this.config.databaseConnection.query(`WITH "rows_to_keep" AS (SELECT id FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1 ORDER BY last_modified DESC LIMIT 50)` +
-          ` DELETE FROM ${JSON.stringify(this.config.registryTable)} WHERE "id" NOT IN (SELECT "id" FROM "rows_to_keep") RETURNING skey;`);
+          ` DELETE FROM ${JSON.stringify(this.config.registryTable)} WHERE "id" NOT IN (SELECT "id" FROM "rows_to_keep") RETURNING skey`,
+        [
+          pkey,
+        ]);
 
         const deleted = deleteOlds.rows.map((d) => d.skey);
 
@@ -86,12 +89,15 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
     // and then do an upsert
     const row = await this.config.databaseConnection.queryFirst(
       `INSERT INTO ${JSON.stringify(this.config.registryTable)} ("pkey", "skey", "value", "created_at", "last_modified") VALUES ($1, ` +
-      `${options?.createSkey ? "uuid_generate_v1()::TEXT" : "$2"}, $3, NOW(), NOW()) ` +
-      `ON CONFLICT ("pkey", "skey") DO UPDATE SET "last_modified" = NOW(), "value" = $3 RETURNING "skey"`,
-      [
+      `${options?.createSkey ? "uuid_generate_v1()::TEXT" : "$3"}, $2, NOW(), NOW()) ` +
+      `ON CONFLICT ("pkey", "skey") DO UPDATE SET "last_modified" = NOW(), "value" = $2 RETURNING "skey"`,
+      options?.createSkey ? [
         pkey,
-        actualSkey,
         valueStringified,
+      ] : [
+        pkey,
+        valueStringified,
+        actualSkey,
       ]
     );
 

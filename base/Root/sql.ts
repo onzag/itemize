@@ -181,6 +181,7 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         type: "unique",
         level: 1,
       },
+      ext: "uuid-ossp",
     },
     value: {
       type: "TEXT",
