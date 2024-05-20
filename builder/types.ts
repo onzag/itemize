@@ -18,7 +18,14 @@ function typeGenerator(ide) {
 
 }
 
-function rqToTypescriptDefinition(itemOrMod: ItemDefinition | Module, id: string, val: RQField, parentModTypeName: string, tabsPlus: number = 0) {
+function rqToTypescriptDefinition(
+  flat: boolean,
+  itemOrMod: ItemDefinition | Module,
+  id: string,
+  val: RQField,
+  parentModTypeName: string,
+  tabsPlus: number = 0,
+) {
   let finalTypeDef = (val.description ? (
     "/**" + val.description + "*/\n" + "\t".repeat(tabsPlus)
   ) : "") + id + (val.required ? "" : "?") + ": ";
@@ -41,18 +48,29 @@ function rqToTypescriptDefinition(itemOrMod: ItemDefinition | Module, id: string
       finalTypeDef += JSON.stringify(itemOrMod.getQualifiedPathName());
     }
   } else if (val.type === "object" && (val.stdFields || val.ownFields)) {
-    if (id === "DATA" && parentModTypeName) {
-      finalTypeDef += parentModTypeName + "[\"DATA\"] & "
+    if (id === "DATA" && flat) {
+      finalTypeDef = "";
+      const properties = {
+        ...val.stdFields,
+        ...val.ownFields,
+      };
+      Object.keys(properties).forEach((p, i) => {
+        finalTypeDef += (i === 0 ? "" : "\t".repeat(tabsPlus)) + rqToTypescriptDefinition(false, itemOrMod, p, properties[p], parentModTypeName, tabsPlus) + ";\n";
+      });
+    } else {
+      if (id === "DATA" && parentModTypeName) {
+        finalTypeDef += parentModTypeName + "[\"DATA\"] & "
+      }
+      finalTypeDef += "{\n";
+      const properties = {
+        ...val.stdFields,
+        ...val.ownFields,
+      };
+      Object.keys(properties).forEach((p) => {
+        finalTypeDef += "\t".repeat(tabsPlus + 1) + rqToTypescriptDefinition(false, itemOrMod, p, properties[p], parentModTypeName, tabsPlus + 1) + ";\n";
+      });
+      finalTypeDef += "\t".repeat(tabsPlus) + "}";
     }
-    finalTypeDef += "{\n";
-    const properties = {
-      ...val.stdFields,
-      ...val.ownFields,
-    };
-    Object.keys(properties).forEach((p) => {
-      finalTypeDef += "\t".repeat(tabsPlus + 1) + rqToTypescriptDefinition(itemOrMod, p, properties[p], parentModTypeName, tabsPlus + 1) + ";\n";
-    });
-    finalTypeDef += "\t".repeat(tabsPlus) + "}";
   } else {
     switch (val.type) {
       case "any":
@@ -174,16 +192,24 @@ function itemTypeNameGetterBaseOnly(item: ItemDefinition) {
     "IdefOnly" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1));
 }
 
-function modTypeNameGetterRq(mod: Module) {
-  return modTypeNameGetterBase(mod) + "RqType";
+function modTypeNameGetterRqSS(mod: Module) {
+  return modTypeNameGetterBase(mod) + "FlatRqType";
+}
+
+function modTypeNameGetterRqCS(mod: Module) {
+  return modTypeNameGetterBase(mod) + "ClientSideRqType";
 }
 
 function modTypeNameGetterSQL(mod: Module) {
   return modTypeNameGetterBase(mod) + "SQLType";
 }
 
-function itemTypeNameGetterRq(item: ItemDefinition) {
-  return itemTypeNameGetterBase(item) + "RqType";
+function itemTypeNameGetterRqSS(item: ItemDefinition) {
+  return itemTypeNameGetterBase(item) + "FlatRqType";
+}
+
+function itemTypeNameGetterRqCS(item: ItemDefinition) {
+  return itemTypeNameGetterBase(item) + "ClientSideRqType";
 }
 
 function itemTypeNameGetterSQL(item: ItemDefinition) {
@@ -195,14 +221,17 @@ function itemTypeNameGetterOnlySQL(item: ItemDefinition) {
 }
 
 function itemTypeBuilder(item: ItemDefinition, mod: Module) {
-  const modTypeNameRq = modTypeNameGetterRq(mod);
+  const modTypeNameRqSS = modTypeNameGetterRqSS(mod);
+  const modTypeNameRqCS = modTypeNameGetterRqCS(mod);
   const modTypeNameSQL = modTypeNameGetterSQL(mod);
 
-  const typeNameRq = itemTypeNameGetterRq(item);
+  const typeNameRqSS = itemTypeNameGetterRqSS(item);
+  const typeNameRqCS = itemTypeNameGetterRqCS(item);
   const typeNameSQL = itemTypeNameGetterSQL(item);
   const typeNameOnlySQL = itemTypeNameGetterOnlySQL(item);
 
-  let rsRq = "interface " + typeNameRq + " extends " + modTypeNameRq + " {\n";
+  let rsRqSS = "interface " + typeNameRqSS + " extends " + modTypeNameRqSS + " {\n";
+  let rsRqCS = "interface " + typeNameRqCS + " extends " + modTypeNameRqCS + " {\n";
   let rsSQL = "interface " + typeNameOnlySQL + " {\n";
   let rsSQLFull = "interface " + typeNameSQL + " extends " + modTypeNameSQL + ", " + typeNameOnlySQL + " {};"
 
@@ -225,7 +254,8 @@ function itemTypeBuilder(item: ItemDefinition, mod: Module) {
   Object.keys(rqItem).forEach((p) => {
     const rsDef = rqItem[p];
 
-    rsRq += "\t" + rqToTypescriptDefinition(item, p, rsDef, modTypeNameRq, 1) + ";\n";
+    rsRqSS += "\t" + rqToTypescriptDefinition(true, item, p, rsDef, modTypeNameRqSS, 1) + (p === "DATA" ? "" : ";\n");
+    rsRqCS += "\t" + rqToTypescriptDefinition(false, item, p, rsDef, modTypeNameRqCS, 1) + ";\n";
   });
 
   Object.keys(sqlItem).forEach((p) => {
@@ -234,7 +264,8 @@ function itemTypeBuilder(item: ItemDefinition, mod: Module) {
     rsSQL += "\t" + sqlToTypescriptDefinition(item, p, rsDef, rqItem[p], 1) + ";\n";
   });
 
-  rsRq += "}\n\n";
+  rsRqSS += "}\n\n";
+  rsRqCS += "}\n\n";
   rsSQL += "}\n\n";
   rsSQLFull += "\n\n";
 
@@ -244,14 +275,16 @@ function itemTypeBuilder(item: ItemDefinition, mod: Module) {
     itemData += itemTypeBuilder(c, mod);
   });
 
-  return rsRq + rsSQL + rsSQLFull + itemData;
+  return rsRqSS + rsRqCS + rsSQL + rsSQLFull + itemData;
 }
 
 function moduleTypeBuilder(mod: Module): string {
-  const typeNameRq = modTypeNameGetterRq(mod);
+  const typeNameRqSS = modTypeNameGetterRqSS(mod);
+  const typeNameRqCS = modTypeNameGetterRqCS(mod);
   const typeNameSQL = modTypeNameGetterSQL(mod);
 
-  let rsRq = "interface " + typeNameRq + " {\n";
+  let rsRqSS = "interface " + typeNameRqSS + " {\n";
+  let rsRqCS = "interface " + typeNameRqCS + " {\n";
   let rsSQL = "interface " + typeNameSQL + " {\n";
 
   const rqModuleElement = getRQDefinitionForModule(mod, {
@@ -271,7 +304,8 @@ function moduleTypeBuilder(mod: Module): string {
   Object.keys(rqModule).forEach((p) => {
     const rsDef = rqModule[p];
 
-    rsRq += "\t" + rqToTypescriptDefinition(mod, p, rsDef, null, 1) + ";\n";
+    rsRqSS += "\t" + rqToTypescriptDefinition(true, mod, p, rsDef, null, 1)  + (p === "DATA" ? "\n" : ";\n");
+    rsRqCS += "\t" + rqToTypescriptDefinition(false, mod, p, rsDef, null, 1) + ";\n";
   });
 
   Object.keys(sqlModule).forEach((p) => {
@@ -280,7 +314,8 @@ function moduleTypeBuilder(mod: Module): string {
     rsSQL += "\t" + sqlToTypescriptDefinition(mod, p, rsDef, rqModule[p], 1) + ";\n";
   });
 
-  rsRq += "}\n\n";
+  rsRqSS += "}\n\n";
+  rsRqCS += "}\n\n";
   rsSQL += "}\n\n";
 
   let itemData = "";
@@ -295,7 +330,7 @@ function moduleTypeBuilder(mod: Module): string {
     childModData += moduleTypeBuilder(m);
   });
 
-  return rsRq + rsSQL + itemData + childModData;
+  return rsRqSS + rsRqCS + rsSQL + itemData + childModData;
 }
 
 export async function rootTypesBuilder(data: IRootRawJSONDataType) {
