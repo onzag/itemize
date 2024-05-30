@@ -7,6 +7,7 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import type { ElasticQueryBuilder } from "../elastic";
 import type { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
 import { EndpointErrorType } from "../../base/errors";
+import { IDeletedElement } from "../cache";
 
 export enum IOTriggerActions {
   CREATE,
@@ -155,6 +156,18 @@ export interface IOTriggerArgType<TSQL = ISQLTableRowValue, TRQ = IRQValue, TSQL
    * a trigger cache you may freely use to store arbitrary values during the run
    */
   triggerCache: {[key: string]: any};
+  /**
+   * By default when deleting it will leave the cascading effect to be asynchronious and return to the user
+   * first, calling out this function should be done during the DELETE event, and it will make the delete be slower as
+   * it will have to first see everything that it will be deleting but in turn calling retrieveDeletedCascade will provide
+   * the list of cascading elements that were deleted by the cascading action
+   */
+  collectDeletedCascade: () => void;
+  /**
+   * If collectDeletedCascade was called duing the DELETE action this will collect all the elements that were deleted by
+   * an action and will be retrievable during DELETED_SYNC and DELETED
+   */
+  deleted: IDeletedElement[];
 }
 
 export interface ISearchTriggerArgType<TSQL = ISQLTableRowValue, TRQ = IRQValue> {

@@ -1441,6 +1441,7 @@ export const RESERVED_CHANGE_PROPERTIES_RQ: {[id: string]: RQArg} = {
   },
   indexing: {
     type: "string",
+    values: ["wait_for", "wait_for_all", "detached"],
     description: "Respective to the indexing, specifically search engine indexes, what do to regarding it",
   },
   parent_id: {
@@ -1520,7 +1521,7 @@ export const RESERVED_ADD_PROPERTIES_RQ: {[id: string]: RQArg} = {
   },
   indexing: {
     type: "string",
-    values: ["wait_for", "detached"],
+    values: ["wait_for", "wait_for_all", "detached"],
     description: "Respective to the indexing, specifically search engine indexes, what do to regarding it",
   },
   in_behalf_of: {

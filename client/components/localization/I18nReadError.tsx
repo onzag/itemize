@@ -6,7 +6,7 @@
  * @module
  */
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { DataContext } from "../../internal/providers/appdata-provider";
@@ -216,6 +216,18 @@ export class I18nReadErrorInternalOptimized extends React.PureComponent<I18nRead
 }
 
 export default function I18nReadError(props: II18nReadErrorProps) {
+  // this is a hack for development and should not affect
+  // production, display errors in the console
+  // when they are displayed in the UI
+  const messageRef = isDevelopment ? useRef(true) : null;
+  if (isDevelopment) {
+    useEffect(() => {
+      return () => {
+        messageRef.current = false;
+      }
+    }, []);
+  }
+
   if (props.error === null) {
     return null;
   }
@@ -231,7 +243,12 @@ export default function I18nReadError(props: II18nReadErrorProps) {
           }
 
           if (isDevelopment && freeError.message) {
-            console.warn(freeError.message);
+            // yes this is a hack to get messages
+            // once and only once
+            if (messageRef.current) {
+              console.warn(freeError.message);
+              messageRef.current = false;
+            }
           }
 
           // cheap way to know if this is a basic error code

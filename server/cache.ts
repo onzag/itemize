@@ -63,16 +63,27 @@ interface IPropertyMapElementPointer {
 }
 
 export interface IBasicOptions {
-  indexing?: "wait_for" | "detached";
+  indexing?: "wait_for" | "wait_for_all" | "detached";
   listenerUUID?: string;
   ignorePreSideEffects?: boolean;
   ignoreSideEffects?: boolean;
 }
 
 export interface IDeleteOptions {
-  ignoreSideEffects?: boolean,
-  indexing?: "wait_for" | "detached";
-  listenerUUID?: string,
+  ignoreSideEffects?: boolean;
+  indexing?: "wait_for" | "wait_for_all" | "detached";
+  listenerUUID?: string;
+  fetchDeletedChildTree?: boolean;
+}
+
+export interface IDeletedElement {
+  type: string;
+  id: string;
+  version: string;
+  parent_id: string;
+  parent_type: string;
+  parent_version: string;
+  created_by: string;
 }
 
 export interface IWritingOptions extends IBasicOptions {
@@ -1517,7 +1528,7 @@ export class Cache {
       );
     };
 
-    if (options.indexing === "wait_for") {
+    if (options.indexing === "wait_for" || options.indexing === "wait_for_all") {
       await indexingFn();
     } else {
       indexingFn();
@@ -2512,7 +2523,7 @@ export class Cache {
       });
     }) : null;
 
-    if (options.indexing === "wait_for") {
+    if (options.indexing === "wait_for" || options.indexing === "wait_for_all") {
       await indexingFn();
       storeInCacheAndSendEvents();
       triggerSideEffects();
@@ -2538,7 +2549,8 @@ export class Cache {
     itemDefinition: ItemDefinition,
     id: string,
     version: string,
-  ) {
+    options: IDeleteOptions = {},
+  ): Promise<IDeletedElement[]> {
     // first we need to find if there is even such a rule and in which modules so we can
     // query the database
     const modulesThatMightBeSetAsChildOf: Module[] =
@@ -2550,7 +2562,7 @@ export class Cache {
       const idefQualified = itemDefinition.getQualifiedPathName();
 
       // now we can loop in these modules
-      await Promise.all(modulesThatMightBeSetAsChildOf.map(async (mod) => {
+      const evenMoreFinalResult = await Promise.all(modulesThatMightBeSetAsChildOf.map(async (mod) => {
         // and ask for results from the module table, where parents do match this
         let results: ISQLTableRowValue[];
         try {
@@ -2579,13 +2591,13 @@ export class Cache {
               },
             },
           );
-          return;
+          return [] as IDeletedElement[];
         }
 
         // if we got results
         if (results.length) {
           // then we need to delete each, one by one
-          await Promise.all(results.map(async (r) => {
+          const finalValue = await Promise.all(results.map(async (r) => {
             // we use the registry to get the proper item definition that represented
             // that module item
             const deleteItemDefinition = this.root.registry[r.type] as ItemDefinition;
@@ -2595,18 +2607,18 @@ export class Cache {
               // an unversioned parent will do a delete all versions that applies to this version
               // as well
               if (isDestroyedByUnversionedParent) {
-                return;
+                return [] as IDeletedElement[];
               }
             }
 
             try {
               // and request a delete on it
-              await this.requestDelete(
+              return (await this.requestDelete(
                 deleteItemDefinition,
                 r.id,
                 r.version || null,
-                r.container_id,
-              );
+                options,
+              )).deleted;
             } catch (err) {
               logger.error(
                 {
@@ -2624,9 +2636,17 @@ export class Cache {
               );
             }
           }));
+
+          return finalValue.flat();
+        } else {
+          return [] as IDeletedElement[];
         }
       }));
+
+      return evenMoreFinalResult.flat();
     }
+
+    return [];
   }
 
   /**
@@ -2647,7 +2667,11 @@ export class Cache {
     id: string,
     version: string,
     options: IDeleteOptions = {},
-  ): Promise<void> {
+  ): Promise<{
+    deleted: IDeletedElement[]
+  }> {
+    const deleted: IDeletedElement[] = [];
+
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
       item;
@@ -2771,16 +2795,19 @@ export class Cache {
 
     // performs the proper deletetition of whatever is in there
     // it takes the record that represents what we are deleting, the parent (or null) and the creator
-    const performProperDeleteOf = async (
+    const performProperDeleteOf1 = async (
+      record: IRQSearchRecord,
+    ) => {
+      // got to cascade and delete all the children, this method should be able to execute after
+      return this.deletePossibleChildrenOf(itemDefinition, record.id, record.version, options);
+    }
+    const performProperDeleteOf2 = async (
       row: ISQLTableRowValue,
       record: IRQSearchRecord,
       parent: { id: string; version: string; type: string },
       createdBy: string,
       trackedProperties: string[],
     ) => {
-      // got to cascade and delete all the children, this method should be able to execute after
-      this.deletePossibleChildrenOf(itemDefinition, record.id, record.version);
-
       if (this.elastic) {
         try {
           const language = itemDefinition.getSearchEngineMainLanguageFromRow(row);
@@ -2839,6 +2866,7 @@ export class Cache {
         );
       }
     }
+    // PERFORM PROPER DELETE OF
 
     // now time to do this and actually do the dropping
     // NOTE this code is quite copy pasted in raw db delete
@@ -3000,15 +3028,45 @@ export class Cache {
           } : null;
           const createdBy = row.created_by;
 
-          // and now we can perform the proper delete where
-          // we update the caches
-          // we do this without awaiting, as for all it concerns
-          // our action is done and only events will need to fire
-          if (options.indexing === "wait_for") {
-            await performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
-          } else {
-            performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
-          }
+          deleted.push({
+            id: row.id,
+            type: selfTable,
+            version: row.version || null,
+            parent_id: row.parent_id,
+            parent_type: row.parent_type,
+            parent_version: row.parent_version || null,
+            created_by: createdBy,
+          });
+
+          await Promise.all([
+            (
+              async () => {
+                if (options.fetchDeletedChildTree || options.indexing === "wait_for_all") {
+                  const moreDeleted = await performProperDeleteOf1(record);
+                  if (options.fetchDeletedChildTree) {
+                    moreDeleted.forEach((v) => deleted.push(v));
+                  }
+                  return;
+                } else {
+                  // no awaiting, no collecting
+                  performProperDeleteOf1(record);
+                  return;
+                }
+              }
+            )(),
+            (
+              async () => {
+                if (options.indexing === "wait_for" || options.indexing === "wait_for_all") {
+                  await performProperDeleteOf2(row, record, parent, createdBy, trackedProperties);
+                  return;
+                } else {
+                  performProperDeleteOf2(row, record, parent, createdBy, trackedProperties);
+                  return;
+                }
+              }
+            )(),
+          ])
+
         }));
       } else {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
@@ -3098,12 +3156,45 @@ export class Cache {
           version: row.parent_version || null,
         } : null;
         const createdBy = row.created_by;
-        // we don't want to await any of this
-        if (options.indexing === "wait_for") {
-          await performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
-        } else {
-          performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
-        }
+
+        deleted.push({
+          id: row.id,
+          type: selfTable,
+          version: row.version || null,
+          parent_id: row.parent_id,
+          parent_type: row.parent_type,
+          parent_version: row.parent_version || null,
+          created_by: createdBy,
+        });
+
+        await Promise.all([
+          (
+            async () => {
+              if (options.fetchDeletedChildTree || options.indexing === "wait_for_all") {
+                const moreDeleted = await performProperDeleteOf1(record);
+                if (options.fetchDeletedChildTree) {
+                  moreDeleted.forEach((v) => deleted.push(v));
+                }
+                return;
+              } else {
+                // no awaiting, no collecting
+                performProperDeleteOf1(record);
+                return;
+              }
+            }
+          )(),
+          (
+            async () => {
+              if (options.indexing === "wait_for" || options.indexing === "wait_for_all") {
+                await performProperDeleteOf2(row, record, parent, createdBy, trackedProperties);
+                return;
+              } else {
+                performProperDeleteOf2(row, record, parent, createdBy, trackedProperties);
+                return;
+              }
+            }
+          )(),
+        ]);
       }
 
       if (rowsToPerformDeleteSideEffects && rowsToPerformDeleteSideEffects.length) {
@@ -3164,6 +3255,8 @@ export class Cache {
           });
         })() : null;
       }
+
+      return { deleted };
     } catch (err) {
       logger.error(
         {

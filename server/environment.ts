@@ -25,6 +25,8 @@ export const INSTANCE_LOG_FILE = `logs/info.${INSTANCE_UUID}.log`;
 export const INSTANCE_LOG_ERROR_FILE = `logs/error.${INSTANCE_UUID}.log`;
 export const REFRESH_ADMIN_PASSWORD = process.env.REFRESH_ADMIN_PASSWORD === "true";
 
+export const DISABLE_CONSISTENCY_CHECKS = process.env.DISABLE_CONSISTENCY_CHECKS === "true";
+
 if (
   INSTANCE_MODE !== "CLUSTER_MANAGER" &&
   INSTANCE_MODE !== "GLOBAL_MANAGER" &&

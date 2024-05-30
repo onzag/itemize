@@ -46,10 +46,10 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
     if (options?.maxSize) {
       try {
         const deleteOlds = await this.config.databaseConnection.query(`WITH "rows_to_keep" AS (SELECT id FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1 ORDER BY last_modified DESC LIMIT 50)` +
-          ` DELETE FROM ${JSON.stringify(this.config.registryTable)} WHERE "id" NOT IN (SELECT "id" FROM "rows_to_keep") RETURNING skey`,
-        [
-          pkey,
-        ]);
+          ` DELETE FROM ${JSON.stringify(this.config.registryTable)} WHERE "id" NOT IN (SELECT "id" FROM "rows_to_keep") AND "pkey" = $1 RETURNING skey`,
+          [
+            pkey,
+          ]);
 
         const deleted = deleteOlds.rows.map((d) => d.skey);
 
@@ -166,11 +166,56 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
   }
 
   /**
+   * Provides all the skeys for a given value in a pkey
+   * @param pkey 
+   * @param value 
+   * @param options 
+   * @returns 
+   */
+  public async getSkeysForValue(pkey: string, value: any, options: { limit?: number } = {}): Promise<string[]> {
+    // so we selent all rows for the given pkey and select all skey and value
+    const rows = await this.config.databaseConnection.queryRows(
+      `SELECT "skey" FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1 AND "value" = $2` + (
+        options.limit ? " LIMIT " + options.limit : ""
+      ),
+      [
+        pkey,
+        JSON.stringify(value),
+      ],
+    );
+
+    return rows.map((v) => v.skey);
+  }
+
+  /**
+   * Provides all the pkey skey combos for a given value
+   * 
+   * NOTE this method is inefficient
+   * 
+   * @param value 
+   * @param options 
+   * @returns 
+   */
+  public async getPkeySkeysForValue(value: any, options: { limit?: number } = {}): Promise<Array<[string, string]>> {
+    // so we selent all rows for the given pkey and select all skey and value
+    const rows = await this.config.databaseConnection.queryRows(
+      `SELECT "skey", "pkey" FROM ${JSON.stringify(this.config.registryTable)} WHERE "value" = $1` + (
+        options.limit ? " LIMIT " + options.limit : ""
+      ),
+      [
+        JSON.stringify(value),
+      ],
+    );
+
+    return rows.map((v) => [v.pkey, v.skey]);
+  }
+
+  /**
    * Provides all the subkeys including the empty default subkey
    * for the given registry key name
    * @param pkey the primary key name
    */
-  public async getAllInPkey<T>(pkey: string, options: {asArray?: boolean, limit?: number, noStoreInMemoryCache?: boolean} = {}): Promise<IAllKeyResult<T> | T[]> {
+  public async getAllInPkey<T>(pkey: string, options: { asArray?: boolean, limit?: number, noStoreInMemoryCache?: boolean } = {}): Promise<IAllKeyResult<T> | T[]> {
     // so we selent all rows for the given pkey and select all skey and value
     const rows = await this.config.databaseConnection.queryRows(
       `SELECT * FROM ${JSON.stringify(this.config.registryTable)} WHERE "pkey" = $1` + (

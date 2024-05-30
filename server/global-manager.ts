@@ -32,7 +32,7 @@ import { IManyValueType } from "../database/base";
 import PhoneProvider from "./services/base/PhoneProvider";
 import { ItemizeRawDB } from "./raw-db";
 import { ItemizeElasticClient } from "./elastic";
-import { GLOBAL_MANAGER_MODE, GLOBAL_MANAGER_SERVICES, REFRESH_ADMIN_PASSWORD } from "./environment";
+import { DISABLE_CONSISTENCY_CHECKS, GLOBAL_MANAGER_MODE, GLOBAL_MANAGER_SERVICES, REFRESH_ADMIN_PASSWORD } from "./environment";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -682,7 +682,11 @@ export class GlobalManager {
       this.mailProvider.execute();
     }
 
-    if (this.elastic && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC")) {
+    if (
+      this.elastic &&
+      (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC") &&
+      !DISABLE_CONSISTENCY_CHECKS
+    ) {
       (async () => {
         let firstAvoided = false;
         while (true) {

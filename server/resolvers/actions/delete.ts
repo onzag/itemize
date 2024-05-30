@@ -23,6 +23,7 @@ import { IRQValue } from "../../../rq-querier";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
 import { FRQIdefResolverType, IRQResolverArgs } from "../../../base/Root/rq";
+import { IDeletedElement } from "../../cache";
 
 function noop() { };
 
@@ -199,6 +200,14 @@ export async function deleteItemDefinition(
   // and extract the triggers from the registry
   const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+
+  let deleted: IDeletedElement[] = null;
+  let collectCascade = false;
+
+  const collectDeletedCascade = () => {
+    collectCascade = true;
+  }
+
   // if we got any of them
   if (
     itemDefinitionTrigger || moduleTrigger
@@ -237,6 +246,8 @@ export async function deleteItemDefinition(
         setForId: noop,
         setVersion: noop,
         triggerCache: modTriggerCache,
+        collectDeletedCascade,
+        deleted: null,
       });
     }
     // same with the item definition
@@ -273,19 +284,24 @@ export async function deleteItemDefinition(
         setForId: noop,
         setVersion: noop,
         triggerCache,
+        collectDeletedCascade: noop,
+        deleted: null,
       });
     }
   }
 
-  await appData.cache.requestDelete(
+  const deletedRs = await appData.cache.requestDelete(
     itemDefinition,
     resolverArgs.args.id,
     resolverArgs.args.version,
     {
       listenerUUID: resolverArgs.args.listener_uuid || null,
       indexing: resolverArgs.args.indexing || "detached",
+      fetchDeletedChildTree: collectCascade,
     },
   );
+
+  deleted = deletedRs.deleted;
 
   if (moduleTrigger) {
     const args = {
@@ -319,6 +335,8 @@ export async function deleteItemDefinition(
       setForId: noop,
       setVersion: noop,
       triggerCache: modTriggerCache,
+      collectDeletedCascade: noop,
+      deleted,
     };
     // we execute the trigger
     await moduleTrigger(args);
@@ -374,6 +392,8 @@ export async function deleteItemDefinition(
       setForId: noop,
       setVersion: noop,
       triggerCache,
+      collectDeletedCascade: noop,
+      deleted,
     };
     // we call the trigger
     await itemDefinitionTrigger(args);

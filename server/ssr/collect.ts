@@ -795,6 +795,8 @@ export class Collector {
             customId: null,
             setForId: noop,
             setVersion: noop,
+            deleted: null,
+            collectDeletedCascade: noop,
           });
         }
 
@@ -833,6 +835,8 @@ export class Collector {
             setForId: noop,
             setVersion: noop,
             triggerCache: {},
+            deleted: null,
+            collectDeletedCascade: noop,
           });
         }
       }

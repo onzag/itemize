@@ -586,10 +586,14 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * used to wait for indexing to be attempted and done/or fail just so that in most cases scenarios after this is released
    * search shall be guaranteed to contain updated results to whatever changed occurred
    * 
+   * wait_for will wait for elastic indexes to be ready for the element in question
+   * wait_for_all only has true effect when cascading effects are in operation, like when deleting a parent causes delete of
+   * all children, it will wait until all the children are also ready
+   * 
    * this doesn't apply for SQL indexes that don't use search engine, SQL indexes are consistent and are assured to be consistent
    * this is only concerning search engine synchronization
    */
-  indexing?: "wait_for" | "detached";
+  indexing?: "wait_for" | "wait_for_all" | "detached";
   /**
    * Specify the last modified value of the current value in an edit action and it will only overwrite values
    * if the last modified matches what is given here, this is for usage of concurrency when making updates with offline

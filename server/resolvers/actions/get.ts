@@ -246,6 +246,8 @@ export async function getItemDefinition(
         setForId: noop,
         setVersion: noop,
         triggerCache: {},
+        collectDeletedCascade: noop,
+        deleted: null,
       });
     }
 
@@ -281,6 +283,8 @@ export async function getItemDefinition(
         setForId: noop,
         setVersion: noop,
         triggerCache: {},
+        collectDeletedCascade: noop,
+        deleted: null,
       });
     }
   }
@@ -574,6 +578,8 @@ export async function getItemDefinitionList(
             setForId: noop,
             setVersion: noop,
             triggerCache: {},
+            collectDeletedCascade: noop,
+            deleted: null,
           });
         }
 
@@ -609,6 +615,8 @@ export async function getItemDefinitionList(
             setForId: noop,
             setVersion: noop,
             triggerCache: {},
+            collectDeletedCascade: noop,
+            deleted: null,
           });
         }
       }
@@ -874,6 +882,8 @@ export async function getModuleList(
             setForId: noop,
             setVersion: noop,
             triggerCache: {},
+            collectDeletedCascade: noop,
+            deleted: null,
           });
         }
 
@@ -909,6 +919,8 @@ export async function getModuleList(
             setForId: noop,
             setVersion: noop,
             triggerCache: {},
+            collectDeletedCascade: noop,
+            deleted: null,
           });
         }
       }

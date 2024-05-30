@@ -442,6 +442,8 @@ export async function addItemDefinition(
             forVersion = version;
           },
           triggerCache: modTriggerCache,
+          collectDeletedCascade: noop,
+          deleted: null,
         });
         // and if we have a new value
         if (newValueAccordingToModule) {
@@ -495,7 +497,9 @@ export async function addItemDefinition(
           setVersion: (version: string) => {
             forVersion = version;
           },
-          triggerCache
+          triggerCache,
+          collectDeletedCascade: noop,
+          deleted: null,
         });
         // and make it the new value if such trigger was registered
         if (newValueAccordingToIdef) {
@@ -588,6 +592,8 @@ export async function addItemDefinition(
         setForId: noop,
         setVersion: noop,
         triggerCache: modTriggerCache,
+        collectDeletedCascade: noop,
+        deleted: null,
       };
       await moduleTrigger(args);
 
@@ -645,6 +651,8 @@ export async function addItemDefinition(
         setForId: noop,
         setVersion: noop,
         triggerCache,
+        collectDeletedCascade: noop,
+        deleted: null,
       };
       await itemDefinitionTrigger(args);
 

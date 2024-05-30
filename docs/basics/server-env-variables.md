@@ -195,3 +195,11 @@ When sending an email via SMTP service, the receipient or recepients don't matte
 ## FORCE_ALL_OUTBOUND_SMS_TO
 
 When sending an email via the phone service, the target or targets don't matter at all, since all the messages will be received by that one specific target, the data to send will be overwritten; this is useful in debugging and testing scenarios
+
+## DISABLE_CONSISTENCY_CHECKS
+
+Default `false`
+
+Normally you don't want to use this value, consistency checks are used to ensure that elasticsearch indexes are up to date and are consistent, normally this only fixes bugs related to the server itself, like bad writes, network errors, etc... disabling consistency checks is nevertheless good for when you may want to reduce the amount of logs in a development environment, or debug issues with search that use searchengine that fix themselves after a consistency check (shouldn't happen).
+
+You may still see a consistency check happen, but this is ran when the instance is prepared for the first time; this is because elasticsearch may be empty with no data, and the consistency check fixes that; what DISABLE_CONSISTENCY_CHECKS=true does is disabling the timed consistency checks that happen every so often.

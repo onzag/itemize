@@ -839,6 +839,8 @@ export async function searchModule(
                 setForId: noop,
                 setVersion: noop,
                 triggerCache: {},
+                collectDeletedCascade: noop,
+                deleted: null,
               });
             }
 
@@ -874,6 +876,8 @@ export async function searchModule(
                 setForId: noop,
                 setVersion: noop,
                 triggerCache: {},
+                collectDeletedCascade: noop,
+                deleted: null,
               });
             }
           }
@@ -1836,6 +1840,8 @@ export async function searchItemDefinition(
                   setForId: noop,
                   setVersion: noop,
                   triggerCache: {},
+                  collectDeletedCascade: noop,
+                  deleted: null,
                 });
               }
 
@@ -1871,6 +1877,8 @@ export async function searchItemDefinition(
                   setForId: noop,
                   setVersion: noop,
                   triggerCache: {},
+                  collectDeletedCascade: noop,
+                  deleted: null,
                 });
               }
             }
