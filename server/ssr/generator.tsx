@@ -17,14 +17,14 @@ import { StaticRouter } from "react-router-dom";
 import Root from "../../base/Root";
 import Moment from "moment";
 import { Collector } from "./collect";
-import { capitalize } from "../../util";
+import { capitalize, escapeHtml } from "../../util";
 import { DOMWindow } from "@onzag/itemize-text-engine/serializer/dom";
 import { jwtDecode } from "../token";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 import { convertHTMLToUSSDTree, IUSSDChunk } from "../../ussd";
 import { walkReactTree } from "./react-analyze";
 import ReactDOMServer from "react-dom/server";
-import { NODE_ENV, NO_SSR, TRUST_ALL_INBOUND_CONNECTIONS } from "../environment";
+import { LOUD_SSR_ERRORS, NODE_ENV, NO_SSR, TRUST_ALL_INBOUND_CONNECTIONS } from "../environment";
 import uuidv5 from "uuid/v5";
 
 const ETAG_UUID_NAMESPACE = "4870ebbf-2ecf-40df-9f8b-10729e66f30c";
@@ -614,21 +614,27 @@ export async function ssrGenerator(
         throw err;
       }
 
-      const usedTitle = i18nAppName || config.appName || "";
-      const usedDescription = i18nAppDescription || i18nAppName || config.appName || "";
-      const usedOgTitle = usedTitle;
-      const usedOgDescription = usedDescription;
-      const usedOgImage = "/rest/resource/icons/android-chrome-512x512.png";
-      newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
-      newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
-      newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
-      newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
-      newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
-      newHTML = newHTML.replace(/\$SSRAPP/g, "");
-      newHTML = newHTML.replace(/\$SSRROBOTS/g, "all");
-      newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
-      newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
-      newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags || "");
+      if (LOUD_SSR_ERRORS) {
+        newHTML = "<!DOCTYPE html><html><body><p>" +
+          escapeHtml((err.message || "").toString()) + "</p><p>" +
+          escapeHtml((err.stack || "").toString()) + "</p></body></html>";
+      } else {
+        const usedTitle = i18nAppName || config.appName || "";
+        const usedDescription = i18nAppDescription || i18nAppName || config.appName || "";
+        const usedOgTitle = usedTitle;
+        const usedOgDescription = usedDescription;
+        const usedOgImage = "/rest/resource/icons/android-chrome-512x512.png";
+        newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
+        newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
+        newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
+        newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
+        newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
+        newHTML = newHTML.replace(/\$SSRAPP/g, "");
+        newHTML = newHTML.replace(/\$SSRROBOTS/g, "all");
+        newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
+        newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
+        newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags || "");
+      }
 
       // cannot set etag or cache headers because the rendering failed
       // this is why we end abruptly here

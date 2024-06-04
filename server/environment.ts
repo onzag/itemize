@@ -66,6 +66,7 @@ if (
 export const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 export const NO_SEO = process.env.NO_SEO === "true";
 export const NO_SSR = process.env.NO_SSR === "true";
+export const LOUD_SSR_ERRORS = process.env.LOUD_SSR_ERRORS === "true";
 
 // FORCING STUFF
 export const FORCE_ELASTIC_REBUILD = process.env.FORCE_ELASTIC_REBUILD === "true";

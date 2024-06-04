@@ -44,6 +44,7 @@ import {
 import type { ItemizeElasticClient } from "./elastic";
 import type { ItemizeRawDB } from "./raw-db";
 import { NanoSecondComposedDate } from "../nanodate";
+import { MAX_PG_INDEX_SIZE, makeIdOutOf } from "../dbbuilder/build-index";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -1345,19 +1346,27 @@ export class Cache {
       // check that it's about id and version constraint
       if (
         options.ignoreAlreadyExists &&
-        err.code === "23505" &&
-        err.constraint === "PRIMARY_KEY"
+        err.code === "23505"
       ) {
-        if (options.ifAlreadyExistsCall || options.ifAlreadyExistsReturn === "current") {
-          const value = await this.requestValue(
-            itemDefinition,
-            options.forId,
-            options.version || null,
-          );
-          options.ifAlreadyExistsCall && options.ifAlreadyExistsCall(value);
-          return value as T;
+        // build the constraint name based on the naming rules
+        let constraintName = moduleTable + "_PRIMARY_KEY";
+        if (constraintName.length > MAX_PG_INDEX_SIZE) {
+          constraintName = makeIdOutOf(constraintName);
         }
-        return null;
+
+        // check that it's our primary key constraint
+        if (err.constraint === constraintName) {
+          if (options.ifAlreadyExistsCall || options.ifAlreadyExistsReturn === "current") {
+            const value = await this.requestValue(
+              itemDefinition,
+              options.forId,
+              options.version || null,
+            );
+            options.ifAlreadyExistsCall && options.ifAlreadyExistsCall(value);
+            return value as T;
+          }
+          return null;
+        }
       }
 
       logger.error(

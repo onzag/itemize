@@ -120,6 +120,12 @@ Default `false`
 
 Disables server side rendering, useful for development
 
+### LOUD_SSR_ERRORS
+
+Default `false`
+
+If NO_SSR is set to false, and LOUD_SSR_ERRORS is set to true whenever SSR fails instead of having a graceful fallback it will generate a traceback and return to the client, do not let this option enabled in production as it reveals parts of the app and how it works
+
 ## NO_SEO
 
 Default `false`
