@@ -34,6 +34,7 @@ export default {
   compileOnSave: true,
   exclude: [
     "node_modules",
+    "deployments"
   ],
   include: [
     "**/*.ts",

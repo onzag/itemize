@@ -14,6 +14,10 @@ import colors from "colors";
 import { execSudo } from "../setup/exec";
 import equals from "deep-equal";
 
+const ELASTIC_VERSION = process.env.ELASTIC_VERSION || "8.2.0";
+const REDIS_VERSION = process.env.REDIS_VERSION || "";
+const POSTGIS_VERSION = process.env.POSTGIS_VERSION || "13-3.4";
+
 /**
  * this function is triggered by the main.ts file and passes its argument
  * its configuration is there, check the main.ts file for modification on how
@@ -104,7 +108,7 @@ export async function start(version: string) {
         `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfig.password} ` +
         `-e POSTGRES_USER=${dbConfig.user} -e POSTGRES_DB=${dbConfig.database} ` +
         `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
-        `-p ${dbConfig.port}:5432 -d postgis/postgis:13-3.4`,
+        `-p ${dbConfig.port}:5432 -d postgis/postgis:${POSTGIS_VERSION}`,
         "Itemize Docker Contained PGSQL Postgis Enabled Database",
       );
     } catch (err) {
@@ -153,7 +157,7 @@ export async function start(version: string) {
             await execSudo(
               `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devedb -e ELASTIC_PASSWORD=${password} ` +
               `-e "ES_JAVA_OPTS=-Xms4g -Xmx4g" ` +
-              `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:8.2.0`,
+              `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}`,
               "Itemize Docker Contained Elasticsearch Database",
             );
           } catch (err) {
@@ -233,7 +237,7 @@ export async function start(version: string) {
     try {
       await execSudo(
         `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devredis ` +
-        `-p ${redisConfig.global.port}:6379 -d redis`,
+        `-p ${redisConfig.global.port}:6379 -d redis${REDIS_VERSION ? ":" + REDIS_VERSION : ""}`,
         "Itemize Docker Contained REDIS Database",
       );
     } catch (err) {

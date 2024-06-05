@@ -12,6 +12,8 @@ import redis, { RedisClient } from "redis";
 import { Client } from "@elastic/elasticsearch";
 const fsAsync = fs.promises;
 
+import colors from "colors";
+
 /**
  * Runs the connection test
  * @param version the version to check, whether developent or production
@@ -29,6 +31,22 @@ export default async function runConTest(version: string) {
   const dbConfig: IDBConfigRawJSONDataType = JSON.parse(await fsAsync.readFile(path.join("config", dbConfigToUse), "utf-8"));
   const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(await fsAsync.readFile(path.join("config", redisConfigToUse), "utf-8"));
 
+  Object.keys(redisConfig.cache).forEach((key) => {
+    if (redisConfig.cache[key] === null) {
+      delete redisConfig.cache[key];
+    }
+  });
+  Object.keys(redisConfig.pubSub).forEach((key) => {
+    if (redisConfig.pubSub[key] === null) {
+      delete redisConfig.pubSub[key];
+    }
+  });
+  Object.keys(redisConfig.global).forEach((key) => {
+    if (redisConfig.global[key] === null) {
+      delete redisConfig.global[key];
+    }
+  });
+
   const dbConnectionConfig = {
     host: dbConfig.host,
     port: dbConfig.port,
@@ -44,13 +62,22 @@ export default async function runConTest(version: string) {
   // make a db connection and run a test
   const dbConnection = new DatabaseConnection(dbConnectionConfig);
 
-  const schemaTableExists = (await dbConnection.queryFirst(
-    `SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'schema') AS "exists"`,
-  )).exists;
+  let schemaTableExists: any = null;
+  try {
+    schemaTableExists = (await dbConnection.queryFirst(
+      `SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'schema') AS "exists"`,
+    )).exists;
+  } catch (err) {
+    console.log(colors.red(err.stack));
+    console.log(colors.red("Failed to perform a SQL query"));
+    throw err;
+  }
 
   if (!schemaTableExists) {
-    console.log("Did not find a schema table, was the database ever built?");
+    console.log(colors.red("Did not find a schema table, was the database ever built?"));
     process.exit(1);
+  } else {
+    console.log(colors.green("Successfully performed a select query"));
   }
 
   // now try to test redis
@@ -62,9 +89,12 @@ export default async function runConTest(version: string) {
     await testRedisClient(globalClient);
     globalClient.quit();
   } catch (err) {
+    console.log(colors.red(err.stack));
     console.log("Failed to connect to the global redis service");
     process.exit(1);
   }
+
+  console.log(colors.green("Successfully connected to global redis"));
 
   console.log("Attempting to connect to global pub sub redis");
 
@@ -74,9 +104,12 @@ export default async function runConTest(version: string) {
     await testRedisClient(pubSubClient);
     pubSubClient.quit();
   } catch (err) {
+    console.log(colors.red(err.stack));
     console.log("Failed to connect to the pub sub redis service");
     process.exit(1);
   }
+
+  console.log(colors.green("Successfully connected to pub sub redis"));
 
   console.log("Attempting to connect to cluster cache redis");
 
@@ -86,10 +119,12 @@ export default async function runConTest(version: string) {
     await testRedisClient(clusterClient);
     clusterClient.quit();
   } catch (err) {
-    console.log(err.stack);
+    console.log(colors.red(err.stack));
     console.log("Failed to connect to the local cache redis service");
     process.exit(1);
   }
+
+  console.log(colors.green("Successfully connected to local redis"));
 
   // if we have elastic available
   if (dbConfig.elastic) {
@@ -104,14 +139,20 @@ export default async function runConTest(version: string) {
       });
 
       if (pong) {
-        console.log("Succesfully received a reply");
+        console.log(colors.green("Succesfully received an elastic reply"));
       }
     } catch (err) {
-      console.log(err.stack);
-      console.log("Failed to connect to elasticsearch");
+      console.log(colors.red(err.stack));
+      if (err.meta?.statusCode === 0) {
+        console.log(colors.yellow("If the connection was dropped due to invalid certificate, this means that you need to install the certificate, " + 
+        "in the client machine for https connections, NODE_TLS_REJECT_UNAUTHORIZED=0 is not recommended to use in production"));
+      }
+      console.log(colors.red("Failed to connect to elasticsearch"));
       process.exit(1);
     }
   }
+
+  console.log(colors.green("ALL TESTS PASSED"));
 }
 
 /**

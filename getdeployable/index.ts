@@ -151,6 +151,9 @@ export default async function build(version: string, buildID: string, userat: st
   console.log("emiting " + colors.green(path.join("deployments", buildID, "package-lock.json")));
   await fsAsync.copyFile("package-lock.json", path.join("deployments", buildID, "package-lock.json"));
 
+  console.log("emiting " + colors.green(path.join("deployments", buildID, "tsconfig.json")));
+  await fsAsync.copyFile("tsconfig.json", path.join("deployments", buildID, "tsconfig.json"));
+
   console.log("emiting " + colors.green(path.join("deployments", buildID, "itemize.config.js")));
   await fsAsync.copyFile("itemize.config.js", path.join("deployments", buildID, "itemize.config.js"));
 
@@ -165,6 +168,9 @@ export default async function build(version: string, buildID: string, userat: st
 
   console.log("emiting " + colors.green(path.join("deployments", buildID, "src")));
   await copyDir("src", path.join("deployments", buildID, "src"));
+
+  console.log("emiting " + colors.green(path.join("deployments", buildID, "types")));
+  await copyDir("types", path.join("deployments", buildID, "types"));
 
   // as well as these
   if (actualServices.includes("extended") || actualServices.includes("clustermgr") || actualServices.includes("globalmgr")) {
@@ -192,7 +198,7 @@ export default async function build(version: string, buildID: string, userat: st
   await fsAsync.writeFile(path.join("deployments", buildID, ".ssh-user"), username + "@" + servername);
 
   const rsyncComand = "rsync -rvz" +
-    (sshport === 22 ? " -e 'ssh -p 2222' " : " ") +
+    (sshport !== 22 ? (" -e 'ssh -p " + sshport + "' ") : " ") +
     "--progress $PWD " + username + "@" + servername + ":/home/" + username + "/" + buildID;
 
   console.log("emiting " + colors.green(path.join("deployments", buildID, "rsync.sh")));
