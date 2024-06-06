@@ -1,15 +1,22 @@
 #!/bin/bash
 
-# usage "bash start-ssl.sh [scale]"
+# usage "bash start-ssl.sh [scale] (soft|full)"
 
 # use this script to start the cluster using the nginx-ssl.conf that is configured to use a SSL configuration
 # make sure that the key and certificate are present as determined by the configuration, the script will check
 # for them and refuse to proceed if not found
 
+echo "Usage bash start-ssl.sh [number of scale] (soft|full)";
+
 # this script needs one parameter for the server scale, as how many extended instances are to be used
 if [ -z "$1" ]
     then
         echo "App server scale was not provided"; echo "DEAD"; exit 1;
+fi
+
+if [ "$EUID" -ne 0 ]
+  then echo "This script should be ran as root";
+  exit 1;
 fi
 
 # we need SSL
@@ -42,4 +49,4 @@ else
     exit 1;
 fi
 
-bash run.sh "$1" "nginx-ssl.conf"
+bash run.sh "$1" "nginx-ssl.conf" "$2"

@@ -163,14 +163,17 @@ export default async function build(version: string, buildID: string, userat: st
   console.log("calling " + colors.green("esbuild"));
   execSync("NODE_ENV=" + version + " node esbuild.js");
 
+  console.log("calling " + colors.green("tsc"));
+  execSync("npm run install");
+
   console.log("emiting " + colors.green(path.join("deployments", buildID, "dist")));
   await copyDir("dist", path.join("deployments", buildID, "dist"));
 
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "src")));
-  await copyDir("src", path.join("deployments", buildID, "src"));
+  // console.log("emiting " + colors.green(path.join("deployments", buildID, "src")));
+  // await copyDir("src", path.join("deployments", buildID, "src"));
 
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "types")));
-  await copyDir("types", path.join("deployments", buildID, "types"));
+  // console.log("emiting " + colors.green(path.join("deployments", buildID, "types")));
+  // await copyDir("types", path.join("deployments", buildID, "types"));
 
   // as well as these
   if (actualServices.includes("extended") || actualServices.includes("clustermgr") || actualServices.includes("globalmgr")) {
@@ -186,7 +189,9 @@ export default async function build(version: string, buildID: string, userat: st
     }
   }
 
-  message += "\n\nTo start the server you should always do bash start.sh [NUMBER_OF_SCALE] even if no scalable services have been added";
+  message += "\n\nTo start the server you should always do `bash start.sh [NUMBER_OF_SCALE]` even if no scalable services have been added";
+  message += "\n\nBefore starting the server you should run `bash install.sh`";
+  message += "\n\nIn order to synchronize the server with the remote you should run `bash rsync.sh` or `bash rsync-only-dist.sh` in the client machine";
 
   const userdata = userat.split("@");
   const username = userdata[0].trim();
@@ -197,12 +202,33 @@ export default async function build(version: string, buildID: string, userat: st
   console.log("emiting " + colors.green(path.join("deployments", buildID, ".ssh-user")));
   await fsAsync.writeFile(path.join("deployments", buildID, ".ssh-user"), username + "@" + servername);
 
-  const rsyncComand = "rsync -rvz" +
+  // RSYNC SCRIPT GENERATION
+  const nodeCheck = "ssh " + username + "@" + servername + (sshport !== 22 ? (" -p " + sshport + " ") : " ") + "\"ps | grep node\"";
+  const nodeBreakdown = "if [ $? -eq 0 ]; then echo \"node is running, this script cant deploy over a currently running environment\"; exit 1; else echo \"node is not running, deploying\"; fi";
+
+  const rsyncCommandStart = "rsync -rvz" +
     (sshport !== 22 ? (" -e 'ssh -p " + sshport + "' ") : " ") +
-    "--progress $PWD " + username + "@" + servername + ":/home/" + username + "/" + buildID;
+    "--progress ";
+  const rsyncCommandEnd = " " + username + "@" + servername + ":/home/" + username;
+
+  const nodeModulesDelete = "ssh " + username + "@" + servername + (sshport !== 22 ? (" -p " + sshport + " ") : " ") + "\"rm -r /home/" + username + "/" + buildID +  "/node_modules\"";
+
+  const rsyncCommandPWD = "#!/bin/bash\n\n#this script will rsync the contents of this cluster into the target, all of it\n\n" +
+    nodeCheck + ";\n" + nodeBreakdown + ";\n" + rsyncCommandStart + "$PWD" + rsyncCommandEnd + ";\n" + nodeModulesDelete + ";";
 
   console.log("emiting " + colors.green(path.join("deployments", buildID, "rsync.sh")));
-  await fsAsync.writeFile(path.join("deployments", buildID, "rsync.sh"), rsyncComand);
+  await fsAsync.writeFile(path.join("deployments", buildID, "rsync.sh"), rsyncCommandPWD);
+
+  const rsyncCommandOnlyDist = "#!/bin/bash\n\n#this script will rsync updates of the app cluster into the target\n\n" +
+    nodeCheck + "\n" + nodeBreakdown + "\n" + rsyncCommandStart + "$PWD/dist" + rsyncCommandEnd + "/" + buildID + ";\n" + nodeModulesDelete + ";";
+
+  console.log("emiting " + colors.green(path.join("deployments", buildID, "rsync-only-dist.sh")));
+  await fsAsync.writeFile(path.join("deployments", buildID, "rsync-only-dist.sh"), rsyncCommandOnlyDist);
+
+  // install script to install the packages in the server side
+  const installScriptBase = "if [ \"$EUID\" -eq 0 ]; then echo \"This script shouldn't be ran as root\"; exit 1; fi\n";
+  console.log("emiting " + colors.green(path.join("deployments", buildID, "install.sh")));
+  await fsAsync.writeFile(path.join("deployments", buildID, "install.sh"), installScriptBase + "npm install --ignore-scripts --omit=dev");
 
   if (actualServices.length) {
     await fsAsync.mkdir(path.join("deployments", buildID, "systemd"));

@@ -1,0 +1,5 @@
+/etc/nginx/nginx.conf
+
+# The first line is what matters, change the path to determine where
+# The nginx file is to be injected when it is ran, if you are using something
+# such as certbot ensure to modify nginx-ssl to match and don't destroy certbot

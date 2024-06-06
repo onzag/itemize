@@ -22,6 +22,7 @@ const filesToConfirm = [
   "stop.sh",
   "start-ssl.sh",
   "run.sh",
+  "nginx-config-file",
   "restart.sh",
 ];
 

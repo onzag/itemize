@@ -146,6 +146,7 @@ export default async function runConTest(version: string) {
       if (err.meta?.statusCode === 0) {
         console.log(colors.yellow("If the connection was dropped due to invalid certificate, this means that you need to install the certificate, " + 
         "in the client machine for https connections, NODE_TLS_REJECT_UNAUTHORIZED=0 is not recommended to use in production"));
+        console.log(colors.yellow("A valid option is to use NODE_EXTRA_CA_CERTS=/path/to/cert.crt but it also needs to be added to the service files"));
       }
       console.log(colors.red("Failed to connect to elasticsearch"));
       process.exit(1);
