@@ -146,7 +146,13 @@ export default async function build(version: string, buildID: string, userat: st
   await fsAsync.copyFile("run.sh", path.join("deployments", buildID, "run.sh"));
 
   console.log("emiting " + colors.green(path.join("deployments", buildID, "package.json")));
-  await fsAsync.copyFile("package.json", path.join("deployments", buildID, "package.json"));
+
+  // due to jokescript npm being unable to disable install scripts this has to be done
+  const packageJSONrepaired = JSON.parse(await fsAsync.readFile("package.json", "utf-8"));
+  if (packageJSONrepaired.scripts) {
+    delete packageJSONrepaired.scripts.install;
+  }
+  await fsAsync.writeFile("package.json", JSON.stringify(packageJSONrepaired));
 
   console.log("emiting " + colors.green(path.join("deployments", buildID, "package-lock.json")));
   await fsAsync.copyFile("package-lock.json", path.join("deployments", buildID, "package-lock.json"));
@@ -228,7 +234,7 @@ export default async function build(version: string, buildID: string, userat: st
   // install script to install the packages in the server side
   const installScriptBase = "if [ \"$EUID\" -eq 0 ]; then echo \"This script shouldn't be ran as root\"; exit 1; fi\n";
   console.log("emiting " + colors.green(path.join("deployments", buildID, "install.sh")));
-  await fsAsync.writeFile(path.join("deployments", buildID, "install.sh"), installScriptBase + "npm install --ignore-scripts --omit=dev");
+  await fsAsync.writeFile(path.join("deployments", buildID, "install.sh"), installScriptBase + "npm install");
 
   if (actualServices.length) {
     await fsAsync.mkdir(path.join("deployments", buildID, "systemd"));

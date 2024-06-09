@@ -12,19 +12,11 @@ if [ "$EUID" -ne 0 ]
   exit 1;
 fi
 
-# first let's check that awk is installed
-if ! command -v awk &> /dev/null; then
-    echo "Awk is not installed, please check your installation"
-    echo "DEAD";
-    exit 1;
-fi
-
 # now let's loop over our services
-while IFS= read -r line; do
-    service_name=$(echo "$line" | awk '{split($1, a, "."); print a[1]}')
+for service_name in $(ls /etc/systemd/system | grep itmzsrv-); do
     echo "enabling $service_name";
 
     # it is started
-    systemctl enable "$service_name.service";
-    systemctl start "$service_name.service";
-done < <(systemctl list-units --type=service --all | grep "itmzsrv-")
+    systemctl enable "$service_name";
+    systemctl start "$service_name";
+done
