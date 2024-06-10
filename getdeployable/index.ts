@@ -152,7 +152,7 @@ export default async function build(version: string, buildID: string, userat: st
   if (packageJSONrepaired.scripts) {
     delete packageJSONrepaired.scripts.install;
   }
-  await fsAsync.writeFile("package.json", JSON.stringify(packageJSONrepaired));
+  await fsAsync.writeFile(path.join("deployments", buildID, "package.json"), JSON.stringify(packageJSONrepaired));
 
   console.log("emiting " + colors.green(path.join("deployments", buildID, "package-lock.json")));
   await fsAsync.copyFile("package-lock.json", path.join("deployments", buildID, "package-lock.json"));
