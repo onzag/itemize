@@ -81,7 +81,7 @@ export function ProgressingElement(props: IProgressingElementProps) {
     {props.children}
     {
       props.isProgressing ?
-        <DelayDisplay duration={props.delayDuration || 300}>
+        <DelayDisplay duration={props.delayDuration ?? 300}>
           <Cover>
             <CircularProgressStyled size={size} />
           </Cover>
