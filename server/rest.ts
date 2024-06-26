@@ -11,7 +11,7 @@ import Module from "../base/Root/Module";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
-import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES } from "../constants";
+import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES, ADMIN_ROLE } from "../constants";
 import { getMode } from "./mode";
 import { ENVIRONMENT_DETAILS, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
 import { jwtVerify } from "./token";
@@ -440,7 +440,7 @@ export default function restServices(appData: IAppDataType) {
       forbidden = (
         typeof result.id !== "string" ||
         typeof result.sessionId !== "number" ||
-        result.role !== "ADMIN"
+        result.role !== ADMIN_ROLE
       );
     } catch (err) {
       forbidden = true;
@@ -460,108 +460,108 @@ export default function restServices(appData: IAppDataType) {
   });
 
   // ADMINISTRATIVE STUFF
-  router.get("/logs/:level/:id", async (req, res) => {
-    res.setHeader("content-type", "application/json; charset=utf-8");
+  // router.get("/logs/:level/:id", async (req, res) => {
+  //   res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const forbidden = await validateToken(req);
-    if (forbidden) {
-      res.status(401).end(JSON.stringify({
-        status: "NOT_AUTHORIZED",
-      }));
-      return;
-    }
+  //   const forbidden = await validateToken(req);
+  //   if (forbidden) {
+  //     res.status(401).end(JSON.stringify({
+  //       status: "NOT_AUTHORIZED",
+  //     }));
+  //     return;
+  //   }
 
-    let fromMs = req.query.from && Date.parse(req.query.from.toString());
-    let toMs = req.query.to && Date.parse(req.query.to.toString());
-    const level: "info" | "error" = req.params.level as any;
-    const id = req.params.id;
+  //   let fromMs = req.query.from && Date.parse(req.query.from.toString());
+  //   let toMs = req.query.to && Date.parse(req.query.to.toString());
+  //   const level: "info" | "error" = req.params.level as any;
+  //   const id = req.params.id;
 
-    if (!fromMs || isNaN(fromMs) || !toMs || isNaN(toMs) || !id || (level !== "info" && level !== "error")) {
-      res.status(400).end(JSON.stringify({
-        status: "BAD_REQUEST",
-      }));
-    }
+  //   if (!fromMs || isNaN(fromMs) || !toMs || isNaN(toMs) || !id || (level !== "info" && level !== "error")) {
+  //     res.status(400).end(JSON.stringify({
+  //       status: "BAD_REQUEST",
+  //     }));
+  //   }
 
-    const fromD = new Date(fromMs);
-    const toD = new Date(toMs);
+  //   const fromD = new Date(fromMs);
+  //   const toD = new Date(toMs);
 
-    const allLogs = await appData.loggingService.getLogsOf(id, level, fromD, toD);
-    res.end(JSON.stringify({
-      status: "OK",
-      logs: allLogs,
-    }));
-  });
+  //   const allLogs = await appData.loggingService.getLogsOf(id, level, fromD, toD);
+  //   res.end(JSON.stringify({
+  //     status: "OK",
+  //     logs: allLogs,
+  //   }));
+  // });
 
-  router.get("/logs", async (req, res) => {
-    res.setHeader("content-type", "application/json; charset=utf-8");
+  // router.get("/logs", async (req, res) => {
+  //   res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const forbidden = await validateToken(req);
-    if (forbidden) {
-      res.status(401).end(JSON.stringify({
-        status: "NOT_AUTHORIZED",
-      }));
-      return;
-    }
+  //   const forbidden = await validateToken(req);
+  //   if (forbidden) {
+  //     res.status(401).end(JSON.stringify({
+  //       status: "NOT_AUTHORIZED",
+  //     }));
+  //     return;
+  //   }
 
-    const allLogInstances = await appData.loggingService.getLogsInstanceIds();
-    res.end(JSON.stringify({
-      status: "OK",
-      ids: allLogInstances,
-    }));
-  })
+  //   const allLogInstances = await appData.loggingService.getLogsInstanceIds();
+  //   res.end(JSON.stringify({
+  //     status: "OK",
+  //     ids: allLogInstances,
+  //   }));
+  // })
 
-  router.delete("/logs/:id", async (req, res) => {
-    res.setHeader("content-type", "application/json; charset=utf-8");
+  // router.delete("/logs/:id", async (req, res) => {
+  //   res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const forbidden = await validateToken(req);
-    if (forbidden) {
-      res.status(401).end(JSON.stringify({
-        status: "NOT_AUTHORIZED",
-      }));
-      return;
-    }
+  //   const forbidden = await validateToken(req);
+  //   if (forbidden) {
+  //     res.status(401).end(JSON.stringify({
+  //       status: "NOT_AUTHORIZED",
+  //     }));
+  //     return;
+  //   }
 
-    const status = await appData.loggingService.clearLogsOf(req.params.id);
-    res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
-      status,
-    }));
-  });
+  //   const status = await appData.loggingService.clearLogsOf(req.params.id);
+  //   res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
+  //     status,
+  //   }));
+  // });
 
-  router.get("/clusters/info", async (req, res) => {
-    res.setHeader("content-type", "application/json; charset=utf-8");
+  // router.get("/clusters/info", async (req, res) => {
+  //   res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const forbidden = await validateToken(req);
-    if (forbidden) {
-      res.status(401).end(JSON.stringify({
-        status: "NOT_AUTHORIZED",
-      }));
-      return;
-    }
+  //   const forbidden = await validateToken(req);
+  //   if (forbidden) {
+  //     res.status(401).end(JSON.stringify({
+  //       status: "NOT_AUTHORIZED",
+  //     }));
+  //     return;
+  //   }
 
-    const allPings = await appData.elastic.getAllStoredPingsAt(PING_DATA_IDENTIFIER);
-    res.end(JSON.stringify({
-      status: "OK",
-      self: ENVIRONMENT_DETAILS,
-      pings: allPings,
-    }));
-  });
+  //   const allPings = await appData.loggingService.getAllStoredPingsAt(PING_DATA_IDENTIFIER);
+  //   res.end(JSON.stringify({
+  //     status: "OK",
+  //     self: ENVIRONMENT_DETAILS,
+  //     pings: allPings,
+  //   }));
+  // });
 
-  router.delete("/clusters/info/:uuid", async (req, res) => {
-    res.setHeader("content-type", "application/json; charset=utf-8");
+  // router.delete("/clusters/info/:uuid", async (req, res) => {
+  //   res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const forbidden = await validateToken(req);
-    if (forbidden) {
-      res.status(401).end(JSON.stringify({
-        status: "NOT_AUTHORIZED",
-      }));
-      return;
-    }
+  //   const forbidden = await validateToken(req);
+  //   if (forbidden) {
+  //     res.status(401).end(JSON.stringify({
+  //       status: "NOT_AUTHORIZED",
+  //     }));
+  //     return;
+  //   }
 
-    const status = await appData.elastic.deletePingsFor(PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, req.params.uuid);
-    res.status(status === "NOT_DEAD" ? 403 : 200).end(JSON.stringify({
-      status,
-    }));
-  });
+  //   const status = await appData.loggingService.deletePingsFor(PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, req.params.uuid);
+  //   res.status(status === "NOT_DEAD" ? 403 : 200).end(JSON.stringify({
+  //     status,
+  //   }));
+  // });
 
   // now we add a 404
   router.use((req, res) => {

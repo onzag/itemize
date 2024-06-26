@@ -8,9 +8,10 @@ import express from "express";
 import http from "http";
 import path from "path";
 import fs from "fs";
+import os from "os";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { types } from "pg";
-import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, REGISTRY_IDENTIFIER } from "../constants";
+import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER, REGISTRY_IDENTIFIER } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import { Listener } from "./listener";
@@ -61,6 +62,7 @@ import {
   PORT,
   buildEnvironmentInfo,
   FAKE_USSD,
+  IEnvironmentInfo,
 } from "./environment";
 import USSDProvider from "./services/base/USSDProvider";
 import { FakeUSSDService } from "./services/fake-ussd";
@@ -211,7 +213,7 @@ export interface IAppDataType {
   rawDB: ItemizeRawDB;
   elastic: ItemizeElasticClient;
   domain: string;
-  userTokenQuery: (arg: {token?: string, username?: string, password?: string, country?: string}) => Promise<{id: string; token: string; role: string}>;
+  userTokenQuery: (arg: { token?: string, username?: string, password?: string, country?: string }) => Promise<{ id: string; token: string; role: string }>;
 }
 
 export interface IServerDataType {
@@ -732,24 +734,55 @@ export async function initializeServer(
       dbConfig.elasticLangAnalyzers,
     ) : null;
 
-    if (elastic) {
+    if (logger) {
       const envInfo = buildEnvironmentInfo(
         buildnumber,
         redisConfig,
         dbConfig,
       );
 
-      elastic.createPing({
+      logger.createPing<IEnvironmentInfo, {
+        cpuUsageTotal: NodeJS.CpuUsage,
+        cpuUsage: NodeJS.CpuUsage;
+        memoryUsage: NodeJS.MemoryUsage;
+        cpuPercent: number;
+        loadAvg60: number;
+        freeMem: number;
+      }>({
+        id: PING_DATA_IDENTIFIER,
         data: envInfo,
-        dataIndex: PING_DATA_IDENTIFIER,
-        statusIndex: PING_STATUS_IDENTIFIER,
-        statusRetriever: () => {
-          return {
-            cpuUsage: process.cpuUsage(),
-            memoryUsage: process.memoryUsage(),
+        statusRetriever: (info) => {
+          // first time
+          if (info.firstTimeMs === info.currentTimeMs) {
+            return {
+              doNotStore: true,
+              status: {
+                cpuUsageTotal: process.cpuUsage(),
+                cpuUsage: process.cpuUsage(),
+                memoryUsage: process.memoryUsage(),
+                cpuPercent: null,
+                loadAvg60: null,
+                freeMem: null,
+              }
+            }
+          } else {
+            const currentUsage = process.cpuUsage(info.previousStatus.cpuUsageTotal);
+            const cpuUsagePercentage = 100 * (currentUsage.user + currentUsage.system) /
+              ((info.currentTimeMs - info.previousTimeMs) * 1000);
+            return {
+              doNotStore: false,
+              status: {
+                cpuUsage: currentUsage,
+                cpuUsageTotal: process.cpuUsage(),
+                memoryUsage: process.memoryUsage(),
+                cpuPercent: cpuUsagePercentage,
+                loadAvg60: os.loadavg()[0],
+                freeMem: os.freemem(),
+              }
+            }
           }
         }
-      })
+      });
     }
 
     logger.info(

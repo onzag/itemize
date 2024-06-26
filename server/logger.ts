@@ -112,10 +112,41 @@ function converterFn(level: string, obj: IItemizeLoggingErrorStructure<any>) {
   return rawLogger[level](msg, obj);
 }
 
+/**
+ * A ping is an object that stores ping data sporadically
+ * within the logger, the ping object is used by default to store
+ * memory usage and cpu usage of the process
+ */
+export interface IItemizePingObjectGenerator<D, S> {
+  id: string;
+  data: D,
+  statusRetriever: (
+    info: {
+      data: D;
+      previousStatus: S;
+      previousTimeMs: number;
+      currentTimeMs: number;
+      firstTimeMs: number;
+    }
+  ) => {status: S, doNotStore: boolean},
+};
+
+export interface IItemizePingObject<D, S> {}
+
+/**
+ * @ignore
+ * Represents the list of pings that have been created
+ */
+const pingsCreated: IItemizePingObjectGenerator<any, any>[] = [];
+function defaultCreatePing<D, S>(data: IItemizePingObjectGenerator<D, S>) {
+  pingsCreated.push(data);
+}
+
 export const logger = disableLogger ? null : {
   info: converterFn.bind(null, "info") as (arg: IItemizeLoggingStructure<any>) => void,
   debug: converterFn.bind(null, "debug") as (arg: IItemizeLoggingStructure<any>) => void,
   error: converterFn.bind(null, "error") as (arg: IItemizeLoggingErrorStructure<any>) => void,
+  createPing: defaultCreatePing,
 }
 
 export type ILoggerType = typeof logger;
@@ -158,6 +189,11 @@ export function extendLoggerWith(p: LoggingProvider<any>) {
 
   rawLogger.remove(standardInfoTransport);
   rawLogger.remove(standardErrorTransport);
+  
+  logger.createPing = p.createPing.bind(p, INSTANCE_UUID);
+  pingsCreated.forEach((p) => {
+    logger.createPing(p);
+  });
 }
 
 process.on('warning', (warningInfo) => {

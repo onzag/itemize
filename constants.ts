@@ -115,6 +115,10 @@ export interface IItemizeConstantsConfig {
    * search filed, default is 100
    */
   SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE?: number;
+  /**
+   * Specifies the admin role for the user
+   */
+  ADMIN_ROLE?: string;
 }
 
 // in the client side it gets injected via esbuild in the server side
@@ -1631,8 +1635,6 @@ export const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
  * An identifier for the ping information
  */
 export const PING_DATA_IDENTIFIER = "ping_data";
-export const PING_STATUS_IDENTIFIER = "ping_status";
-
 /**
  * An identifier from when the server kicks an user from the
  * login (aka sudden remote logout)
@@ -1690,3 +1692,8 @@ export const CACHED_SELECTS_LOCATION_GLOBAL = "CACHED_SELECTS";
  * Specifies the maximum size for the searchengine_full_highlights value
  */
 export const SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE = R_ITEMIZE_CONSTANTS_CONFIG.SEARCHENGINE_MAX_HIGHLIGHT_FRAMENT_SIZE || 100;
+
+/**
+ * Specifies the admin role
+ */
+export const ADMIN_ROLE = R_ITEMIZE_CONSTANTS_CONFIG.ADMIN_ROLE || "ADMIN";

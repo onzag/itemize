@@ -32,7 +32,7 @@ export default async function itemizeConfigSetup(arg: ISetupConfigType): Promise
   if (!exists) {
     console.log("emiting " + colors.green("itemize.config.js"));
     await fsAsync.writeFile("itemize.config.js", config);
-  } else if (content !== config)  {
+  } else if (content !== config) {
     if (await confirm("Itemize config config is non-standard, would you like to emit the default?")) {
       console.log("emiting " + colors.green("itemize.config.js"));
       await fsAsync.writeFile("itemize.config.js", config);

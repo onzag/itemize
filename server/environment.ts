@@ -1,6 +1,7 @@
 import type { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISingleRedisConfigRawJSONDataType } from "../config";
 import uuid from "uuid";
 import fs from "fs";
+import os from "os";
 
 export const TRUST_ALL_INBOUND_CONNECTIONS = process.env.TRUST_ALL_INBOUND_CONNECTIONS === "true";
 
@@ -88,11 +89,15 @@ export interface IEnvironmentInfo {
   arch: string;
   platform: string;
 
+  totalMem: number;
+  cpus: number;
+
   buildnumber: string;
   redisGlobal: ISingleRedisConfigRawJSONDataType;
   redisCache: ISingleRedisConfigRawJSONDataType;
   redisPubSub: ISingleRedisConfigRawJSONDataType;
   postgresql: IDBConfigRawJSONDataType;
+  elastic: any;
   environment: typeof ENVIRONMENT_DETAILS;
 }
 
@@ -114,17 +119,26 @@ export function buildEnvironmentInfo(
   delete postgresql.password;
   delete postgresql.elasticLangAnalyzers;
   delete postgresql.dictionaries;
+  
+  const elastic = postgresql.elastic;
+  delete elastic.auth;
+
+  delete postgresql.elastic;
 
   return {
     nodeVersion: process.version,
     arch: process.arch,
     platform: process.platform,
 
+    totalMem: os.totalmem(),
+    cpus: os.cpus().length,
+
     buildnumber,
     redisCache,
     redisGlobal,
     redisPubSub,
     postgresql,
+    elastic,
     environment: ENVIRONMENT_DETAILS,
   };
 }

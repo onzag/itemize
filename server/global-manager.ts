@@ -12,6 +12,7 @@ import {
   UNSPECIFIED_OWNER,
   SERVER_BLOCK_UNTIL_REFRESH_TIME,
   SERVER_ELASTIC_CONSISTENCY_CHECK_TIME,
+  ADMIN_ROLE,
 } from "../constants";
 import {
   ISensitiveConfigRawJSONDataType,
@@ -212,12 +213,12 @@ export class GlobalManager {
     }
   }
   private async addAdminUserIfMissing() {
-    if (!this.config.roles.includes("ADMIN")) {
+    if (!this.config.roles.includes(ADMIN_ROLE)) {
       logger.info(
         {
           className: "GlobalManager",
           methodName: "addAdminUserIfMissing",
-          message: "Admin role is not included within the roles; avoiding this check",
+          message: ADMIN_ROLE + " role is not included within the roles; avoiding this check",
         }
       );
       return;
@@ -293,7 +294,7 @@ export class GlobalManager {
       const sqlIdefData: IManyValueType = {
         username,
         password: ["crypt(?, gen_salt('bf',10))", [password]],
-        role: "ADMIN",
+        role: ADMIN_ROLE,
         app_language: this.config.fallbackLanguage,
         app_country: this.config.fallbackCountryCode,
         app_currency: this.config.fallbackCurrency,

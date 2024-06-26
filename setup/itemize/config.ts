@@ -78,6 +78,10 @@ module.exports = {
      *   How many listeners can be added per socket
      *   This specifies the number of items and search the client can keep track of at once
      *   Defaults to 100
+     * 
+     * ADMIN_ROLE
+     *   The role for the admin
+     *   Defaults to "ADMIN"
      */
     constants: {
 

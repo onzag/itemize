@@ -13,17 +13,22 @@ import fs from "fs";
 import { INSTANCE_LOG_FILE, INSTANCE_LOG_ERROR_FILE, NODE_ENV } from "../../../server/environment";
 import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../../../config";
 import { RegistryService } from "../registry";
-import { IItemizeFinalLoggingObject } from "../../logger";
+import { IItemizeFinalLoggingObject, IItemizePingObjectGenerator } from "../../logger";
 
-export interface ILogsRecord {
-  data: any;
+export interface ILogsRecord<S> {
+  data: S;
   createdAt: string;
 }
 
 export interface ILogsResult {
   instanceId: string;
   level: "info" | "error";
-  records: ILogsRecord[];
+  records: ILogsRecord<any>[];
+}
+
+export interface IPingsResult<S> {
+  instanceId: string;
+  pings: ILogsRecord<S>[];
 }
 
 /**
@@ -152,6 +157,37 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
 
   }
 
+  /**
+   * @override used to create logged pings to get instance specific information
+   * for example statistics of memory usage
+   * @param data 
+   */
+  public createPing<D, S>(instanceId: string, data: IItemizePingObjectGenerator<D, S>) {
+    return null;
+  }
+
+  /**
+   * @override to provide the ping data for a given ping with an id
+   * @param instanceId 
+   * @param pingId 
+   */
+  public async getPingDataOf<D>(instanceId: string, pingId: string): Promise<D> {
+    return null;
+  }
+
+  /**
+   * @override to provide the ping data for a given ping with an id
+   * @param instanceId 
+   * @param pingId 
+   */
+  public async getPingsOf<S>(instanceId: string, pingId: string, fromDate: Date, toDate: Date): Promise<IPingsResult<S>> {
+    return null;
+  }
+
+  /**
+   * @override return the list of string of instance ids
+   * @returns 
+   */
   public async getLogsInstanceIds(): Promise<string[]> {
     return null;
   }

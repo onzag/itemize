@@ -7,10 +7,10 @@ import { getElasticSchemaForRoot, IElasticIndexDefinitionType, IElasticSchemaDef
 import { logger } from "./logger";
 import equals from "deep-equal";
 import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
-import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
+import { DELETED_REGISTRY_IDENTIFIER } from "../constants";
 import { CAN_LOG_DEBUG, ELASTIC_EXECUTE_CONSISTENCY_CHECKS_FROM_SCRATCH_AT, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, GLOBAL_MANAGER_MODE, INSTANCE_MODE, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
-import { AggregationsAggregationContainer, FieldValue, GetResponse, MgetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchHit, SearchRequest, SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
+import { AggregationsAggregationContainer, FieldValue, GetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchHit, SearchRequest, SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
 import type { IElasticHighlightReply } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISearchLimitersType } from "../base/Root";
@@ -33,25 +33,11 @@ interface ElasticRequestOptions {
 interface IDocumentBasicInfo { lastModified: NanoSecondComposedDate, index: string, language: string, id: string };
 interface IDocumentSeqNoInfo { seqNo: number, primaryTerm: number, lastModified: NanoSecondComposedDate };
 
-export interface IElasticPing<N> {
-  statusIndex: string;
-  dataIndex: string;
-  data: N;
-}
-
-interface IElasticPingSetter<N, T> extends IElasticPing<N> {
-  statusRetriever: () => T;
-}
-
 export interface IElasticSelectBuilderArg {
   itemOrModule: string | ItemDefinition | Module;
   language?: string;
   types?: (string | ItemDefinition)[];
   boost?: number;
-}
-
-export interface IPingEvent<N, T> extends IElasticPing<N> {
-  status: T;
 }
 
 interface ILangAnalyzers {
@@ -239,9 +225,6 @@ export class ItemizeElasticClient {
 
   private currentlyEnsuringIndexInGroup: { [n: string]: Promise<boolean> } = {};
 
-  private pings: IElasticPingSetter<any, any>[] = [];
-  private pingsInitialDataSet: boolean[] = [];
-
   constructor(
     root: Root,
     rawDB: ItemizeRawDB,
@@ -270,8 +253,6 @@ export class ItemizeElasticClient {
     // in extended mode where prepare instance is never called
     this.prepareInstancePromise = null;
     this.prepareInstancePromiseResolve = null;
-
-    setInterval(this.executePings.bind(this), SERVER_ELASTIC_PING_INTERVAL_TIME);
   }
 
   /**
@@ -2699,143 +2680,6 @@ export class ItemizeElasticClient {
     }
     const response = await this.elasticClient.count(request);
     return response;
-  }
-
-  // ping functionality
-  public createPing<N, T>(setter: IElasticPingSetter<N, T>) {
-    if (setter.dataIndex.startsWith("mod_")) {
-      throw new Error("Index name for a ping cannot start with 'mod_' as in " + setter.dataIndex);
-    } else if (setter.statusIndex.startsWith("mod_")) {
-      throw new Error("Index status name for a ping cannot start with 'mod_' as in " + setter.statusIndex);
-    } else if (setter.dataIndex === "status" || setter.dataIndex === "logs") {
-      throw new Error("Index name for a ping cannot be " + setter.dataIndex);
-    } else if (setter.statusIndex === "status" || setter.statusIndex === "logs") {
-      throw new Error("Index status name for a ping cannot be " + setter.dataIndex);
-    }
-    this.pings.push(setter);
-    this.pingsInitialDataSet.push(false);
-  }
-
-  private async executePing(index: number) {
-    const setter = this.pings[index];
-    const initialDataSet = this.pingsInitialDataSet[index];
-
-    if (!initialDataSet) {
-      const initialData = { ...setter.data };
-      initialData.timestamp = (new Date()).toISOString();
-
-      try {
-        await this.elasticClient.index({
-          index: setter.dataIndex,
-          id: INSTANCE_UUID,
-          document: initialData,
-        });
-        this.pingsInitialDataSet[index] = true;
-      } catch (err) {
-        logger.error(
-          {
-            className: "ItemizeElasticClient",
-            methodName: "executePing",
-            message: "Could not execute a given ping initial data",
-            serious: true,
-            err,
-          }
-        );
-      }
-    }
-
-    try {
-      const status = setter.statusRetriever();
-      status.instanceId = INSTANCE_UUID;
-      status.timestamp = (new Date()).toISOString();
-
-      await this.elasticClient.index({
-        index: setter.statusIndex,
-        document: status,
-      });
-    } catch (err) {
-      logger.error(
-        {
-          className: "ItemizeElasticClient",
-          methodName: "executePing",
-          message: "Could not execute a ping",
-          serious: true,
-          err,
-        }
-      );
-    }
-  }
-
-  private async executePings() {
-    await Promise.all(this.pings.map((p, index) => this.executePing(index)));
-  }
-
-  public async getAllStoredPingsAt<N>(dataIndex: string) {
-    const allResults = await this.elasticClient.search<N>({
-      index: dataIndex,
-    });
-
-    const resultKeyd: { [key: string]: N } = {};
-
-    allResults.hits.hits.forEach((hit) => {
-      resultKeyd[hit._id] = hit._source;
-    });
-
-    return resultKeyd;
-  }
-
-  public async deletePingsFor(dataIndex: string, statusIndex: string, instanceId: string): Promise<"NOT_DEAD" | "OK"> {
-    const lastStatusGiven = await this.elasticClient.search({
-      index: statusIndex,
-      size: 1,
-      _source: false,
-      query: {
-        match: {
-          instanceId,
-        }
-      },
-      fields: [
-        "timestamp",
-      ],
-      sort: [
-        {
-          timestamp: {
-            order: "desc",
-          }
-        } as any,
-      ]
-    });
-
-    if (lastStatusGiven.hits.total !== 0) {
-      const now = (new Date()).getTime();
-      const timestamp = (new Date(lastStatusGiven.hits[0].fields.timestamp[0])).getTime();
-
-      const diff = timestamp - now;
-      // can't assume dead until 30 seconds have passed
-      if (diff <= 30000) {
-        return "NOT_DEAD";
-      }
-
-      await this.elasticClient.deleteByQuery({
-        index: statusIndex,
-        query: {
-          match: {
-            instanceId,
-          }
-        },
-      });
-    }
-
-    await this.elasticClient.deleteByQuery({
-      index: dataIndex,
-      query: {
-        term: {
-          _id: instanceId,
-        }
-      },
-    });
-
-    return "OK";
   }
 
   public async guessGeoIpFor(ip: string): Promise<{
