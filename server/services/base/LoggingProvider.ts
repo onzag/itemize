@@ -171,7 +171,7 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
    * @param instanceId 
    * @param pingId 
    */
-  public async getPingDataOf<D>(instanceId: string, pingId: string): Promise<D> {
+  public async getPingDataOf<D>(instanceId: string, pingId: string): Promise<{data: D, timestamp: string}> {
     return null;
   }
 
@@ -179,21 +179,41 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
    * @override to provide the ping data for a given ping with an id
    * @param instanceId 
    * @param pingId 
+   * @param fromDate
+   * @param toDate
    */
   public async getPingsOf<S>(instanceId: string, pingId: string, fromDate: Date, toDate: Date): Promise<IPingsResult<S>> {
     return null;
   }
 
   /**
-   * @override return the list of string of instance ids
+   * @override to provide the functionality
+   * @param instanceId 
+   * @param pingId 
    * @returns 
    */
-  public async getLogsInstanceIds(): Promise<string[]> {
+  public async isPingAlive(instanceId: string, pingId: string): Promise<{alive: boolean, lastHeard: string}> {
     return null;
   }
 
-  public async clearLogsOf(instanceId: string): Promise<"OK" | "ERROR" | "NOT_AUTHORIZED"> {
-    return "ERROR";
+  /**
+   * @override return the instance ids that called the given ping with that id
+   * @returns 
+   */
+  public async getPingInstanceIds(pingId: string): Promise<string[]> {
+    return null;
+  }
+
+  /**
+   * @override return the instance ids that called the given ping with their id and data
+   * @returns 
+   */
+  public async getPingsWithData<D>(pingId: string): Promise<Array<{instanceId: string, data: D, timestamp: string}>> {
+    return null;
+  }
+
+  public async clearLogsOf(instanceId: string) {
+    return null;
   }
 
   public async getLogsOf(instanceId: string, level: "info" | "error", fromDate: Date, toDate: Date): Promise<ILogsResult> {

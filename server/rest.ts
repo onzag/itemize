@@ -13,10 +13,17 @@ import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefin
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES, ADMIN_ROLE } from "../constants";
 import { getMode } from "./mode";
-import { ENVIRONMENT_DETAILS, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
+import { IEnvironmentInfo, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
 import { jwtVerify } from "./token";
 import { IServerSideTokenDataType } from "./resolvers/basic";
 import fs from "fs";
+import { INetwork, INetworkDbNode, INetworkServerNode } from "./network";
+import uuidv5 from "uuid/v5";
+
+const NAMESPACE = "23ab4609-df49-4fdf-931b-4203adb284f3";
+export function makeNetworkIdOutOf(str: string) {
+  return "DB" + uuidv5(str, NAMESPACE).replace(/-/g, "");
+}
 
 export function secureEndpointRouter(appData: IAppDataType, req: express.Request, res: express.Response, next: () => void) {
   const hostname = req.headers["host"];
@@ -460,108 +467,377 @@ export default function restServices(appData: IAppDataType) {
   });
 
   // ADMINISTRATIVE STUFF
-  // router.get("/logs/:level/:id", async (req, res) => {
-  //   res.setHeader("content-type", "application/json; charset=utf-8");
+  router.get("/admin/network", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
 
-  //   const forbidden = await validateToken(req);
-  //   if (forbidden) {
-  //     res.status(401).end(JSON.stringify({
-  //       status: "NOT_AUTHORIZED",
-  //     }));
-  //     return;
-  //   }
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
 
-  //   let fromMs = req.query.from && Date.parse(req.query.from.toString());
-  //   let toMs = req.query.to && Date.parse(req.query.to.toString());
-  //   const level: "info" | "error" = req.params.level as any;
-  //   const id = req.params.id;
+    const instances = await appData.loggingService.getPingsWithData<IEnvironmentInfo>(PING_DATA_IDENTIFIER);
+    const networkResult: INetwork = {
+      nodes: [],
+    };
 
-  //   if (!fromMs || isNaN(fromMs) || !toMs || isNaN(toMs) || !id || (level !== "info" && level !== "error")) {
-  //     res.status(400).end(JSON.stringify({
-  //       status: "BAD_REQUEST",
-  //     }));
-  //   }
+    await Promise.all(instances.map(async (i) => {
+      if (!i.data || !i.data.environment || !i.data.environment.INSTANCE_GROUP_ID) {
+        return;
+      }
 
-  //   const fromD = new Date(fromMs);
-  //   const toD = new Date(toMs);
+      const groupId = i.data.environment.INSTANCE_GROUP_ID;
 
-  //   const allLogs = await appData.loggingService.getLogsOf(id, level, fromD, toD);
-  //   res.end(JSON.stringify({
-  //     status: "OK",
-  //     logs: allLogs,
-  //   }));
-  // });
+      const livingInfo = await appData.loggingService.isPingAlive(i.instanceId, PING_DATA_IDENTIFIER);
 
-  // router.get("/logs", async (req, res) => {
-  //   res.setHeader("content-type", "application/json; charset=utf-8");
+      const node: INetworkServerNode = {
+        createdAt: i.timestamp,
+        envData: i.data.environment,
+        groupId,
+        instanceId: i.instanceId,
+        nodeId: i.instanceId,
+        alive: livingInfo.alive,
+        lastHeard: livingInfo.lastHeard,
 
-  //   const forbidden = await validateToken(req);
-  //   if (forbidden) {
-  //     res.status(401).end(JSON.stringify({
-  //       status: "NOT_AUTHORIZED",
-  //     }));
-  //     return;
-  //   }
+        // to determine
+        name: null,
+        type: null,
+        links: [],
+      }
 
-  //   const allLogInstances = await appData.loggingService.getLogsInstanceIds();
-  //   res.end(JSON.stringify({
-  //     status: "OK",
-  //     ids: allLogInstances,
-  //   }));
-  // })
+      let hasDbConnection = false;
+      let hasGlobalRedisConnection = false;
+      let hasPubsubRedisConnection = false;
+      let hasClusterRedisConnection = false;
+      let hasElasticConnection = false;
 
-  // router.delete("/logs/:id", async (req, res) => {
-  //   res.setHeader("content-type", "application/json; charset=utf-8");
+      if (i.data.environment.INSTANCE_MODE === "ABSOLUTE") {
+        node.type = "absolute";
+        node.name = i.data.environment.NODE_ENV + " absolute server";
 
-  //   const forbidden = await validateToken(req);
-  //   if (forbidden) {
-  //     res.status(401).end(JSON.stringify({
-  //       status: "NOT_AUTHORIZED",
-  //     }));
-  //     return;
-  //   }
+        hasDbConnection = true;
+        hasGlobalRedisConnection = true;
+        hasPubsubRedisConnection = true;
+        hasClusterRedisConnection = true;
+        hasElasticConnection = true;
 
-  //   const status = await appData.loggingService.clearLogsOf(req.params.id);
-  //   res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
-  //     status,
-  //   }));
-  // });
+      } else if (i.data.environment.INSTANCE_MODE === "GLOBAL_MANAGER") {
+        hasDbConnection = true;
+        hasGlobalRedisConnection = true;
+        hasPubsubRedisConnection = true;
+        hasElasticConnection = true;
 
-  // router.get("/clusters/info", async (req, res) => {
-  //   res.setHeader("content-type", "application/json; charset=utf-8");
+        if (i.data.environment.GLOBAL_MANAGER_MODE === "ABSOLUTE") {
+          node.type = "global-manager-absolute";
+          node.name = "absolute global manager";
+        } else if (i.data.environment.GLOBAL_MANAGER_MODE === "ELASTIC") {
+          node.type = "global-manager-elastic";
+          node.name = "elasticsearch and indexing global manager";
+        } else if (i.data.environment.GLOBAL_MANAGER_MODE === "SERVER_DATA") {
+          node.type = "global-manager-server-data";
+          node.name = "server data global manager";
+        } else if (i.data.environment.GLOBAL_MANAGER_MODE === "SERVICES") {
+          if (i.data.environment.GLOBAL_MANAGER_SERVICES.length === 0) {
+            node.type = "global-manager-services";
+            node.name = "absolute services global manager";
+          } else {
+            node.type = "global-manager-service-x";
+            node.name = "services global manager (" + i.data.environment.GLOBAL_MANAGER_SERVICES.join(", ") + ")";
+          }
+        } else {
+          return;
+        }
+      } else if (i.data.environment.INSTANCE_MODE === "CLUSTER_MANAGER") {
+        node.type = "cluster-manager";
+        node.name = i.data.environment.NODE_ENV + " cluster manager";
 
-  //   const forbidden = await validateToken(req);
-  //   if (forbidden) {
-  //     res.status(401).end(JSON.stringify({
-  //       status: "NOT_AUTHORIZED",
-  //     }));
-  //     return;
-  //   }
+        hasDbConnection = true;
+        hasGlobalRedisConnection = true;
+        hasPubsubRedisConnection = true;
+        hasClusterRedisConnection = true;
+        hasElasticConnection = true;
+      } else if (i.data.environment.INSTANCE_MODE === "EXTENDED") {
+        node.type = "extended";
+        node.name = i.data.environment.NODE_ENV + " extended server";
 
-  //   const allPings = await appData.loggingService.getAllStoredPingsAt(PING_DATA_IDENTIFIER);
-  //   res.end(JSON.stringify({
-  //     status: "OK",
-  //     self: ENVIRONMENT_DETAILS,
-  //     pings: allPings,
-  //   }));
-  // });
+        hasDbConnection = true;
+        hasGlobalRedisConnection = true;
+        hasPubsubRedisConnection = true;
+        hasClusterRedisConnection = true;
+        hasElasticConnection = true;
+      } else {
+        return;
+      }
 
-  // router.delete("/clusters/info/:uuid", async (req, res) => {
-  //   res.setHeader("content-type", "application/json; charset=utf-8");
+      if (hasDbConnection) {
+        const pgInfo = i.data.postgresql;
+        if (pgInfo?.host) {
+          const hostlocation = pgInfo.host + ":" + (pgInfo.port || "5432");
+          const nodeId = makeNetworkIdOutOf(hostlocation);
+          let db: INetworkDbNode = networkResult.nodes.find((v) => v.nodeId === nodeId) as INetworkDbNode;
+          if (!db) {
+            db = {
+              type: "pg",
+              groupId: "GLOBAL",
+              host: hostlocation,
+              links: [
+                {
+                  id: i.instanceId,
+                  type: "uses-as-central-database",
+                },
+              ],
+              name: "PostgreSQL database",
+              nodeId,
+            };
+            networkResult.nodes.push(db);
+          } else {
+            db.links.push({
+              id: i.instanceId,
+              type: "uses-as-central-database",
+            });
+          }
 
-  //   const forbidden = await validateToken(req);
-  //   if (forbidden) {
-  //     res.status(401).end(JSON.stringify({
-  //       status: "NOT_AUTHORIZED",
-  //     }));
-  //     return;
-  //   }
+          node.links.push({
+            id: nodeId,
+            type: "uses-as-central-database",
+          });
+        }
+      }
 
-  //   const status = await appData.loggingService.deletePingsFor(PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, req.params.uuid);
-  //   res.status(status === "NOT_DEAD" ? 403 : 200).end(JSON.stringify({
-  //     status,
-  //   }));
-  // });
+      if (hasElasticConnection) {
+        const elasicInfo = i.data.elastic;
+        if (elasicInfo?.node) {
+          const hostlocation = elasicInfo.node;
+          const nodeId = makeNetworkIdOutOf(hostlocation);
+          let elastic: INetworkDbNode = networkResult.nodes.find((v) => v.nodeId === nodeId) as INetworkDbNode;
+          if (!elastic) {
+            elastic = {
+              type: "elastic",
+              groupId: "GLOBAL",
+              host: hostlocation,
+              links: [
+                {
+                  id: i.instanceId,
+                  type: "uses-as-search-database",
+                },
+              ],
+              name: "Elasticsearch database",
+              nodeId,
+            };
+            networkResult.nodes.push(elastic);
+          } else {
+            elastic.links.push({
+              id: i.instanceId,
+              type: "uses-as-search-database",
+            });
+          }
+
+          elastic.links.push({
+            id: nodeId,
+            type: "uses-as-search-database",
+          });
+        }
+      }
+
+      if (hasClusterRedisConnection) {
+        const redisInfo = i.data.redisCache;
+        if (redisInfo?.host) {
+          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + redisInfo.path;
+          const nodeId = makeNetworkIdOutOf(hostlocation);
+          let redisNode = networkResult.nodes.find((n) => n.nodeId === nodeId);
+          if (!redisNode) {
+            redisNode = {
+              groupId,
+              type: "redis",
+              host: hostlocation,
+              links: [
+                {
+                  id: i.instanceId,
+                  type: "uses-as-cluster-cache",
+                },
+              ],
+              name: "Redis server",
+              nodeId,
+            };
+            networkResult.nodes.push(redisNode);
+          } else {
+            redisNode.links.push({
+              id: i.instanceId,
+              type: "uses-as-cluster-cache",
+            });
+          }
+
+          node.links.push({
+            id: nodeId,
+            type: "uses-as-cluster-cache",
+          });
+        }
+      }
+
+      if (hasGlobalRedisConnection) {
+        const redisInfo = i.data.redisGlobal;
+        if (redisInfo?.host) {
+          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + redisInfo.path;
+          const nodeId = makeNetworkIdOutOf(hostlocation);
+          let redisNode = networkResult.nodes.find((n) => n.nodeId === nodeId);
+          if (!redisNode) {
+            redisNode = {
+              groupId,
+              type: "redis",
+              host: hostlocation,
+              links: [
+                {
+                  id: i.instanceId,
+                  type: "uses-as-global-cache",
+                },
+              ],
+              name: "Redis server",
+              nodeId,
+            };
+            networkResult.nodes.push(redisNode);
+          } else {
+            redisNode.links.push({
+              id: i.instanceId,
+              type: "uses-as-global-cache",
+            });
+
+            if (redisNode.groupId !== "GLOBAL") {
+              redisNode.groupId = "GLOBAL";
+            }
+          }
+
+          node.links.push({
+            id: nodeId,
+            type: "uses-as-global-cache",
+          });
+        }
+      }
+
+      if (hasPubsubRedisConnection) {
+        const redisInfo = i.data.redisPubSub;
+        if (redisInfo?.host) {
+          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + redisInfo.path;
+          const nodeId = makeNetworkIdOutOf(hostlocation);
+          let redisNode = networkResult.nodes.find((n) => n.nodeId === nodeId);
+          if (!redisNode) {
+            redisNode = {
+              groupId,
+              type: "redis",
+              host: hostlocation,
+              links: [
+                {
+                  id: i.instanceId,
+                  type: "uses-as-global-pubsub",
+                },
+              ],
+              name: "Redis server",
+              nodeId,
+            };
+            networkResult.nodes.push(redisNode);
+          } else {
+            redisNode.links.push({
+              id: i.instanceId,
+              type: "uses-as-global-pubsub",
+            });
+
+            if (redisNode.groupId !== "GLOBAL") {
+              redisNode.groupId = "GLOBAL";
+            }
+          }
+
+          node.links.push({
+            id: nodeId,
+            type: "uses-as-global-pubsub",
+          });
+        }
+      }
+    }));
+
+    res.status(200).end(JSON.stringify(networkResult));
+  });
+
+  router.get("/admin/logs/:level/:id", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    let fromMs = req.query.from && Date.parse(req.query.from.toString());
+    let toMs = req.query.to && Date.parse(req.query.to.toString());
+    const level: "info" | "error" = req.params.level as any;
+    const id = req.params.id;
+
+    if (!fromMs || isNaN(fromMs) || !id || (level !== "info" && level !== "error")) {
+      res.status(400).end(JSON.stringify({
+        status: "BAD_REQUEST",
+      }));
+    }
+
+    const fromD = new Date(fromMs);
+    const toD = toMs && !isNaN(toMs) ? new Date(toMs) : null;
+
+    const allLogs = await appData.loggingService.getLogsOf(id, level, fromD, toD);
+    res.end(JSON.stringify({
+      status: "OK",
+      logs: allLogs,
+    }));
+  });
+
+  router.get("/admin/pings/:pid/:id", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    let fromMs = req.query.from && Date.parse(req.query.from.toString());
+    let toMs = req.query.to && Date.parse(req.query.to.toString());
+    const pingid = req.params.pid;
+    const id = req.params.id;
+
+    if (!fromMs || isNaN(fromMs) || !id || !pingid) {
+      res.status(400).end(JSON.stringify({
+        status: "BAD_REQUEST",
+      }));
+    }
+
+    const fromD = new Date(fromMs);
+    const toD = toMs && !isNaN(toMs) ? new Date(toMs) : null;
+
+    const allPings = await appData.loggingService.getPingsOf(id, pingid, fromD, toD);
+    res.end(JSON.stringify({
+      status: "OK",
+      pings: allPings,
+    }));
+  });
+
+  router.delete("/admin/logs/:id", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const status = await appData.loggingService.clearLogsOf(req.params.id);
+    res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
+      status,
+    }));
+  });
 
   // now we add a 404
   router.use((req, res) => {

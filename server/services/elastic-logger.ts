@@ -287,38 +287,61 @@ export class ElasticLoggerService extends LoggingProvider<null> {
     });
   }
 
-  public async getLogsInstanceIds(): Promise<string[]> {
+  public async getPingDataOf<D>(instanceId: string, pingId: string): Promise<{ data: D, timestamp: string }> {
     const results = await this.elastic.search({
-      index: logsIndex,
-      aggs: {
-        instance_ids: {
-          terms: {
-            field: "instance_id",
-          }
+      index: pingId + "_data",
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                _id: {
+                  value: instanceId,
+                }
+              }
+            }
+          ]
         }
       }
     });
 
-    // TODO
-    console.log(results)
+    if (results.hits?.hits.length) {
+      const source = results.hits?.hits[0]._source as any;
+      return {
+        timestamp: source.timestamp,
+        data: source,
+      }
+    }
 
-    return [];
+    return null;
   }
 
-  public async clearLogsOf(instanceId: string): Promise<"OK" | "ERROR" | "NOT_AUTHORIZED"> {
-    try {
-      await this.elastic.deleteByQuery({
-        index: logsIndex,
-        query: {
-          term: {
-            instance_id: instanceId,
-          },
+  public async getPingInstanceIds(pingId: string): Promise<string[]> {
+    const results = await this.elastic.search({
+      index: pingId + "_data",
+      _source: ["_id"],
+    });
+
+    return results.hits.hits.map((v) => v._id);
+  }
+
+  public async getPingsWithData<D>(pingId: string): Promise<Array<{ instanceId: string, data: D, timestamp: string }>> {
+    const results = await this.elastic.search({
+      index: pingId + "_data",
+    });
+
+    return results.hits.hits.map((v) => ({ instanceId: v._id, timestamp: (v._source as any).timestamp, data: v._source as any }));
+  }
+
+  public async clearLogsOf(instanceId: string) {
+    await this.elastic.deleteByQuery({
+      index: logsIndex,
+      query: {
+        term: {
+          instance_id: instanceId,
         },
-      });
-    } catch {
-      return "ERROR";
-    }
-    return "OK";
+      },
+    });
   }
 
   public async getLogsOf(instanceId: string, level: "info" | "error", fromDate: Date, toDate: Date): Promise<ILogsResult> {
@@ -351,5 +374,48 @@ export class ElasticLoggerService extends LoggingProvider<null> {
         );
       }),
     });
+  }
+
+  public async isPingAlive(instanceId: string, pingId: string): Promise<{alive: boolean; lastHeard: string;}> {
+    const results = await this.elastic.search({
+      index: pingId + "_status",
+      query: {
+        bool: {
+          must: {
+            term: {
+              ["instanceId.keyword"]: {
+                value: instanceId,
+              },
+            },
+          },
+        },
+      },
+      size: 1,
+      sort: [
+        {
+          timestamp: {
+            order: "desc",
+          }
+        } as any,
+      ],
+      _source: ["timestamp"],
+    });
+
+    const lastTimestampHeardOf = results.hits?.hits && results.hits.hits[0] && results.hits.hits[0]._source["timestamp"];
+
+    if (!lastTimestampHeardOf) {
+      return {alive: false, lastHeard: null};
+    }
+
+    const currentTime = (new Date()).getTime();
+    const lastTime = (new Date(lastTimestampHeardOf)).getTime();
+
+    const timeDifference = currentTime - lastTime;
+
+    if (timeDifference > (SERVER_ELASTIC_PING_INTERVAL_TIME*2)) {
+      return {alive: false, lastHeard: lastTimestampHeardOf};
+    }
+
+    return {alive: true, lastHeard: lastTimestampHeardOf};
   }
 }

@@ -13,6 +13,12 @@ if (NODE_ENV !== "development" && NODE_ENV !== "production") {
 }
 export const PORT: number = process.env.PORT ? (parseInt(process.env.PORT) || 8000) : 8000;
 export const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
+
+if (INSTANCE_GROUP_ID === "GLOBAL") {
+  console.error("Invalid reserved INSTANCE_GROUP_ID ", INSTANCE_GROUP_ID);
+  process.exit(1);
+}
+
 export const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 export const GLOBAL_MANAGER_MODE: "ABSOLUTE" | "ELASTIC" | "SERVER_DATA" | "SERVICES" = process.env.GLOBAL_MANAGER_MODE || "ABSOLUTE" as any;
 export const GLOBAL_MANAGER_SERVICES: string[] = (process.env.GLOBAL_MANAGER_SERVICES && process.env.GLOBAL_MANAGER_SERVICES.split(",").map((s) => s.trim())) || [];
@@ -82,6 +88,9 @@ export const ENVIRONMENT_DETAILS = {
   NO_SEO,
   LOG_LEVEL,
   NODE_ENV,
+
+  GLOBAL_MANAGER_MODE,
+  GLOBAL_MANAGER_SERVICES,
 };
 
 export interface IEnvironmentInfo {
