@@ -11,7 +11,7 @@ import Module from "../base/Root/Module";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
-import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES, ADMIN_ROLE } from "../constants";
+import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES, ADMIN_ROLE, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
 import { getMode } from "./mode";
 import { IEnvironmentInfo, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
 import { jwtVerify } from "./token";
@@ -434,7 +434,11 @@ export default function restServices(appData: IAppDataType) {
   appData.root.getAllModules().forEach(buildRouteForModule);
 
   async function validateToken(req: any) {
-    const token = req.query.token && req.query.token.toString();
+    const token = (
+      req.query.token && req.query.token.toString()
+    ) || (
+        req.headers["token"] && req.headers["token"].toString()
+      );
 
     if (!token) {
       return true;
@@ -490,7 +494,17 @@ export default function restServices(appData: IAppDataType) {
 
       const groupId = i.data.environment.INSTANCE_GROUP_ID;
 
-      const livingInfo = await appData.loggingService.isPingAlive(i.instanceId, PING_DATA_IDENTIFIER);
+      const currentTime = (new Date()).getTime();
+      const createdTime = (new Date(i.timestamp)).getTime();
+
+      const timeDifference = currentTime - createdTime;
+
+      const isAliveByDefault = timeDifference <= (SERVER_ELASTIC_PING_INTERVAL_TIME * 2);
+
+      const livingInfo = await appData.loggingService.isPingAlive(
+        i.instanceId,
+        PING_DATA_IDENTIFIER,
+      );
 
       const node: INetworkServerNode = {
         createdAt: i.timestamp,
@@ -498,8 +512,9 @@ export default function restServices(appData: IAppDataType) {
         groupId,
         instanceId: i.instanceId,
         nodeId: i.instanceId,
-        alive: livingInfo.alive,
-        lastHeard: livingInfo.lastHeard,
+        alive: livingInfo.alive || isAliveByDefault,
+        lastHeard: livingInfo.lastHeard || i.timestamp,
+        nodeType: "server",
 
         // to determine
         name: null,
@@ -582,6 +597,7 @@ export default function restServices(appData: IAppDataType) {
               type: "pg",
               groupId: "GLOBAL",
               host: hostlocation,
+              nodeType: "database",
               links: [
                 {
                   id: i.instanceId,
@@ -617,6 +633,7 @@ export default function restServices(appData: IAppDataType) {
               type: "elastic",
               groupId: "GLOBAL",
               host: hostlocation,
+              nodeType: "database",
               links: [
                 {
                   id: i.instanceId,
@@ -634,7 +651,7 @@ export default function restServices(appData: IAppDataType) {
             });
           }
 
-          elastic.links.push({
+          node.links.push({
             id: nodeId,
             type: "uses-as-search-database",
           });
@@ -644,11 +661,12 @@ export default function restServices(appData: IAppDataType) {
       if (hasClusterRedisConnection) {
         const redisInfo = i.data.redisCache;
         if (redisInfo?.host) {
-          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + redisInfo.path;
+          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + (redisInfo.path || "");
           const nodeId = makeNetworkIdOutOf(hostlocation);
           let redisNode = networkResult.nodes.find((n) => n.nodeId === nodeId);
           if (!redisNode) {
             redisNode = {
+              nodeType: "database",
               groupId,
               type: "redis",
               host: hostlocation,
@@ -679,11 +697,12 @@ export default function restServices(appData: IAppDataType) {
       if (hasGlobalRedisConnection) {
         const redisInfo = i.data.redisGlobal;
         if (redisInfo?.host) {
-          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + redisInfo.path;
+          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + (redisInfo.path || "");
           const nodeId = makeNetworkIdOutOf(hostlocation);
           let redisNode = networkResult.nodes.find((n) => n.nodeId === nodeId);
           if (!redisNode) {
             redisNode = {
+              nodeType: "database",
               groupId,
               type: "redis",
               host: hostlocation,
@@ -718,11 +737,12 @@ export default function restServices(appData: IAppDataType) {
       if (hasPubsubRedisConnection) {
         const redisInfo = i.data.redisPubSub;
         if (redisInfo?.host) {
-          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + redisInfo.path;
+          const hostlocation = redisInfo.host + ":" + (redisInfo.port || "6379") + "/" + (redisInfo.path || "");
           const nodeId = makeNetworkIdOutOf(hostlocation);
           let redisNode = networkResult.nodes.find((n) => n.nodeId === nodeId);
           if (!redisNode) {
             redisNode = {
+              nodeType: "database",
               groupId,
               type: "redis",
               host: hostlocation,
@@ -753,6 +773,8 @@ export default function restServices(appData: IAppDataType) {
           });
         }
       }
+
+      networkResult.nodes.push(node);
     }));
 
     res.status(200).end(JSON.stringify(networkResult));
@@ -769,12 +791,12 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    let fromMs = req.query.from && Date.parse(req.query.from.toString());
-    let toMs = req.query.to && Date.parse(req.query.to.toString());
-    const level: "info" | "error" = req.params.level as any;
+    let fromMs = req.query.from && (Date.parse(req.query.from.toString()) || parseInt(req.query.from.toString()));
+    let toMs = req.query.to && (Date.parse(req.query.to.toString()) || parseInt(req.query.to.toString()));
+    const level: "info" | "error" | "any" = req.params.level as any;
     const id = req.params.id;
 
-    if (!fromMs || isNaN(fromMs) || !id || (level !== "info" && level !== "error")) {
+    if (!fromMs || isNaN(fromMs) || !id || (level !== "info" && level !== "error" && level !== "any")) {
       res.status(400).end(JSON.stringify({
         status: "BAD_REQUEST",
       }));
@@ -801,8 +823,8 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    let fromMs = req.query.from && Date.parse(req.query.from.toString());
-    let toMs = req.query.to && Date.parse(req.query.to.toString());
+    let fromMs = req.query.from && (Date.parse(req.query.from.toString()) || parseInt(req.query.from.toString()));
+    let toMs = req.query.to && (Date.parse(req.query.to.toString()) || parseInt(req.query.to.toString()));
     const pingid = req.params.pid;
     const id = req.params.id;
 
@@ -838,6 +860,24 @@ export default function restServices(appData: IAppDataType) {
       status,
     }));
   });
+
+  // TODO get and stream all the logs
+  // router.get("/admin/logs/:id", async (req, res) => {
+    // res.setHeader("content-type", "application/json; charset=utf-8");
+
+    // const forbidden = await validateToken(req);
+    // if (forbidden) {
+    //   res.status(401).end(JSON.stringify({
+    //     status: "NOT_AUTHORIZED",
+    //   }));
+    //   return;
+    // }
+
+    // const status = await appData.loggingService.clearLogsOf(req.params.id);
+    // res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
+    //   status,
+    // }));
+  //})
 
   // now we add a 404
   router.use((req, res) => {

@@ -14,6 +14,7 @@ export interface INetworkNode {
 }
 
 export interface INetworkServerNode extends INetworkNode {
+  nodeType: "server";
   type: "extended" | "cluster-manager" | "global-manager-absolute" | "global-manager-services" |
   "global-manager-elastic" | "global-manager-server-data" | "global-manager-service-x" | "absolute";
   envData: typeof ENVIRONMENT_DETAILS;
@@ -24,10 +25,11 @@ export interface INetworkServerNode extends INetworkNode {
 }
 
 export interface INetworkDbNode extends INetworkNode {
+  nodeType: "database";
   type: "elastic" | "redis" | "pg";
   host: string;
 }
 
 export interface INetwork {
-  nodes: Array<INetworkDbNode | INetworkNode>;
+  nodes: Array<INetworkDbNode | INetworkServerNode>;
 }

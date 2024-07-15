@@ -18,12 +18,13 @@ import { IItemizeFinalLoggingObject, IItemizePingObjectGenerator } from "../../l
 export interface ILogsRecord<S> {
   data: S;
   createdAt: string;
+  level: "info" | "error";
 }
 
 export interface ILogsResult {
   instanceId: string;
-  level: "info" | "error";
-  records: ILogsRecord<any>[];
+  level: "info" | "error" | "any";
+  records: ILogsRecord<IItemizeFinalLoggingObject>[];
 }
 
 export interface IPingsResult<S> {
@@ -216,7 +217,7 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
     return null;
   }
 
-  public async getLogsOf(instanceId: string, level: "info" | "error", fromDate: Date, toDate: Date): Promise<ILogsResult> {
+  public async getLogsOf(instanceId: string, level: "info" | "error" | "any", fromDate: Date, toDate: Date): Promise<ILogsResult> {
     return null;
   }
 }

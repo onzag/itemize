@@ -73,6 +73,15 @@ import { ElasticLocationService } from "./services/elastic-location";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { RQRootSchema, getRQSchemaForRoot } from "../base/Root/rq";
 
+export interface IServerPingDataPing {
+  cpuUsageTotal: NodeJS.CpuUsage,
+  cpuUsage: NodeJS.CpuUsage;
+  memoryUsage: NodeJS.MemoryUsage;
+  cpuPercent: number;
+  loadAvg60: number;
+  freeMem: number;
+};
+
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
 try {
@@ -741,14 +750,7 @@ export async function initializeServer(
         dbConfig,
       );
 
-      logger.createPing<IEnvironmentInfo, {
-        cpuUsageTotal: NodeJS.CpuUsage,
-        cpuUsage: NodeJS.CpuUsage;
-        memoryUsage: NodeJS.MemoryUsage;
-        cpuPercent: number;
-        loadAvg60: number;
-        freeMem: number;
-      }>({
+      logger.createPing<IEnvironmentInfo, IServerPingDataPing>({
         id: PING_DATA_IDENTIFIER,
         data: envInfo,
         statusRetriever: (info) => {
