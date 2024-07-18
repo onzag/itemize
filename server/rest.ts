@@ -780,7 +780,7 @@ export default function restServices(appData: IAppDataType) {
     res.status(200).end(JSON.stringify(networkResult));
   });
 
-  router.get("/admin/logs/:level/:id", async (req, res) => {
+  router.get("/admin/nodes/:id/logs/:level", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     const forbidden = await validateToken(req);
@@ -812,7 +812,7 @@ export default function restServices(appData: IAppDataType) {
     }));
   });
 
-  router.get("/admin/pings/:pid/:id", async (req, res) => {
+  router.get("/admin/nodes/:id/pings/:pid", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     const forbidden = await validateToken(req);
@@ -844,7 +844,7 @@ export default function restServices(appData: IAppDataType) {
     }));
   });
 
-  router.delete("/admin/logs/:id", async (req, res) => {
+  router.delete("/admin/nodes/:id/logs", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     const forbidden = await validateToken(req);
@@ -855,29 +855,273 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    const status = await appData.loggingService.clearLogsOf(req.params.id);
-    res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
-      status,
-    }));
+    try {
+      await appData.loggingService.clearLogsOf(req.params.id);
+      res.status(200).end(JSON.stringify({status: "OK"}));
+    } catch (err) {
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+    }
   });
 
-  // TODO get and stream all the logs
-  // router.get("/admin/logs/:id", async (req, res) => {
-    // res.setHeader("content-type", "application/json; charset=utf-8");
+  router.delete("/admin/nodes/:id/pings/:pid", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
 
-    // const forbidden = await validateToken(req);
-    // if (forbidden) {
-    //   res.status(401).end(JSON.stringify({
-    //     status: "NOT_AUTHORIZED",
-    //   }));
-    //   return;
-    // }
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
 
-    // const status = await appData.loggingService.clearLogsOf(req.params.id);
-    // res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
-    //   status,
-    // }));
-  //})
+    try {
+      await appData.loggingService.clearPingsOf(req.params.id, req.params.pid);
+      res.status(200).end(JSON.stringify({status: "OK"}));
+    } catch (err) {
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+    }
+  });
+
+  router.get("/admin/nodes/:id/pingfile/:pid", async (req, res) => {
+    res.setHeader("content-type", "text/plain; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end("NOT_AUTHORIZED");
+      return;
+    }
+
+    res.status(200);
+    await appData.loggingService.streamPingsOf(req.params.id, req.params.pid, res.write.bind(res));
+    res.end();
+  });
+
+  router.get("/admin/nodes/:id/logfile", async (req, res) => {
+    res.setHeader("content-type", "text/plain; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end("NOT_AUTHORIZED");
+      return;
+    }
+
+    res.status(200);
+    await appData.loggingService.streamLogsOf(req.params.id, res.write.bind(res));
+    res.end();
+  });
+
+  router.delete("/admin/nodes/:id", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const adminKey = req.headers["adminkey"];
+
+    if (!adminKey || adminKey !== appData.sensitiveConfig.adminKey) {
+      res.status(403).end(JSON.stringify({
+        status: "INVALID_ADMIN_KEY",
+      }));
+      return;
+    }
+
+    const isAlive = await appData.loggingService.isPingAlive(req.params.id, PING_DATA_IDENTIFIER);
+
+    if (isAlive.alive) {
+      res.status(403).end(JSON.stringify({status: "NODE_IS_ALIVE", lastHeard: isAlive.lastHeard}));
+    } else {
+      try {
+        // this deletes pings by default because the event listeners
+        // attached to clearing the logs automatically by the exposed default logger
+        // node will be ofifically gone
+        await appData.loggingService.clearLogsOf(req.params.id);
+        res.status(200).end(JSON.stringify({status: "OK"}));
+      } catch (err) {
+        res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      }
+    }
+  });
+  
+  router.get("/admin/item/:type/:id/:version", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const adminKey = req.headers["adminkey"];
+
+    if (!adminKey || adminKey !== appData.sensitiveConfig.adminKey) {
+      res.status(403).end(JSON.stringify({
+        status: "INVALID_ADMIN_KEY",
+      }));
+      return;
+    }
+
+    const actualVersion = req.params.version === "_" ? null : req.params.version;
+
+    try {
+      const value = await appData.cache.requestValue(req.params.type, req.params.id, actualVersion);
+      res.status(200).end(JSON.stringify({status: "OK", value}));
+    } catch (err) {
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+    }
+  });
+
+  router.delete("/admin/item/:type/:id/:version", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const adminKey = req.headers["adminkey"];
+
+    if (!adminKey || adminKey !== appData.sensitiveConfig.adminKey) {
+      res.status(403).end(JSON.stringify({
+        status: "INVALID_ADMIN_KEY",
+      }));
+      return;
+    }
+
+    const actualVersion = req.params.version === "_" ? null : req.params.version;
+
+    try {
+      const value = await appData.cache.requestDelete(req.params.type, req.params.id, actualVersion);
+      res.status(200).end(JSON.stringify({status: "OK", value}));
+    } catch (err) {
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+    }
+  });
+
+  router.post("/admin/item/:type/:id/:version", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const adminKey = req.headers["adminkey"];
+
+    if (!adminKey || adminKey !== appData.sensitiveConfig.adminKey) {
+      res.status(403).end(JSON.stringify({
+        status: "INVALID_ADMIN_KEY",
+      }));
+      return;
+    }
+
+    const actualVersion = req.params.version === "_" ? null : req.params.version;
+
+    if (!req.body.update || typeof req.body.update !== "object" || req.body.update === null) {
+      res.status(400).end(JSON.stringify({
+        status: "INVALID_JSON_UPDATE",
+      }));
+      return;
+    }
+
+    if (!req.body.dictionary || typeof req.body.dictionary !== "string") {
+      res.status(400).end(JSON.stringify({
+        status: "INVALID_DICTIONARY",
+      }));
+      return;
+    }
+
+    if (!req.body.language || typeof req.body.language !== "string") {
+      res.status(400).end(JSON.stringify({
+        status: "INVALID_LANGUAGE",
+      }));
+      return;
+    }
+
+    try {
+      const value = await appData.cache.requestUpdate(
+        req.params.type,
+        req.params.id,
+        actualVersion,
+        req.body.update,
+        {
+          dictionary: req.body.dictionary,
+          language: req.body.language,
+        }
+      );
+      res.status(200).end(JSON.stringify({status: "OK", value}));
+    } catch (err) {
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+    }
+  });
+
+  router.post("/admin/elastic/reindex/:type", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const adminKey = req.headers["adminkey"];
+
+    if (!adminKey || adminKey !== appData.sensitiveConfig.adminKey) {
+      res.status(403).end(JSON.stringify({
+        status: "INVALID_ADMIN_KEY",
+      }));
+      return;
+    }
+
+    try {
+      await appData.elastic.rebuildIndexes(req.params.type, true);
+      res.status(200).end(JSON.stringify({status: "OK"}));
+    } catch (err) {
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+    }
+  });
+
+  router.post("/admin/elastic/recheck/:type", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const adminKey = req.headers["adminkey"];
+
+    if (!adminKey || adminKey !== appData.sensitiveConfig.adminKey) {
+      res.status(403).end(JSON.stringify({
+        status: "INVALID_ADMIN_KEY",
+      }));
+      return;
+    }
+
+    try {
+      await appData.elastic.runConsistencyCheck(req.params.type, true);
+      res.status(200).end(JSON.stringify({status: "OK"}));
+    } catch (err) {
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+    }
+  });
 
   // now we add a 404
   router.use((req, res) => {

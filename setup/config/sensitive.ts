@@ -282,6 +282,11 @@ export async function sensitiveConfigSetup(
         defaultValue: genToken(16),
       },
       {
+        variableName: "adminKey",
+        message: "An administration key that is used to perform administrative actions on an admin user account",
+        defaultValue: genToken(16),
+      },
+      {
         variableName: "ussd",
         message: "The API configuration used for USSD protocol for extremely old devices",
         type: "config",

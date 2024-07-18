@@ -635,6 +635,7 @@ export class ItemizeElasticClient {
     qualifiedName: string,
     value: IElasticIndexDefinitionType,
     isInitialRebuildIndexes: boolean,
+    forceRebuild?: boolean,
   ) {
     logger.info(
       {
@@ -663,7 +664,7 @@ export class ItemizeElasticClient {
 
     const equalSignature = equals(signature, currentSignature, { strict: true });
 
-    const force = (isInitialRebuildIndexes ? FORCE_ELASTIC_REBUILD : false);
+    const force = forceRebuild || (isInitialRebuildIndexes ? FORCE_ELASTIC_REBUILD : false);
 
     if (!indexInfo || force || !equalSignature) {
       logger.info(
@@ -690,13 +691,15 @@ export class ItemizeElasticClient {
           {
             className: "ItemizeElasticClient",
             methodName: "_rebuildIndexGroup",
-            message: "Index group for " + qualifiedName + (
-              FORCE_ELASTIC_REBUILD ?
-                " exists but FORCE_ELASTIC_REBUILD is set to true, destructive actions taken" :
-                (!equalSignature && indexInfo ?
-                  " exists but the signature of the index is deemed incompatible, destructive actions taken" :
-                  " deemed missing, but mapping found, destructive actions taken")
-            ),
+            message: "Index group for " + qualifiedName +
+              (forceRebuild ? " exists but it's being manually forced to rebuild, destructive actions taken" : (
+                FORCE_ELASTIC_REBUILD ?
+                  " exists but FORCE_ELASTIC_REBUILD is set to true, destructive actions taken" :
+                  (!equalSignature && indexInfo ?
+                    " exists but the signature of the index is deemed incompatible, destructive actions taken" :
+                    " deemed missing, but mapping found, destructive actions taken")
+              )
+              ),
             data: {
               currentSignature,
               signature,
@@ -793,6 +796,7 @@ export class ItemizeElasticClient {
    */
   public async rebuildIndexes(
     itemDefinitionOrModule: string | ItemDefinition | Module,
+    force?: boolean,
   ): Promise<void> {
     await this.waitForServerData();
 
@@ -810,6 +814,7 @@ export class ItemizeElasticClient {
       qualifiedName,
       schemaToBuild,
       true,
+      force,
     );
   }
 

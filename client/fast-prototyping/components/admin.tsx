@@ -5,6 +5,7 @@ import { useUserDataRetriever } from "../../components/user/UserDataRetriever";
 import { useCallback, useEffect, useState } from "react";
 import type { ILogsRecord, ILogsResult, IPingsResult } from "../../../server/services/base/LoggingProvider";
 import type { IServerPingDataPing } from "../../../server";
+import { useRootRetriever } from "../../../client/components/root/RootRetriever";
 
 interface ID3Node {
   // id of the node
@@ -67,6 +68,13 @@ export function NetworkExplorer() {
   const [pingsErr, setPingsErr] = useState<string>(null);
   const [loadingPings, setLoadingPings] = useState(true);
 
+  const [adminKey, setAdminKey] = useState("");
+  const [currentAdminResponse, setCurrentAdminResponse] = useState("");
+
+  const updateAdminKey = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setAdminKey(e.target.value);
+  }, []);
+
   const [logs, setLogs] = useState<ILogsResult>(null);
   const [logsErr, setLogsErr] = useState<string>(null);
   const [loadingLogs, setLoadingLogs] = useState(true);
@@ -77,6 +85,145 @@ export function NetworkExplorer() {
   const [useTimeCriteria, setUsageTimeCriteria] = useState({ from: null, to: null });
   const [logWindowOption, setLogWindowOption] = useState(-300000);
   const [useLogWindowCriteria, setLogWindowCriteria] = useState({ from: null, to: null, type: "any" });
+
+  const rootInfo = useRootRetriever();
+
+  const [id, setId] = useState("");
+  const [version, setVersion] = useState("");
+
+  const updateId = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setId(e.target.value);
+  }, []);
+
+  const updateVersion = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setVersion(e.target.value);
+  }, []);
+
+  const deleteNode = useCallback(async () => {
+    try {
+      const rs = await fetch("/rest/admin/nodes/" + currentNode.nodeId, {
+        method: "delete",
+        credentials: "omit",
+        headers: {
+          'Token': userData.token,
+          "adminkey": adminKey,
+        },
+      });
+      if (rs.status !== 200) {
+        try {
+          const json = await rs.json();
+          if (json.status) {
+            alert(json.status);
+          } else {
+            alert("UNKNOWN_ERROR");
+          }
+        } catch (err) {
+          console.warn(err);
+          alert("UNKNOWN_ERROR");
+        }
+      } else {
+        try {
+          alert("SUCCESS");
+          setCurrentNode(null);
+          loadNetwork();
+        } catch (err) {
+          console.warn(err);
+          alert("INVALID_SERVER_RESPONSE");
+        }
+      }
+    } catch (err) {
+      alert("NETWORK_ERROR");
+    }
+  }, [currentNode, adminKey]);
+
+  const [selectablesIdef, selectablesElasticIdef] = useMemo(() => {
+    const idefs: string[] = [];
+    const idefsElastic: string[] = [];
+    rootInfo.root.getAllModules().forEach((m) => m.getAllChildDefinitionsRecursive().forEach((v) => {
+      idefs.push(v.getQualifiedPathName());
+      if (v.isSearchEngineEnabled()) {
+        idefsElastic.push(v.getQualifiedPathName());
+      }
+    }));
+    return [idefs, idefsElastic];
+  }, [rootInfo.root]);
+
+  const [idef, setIdef] = useState(selectablesIdef[0] || "");
+  const [eidef, setEidef] = useState(selectablesElasticIdef[0] || "");
+
+  const rebuildIndex = useCallback(async (reindex: boolean) => {
+    try {
+      const rs = await fetch("/rest/admin/elastic/" + (reindex ? "reindex" : "recheck") + "/" + eidef, {
+        method: "delete",
+        credentials: "omit",
+        headers: {
+          'Token': userData.token,
+          "adminkey": adminKey,
+        },
+      });
+      if (rs.status !== 200) {
+        try {
+          const json = await rs.json();
+          if (json.status) {
+            alert(json.status);
+          } else {
+            alert("UNKNOWN_ERROR");
+          }
+        } catch (err) {
+          console.warn(err);
+          alert("UNKNOWN_ERROR");
+        }
+      } else {
+        try {
+          alert("SUCCESS");
+        } catch (err) {
+          console.warn(err);
+          alert("INVALID_SERVER_RESPONSE");
+        }
+      }
+    } catch (err) {
+      alert("NETWORK_ERROR");
+    }
+  }, [adminKey, eidef]);
+
+  const updateIdef = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setIdef(e.target.value);
+  }, []);
+
+  const updateEidef = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setEidef(e.target.value);
+  }, []);
+
+  const retrieveItem = useCallback(async () => {
+    try {
+      const rs = await fetch("/rest/admin/item/" + idef + "/" + id + "/" + (version || "_"), {
+        credentials: "omit",
+        headers: {
+          'Token': userData.token,
+          "adminkey": adminKey,
+        },
+      });
+      if (rs.status !== 200) {
+        try {
+          const json = await rs.json();
+          setCurrentAdminResponse(JSON.stringify(json, null, 2));
+        } catch (err) {
+          console.warn(err);
+          setCurrentAdminResponse("INVALID_SERVER_RESPONSE");
+        }
+      } else {
+        try {
+          const json = await rs.json();
+          setCurrentAdminResponse(JSON.stringify(json, null, 2));
+        } catch (err) {
+          console.warn(err);
+          setCurrentAdminResponse("INVALID_SERVER_RESPONSE");
+        }
+      }
+    } catch (err) {
+      setCurrentAdminResponse("NETWORK_ERROR");
+    }
+  }, [adminKey, id, version, idef]);
 
   const onChangeLogCriteriaType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setLogWindowCriteria({
@@ -399,7 +546,7 @@ export function NetworkExplorer() {
 
     const allGroups: string[] = [];
     networkToRender.nodes.forEach((v) => {
-      if (!allGroups.includes[v.groupId]) {
+      if (!allGroups.includes(v.groupId)) {
         allGroups.push(v.groupId);
       }
     });
@@ -543,7 +690,7 @@ export function NetworkExplorer() {
   useEffect(() => {
     if (d3loaded && currentRenderedNetwork.current !== network) {
       currentRenderedNetwork.current = network;
-      renderCurrentNetwork(false);
+      renderCurrentNetwork(showDead);
     }
   }, [d3loaded, network]);
 
@@ -562,8 +709,8 @@ export function NetworkExplorer() {
       (async () => {
         setLoadingPings(true);
         try {
-          const rs = await fetch("/rest/admin/pings/ping_data/" + currentNode.nodeId +
-            "?from=" + useTimeCriteria.from + "&to=" + (useTimeCriteria.to || ""), {
+          const rs = await fetch("/rest/admin/nodes/" + currentNode.nodeId +
+            "/pings/ping_data?from=" + useTimeCriteria.from + "&to=" + (useTimeCriteria.to || ""), {
             credentials: "omit",
             headers: {
               'Token': userData.token,
@@ -609,8 +756,8 @@ export function NetworkExplorer() {
       (async () => {
         setLoadingLogs(true);
         try {
-          const rs = await fetch("/rest/admin/logs/" + useLogWindowCriteria.type + "/" + currentNode.nodeId +
-            "?from=" + useTimeCriteria.from + "&to=" + (useTimeCriteria.to || ""), {
+          const rs = await fetch("/rest/admin/nodes/" + currentNode.nodeId + "/logs/" + useLogWindowCriteria.type +
+            "?from=" + useLogWindowCriteria.from + "&to=" + (useLogWindowCriteria.to || ""), {
             credentials: "omit",
             headers: {
               'Token': userData.token,
@@ -765,6 +912,72 @@ export function NetworkExplorer() {
             null
         }
       </div> : null}
+      {currentNode ? <div style={{ width, padding: "1rem", border: "solid 2px", background: "aliceblue", margin: "1rem" }}>
+        <div style={{
+          marginBottom: '1rem',
+          fontSize: '18px',
+          fontWeight: '600'
+        }}>
+          Administrative actions on the node
+        </div>
+        {currentNode.nodeType === "server" ? <div>
+          <a
+            href={"/rest/admin/nodes/" + currentNode.nodeId + "/logfile?token=" + encodeURIComponent(userData.token)}
+            download={currentNode.nodeId + ".logs.txt"}
+          >
+            <button>Donwload logs</button>
+          </a>
+          <a
+            href={"/rest/admin/nodes/" + currentNode.nodeId + "/pingfile/ping_data?token=" + encodeURIComponent(userData.token)}
+            download={currentNode.nodeId + ".pings.txt"}
+          >
+            <button>Donwload ping data</button>
+          </a>
+          {currentNode.alive ? null : (
+            <>
+              <input type="text" placeholder="administrative key" onChange={updateAdminKey} value={adminKey} />
+              <button onClick={deleteNode}>
+                delete node
+              </button>
+            </>
+          )}
+        </div> : (
+          currentNode.nodeType === "database" ? (
+            (currentNode as INetworkDbNode).type === "elastic" ? (
+              <div>
+                <input type="text" placeholder="administrative key" onChange={updateAdminKey} value={adminKey} />
+                <select value={eidef} onChange={updateEidef}>
+                  {selectablesElasticIdef.map((v) => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+                <button onClick={rebuildIndex.bind(null, true)}>Rebuild index</button>
+                <button onClick={rebuildIndex.bind(null, false)}>Run consistency check</button>
+              </div>
+            ) : ((currentNode as INetworkDbNode).type === "pg" ? (
+              <>
+                <div>
+                  <input type="text" placeholder="administrative key" onChange={updateAdminKey} value={adminKey} />
+                  <select value={idef} onChange={updateIdef}>
+                    {selectablesIdef.map((v) => (
+                      <option key={v} value={v}>{v}</option>
+                    ))}
+                  </select>
+                  <input type="text" placeholder="item id" value={id} onChange={updateId} />
+                  <input type="text" placeholder="item version" value={version} onChange={updateVersion} />
+                  <button onClick={retrieveItem}>Fetch item</button>
+                  <button>Force delete item (ignores triggers)</button>
+                  <input type="text" placeholder="json based update" />
+                  <button>Force update item (ignores triggers)</button>
+                </div>
+                <code>
+                  {currentAdminResponse}
+                </code>
+              </>
+            ) : null)
+          ) : null
+        )}
+      </div> : null}
       {currentNode && currentNode.nodeType === "server" ? <div style={{ width, padding: "1rem", border: "solid 2px", background: "aliceblue", margin: "1rem" }}>
         <div style={{
           marginBottom: '1rem',
@@ -778,15 +991,19 @@ export function NetworkExplorer() {
             <option value={-1200000}>{currentNode.alive ? "last 20 minutes from now" : "last 20 living minutes"}</option>
             <option value={-1800000}>{currentNode.alive ? "last 30 minutes from now" : "last 30 living minutes"}</option>
           </select>
-          <button onClick={moveUsageTimeLeft}>
+          {useTimeCriteria.from && useTimeCriteria.from > (new Date(currentNode.createdAt)).getTime() ? <button onClick={moveUsageTimeLeft}>
             prev
-          </button>
-          {useTimeCriteria.to === null || (!currentNode.alive && (new Date(currentNode.lastHeard)).getTime() < useLogWindowCriteria.to) ? null : (
+          </button> : null}
+          {useTimeCriteria.to === null || (!currentNode.alive && (new Date(currentNode.lastHeard)).getTime() < useTimeCriteria.to) ? null : (
             <button onClick={moveUsageTimeRight}>
               next
             </button>
           )}
         </div>
+        {useTimeCriteria.from ? <div>
+          viewing logs from {(new Date(useTimeCriteria.from)).toLocaleDateString()} {(new Date(useTimeCriteria.from)).toLocaleTimeString()}-{useTimeCriteria.to ?
+            ((new Date(useTimeCriteria.to)).toLocaleDateString() + " " + (new Date(useTimeCriteria.to)).toLocaleTimeString()) : "now"}
+        </div> : null}
         <div style={{ marginBottom: "1rem" }}>
           <div style={{ marginTop: "20px" }}>CPU usage</div>
           <div style={{ fontSize: "10px" }}><div style={{ display: "inline-block", width: "10px", height: "10px", background: "#7b1fa2" }}></div> CPU process load</div>
@@ -845,9 +1062,9 @@ export function NetworkExplorer() {
             <option value="error">errors</option>
             <option value="info">info</option>
           </select>
-          <button onClick={moveLogWindowLeft}>
+          {useLogWindowCriteria.from && useLogWindowCriteria.from > (new Date(currentNode.createdAt)).getTime() ? <button onClick={moveLogWindowLeft}>
             prev
-          </button>
+          </button> : null}
           {useLogWindowCriteria.to === null || (!currentNode.alive && (new Date(currentNode.lastHeard)).getTime() < useLogWindowCriteria.to) ? null : (
             <button onClick={moveLogWindowRight}>
               next
@@ -855,7 +1072,11 @@ export function NetworkExplorer() {
           )}
         </div>
         {logs ? <div style={{ marginBottom: "1rem" }}>
-          <div style={{ marginTop: "20px" }}>{logs.level.toUpperCase() + " logs (newer first)"}</div>
+          <div style={{ marginTop: "20px" }}>{logs.level.toUpperCase() + " logs (oldest first)"}</div>
+        </div> : null}
+        {useLogWindowCriteria.from ? <div>
+          viewing logs from {(new Date(useLogWindowCriteria.from)).toLocaleDateString()} {(new Date(useLogWindowCriteria.from)).toLocaleTimeString()}-{useLogWindowCriteria.to ?
+            ((new Date(useLogWindowCriteria.to)).toLocaleDateString() + " " + (new Date(useLogWindowCriteria.to)).toLocaleTimeString()) : "now"}
         </div> : null}
         <div>
           {logs && logs.records.map((r, i) => {

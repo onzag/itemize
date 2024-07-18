@@ -283,6 +283,11 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   devKey: string;
   /**
+   * An administration key, used for peforming some administrative actions in addition
+   * of the admin account being required
+   */
+  adminKey: string;
+  /**
    * Custom information added to the sensitive config
    */
   custom?: {
@@ -396,6 +401,9 @@ export const rawSensitiveConfigSchema = {
     devKey: {
       type: "string",
     },
+    adminKey: {
+      type: "string",
+    },
     containers: {
       type: ["object", "null"],
       additionalProperties: {
@@ -442,6 +450,7 @@ export const rawSensitiveConfigSchema = {
     "logging",
     "defaultContainerID",
     "devKey",
+    "adminKey",
   ],
 };
 

@@ -49,6 +49,8 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
   private infoStreamReady: boolean = false;
   private errorStreamReady: boolean = false;
 
+  private logDataDestroyedListeners: Array<(instanceId: string) => Promise<void>> = [];
+
   public static getType() {
     return ServiceProviderType.NONE;
   }
@@ -161,6 +163,10 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
   /**
    * @override used to create logged pings to get instance specific information
    * for example statistics of memory usage
+   * 
+   * when you create a ping you may want to add an event listener to onInstanceLogDataDestroyed to also
+   * destroy ping information you may have manually created
+   * 
    * @param data 
    */
   public createPing<D, S>(instanceId: string, data: IItemizePingObjectGenerator<D, S>) {
@@ -213,11 +219,62 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
     return null;
   }
 
-  public async clearLogsOf(instanceId: string) {
+  /**
+   * @override
+   * 
+   * remember to call triggerLogDataDestroyedListeners at the end
+   * 
+   * @param instanceId 
+   * @returns 
+   */
+  public async clearLogsOf(instanceId: string): Promise<void> {
+    return null;
+  }
+
+  public async clearPingsOf(instanceId: string, pingId: string): Promise<void> {
     return null;
   }
 
   public async getLogsOf(instanceId: string, level: "info" | "error" | "any", fromDate: Date, toDate: Date): Promise<ILogsResult> {
     return null;
+  }
+
+  /**
+   * Streams the logs of a given writable response
+   * 
+   * it should write and append lines of valid json to this response with the given logs
+   * 
+   * @param instanceId 
+   * @param write 
+   */
+  public async streamLogsOf(instanceId: string, write: (chunk: string) => void): Promise<void> {
+    return null;
+  }
+
+  /**
+   * Streams the logs of a given writable response
+   * 
+   * it should write and append lines of valid json to this response with the given logs
+   * 
+   * @param instanceId 
+   * @param write 
+   */
+  public async streamPingsOf(instanceId: string, pingId: string, write: (chunk: string) => void): Promise<void> {
+    return null;
+  }
+
+  public async addLogDataDestroyedListener(listener: (instanceId: string) => Promise<void>) {
+    this.logDataDestroyedListeners.push(listener);
+  }
+
+  public async removeLogDataDestroyedListener(listener: (instanceId: string) => Promise<void>) {
+    const index = this.logDataDestroyedListeners.indexOf(listener);
+    if (index !== -1) {
+      this.logDataDestroyedListeners.splice(index, 1);
+    }
+  }
+
+  public async triggerLogDataDestroyedListeners(instanceId: string): Promise<void> {
+    await Promise.all(this.logDataDestroyedListeners.map((v) => v(instanceId)));
   }
 }

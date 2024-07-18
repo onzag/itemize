@@ -138,15 +138,31 @@ export interface IItemizePingObject<D, S> {}
  * Represents the list of pings that have been created
  */
 const pingsCreated: IItemizePingObjectGenerator<any, any>[] = [];
+const pingsRegistered: string[] = [];
 function defaultCreatePing<D, S>(data: IItemizePingObjectGenerator<D, S>) {
   pingsCreated.push(data);
+}
+function defaultRegisterPing(pingId: string) {
+  pingsRegistered.push(pingId);
 }
 
 export const logger = disableLogger ? null : {
   info: converterFn.bind(null, "info") as (arg: IItemizeLoggingStructure<any>) => void,
   debug: converterFn.bind(null, "debug") as (arg: IItemizeLoggingStructure<any>) => void,
   error: converterFn.bind(null, "error") as (arg: IItemizeLoggingErrorStructure<any>) => void,
+  /**
+   * if you create pings conditionally, remember to register it in an else
+   * clause so that other servers are aware of this ping and can clear the data
+   */
   createPing: defaultCreatePing,
+  /**
+   * registers a ping without creating it, this is because pings
+   * are cleared when the data of an instance is destroyed, if the server
+   * that created that ping isn't called for and that ping isn't global
+   * then the data will stick, register always every ping when it was
+   * created asymetrically
+   */
+  registerPing: defaultRegisterPing,
 }
 
 export type ILoggerType = typeof logger;
@@ -190,9 +206,23 @@ export function extendLoggerWith(p: LoggingProvider<any>) {
   rawLogger.remove(standardInfoTransport);
   rawLogger.remove(standardErrorTransport);
   
-  logger.createPing = p.createPing.bind(p, INSTANCE_UUID);
+  logger.createPing = (arg) => {
+    p.createPing(INSTANCE_UUID, arg);
+    p.addLogDataDestroyedListener(async (instanceId: string) => {
+      await p.clearPingsOf(instanceId, arg.id);
+    });
+  }
   pingsCreated.forEach((p) => {
     logger.createPing(p);
+  });
+
+  logger.registerPing = (pingId: string) => {
+    p.addLogDataDestroyedListener(async (instanceId: string) => {
+      await p.clearPingsOf(instanceId, pingId);
+    });
+  }
+  pingsRegistered.forEach((pingId) => {
+    logger.registerPing(pingId);
   });
 }
 

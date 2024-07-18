@@ -347,13 +347,52 @@ export class ElasticLoggerService extends LoggingProvider<null> {
         bool: {
           must: {
             term: {
-              ["instance_id.keyword"]: {
+              instance_id: {
                 value: instanceId,
               },
             },
           },
         },
       },
+    });
+
+    await this.triggerLogDataDestroyedListeners(instanceId);
+  }
+
+  public async clearPingsOf(instanceId: string, pingId: string) {
+    const pingDataIndex = pingId + "_data";
+    const pingStatusIndex = pingId + "_status";
+    await this.elastic.deleteByQuery({
+      index: pingDataIndex,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                _id: {
+                  value: instanceId,
+                }
+              }
+            }
+          ]
+        }
+      }
+    });
+    await this.elastic.deleteByQuery({
+      index: pingStatusIndex,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                ["instanceId.keyword"]: {
+                  value: instanceId,
+                },
+              },
+            },
+          ]
+        }
+      }
     });
   }
 
@@ -364,12 +403,18 @@ export class ElasticLoggerService extends LoggingProvider<null> {
       query: {
         bool: {
           must: ([
-            level !== "any" ? {
+            {
               term: {
-                ["instance_id.keyword"]: {
+                instance_id: {
                   value: instanceId,
                 },
-                level: level,
+              },
+            },
+            level !== "any" ? {
+              term: {
+                level: {
+                  value: level,
+                },
               },
             } : null,
             {
@@ -390,7 +435,7 @@ export class ElasticLoggerService extends LoggingProvider<null> {
       sort: [
         {
           timestamp: {
-            order: "desc",
+            order: "asc",
           }
         } as any,
       ],
@@ -408,8 +453,114 @@ export class ElasticLoggerService extends LoggingProvider<null> {
             level: sourceAsAny.level,
           }
         );
-      }).reverse(),
+      }),
     });
+  }
+
+  /**
+   * Streams the logs of a given writable response
+   * 
+   * it should write and append lines of valid json to this response with the given logs
+   * 
+   * @param instanceId 
+   * @param write the write fn of the steream
+   */
+  public async streamLogsOf(instanceId: string, write: (chunk: string) => void): Promise<void> {
+    let response = await this.elastic.search({
+      index: logsIndex,
+      scroll: "1m",
+      size: 50,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                instance_id: {
+                  value: instanceId,
+                },
+              },
+            },
+          ]
+        },
+      },
+      sort: [
+        {
+          timestamp: {
+            order: "asc",
+          }
+        } as any,
+      ],
+    });
+
+    let scrollId = response._scroll_id;
+
+    // Scroll through the remaining batches
+    while (response.hits.hits.length > 0) {
+      response.hits.hits.forEach(hit => write(JSON.stringify(hit._source) + '\n'));
+      
+      response = await this.elastic.scroll({
+        scroll_id: scrollId,
+        scroll: "1m",
+      });
+
+      scrollId = response._scroll_id;
+    }
+  }
+
+  /**
+   * Streams the pings of a given writable response
+   * 
+   * it should write and append lines of valid json to this response with the given logs
+   * 
+   * @param instanceId 
+   * @param write the write fn of the steream
+   */
+  public async streamPingsOf(instanceId: string, pingId: string, write: (chunk: string) => void): Promise<void> {
+    const pingData = await this.getPingDataOf(instanceId, pingId);
+    write(JSON.stringify(pingData) + "\n");
+
+
+    const statusIndex = pingId + "_status";
+
+    let response = await this.elastic.search({
+      index: statusIndex,
+      scroll: "1m",
+      size: 50,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                ["instanceId.keyword"]: {
+                  value: instanceId,
+                },
+              },
+            },
+          ]
+        },
+      },
+      sort: [
+        {
+          timestamp: {
+            order: "asc",
+          }
+        } as any,
+      ],
+    });
+
+    let scrollId = response._scroll_id;
+
+    // Scroll through the remaining batches
+    while (response.hits.hits.length > 0) {
+      response.hits.hits.forEach(hit => write(JSON.stringify(hit._source) + '\n'));
+      
+      response = await this.elastic.scroll({
+        scroll_id: scrollId,
+        scroll: "1m",
+      });
+
+      scrollId = response._scroll_id;
+    }
   }
 
   public async getPingsOf<S>(instanceId: string, pingId: string, fromDate: Date, toDate: Date): Promise<IPingsResult<S>> {
@@ -499,7 +650,7 @@ export class ElasticLoggerService extends LoggingProvider<null> {
         bool: {
           must: {
             term: {
-              ["instanceId.keyword"]: {
+              instance_id: {
                 value: instanceId,
               },
             },
