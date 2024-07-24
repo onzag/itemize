@@ -859,7 +859,7 @@ export default function restServices(appData: IAppDataType) {
       await appData.loggingService.clearLogsOf(req.params.id);
       res.status(200).end(JSON.stringify({status: "OK"}));
     } catch (err) {
-      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR", stack: err.stack}));
     }
   });
 
@@ -878,7 +878,7 @@ export default function restServices(appData: IAppDataType) {
       await appData.loggingService.clearPingsOf(req.params.id, req.params.pid);
       res.status(200).end(JSON.stringify({status: "OK"}));
     } catch (err) {
-      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR", stack: err.stack}));
     }
   });
 
@@ -973,7 +973,7 @@ export default function restServices(appData: IAppDataType) {
       const value = await appData.cache.requestValue(req.params.type, req.params.id, actualVersion);
       res.status(200).end(JSON.stringify({status: "OK", value}));
     } catch (err) {
-      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR", stack: err.stack}));
     }
   });
 
@@ -1003,11 +1003,11 @@ export default function restServices(appData: IAppDataType) {
       const value = await appData.cache.requestDelete(req.params.type, req.params.id, actualVersion);
       res.status(200).end(JSON.stringify({status: "OK", value}));
     } catch (err) {
-      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR", stack: err.stack}));
     }
   });
 
-  router.post("/admin/item/:type/:id/:version", async (req, res) => {
+  router.put("/admin/item/:type/:id/:version", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     const forbidden = await validateToken(req);
@@ -1063,7 +1063,7 @@ export default function restServices(appData: IAppDataType) {
       );
       res.status(200).end(JSON.stringify({status: "OK", value}));
     } catch (err) {
-      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR", stack: err.stack}));
     }
   });
 
@@ -1089,9 +1089,10 @@ export default function restServices(appData: IAppDataType) {
 
     try {
       await appData.elastic.rebuildIndexes(req.params.type, true);
+      await appData.elastic.runConsistencyCheck(req.params.type, true);
       res.status(200).end(JSON.stringify({status: "OK"}));
     } catch (err) {
-      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR", stack: err.stack}));
     }
   });
 
@@ -1119,7 +1120,7 @@ export default function restServices(appData: IAppDataType) {
       await appData.elastic.runConsistencyCheck(req.params.type, true);
       res.status(200).end(JSON.stringify({status: "OK"}));
     } catch (err) {
-      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR"}));
+      res.status(500).end(JSON.stringify({status: "INTERNAL_SERVER_ERROR", stack: err.stack}));
     }
   });
 

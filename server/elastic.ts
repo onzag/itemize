@@ -31,7 +31,7 @@ interface ElasticRequestOptions {
 };
 
 interface IDocumentBasicInfo { lastModified: NanoSecondComposedDate, index: string, language: string, id: string };
-interface IDocumentSeqNoInfo { seqNo: number, primaryTerm: number, lastModified: NanoSecondComposedDate };
+interface IDocumentSeqNoInfo { info: { seqNo: number, primaryTerm: number, lastModified: NanoSecondComposedDate }, indexNotFound: boolean, notFound: boolean };
 
 export interface IElasticSelectBuilderArg {
   itemOrModule: string | ItemDefinition | Module;
@@ -443,6 +443,9 @@ export class ItemizeElasticClient {
       persistent: {
         // disable auto create index for mod to ensure we get an error
         // when pushing for upserts because the guessed types are wrong
+        // basically when documents are being created and indexed they first
+        // have to be defined types manually by the type system based in our schema
+        // and if we let elastic choose it will pick the wrong mappings
         "action.auto_create_index": "-mod_*,-status,-logs,*",
       }
     });
@@ -1603,13 +1606,13 @@ export class ItemizeElasticClient {
               knownValue,
             );
 
-            let isOutdated = notMissingButOutdated.find((r) => r._id === id);
+            let outdatedValue = notMissingButOutdated.find((r) => r._id === id);
 
             const indexItWillBelongTo = baseIndexPrefix + (objectInfo.language || "none");
 
             // if it's missing then we gotta be sure the index where it will be added
             // is there, just in case
-            if (!isOutdated) {
+            if (!outdatedValue) {
               // if this doesn't find that our index exists
               // then it will create it for our later operations
               await this.ensureIndexInGroup(
@@ -1628,10 +1631,10 @@ export class ItemizeElasticClient {
             // to retrieve the primary term manually per update
             // and check it against the current just in case
             let seqNoInfo: IDocumentSeqNoInfo = null;
-            if (isOutdated) {
+            if (outdatedValue) {
               seqNoInfo = await this.getSeqNoInfo({
-                id: isOutdated._id,
-                index: isOutdated._index,
+                id: outdatedValue._id,
+                index: outdatedValue._index,
                 language: null,
                 lastModified: null,
               });
@@ -1639,7 +1642,7 @@ export class ItemizeElasticClient {
               // somehow was deleted during this operation
               // assuming that is because it was indeed deleted from db
               // and another elasticseach call deleted the value, lets confirm
-              if (!seqNoInfo) {
+              if (seqNoInfo.notFound) {
                 knownValue = await
                   rawDBClient.performRawDBSelect(
                     idef,
@@ -1651,7 +1654,7 @@ export class ItemizeElasticClient {
                 // it was not deleted, what happened? why is it gone?
                 if (knownValue) {
                   // it will have to be created again
-                  isOutdated = null;
+                  outdatedValue = null;
 
                   // guess it was legit gone, we are good
                 } else {
@@ -1661,11 +1664,13 @@ export class ItemizeElasticClient {
 
               // we got our seq info but it's greater than our database value
               // somehow it got updated in the meantime
-              if (seqNoInfo && seqNoInfo.lastModified.greaterThanEqual(objectInfo.lastModified)) {
+              if (seqNoInfo && seqNoInfo.info.lastModified.greaterThanEqual(objectInfo.lastModified)) {
                 // we do nothing it was updaed by something else
                 return null;
               }
             }
+
+            const operation = outdatedValue ? "update" : "create";
 
             CAN_LOG_DEBUG && logger.debug(
               {
@@ -1673,7 +1678,7 @@ export class ItemizeElasticClient {
                 methodName: "_runConsistencyCheck",
                 message: "Operation for " + qualifiedPathName + " has been added",
                 data: {
-                  operation: isOutdated ? "update" : "create",
+                  operation,
                   index: indexItWillBelongTo,
                   id,
                 },
@@ -1682,17 +1687,17 @@ export class ItemizeElasticClient {
 
             return [
               {
-                [isOutdated ? "update" : "create"]: isOutdated ? {
-                  _index: isOutdated._index,
-                  _id: isOutdated._id,
-                  if_seq_no: seqNoInfo.seqNo,
-                  if_primary_term: seqNoInfo.primaryTerm,
+                [operation]: outdatedValue ? {
+                  _index: outdatedValue._index,
+                  _id: outdatedValue._id,
+                  if_seq_no: seqNoInfo.info.seqNo,
+                  if_primary_term: seqNoInfo.info.primaryTerm,
                 } : {
                   _index: indexItWillBelongTo,
                   _id: id,
                 }
               },
-              isOutdated ? { doc: convertedSQL } : convertedSQL,
+              outdatedValue ? { doc: convertedSQL } : convertedSQL,
             ]
           }))) as any[][];
 
@@ -1969,7 +1974,11 @@ export class ItemizeElasticClient {
     }
 
     if (this.currentlyEnsuringIndexInGroup[indexName]) {
-      return await this.currentlyEnsuringIndexInGroup[indexName];
+      const rs = await this.currentlyEnsuringIndexInGroup[indexName];
+      if (cache) {
+        cache[indexName] = true;
+      }
+      return rs;
     }
 
     this.currentlyEnsuringIndexInGroup[indexName] = new Promise(async (resolve, reject) => {
@@ -1982,17 +1991,20 @@ export class ItemizeElasticClient {
         if (!doesExist) {
           await this.generateMissingIndexInGroup(indexName, language, value);
         }
+
+        if (cache) {
+          cache[indexName] = true;
+        }
+
+        delete this.currentlyEnsuringIndexInGroup[indexName];
         resolve(true);
       } catch (err) {
+        delete this.currentlyEnsuringIndexInGroup[indexName];
         reject(err);
       }
     });
 
     await this.currentlyEnsuringIndexInGroup[indexName];
-
-    if (cache) {
-      cache[indexName] = true;
-    }
   }
 
   private async generateMissingIndexInGroup(
@@ -2044,21 +2056,33 @@ export class ItemizeElasticClient {
       });
     } catch (err) {
       if (err.meta.statusCode === 404) {
-        return null;
+        return {
+          indexNotFound: true,
+          notFound: true,
+          info: null,
+        };
       } else {
         throw err;
       }
     }
 
     if (!value || !value.found) {
-      return null;
+      return {
+        indexNotFound: false,
+        notFound: true,
+        info: null,
+      };
     }
 
     return {
-      lastModified: new NanoSecondComposedDate((value._source as any).last_modified),
-      seqNo: value._seq_no,
-      primaryTerm: value._primary_term,
-    };
+      info: {
+        lastModified: new NanoSecondComposedDate((value._source as any).last_modified),
+        seqNo: value._seq_no,
+        primaryTerm: value._primary_term,
+      },
+      indexNotFound: false,
+      notFound: false,
+    }
   }
 
   public async getDocumentBasicInfo(
@@ -2488,20 +2512,20 @@ export class ItemizeElasticClient {
     if (greaterCurrentDocumentInfo) {
       const seqNoInfo = await this.getSeqNoInfo(greaterCurrentDocumentInfo);
       // was deleted somehow while we were doing this
-      if (!seqNoInfo) {
+      if (seqNoInfo.notFound) {
 
       } else {
         // somehow the document itself changed and was updated while we weren't looking
         // and trying to get this seq no info
-        if (seqNoInfo.lastModified.greaterThanEqual(updateLastModified)) {
+        if (seqNoInfo.info.lastModified.greaterThanEqual(updateLastModified)) {
           // cancel it like before
           return;
         }
 
         // proceed with the update
         delete updateAction.doc_as_upsert;
-        updateAction.if_seq_no = seqNoInfo.seqNo;
-        updateAction.if_primary_term = seqNoInfo.primaryTerm;
+        updateAction.if_seq_no = seqNoInfo.info.seqNo;
+        updateAction.if_primary_term = seqNoInfo.info.primaryTerm;
       }
     }
 

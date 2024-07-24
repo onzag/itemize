@@ -86,10 +86,26 @@ export function NetworkExplorer() {
   const [logWindowOption, setLogWindowOption] = useState(-300000);
   const [useLogWindowCriteria, setLogWindowCriteria] = useState({ from: null, to: null, type: "any" });
 
+  const [jsonUpdate, setJsonUpdate] = useState("");
+  const [dictionary, setDictionary] = useState("simple");
+  const [language, setLanguage] = useState("en");
+
+  const updateJsonUpdate = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setJsonUpdate(e.target.value);
+  }, []);
+  const updateDictionary = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setDictionary(e.target.value);
+  }, []);
+  const updateLanguage = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setLanguage(e.target.value);
+  }, []);
+
   const rootInfo = useRootRetriever();
 
   const [id, setId] = useState("");
   const [version, setVersion] = useState("");
+
+  const [executingAdminOperation, setExecutingAdminOperation] = useState(null as string);
 
   const updateId = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setId(e.target.value);
@@ -152,9 +168,10 @@ export function NetworkExplorer() {
   const [eidef, setEidef] = useState(selectablesElasticIdef[0] || "");
 
   const rebuildIndex = useCallback(async (reindex: boolean) => {
+    setExecutingAdminOperation(reindex ? "reindex" : "recheck");
     try {
       const rs = await fetch("/rest/admin/elastic/" + (reindex ? "reindex" : "recheck") + "/" + eidef, {
-        method: "delete",
+        method: "put",
         credentials: "omit",
         headers: {
           'Token': userData.token,
@@ -184,6 +201,7 @@ export function NetworkExplorer() {
     } catch (err) {
       alert("NETWORK_ERROR");
     }
+    setExecutingAdminOperation(null);
   }, [adminKey, eidef]);
 
   const updateIdef = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -193,6 +211,79 @@ export function NetworkExplorer() {
   const updateEidef = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setEidef(e.target.value);
   }, []);
+
+  const forceDelete = useCallback(async () => {
+    const confirm = prompt("Are you sure you want to delete this item y/n", "n");
+    if (confirm !== "y") {
+      return;
+    }
+
+    try {
+      const rs = await fetch("/rest/admin/item/" + idef + "/" + id + "/" + (version || "_"), {
+        credentials: "omit",
+        method: "delete",
+        headers: {
+          'Token': userData.token,
+          "adminkey": adminKey,
+        },
+      });
+      if (rs.status !== 200) {
+        try {
+          const json = await rs.json();
+          setCurrentAdminResponse(JSON.stringify(json, null, 2));
+        } catch (err) {
+          console.warn(err);
+          setCurrentAdminResponse("INVALID_SERVER_RESPONSE");
+        }
+      } else {
+        try {
+          const json = await rs.json();
+          setCurrentAdminResponse(JSON.stringify(json, null, 2));
+        } catch (err) {
+          console.warn(err);
+          setCurrentAdminResponse("INVALID_SERVER_RESPONSE");
+        }
+      }
+    } catch (err) {
+      setCurrentAdminResponse("NETWORK_ERROR");
+    }
+  }, [adminKey, id, version, idef]);
+
+  const forceUpdate = useCallback(async () => {
+    let parsed: any = null;
+    try {
+      parsed = JSON.parse(jsonUpdate);
+      const rs = await fetch("/rest/admin/item/" + idef + "/" + id + "/" + (version || "_"), {
+        credentials: "omit",
+        method: "put",
+        headers: {
+          'Token': userData.token,
+          "adminkey": adminKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({update: parsed, dictionary, language}),
+      });
+      if (rs.status !== 200) {
+        try {
+          const json = await rs.json();
+          setCurrentAdminResponse(JSON.stringify(json, null, 2));
+        } catch (err) {
+          console.warn(err);
+          setCurrentAdminResponse("INVALID_SERVER_RESPONSE");
+        }
+      } else {
+        try {
+          const json = await rs.json();
+          setCurrentAdminResponse(JSON.stringify(json, null, 2));
+        } catch (err) {
+          console.warn(err);
+          setCurrentAdminResponse("INVALID_SERVER_RESPONSE");
+        }
+      }
+    } catch (err) {
+      setCurrentAdminResponse(!parsed ? "INVALID_JSON" : "NETWORK_ERROR");
+    }
+  }, [adminKey, id, version, idef, jsonUpdate, dictionary, language]);
 
   const retrieveItem = useCallback(async () => {
     try {
@@ -951,8 +1042,18 @@ export function NetworkExplorer() {
                     <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
-                <button onClick={rebuildIndex.bind(null, true)}>Rebuild index</button>
-                <button onClick={rebuildIndex.bind(null, false)}>Run consistency check</button>
+                <button
+                  disabled={!!executingAdminOperation}
+                  onClick={rebuildIndex.bind(null, true)}
+                >
+                  {executingAdminOperation === "reindex" ? "Executing..." : "Rebuild index"}
+                </button>
+                <button
+                  disabled={!!executingAdminOperation}
+                  onClick={rebuildIndex.bind(null, false)}
+                >
+                  {executingAdminOperation === "recheck" ? "Executing..." : "Run consistency check"}
+                </button>
               </div>
             ) : ((currentNode as INetworkDbNode).type === "pg" ? (
               <>
@@ -965,10 +1066,15 @@ export function NetworkExplorer() {
                   </select>
                   <input type="text" placeholder="item id" value={id} onChange={updateId} />
                   <input type="text" placeholder="item version" value={version} onChange={updateVersion} />
+                  <hr></hr>
                   <button onClick={retrieveItem}>Fetch item</button>
-                  <button>Force delete item (ignores triggers)</button>
-                  <input type="text" placeholder="json based update" />
-                  <button>Force update item (ignores triggers)</button>
+                  <hr></hr>
+                  <button onClick={forceDelete}>Force delete item (ignores triggers)</button>
+                  <hr></hr>
+                  <input type="text" placeholder="json based update" value={jsonUpdate} onChange={updateJsonUpdate} />
+                  <input type="text" placeholder="dictionary" value={dictionary} onChange={updateDictionary} />
+                  <input type="text" placeholder="language" value={language} onChange={updateLanguage} />
+                  <button onClick={forceUpdate}>Force update item (ignores triggers)</button>
                 </div>
                 <code>
                   {currentAdminResponse}
