@@ -267,7 +267,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         method: "POST",
         cache: "no-cache",
         headers,
-        body: JSON.stringify({username, password, country: this.props.localeContext.country}),
+        body: JSON.stringify({ username, password, country: this.props.localeContext.country }),
         credentials: "omit",
       })).json();
     } catch (err) {
@@ -474,10 +474,15 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
    * Cleans all the destruction markers
    */
   public async cleanAndDestroyLoggedData() {
+    let cookieEnd = ";domain=" + location.hostname;
+    if (location.protocol === "https:") {
+      cookieEnd += ";secure=true";
+    }
+
     // removing the user data
-    document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-    document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-    document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+    document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
+    document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
+    document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
 
     const dmStatus = await destroyDestructionMarkers();
     if (!dmStatus) {

@@ -171,7 +171,7 @@ export function NetworkExplorer() {
     setExecutingAdminOperation(reindex ? "reindex" : "recheck");
     try {
       const rs = await fetch("/rest/admin/elastic/" + (reindex ? "reindex" : "recheck") + "/" + eidef, {
-        method: "put",
+        method: "post",
         credentials: "omit",
         headers: {
           'Token': userData.token,
