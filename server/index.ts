@@ -636,6 +636,55 @@ export async function initializeServer(
       });
     }
 
+    if (logger) {
+      const envInfo = buildEnvironmentInfo(
+        buildnumber,
+        redisConfig,
+        dbConfig,
+      );
+
+      if (INSTANCE_MODE === "CLUSTER_MANAGER") {
+        delete envInfo.postgresql;
+        delete envInfo.elastic;
+      }
+
+      logger.createPing<IEnvironmentInfo, IServerPingDataPing>({
+        id: PING_DATA_IDENTIFIER,
+        data: envInfo,
+        statusRetriever: (info) => {
+          // first time
+          if (info.firstTimeMs === info.currentTimeMs) {
+            return {
+              doNotStore: true,
+              status: {
+                cpuUsageTotal: process.cpuUsage(),
+                cpuUsage: process.cpuUsage(),
+                memoryUsage: process.memoryUsage(),
+                cpuPercent: null,
+                loadAvg60: null,
+                freeMem: null,
+              }
+            }
+          } else {
+            const currentUsage = process.cpuUsage(info.previousStatus.cpuUsageTotal);
+            const cpuUsagePercentage = 100 * (currentUsage.user + currentUsage.system) /
+              ((info.currentTimeMs - info.previousTimeMs) * 1000);
+            return {
+              doNotStore: false,
+              status: {
+                cpuUsage: currentUsage,
+                cpuUsageTotal: process.cpuUsage(),
+                memoryUsage: process.memoryUsage(),
+                cpuPercent: cpuUsagePercentage,
+                loadAvg60: os.loadavg()[0],
+                freeMem: os.freemem(),
+              }
+            }
+          }
+        }
+      });
+    }
+
     // now for the cluster manager, which manages a specific cluster, it goes here, and it doesn't
     // go futher, the job of the cluster manager is to mantain the cluster redis database
     // up to date, and handle the requests for these up to date requests, it basically
@@ -742,50 +791,6 @@ export async function initializeServer(
       elasticConnection,
       dbConfig.elasticLangAnalyzers,
     ) : null;
-
-    if (logger) {
-      const envInfo = buildEnvironmentInfo(
-        buildnumber,
-        redisConfig,
-        dbConfig,
-      );
-
-      logger.createPing<IEnvironmentInfo, IServerPingDataPing>({
-        id: PING_DATA_IDENTIFIER,
-        data: envInfo,
-        statusRetriever: (info) => {
-          // first time
-          if (info.firstTimeMs === info.currentTimeMs) {
-            return {
-              doNotStore: true,
-              status: {
-                cpuUsageTotal: process.cpuUsage(),
-                cpuUsage: process.cpuUsage(),
-                memoryUsage: process.memoryUsage(),
-                cpuPercent: null,
-                loadAvg60: null,
-                freeMem: null,
-              }
-            }
-          } else {
-            const currentUsage = process.cpuUsage(info.previousStatus.cpuUsageTotal);
-            const cpuUsagePercentage = 100 * (currentUsage.user + currentUsage.system) /
-              ((info.currentTimeMs - info.previousTimeMs) * 1000);
-            return {
-              doNotStore: false,
-              status: {
-                cpuUsage: currentUsage,
-                cpuUsageTotal: process.cpuUsage(),
-                memoryUsage: process.memoryUsage(),
-                cpuPercent: cpuUsagePercentage,
-                loadAvg60: os.loadavg()[0],
-                freeMem: os.freemem(),
-              }
-            }
-          }
-        }
-      });
-    }
 
     logger.info(
       {
