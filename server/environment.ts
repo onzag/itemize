@@ -107,6 +107,8 @@ export interface IEnvironmentInfo {
   redisPubSub: ISingleRedisConfigRawJSONDataType;
   postgresql: IDBConfigRawJSONDataType;
   elastic: any;
+  elasticLogs: any;
+  elasticAnalytics: any;
   environment: typeof ENVIRONMENT_DETAILS;
 }
 
@@ -132,6 +134,12 @@ export function buildEnvironmentInfo(
   const elastic = postgresql.elastic;
   delete elastic.auth;
 
+  const elasticLogs = postgresql.elasticLogs || elastic;
+  delete elasticLogs.auth;
+
+  const elasticAnalytics = postgresql.elasticAnalytics || elastic;
+  delete elasticAnalytics.auth;
+
   delete postgresql.elastic;
 
   return {
@@ -148,6 +156,8 @@ export function buildEnvironmentInfo(
     redisPubSub,
     postgresql,
     elastic,
+    elasticLogs,
+    elasticAnalytics,
     environment: ENVIRONMENT_DETAILS,
   };
 }

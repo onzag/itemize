@@ -18,6 +18,12 @@ const ELASTIC_VERSION = process.env.ELASTIC_VERSION || "8.2.0";
 const REDIS_VERSION = process.env.REDIS_VERSION || "";
 const POSTGIS_VERSION = process.env.POSTGIS_VERSION || "13-3.4";
 
+const suffixer = {
+  elastic: "",
+  elasticLogs: "_logs",
+  elasticAnalytics: "_analytics",
+};
+
 /**
  * this function is triggered by the main.ts file and passes its argument
  * its configuration is there, check the main.ts file for modification on how
@@ -126,70 +132,73 @@ export async function start(version: string) {
     }
   }
 
-  if (dbConfig.elastic) {
-    const elasticNode = dbConfig.elastic.node;
-    const proxy = dbConfig.elastic.proxy;
-    if (proxy) {
-      console.log(colors.red("Development environment elastic database is setup woth a proxy at ") + proxy);
-      console.log(colors.red("As so it cannot be initialized"));
-    } else if (elasticNode) {
-      let elasticURL = typeof elasticNode === "string" || (elasticNode instanceof URL) ? elasticNode : elasticNode.url;
-      if (typeof elasticURL === "string") {
-        elasticURL = new URL(elasticURL);
-      }
-      if (elasticURL) {
-        const hostname = (elasticURL as URL).hostname;
-        const port = (elasticURL as URL).port;
-        const protocol = (elasticURL as URL).protocol;
-        const username = dbConfig.elastic.auth && dbConfig.elastic.auth.username;
-        const password = dbConfig.elastic.auth && dbConfig.elastic.auth.password;
-        if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:" && username === "elastic") {
-          console.log(colors.yellow("Please allow Itemize to create a docker container for elasticsearch"));
-          console.log(colors.yellow("The execution might take a while, please wait..."));
+  const allElastics = ["elastic", "elasticLogs", "elasticAnalytics"];
+  for (let eVersion of allElastics) {
+    if (dbConfig[eVersion]) {
+      const elasticNode = dbConfig[eVersion].node;
+      const proxy = dbConfig[eVersion].proxy;
+      if (proxy) {
+        console.log(colors.red("Development environment " + eVersion + " database is setup with a proxy at ") + proxy);
+        console.log(colors.red("As so it cannot be initialized"));
+      } else if (elasticNode) {
+        let elasticURL = typeof elasticNode === "string" || (elasticNode instanceof URL) ? elasticNode : elasticNode.url;
+        if (typeof elasticURL === "string") {
+          elasticURL = new URL(elasticURL);
+        }
+        if (elasticURL) {
+          const hostname = (elasticURL as URL).hostname;
+          const port = (elasticURL as URL).port;
+          const protocol = (elasticURL as URL).protocol;
+          const username = dbConfig[eVersion].auth && dbConfig[eVersion].auth.username;
+          const password = dbConfig[eVersion].auth && dbConfig[eVersion].auth.password;
+          if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:" && username === "elastic") {
+            console.log(colors.yellow("Please allow Itemize to create a docker container for " + eVersion));
+            console.log(colors.yellow("The execution might take a while, please wait..."));
 
-          try {
-            // and we execute this command with the configuration
-            // it will execute for localhost of course
-            await execSudo(
-              "sysctl -w vm.max_map_count=262144",
-              "Itemize Sysctl setup for elasticsearch",
-            );
-            await execSudo(
-              `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devedb -e ELASTIC_PASSWORD=${password} ` +
-              `-e "ES_JAVA_OPTS=-Xms4g -Xmx4g" ` +
-              `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}`,
-              "Itemize Docker Contained Elasticsearch Database",
-            );
-          } catch (err) {
-            // if something fails show a message
-            console.log(colors.red(err.message));
-            console.log(colors.yellow("Something went wrong please allow for cleanup..."));
             try {
+              // and we execute this command with the configuration
+              // it will execute for localhost of course
               await execSudo(
-                `docker rm ${dockerprefixer}_devedb`,
+                "sysctl -w vm.max_map_count=262144",
+                "Itemize Sysctl setup for elasticsearch",
+              );
+              await execSudo(
+                `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devedb${suffixer[eVersion]} -e ELASTIC_PASSWORD=${password} ` +
+                `-e "ES_JAVA_OPTS=-Xms4g -Xmx4g" ` +
+                `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}`,
                 "Itemize Docker Contained Elasticsearch Database",
               );
-            } catch {
+            } catch (err) {
+              // if something fails show a message
+              console.log(colors.red(err.message));
+              console.log(colors.yellow("Something went wrong please allow for cleanup..."));
+              try {
+                await execSudo(
+                  `docker rm ${dockerprefixer}_devedb${suffixer[eVersion]}`,
+                  "Itemize Docker Contained Elasticsearch Database",
+                );
+              } catch {
+              }
+              throw err;
             }
-            throw err;
+          } else if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+            console.log(colors.red("Development environment " + eVersion + " database host is connecting to ") + hostname);
+            console.log(colors.red("As so it cannot be initialized"));
+          } else if (username !== "elastic") {
+            console.log(colors.red("Development environment " + eVersion + " database is using username (should be elastic) ") + username);
+            console.log(colors.red("As so it cannot be initialized"));
+          } else if (protocol !== "https:") {
+            console.log(colors.red("Development environment " + eVersion + " database host is using protocol ") + protocol);
+            console.log(colors.red("As so it cannot be initialized"));
           }
-        } else if (hostname !== "localhost" && hostname !== "127.0.0.1") {
-          console.log(colors.red("Development environment elastic database host is connecting to ") + hostname);
-          console.log(colors.red("As so it cannot be initialized"));
-        } else if (username !== "elastic") {
-          console.log(colors.red("Development environment elastic database is using username (should be elastic) ") + username);
-          console.log(colors.red("As so it cannot be initialized"));
-        } else if (protocol !== "https:") {
-          console.log(colors.red("Development environment elastic database host is using protocol ") + protocol);
+        } else {
+          console.log(colors.red("Development environment " + eVersion + " database node has no url to connect to"));
           console.log(colors.red("As so it cannot be initialized"));
         }
       } else {
-        console.log(colors.red("Development environment elastic database node has no url to connect to"));
+        console.log(colors.red("Development environment " + eVersion + " database does not have a single node setup, it may have no node or multinode"));
         console.log(colors.red("As so it cannot be initialized"));
       }
-    } else {
-      console.log(colors.red("Development environment elastic database does not have a single node setup, it may have no node or multinode"));
-      console.log(colors.red("As so it cannot be initialized"));
     }
   }
 
@@ -290,37 +299,40 @@ export async function stop(version: string) {
     }
   }
 
-  if (
-    dbConfig.elastic
-  ) {
-    const elasticNode = dbConfig.elastic.node;
-    const proxy = dbConfig.elastic.proxy;
-    const username = dbConfig.elastic.auth && dbConfig.elastic.auth.username;
+  const allElastics = ["elastic", "elasticLogs", "elasticAnalytics"];
+  for (let eVersion of allElastics) {
+    if (
+      dbConfig[eVersion]
+    ) {
+      const elasticNode = dbConfig[eVersion].node;
+      const proxy = dbConfig[eVersion].proxy;
+      const username = dbConfig[eVersion].auth && dbConfig[eVersion].auth.username;
 
-    if (!proxy && elasticNode && username === "elastic") {
-      let elasticURL = typeof elasticNode === "string" || (elasticNode instanceof URL) ? elasticNode : elasticNode.url;
-      if (typeof elasticURL === "string") {
-        elasticURL = new URL(elasticURL);
-      }
+      if (!proxy && elasticNode && username === "elastic") {
+        let elasticURL = typeof elasticNode === "string" || (elasticNode instanceof URL) ? elasticNode : elasticNode.url;
+        if (typeof elasticURL === "string") {
+          elasticURL = new URL(elasticURL);
+        }
 
-      if (elasticURL) {
-        const hostname = (elasticURL as URL).hostname;
-        const protocol = (elasticURL as URL).protocol;
+        if (elasticURL) {
+          const hostname = (elasticURL as URL).hostname;
+          const protocol = (elasticURL as URL).protocol;
 
-        if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:") {
-          try {
-            console.log(colors.yellow("Please allow Itemize to stop the Elastic docker container"));
-            await execSudo(
-              `docker stop ${dockerprefixer}_devedb`,
-              "Itemize Docker Contained Elasticsearch Database",
-            );
-      
-            console.log(colors.yellow("Now we attempt to remove the Elastic docker container"));
-            await execSudo(
-              `docker rm ${dockerprefixer}_devedb`,
-              "Itemize Docker Contained Elasticsearch Database",
-            );
-          } catch (err) {
+          if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:") {
+            try {
+              console.log(colors.yellow("Please allow Itemize to stop the Elastic docker container"));
+              await execSudo(
+                `docker stop ${dockerprefixer}_devedb${suffixer[eVersion]}`,
+                "Itemize Docker Contained Elasticsearch Database",
+              );
+
+              console.log(colors.yellow("Now we attempt to remove the Elastic docker container"));
+              await execSudo(
+                `docker rm ${dockerprefixer}_devedb${suffixer[eVersion]}`,
+                "Itemize Docker Contained Elasticsearch Database",
+              );
+            } catch (err) {
+            }
           }
         }
       }

@@ -221,6 +221,9 @@ export interface IAppDataType {
   customRoles: ICustomRoleType[];
   rawDB: ItemizeRawDB;
   elastic: ItemizeElasticClient;
+  elasticConnection: Client;
+  elasticLogsConnection: Client;
+  elasticAnalyticsConnection: Client;
   domain: string;
   userTokenQuery: (arg: { token?: string, username?: string, password?: string, country?: string }) => Promise<{ id: string; token: string; role: string }>;
 }
@@ -469,7 +472,7 @@ export async function initializeServer(
       INSTANCE_MODE !== "CLEAN_STORAGE";
 
     const LoggingServiceClass = mayUseLoggerService ? (serviceCustom && serviceCustom.loggingServiceProvider) || (
-      dbConfig.elastic ? ElasticLoggerService : null
+      dbConfig.elastic || dbConfig.elasticLogs ? ElasticLoggerService : null
     ) : null;
     const loggingService: LoggingProvider<any> = LoggingServiceClass ? new LoggingServiceClass(
       sensitiveConfig.logging,
@@ -646,6 +649,8 @@ export async function initializeServer(
       if (INSTANCE_MODE === "CLUSTER_MANAGER") {
         delete envInfo.postgresql;
         delete envInfo.elastic;
+        delete envInfo.elasticLogs;
+        delete envInfo.elasticAnalytics;
       }
 
       logger.createPing<IEnvironmentInfo, IServerPingDataPing>({
@@ -780,7 +785,7 @@ export async function initializeServer(
       logger.info(
         {
           functionName: "initializeServer",
-          message: "Setting up elastic connection",
+          message: "Setting up elastic connections",
         },
       );
     }
@@ -791,6 +796,13 @@ export async function initializeServer(
       elasticConnection,
       dbConfig.elasticLangAnalyzers,
     ) : null;
+    
+    const elasticLogsConnection = dbConfig.elasticLogs ? (
+      dbConfig.elasticLogs.node === dbConfig.elastic?.node ? elasticConnection : new Client(dbConfig.elasticLogs)
+    ) : elasticConnection;
+    const elasticAnalyticsConnection = dbConfig.elasticAnalytics ? (
+      dbConfig.elasticAnalytics.node === dbConfig.elastic?.node ? elasticConnection : new Client(dbConfig.elasticAnalytics)
+    ) : elasticConnection;
 
     logger.info(
       {
@@ -1232,6 +1244,9 @@ export async function initializeServer(
       customRoles: custom.customRoles || [],
       rawDB,
       elastic,
+      elasticConnection,
+      elasticLogsConnection,
+      elasticAnalyticsConnection,
       express,
       domain,
       // assigned later during rest setup

@@ -127,29 +127,32 @@ export default async function runConTest(version: string) {
   console.log(colors.green("Successfully connected to local redis"));
 
   // if we have elastic available
-  if (dbConfig.elastic) {
-    // we check it as well
-    console.log("Attempting to connect to elasticsearch");
+  const allElastics = ["elastic", "elasticLogs", "elasticAnalytics"];
+  for (let eVersion of allElastics) {
+    if (dbConfig[eVersion]) {
+      // we check it as well
+      console.log("Attempting to connect to " + eVersion);
 
-    try {
-      // doing a ping pong
-      const client = new Client(dbConfig.elastic);
-      const pong = await client.ping({}, {
-        requestTimeout: 3000,
-      });
+      try {
+        // doing a ping pong
+        const client = new Client(dbConfig[eVersion]);
+        const pong = await client.ping({}, {
+          requestTimeout: 3000,
+        });
 
-      if (pong) {
-        console.log(colors.green("Succesfully received an elastic reply"));
+        if (pong) {
+          console.log(colors.green("Succesfully received an " + eVersion + " reply"));
+        }
+      } catch (err) {
+        console.log(colors.red(err.stack));
+        if (err.meta?.statusCode === 0) {
+          console.log(colors.yellow("If the connection was dropped due to invalid certificate, this means that you need to install the certificate, " +
+            "in the client machine for https connections, NODE_TLS_REJECT_UNAUTHORIZED=0 is not recommended to use in production"));
+          console.log(colors.yellow("A valid option is to use NODE_EXTRA_CA_CERTS=/path/to/cert.crt but it also needs to be added to the service files"));
+        }
+        console.log(colors.red("Failed to connect to elasticsearch"));
+        process.exit(1);
       }
-    } catch (err) {
-      console.log(colors.red(err.stack));
-      if (err.meta?.statusCode === 0) {
-        console.log(colors.yellow("If the connection was dropped due to invalid certificate, this means that you need to install the certificate, " + 
-        "in the client machine for https connections, NODE_TLS_REJECT_UNAUTHORIZED=0 is not recommended to use in production"));
-        console.log(colors.yellow("A valid option is to use NODE_EXTRA_CA_CERTS=/path/to/cert.crt but it also needs to be added to the service files"));
-      }
-      console.log(colors.red("Failed to connect to elasticsearch"));
-      process.exit(1);
     }
   }
 

@@ -35,7 +35,7 @@ export class ElasticLoggerService extends LoggingProvider<null> {
   private pingsLastStatus: any[] = [];
 
   public async initialize(): Promise<void> {
-    this.elastic = new Client(this.appDbConfig.elastic);
+    this.elastic = new Client(this.appDbConfig.elasticLogs || this.appDbConfig.elastic);
 
     while (true) {
       try {

@@ -656,6 +656,74 @@ export default function restServices(appData: IAppDataType) {
             type: "uses-as-search-database",
           });
         }
+
+        const elasicLogsInfo = i.data.elastic;
+        if (elasicLogsInfo?.node) {
+          const hostlocation = elasicLogsInfo.node;
+          const nodeId = makeNetworkIdOutOf(hostlocation);
+          let elasticLogs: INetworkDbNode = networkResult.nodes.find((v) => v.nodeId === nodeId) as INetworkDbNode;
+          if (!elasticLogs) {
+            elasticLogs = {
+              type: "elastic",
+              groupId: "GLOBAL",
+              host: hostlocation,
+              nodeType: "database",
+              links: [
+                {
+                  id: i.instanceId,
+                  type: "uses-as-logs-database",
+                },
+              ],
+              name: "Elasticsearch database",
+              nodeId,
+            };
+            networkResult.nodes.push(elasticLogs);
+          } else {
+            elasticLogs.links.push({
+              id: i.instanceId,
+              type: "uses-as-logs-database",
+            });
+          }
+
+          node.links.push({
+            id: nodeId,
+            type: "uses-as-logs-database",
+          });
+        }
+
+        const elasicAnalyticsInfo = i.data.elasticAnalytics;
+        if (elasicAnalyticsInfo?.node) {
+          const hostlocation = elasicAnalyticsInfo.node;
+          const nodeId = makeNetworkIdOutOf(hostlocation);
+          let elasticAnalytics: INetworkDbNode = networkResult.nodes.find((v) => v.nodeId === nodeId) as INetworkDbNode;
+          if (!elasticAnalytics) {
+            elasticAnalytics = {
+              type: "elastic",
+              groupId: "GLOBAL",
+              host: hostlocation,
+              nodeType: "database",
+              links: [
+                {
+                  id: i.instanceId,
+                  type: "uses-as-analytics-database",
+                },
+              ],
+              name: "Elasticsearch database",
+              nodeId,
+            };
+            networkResult.nodes.push(elasticAnalytics);
+          } else {
+            elasticAnalytics.links.push({
+              id: i.instanceId,
+              type: "uses-as-analytics-database",
+            });
+          }
+
+          node.links.push({
+            id: nodeId,
+            type: "uses-as-analytics-database",
+          });
+        }
       }
 
       if (hasClusterRedisConnection) {

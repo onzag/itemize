@@ -1034,7 +1034,7 @@ export function NetworkExplorer() {
           )}
         </div> : (
           currentNode.nodeType === "database" ? (
-            (currentNode as INetworkDbNode).type === "elastic" ? (
+            (currentNode as INetworkDbNode).type === "elastic" && (currentNode as INetworkDbNode).links.some((l) => l.type === "uses-as-search-database") ? (
               <div>
                 <input type="text" placeholder="administrative key" onChange={updateAdminKey} value={adminKey} />
                 <select value={eidef} onChange={updateEidef}>
