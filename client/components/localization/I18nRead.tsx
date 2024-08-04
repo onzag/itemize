@@ -123,6 +123,21 @@ export interface I18nReadOptions {
    * for the counter, use this to override that
    */
   countValue?: number;
+  /**
+   * By default when dealing with numbers as args it will attempt to use
+   * Intl.NumberFormat to determine how they are to be displayed
+   */
+  disableNumberFormat?: boolean;
+  /**
+   * By default the number formatting is done in the language
+   * that is specified by the current locale, use this to override this
+   * behaviour and set the language manually
+   */
+  numberFormatLang?: string;
+  /**
+   * What to use for the number formatting options
+   */
+  numberFormatOptions?: Intl.NumberFormatOptions;
 }
 
 /**
@@ -318,13 +333,21 @@ function i18nReadInternal(
 
   // if we are passing arguments to replace the {0} {1} etc... numbers
   if (props.args) {
+    // pass to the number formatter
+    const newArgs = (props.disableNumberFormat ? props.args : props.args.map((v) => {
+      if (typeof v === "number") {
+        return (new Intl.NumberFormat(props.numberFormatLang || localeContext.language, props.numberFormatOptions)).format(v);
+      };
+      return v;
+    }));
+
     // we have two options, these are for basic types, which is faster and returns a string
     if (
       !props.argsContentBitsWrapper &&
-      props.args.every((a) => typeof a === "string" || typeof a === "number" || a === null || typeof a === "undefined")
+      newArgs.every((a) => typeof a === "string" || typeof a === "number" || a === null || typeof a === "undefined")
     ) {
       // the standard locale replacer
-      i18nValue = localeReplacer(i18nValue as string, ...props.args);
+      i18nValue = localeReplacer(i18nValue as string, ...newArgs);
       if (props.capitalize) {
         i18nValue = capitalize(i18nValue as string);
       }
@@ -335,7 +358,7 @@ function i18nReadInternal(
       // otherwise we use the locale replacer to array which creates react fragments
       // and returns an array of react nodes, this all depends on the args that the user
       // is passing
-      i18nValue = localeReplacerToArray(i18nValue as string, ...props.args).map((output, index) => {
+      i18nValue = localeReplacerToArray(i18nValue as string, ...newArgs).map((output, index) => {
         // eg 0 2 4 all odd numbers are content bits
         const isContentBit = index % 2 === 0;
         const outputNode = isContentBit && props.argsContentBitsWrapper ? props.argsContentBitsWrapper(output) : output;
