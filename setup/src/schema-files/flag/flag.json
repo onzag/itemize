@@ -24,7 +24,7 @@
             ],
             "default": "OPEN",
             "createRoleAccess": "$CONFIG:const r = [];if(config.roles.includes('MODERATOR')){r.push('MODERATOR')};if(config.roles.includes('ADMIN')){r.push('ADMIN')};return r;",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "reason_text",

@@ -28,7 +28,7 @@
             "createRoleAccess": [],
             "hidden": true,
             "nullable": true,
-            "coerceNullsIntoDefault": true,
+            "coerceNullsIntoDefaultAfterSubmit": true,
             "default": "now"
         },
         {
@@ -142,7 +142,7 @@
             "hidden": true,
             "nullable": true,
             "default": true,
-            "coerceNullsIntoDefault": true,
+            "coerceNullsIntoDefaultAfterSubmit": true,
             "createRoleAccess": [],
             "editRoleAccess": []
         },

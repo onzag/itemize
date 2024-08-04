@@ -61,7 +61,7 @@ export default class PropertyEntryBoolean extends React.Component<
    */
   public onRestoreHijacked() {
     // so we check if we have a ternary, ternaries accept null values
-    const isTernary = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
+    const isTernary = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNullAfterSubmit();
     // so if we have a ternary or our reset value isn't null
     if (isTernary || this.props.state.stateAppliedValue !== null) {
       this.props.onRestore();
@@ -117,7 +117,7 @@ export default class PropertyEntryBoolean extends React.Component<
     const i18nTrue = i18nData && i18nData.true_label;
     const i18nFalse = i18nData && i18nData.false_label;
     const i18nNull = i18nData && i18nData.null_label;
-    const isTernary = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
+    const isTernary = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNullAfterSubmit();
     const trueLabel = i18nTrue || this.props.i18n[this.props.language].yes;
     const falseLabel = i18nFalse || this.props.i18n[this.props.language].no;
     const nullLabel = i18nNull || this.props.i18n[this.props.language].unspecified;

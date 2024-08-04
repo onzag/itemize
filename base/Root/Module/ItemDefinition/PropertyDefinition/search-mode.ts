@@ -468,8 +468,8 @@ export function buildSearchModePropertyDefinitions(
   delete newPropDef.minLength;
 
   // search mode cannot coerce nulls into default
-  if (newPropDef.coerceNullsIntoDefault) {
-    newPropDef.coerceNullsIntoDefault = false;
+  if (newPropDef.coerceNullsIntoDefaultAfterSubmit) {
+    newPropDef.coerceNullsIntoDefaultAfterSubmit = false;
   }
 
   // full text changes to a simple string tex tfield

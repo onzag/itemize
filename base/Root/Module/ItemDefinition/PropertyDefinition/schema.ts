@@ -255,7 +255,7 @@ export default {
         type: "string",
       },
     },
-    coerceNullsIntoDefault: {
+    coerceNullsIntoDefaultAfterSubmit: {
       type: "boolean",
     },
     searchOnlyProperty: {

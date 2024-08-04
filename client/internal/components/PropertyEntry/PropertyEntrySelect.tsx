@@ -128,7 +128,7 @@ export default class PropertyEntrySelect
     const currentValue = this.props.useAppliedValue ?
       this.props.state.stateAppliedValue as any :
       this.props.state.value as any;
-    const isNullable = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
+    const isNullable = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNullAfterSubmit();
 
     const type = this.props.property.getType();
     const isNumeric = ["number", "integer", "year"].includes(type);

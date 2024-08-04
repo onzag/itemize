@@ -591,7 +591,7 @@ export function convertSQLValueToRQValueForProperty(
   // the value is null, for example, after an update, this will
   // ensure coercion keeps on
   if (
-    propertyDefinition.isCoercedIntoDefaultWhenNull() &&
+    propertyDefinition.isCoercedIntoDefaultWhenNullAfterSubmit() &&
     colValue === null
   ) {
     colValue = propertyDefinition.getDefaultValue();
@@ -669,7 +669,7 @@ export function convertRQValueToSQLValueForProperty(
   // we treat undefined as null, and set it to default
   // if it is coerced into null
   if (
-    propertyDefinition.isCoercedIntoDefaultWhenNull() &&
+    propertyDefinition.isCoercedIntoDefaultWhenNullAfterSubmit() &&
     (
       rqPropertyValue === null ||
       typeof rqPropertyValue === "undefined"

@@ -241,7 +241,7 @@ export interface IPropertyDefinitionRawJSONDataType {
    * he is not allowed access to certain property, eg user role, so it is ensured
    * that the null value will be coerced into the default
    */
-  coerceNullsIntoDefault?: boolean;
+  coerceNullsIntoDefaultAfterSubmit?: boolean;
 
   /**
    * Read role permissions
@@ -2317,8 +2317,8 @@ export default class PropertyDefinition {
    * Tells whether the value is coerced into default when null
    * @returns a booean
    */
-  public isCoercedIntoDefaultWhenNull(): boolean {
-    return !!this.rawData.coerceNullsIntoDefault;
+  public isCoercedIntoDefaultWhenNullAfterSubmit(): boolean {
+    return !!this.rawData.coerceNullsIntoDefaultAfterSubmit;
   }
 
   /**

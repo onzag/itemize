@@ -68,7 +68,7 @@ First we want to create the request schema at `hosting/request.json`, that will 
             "subtype": "exact-value",
             "values": ["WAIT", "APPROVED", "DENIED"],
             "default": "WAIT",
-            "coerceNullsIntoDefault": true,
+            "coerceNullsIntoDefaultAfterSubmit": true,
             "nullable": true,
             "createRoleAccess": [],
             "editRoleAccess": ["OWNER_OF_UNIT"]
@@ -1005,7 +1005,7 @@ We want to display that in the hosting view as well as the user view so we want 
     "readRoleAccess": ["&OWNER"],
     "createRoleAccess": [],
     "editRoleAccess": [],
-    "coerceNullsIntoDefault": true
+    "coerceNullsIntoDefaultAfterSubmit": true
 }
 ```
 

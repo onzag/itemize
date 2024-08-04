@@ -36,7 +36,7 @@
             "nullable": true,
             "searchable": false,
             "readRoleAccess": ["&OWNER"],
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "phone",
@@ -55,7 +55,7 @@
             "searchable": false,
             "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "p_notifications",
@@ -65,7 +65,7 @@
             "searchable": false,
             "readRoleAccess": ["&OWNER"],
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN', '&OWNER']}else{return ['&OWNER']}",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "email",
@@ -84,7 +84,7 @@
             "searchable": false,
             "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "e_external",
@@ -94,7 +94,7 @@
             "searchable": false,
             "readRoleAccess": ["&OWNER"],
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN', '&OWNER']}else{return ['&OWNER']}",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "e_notifications",
@@ -104,7 +104,7 @@
             "searchable": false,
             "readRoleAccess": ["&OWNER"],
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN', '&OWNER']}else{return ['&OWNER']}",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "e_newsletter",
@@ -114,7 +114,7 @@
             "searchable": false,
             "readRoleAccess": ["&OWNER"],
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN', '&OWNER']}else{return ['&OWNER']}",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "password",
@@ -132,7 +132,7 @@
             "default": "$CONFIG:if(config.roles.includes('USER')){return 'USER'}else{return config.roles[0]}",
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
             "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefaultAfterSubmit": true
         },
         {
             "id": "profile_picture",
@@ -187,7 +187,7 @@
             "default": 0,
             "nullable": true,
             "hidden": true,
-            "coerceNullsIntoDefault": true,
+            "coerceNullsIntoDefaultAfterSubmit": true,
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&OWNER']}"
         }
     ],

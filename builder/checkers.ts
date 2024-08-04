@@ -1165,28 +1165,28 @@ export function checkPropertyDefinition(
   }
 
   if (
-    typeof rawData.coerceNullsIntoDefault !== "undefined" &&
+    typeof rawData.coerceNullsIntoDefaultAfterSubmit !== "undefined" &&
     !rawData.nullable
   ) {
     throw new CheckUpError(
       "Cannot set coerce nulls into default if property is not nullable",
-      traceback.newTraceToBit("coerceNullsIntoDefault"),
+      traceback.newTraceToBit("coerceNullsIntoDefaultAfterSubmit"),
     );
   } else if (
-    typeof rawData.coerceNullsIntoDefault !== "undefined" &&
+    typeof rawData.coerceNullsIntoDefaultAfterSubmit !== "undefined" &&
     typeof rawData.default === "undefined"
   ) {
     throw new CheckUpError(
       "Cannot set coerce nulls into default if property has no basic default value",
-      traceback.newTraceToBit("coerceNullsIntoDefault"),
+      traceback.newTraceToBit("coerceNullsIntoDefaultAfterSubmit"),
     );
   } else if (
-    typeof rawData.coerceNullsIntoDefault !== "undefined" &&
+    typeof rawData.coerceNullsIntoDefaultAfterSubmit !== "undefined" &&
     rawData.default === null
   ) {
     throw new CheckUpError(
       "Cannot set coerce nulls into default if default value is also null",
-      traceback.newTraceToBit("coerceNullsIntoDefault"),
+      traceback.newTraceToBit("coerceNullsIntoDefaultAfterSubmit"),
     );
   }
 
@@ -1649,7 +1649,7 @@ const minUserNecessaryProperties = [
       }
       return "Some string value";
     },
-    coerceNullsIntoDefault: true
+    coerceNullsIntoDefaultAfterSubmit: true
   },
   {
     id: "session_id",
@@ -1659,7 +1659,7 @@ const minUserNecessaryProperties = [
     default: 0,
     nullable: true,
     hidden: true,
-    coerceNullsIntoDefault: true
+    coerceNullsIntoDefaultAfterSubmit: true
   },
 ]
 
