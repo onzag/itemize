@@ -30,7 +30,9 @@ function getAllKeyNames(obj: any, prefix: string) {
     // so get the value
     const value = obj[key];
     // if the value is a string, we've hit a leaf
-    if (typeof value === "string") {
+    // or if it contains that object inside it's a leaf with
+    // variations in it
+    if (typeof value === "string" || value["&"]) {
       result.push(prefix + key);
     } else {
       // otherwise let's keep getting in

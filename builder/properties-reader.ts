@@ -7,6 +7,8 @@
 import fs from "fs";
 const fsAsync = fs.promises;
 
+const propertiesValidValueRegex = /^[a-zA-Z0-9-_&]+$/;
+
 /**
  * Reads the properties file and converts it to JSON
  * @param pathToFile 
@@ -78,20 +80,81 @@ export async function propertiesReader(pathToFile: string) {
       // if it's last we must set the value
       const isLast = index === (keySplitted.length - 1);
 
-      // if it's last but it's already set throw an error
-      if (isLast && storageLocation[keyBit]) {
+      if (!propertiesValidValueRegex.test(keyBit)) {
         throw new Error(
-          "Could not set value on top of another with key " + key + " setting value " +
-          JSON.stringify(value) + " overlapping " + JSON.stringify(storageLocation[keyBit]) + (currentMainKey ? (" at " + currentMainKey + ",") : ",") +
+          "Invalid value in " + key + " due to " +
+          JSON.stringify(keyBit) + " containing invalid characters" +
           " at file " + pathToFile
         );
-      } else if (isLast) {
+      }
+
+      if (!isLast && keyBit.includes("&")) {
+        throw new Error(
+          "Invalid value in " + key + " due to " +
+          JSON.stringify(keyBit) + " as variations using '&' sign are only allowed at the end bit" +
+          " at file " + pathToFile
+        );
+      }
+
+      const [base, variation] = keyBit.split("&");
+
+      if (keyBit.includes("&")) {
+        if (!variation) {
+          throw new Error(
+            "Invalid value in " + key + " due to " +
+            JSON.stringify(keyBit) + " having a countable variation, yet not providing a value to count for" +
+            " at file " + pathToFile
+          );
+        }
+        if (variation !== "n") {
+          const variationAsInt = parseInt(variation);
+          if (isNaN(variationAsInt) || variationAsInt.toString() !== variation) {
+            throw new Error(
+              "Invalid value in " + key + " due to " +
+              JSON.stringify(keyBit) + " not having a variation of 'n' or an integer but instead " + JSON.stringify(variation) +
+              " at file " + pathToFile
+            );
+          }
+        }
+      }
+
+      // if it's last but it's already set throw an error
+      if (isLast && !variation && storageLocation[base]) {
+        throw new Error(
+          "Could not set value on top of another with key " + key + " setting value " +
+          JSON.stringify(base) + " overlapping " + JSON.stringify(storageLocation[base]) + (currentMainKey ? (" at " + currentMainKey + ",") : ",") +
+          " at file " + pathToFile
+        );
+      } else if (isLast && !variation) {
         // otherwise set the value
-        storageLocation[keyBit] = value;
+        storageLocation[base] = value;
+      } else if (isLast && variation && storageLocation[base] && storageLocation[base][variation]) {
+        throw new Error(
+          "Could not set value on top of another with key " + key + " setting value " +
+          JSON.stringify(keyBit) + " overlapping " + JSON.stringify(storageLocation[base][variation]) + (currentMainKey ? (" at " + currentMainKey + ",") : ",") +
+          " at file " + pathToFile
+        );
+      } else if (isLast && variation) {
+        if (!storageLocation[base]) {
+          storageLocation[base] = {
+            // represents a variations object
+            "&": "t",
+          };
+
+          if (variation !== "n") {
+            throw new Error(
+              "Invalid value in " + key + " due to " +
+              JSON.stringify(keyBit) + " as the first variation must always be the 'n' variation followed by numeric ones" +
+              " at file " + pathToFile
+            );
+          }
+        }
+
+        storageLocation[base][variation] = value;
       } else {
         // otherwise update the object and set the new storage location
-        storageLocation[keyBit] = storageLocation[keyBit] || {};
-        storageLocation = storageLocation[keyBit];
+        storageLocation[base] = storageLocation[base] || {};
+        storageLocation = storageLocation[base];
       }
     });
   }

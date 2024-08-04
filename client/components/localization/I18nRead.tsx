@@ -108,6 +108,21 @@ export interface I18nReadOptions {
    * Override for the whitespace style property
    */
   whiteSpace?: string;
+  /**
+   * Use for countables if countable is defined the first
+   * numeric argument of the arg list will be used as the counted value
+   * in order to determine which counted element is to be used
+   * for display
+   * 
+   * if you want to manually specify a count, use the countValue
+   * prop
+   */
+  countable?: boolean;
+  /**
+   * By default when a field is countable the first numeric arg is to be used
+   * for the counter, use this to override that
+   */
+  countValue?: number;
 }
 
 /**
@@ -250,8 +265,15 @@ function i18nReadInternal(
     );
   }
 
+  // for handling countables
+  if (i18nValue && props.countable) {
+    const countValue = (typeof props.countValue === "number" ? props.countValue :
+      (props.args && props.args.find((a) => typeof a === "number"))) || 0;
+    i18nValue = i18nValue[countValue.toString()] || i18nValue["n"];
+  }
+
   // if we still find nothing in all these contexts
-  if (i18nValue === null) {
+  if (i18nValue === null || typeof i18nValue !== "string") {
     // we want to throw an error
     let errMessage: string = "Unknown key in context: " + props.id;
 
@@ -281,6 +303,10 @@ function i18nReadInternal(
         errMessage += "; for property id " +
           props.propertyId;
       }
+    }
+
+    if (typeof i18nValue !== "string") {
+      errMessage += "; resolves to an object instead of a string";
     }
     // throw the error
     if (typeof window !== "undefined") {
