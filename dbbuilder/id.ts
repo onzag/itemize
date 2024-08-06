@@ -5,7 +5,7 @@
  */
 
 import { DatabaseConnection } from "../database";
-import { ISQLSchemaDefinitionType } from "../base/Root/sql";
+import colors from "colors/safe";
 
 // based on https://blog.andyet.com/2016/02/23/generating-shortids-in-postgres/
 const ID_TRIGGER = `CREATE OR REPLACE FUNCTION id12()
@@ -76,9 +76,35 @@ export async function postprocessIdTriggers(
   }
 
   await Promise.all(gatheredIdTriggeredTables.map(async (idTableName) => {
-    await databaseConnection.query(
-      `DROP TRIGGER IF EXISTS ${JSON.stringify(idTableName + "_TRIGGER")} ON ${JSON.stringify(idTableName)}`,
+    const expectedTriggerName = idTableName + "_TRIGGER";
+    const checkIfExists = await databaseConnection.queryRows(
+      "SELECT trigger_name, action_statement FROM information_schema.triggers WHERE event_manipulation = 'INSERT' AND " +
+      "action_timing = 'BEFORE' AND event_object_table = $1",
+      [
+        idTableName,
+      ]
     );
+    const functionWithTheSameName = checkIfExists.find((r) => r.trigger_name === expectedTriggerName);
+    const functionWithTheSameFunction = checkIfExists.find((r) => r.action_statement === "EXECUTE FUNCTION id12()");
+    
+    if (functionWithTheSameFunction) {
+      if (functionWithTheSameFunction !== functionWithTheSameName) {
+        console.log(colors.red("Note, the function for id12 procedure has been taken" +
+          " by another method or otherwise duplicated on table " + JSON.stringify(idTableName) + " our function exists in " +
+        JSON.stringify(functionWithTheSameFunction.trigger_name)))
+      }
+      return;
+    }
+    
+    // somehow the function has changed and we are using something else I guess id11 or id6 who knows
+    // maybe one day we change id12
+    if (functionWithTheSameName && functionWithTheSameName.action_statement !== "EXECUTE FUNCTION id12()") {
+      await databaseConnection.query(
+        `DROP TRIGGER IF EXISTS ${JSON.stringify(idTableName + "_TRIGGER")} ON ${JSON.stringify(idTableName)}`,
+      );
+    }
+
+    // now we can create the trigger because it must not exist
     await databaseConnection.query(
       `CREATE TRIGGER ${JSON.stringify(idTableName + "_TRIGGER")} BEFORE INSERT ON ${JSON.stringify(idTableName)} ` +
       `FOR EACH ROW EXECUTE PROCEDURE id12()`,
