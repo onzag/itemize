@@ -9,7 +9,7 @@ import colors from "colors/safe";
 import uuidv5 from "uuid/v5";
 
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
-import { showErrorStackAndLogMessage, yesno } from ".";
+import { continueOrKill, showErrorStackAndLogMessage, yesno } from ".";
 import { DatabaseConnection } from "../database";
 
 const NAMESPACE = "23ab5609-df49-4fdf-921b-4604ada284f3";
@@ -68,7 +68,7 @@ export async function buildIndexes(
     // well I just copied this from ChadGPT because I can't
     // fathom how this works, modified it a little but I have no clue how this works
     // and I won't bother to unpack this code
-    const allIndexesInTableInformation = await databaseConnection.queryFirst("SELECT i.relname AS index_name," +
+    const allIndexesInTableInformation = await databaseConnection.queryRows("SELECT i.relname AS index_name," +
       " a.attname AS column_name, am.amname AS index_type, ix.indisunique AS is_unique, ix.indisprimary AS is_primary, k.ordinality AS column_position" +
       " FROM pg_class t JOIN pg_index ix ON t.oid = ix.indrelid JOIN pg_class i ON i.oid = ix.indexrelid JOIN pg_attribute a ON a.attrelid = t.oid JOIN" +
       " pg_am am ON am.oid = i.relam JOIN unnest(ix.indkey) WITH ORDINALITY AS k(attnum, ordinality) ON a.attnum = k.attnum WHERE" +
@@ -87,7 +87,7 @@ export async function buildIndexes(
       if (!currentTableIndexes[indexInfo.index_name]) {
         currentTableIndexes[indexInfo.index_name] = {
           columns: [],
-          type: (indexInfo.primary ? "primary" : (indexInfo.is_unique ? "unique" : indexInfo.index_type.toLowerCase())),
+          type: (indexInfo.is_primary ? "primary" : (indexInfo.is_unique ? "unique" : indexInfo.index_type.toLowerCase())),
         }
       }
       // we set the array by position
@@ -143,6 +143,8 @@ export async function buildIndexes(
               `${newTableIndexes[pgIndexName].type} on columns ` +
               `${newTableIndexes[pgIndexName].columns.join(", ")}`,
             ));
+
+            await continueOrKill();
           }
         }
       }
@@ -193,7 +195,7 @@ export async function buildIndexes(
         if (newIndex) {
           console.log(colors.yellow(
             `Index '${pgIndexId}' of type ${currentIndex.type} on columns ${joinedCurrentColumns} has` +
-            ` been changed, the current index needs to be dropped`,
+            ` changed, the current index needs to be dropped to fit ` + JSON.stringify(newIndex),
           ));
         } else {
           console.log(colors.yellow(
@@ -218,7 +220,7 @@ export async function buildIndexes(
               );
             }
           } catch (err) {
-            showErrorStackAndLogMessage(err);
+            await showErrorStackAndLogMessage(err);
             wasSupposedToDropCurrentIndexButDidnt = true;
           }
         } else {
@@ -249,7 +251,7 @@ export async function buildIndexes(
         // show the message that the index needs to be created
         console.log(colors.yellow(
           `Index '${pgIndexId}' of type ${newIndex.type} ` +
-          ` must now be created which affects columns ${joinedNewColumns}`,
+          ` must now be created which affects columns ${joinedNewColumns} to fit ${JSON.stringify(newIndex)}`,
         ));
 
         // ask on whether we create the index
@@ -257,15 +259,15 @@ export async function buildIndexes(
           "create the index?",
         )) {
           try {
-            if (newIndex.type === "unique") {
-              await databaseConnection.query(
-                `CREATE UNIQUE INDEX ${JSON.stringify(pgIndexId)} ON ` +
-                `${JSON.stringify(tableName)} (${newIndexColumnsSorted.map((c) => JSON.stringify(c)).join(", ")})`
-              );
-            } else if (newIndex.type === "primary") {
+            if (newIndex.type === "primary") {
               await databaseConnection.query(
                 `ALTER TABLE ${JSON.stringify(tableName)} ADD CONSTRAINT ` +
                 `${JSON.stringify(pgIndexId)} PRIMARY KEY (${newIndexColumnsSorted.map((c) => JSON.stringify(c)).join(", ")})`
+              );
+            } else if (newIndex.type === "unique") {
+              await databaseConnection.query(
+                `CREATE UNIQUE INDEX ${JSON.stringify(pgIndexId)} ON ` +
+                `${JSON.stringify(tableName)} (${newIndexColumnsSorted.map((c) => JSON.stringify(c)).join(", ")})`
               );
             } else {
               await databaseConnection.query(
@@ -274,7 +276,7 @@ export async function buildIndexes(
               );
             }
           } catch (err) {
-            showErrorStackAndLogMessage(err);
+            await showErrorStackAndLogMessage(err);
           }
         }
       }

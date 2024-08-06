@@ -11,9 +11,97 @@ import colors from "colors/safe";
 
 import { ISQLSchemaDefinitionType, ISQLTableDefinitionType, ISQLColumnDefinitionType } from "../base/Root/sql";
 import { showErrorStackAndLogMessage, yesno } from ".";
-import { buildColumn } from "./build-column";
+import { buildColumn, convertValueToExpression } from "./build-column";
 import { DatabaseConnection } from "../database";
-import { makeIdOutOf, MAX_PG_FK_SIZE } from "./build-foreign-key";
+import equals from "deep-equal";
+
+async function checkValuesAreEquivalent(
+  databaseConnection: DatabaseConnection,
+  pgGiven: string,
+  schemaGiven: any,
+  isSerial: boolean,
+): Promise<boolean> {
+  // this is a serial and of course has a next val due to primary key pruposes
+  if (isSerial && pgGiven?.startsWith("nextval(") && (schemaGiven === null || typeof schemaGiven === "undefined")) {
+    return true;
+  }
+  // the value in postgreSQL is a function
+  // and our schema does not support function calling
+  // so it must have changed by default
+  if (pgGiven?.includes("(")) {
+    return false;
+  }
+
+  if (!pgGiven && schemaGiven) {
+    return false;
+  }
+
+  if (!pgGiven && (typeof schemaGiven === "undefined" || schemaGiven === null)) {
+    return true;
+  }
+
+  const toAny = await databaseConnection.queryFirst("SELECT " + pgGiven + " AS value");
+  const pgValue: any = toAny.value;
+
+  return (pgValue === schemaGiven || equals(pgGiven, schemaGiven, { strict: true }));
+}
+
+const postgresTypeEquivalents = [
+  ["NUMERIC", "DECIMAL"],
+  ["INT", "INTEGER", "INT4", "SERIAL", "SERIAL4"],
+  ["SMALLINT", "INT2"],
+  ["BIGINT", "INT8", "BIGSERIAL", "SERIAL8"],
+  ["REAL", "FLOAT4"],
+  ["DOUBLE PRECISION", "FLOAT8"],
+  ["CHARACTER VARYING", "VARCHAR"],
+  ["CHARACTER", "CHAR"],
+  ["TIMESTAMP WITHOUT TIME ZONE", "TIMESTAMP"],
+  ["TIMESTAMP WITH TIME ZONE", "TIMESTAMPTZ"],
+  ["TIME WITHOUT TIME ZONE", "TIME"],
+  ["TIME WITH TIME ZONE", "TIMETZ"],
+  ["BOOLEAN", "BOOL"]
+];
+
+async function checkTypesAreEquivalent(
+  current: string,
+  wanted: string,
+  currentDefault: string,
+) {
+  const currentUpper = current.trim().toUpperCase().replace(/\s\s+/g, ' ');
+  const wantedUpper = wanted.trim() === "ID" ? "TEXT" : wanted.trim().toUpperCase().replace(/\s\s+/g, ' ');
+
+  if (currentUpper === wantedUpper) {
+    return true;
+  }
+
+  const currentIsArray = currentUpper.endsWith("[]");
+  const wantedIsArray = wantedUpper.endsWith("[]");
+
+  if (currentIsArray !== wantedIsArray) {
+    return false;
+  }
+
+  const currentUnarrayed = currentUpper.replace("[]", "").trim();
+  const wantedUnarrayed = wantedUpper.replace("[]", "").trim();
+
+  const currentEquivalenceIndex = postgresTypeEquivalents.findIndex((v) => v.some((v2) => v2 === currentUnarrayed));
+  const wantedEquivalenceIndex = postgresTypeEquivalents.findIndex((v) => v.some((v2) => v2 === wantedUnarrayed));
+
+  if (currentEquivalenceIndex !== -1 && currentEquivalenceIndex === wantedEquivalenceIndex) {
+    // serials just are integers that have a default value
+    if (wantedUpper.includes("SERIAL")) {
+      // in order to be 100% sure they are truly equal we are going to check
+      // that the default for the nextval exists
+      const hasNextVal = currentDefault.startsWith("nextval(");
+      if (!hasNextVal) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  return currentUnarrayed === wantedUnarrayed;
+}
 
 function fastRead(options: read.Options): Promise<{
   result: string;
@@ -87,7 +175,7 @@ export async function addMissingColumnToTable(
       }
       return newColumnSchema;
     } catch (err) {
-      showErrorStackAndLogMessage(err);
+      await showErrorStackAndLogMessage(err);
       if (await yesno("Consider it successful? The column will be considered as properly added")) {
         return newColumnSchema;
       }
@@ -141,7 +229,7 @@ export async function dropExtraColumnInTable(
       return null;
     } catch (err) {
       // if not change the result schema
-      showErrorStackAndLogMessage(err);
+      await showErrorStackAndLogMessage(err);
     }
   }
 }
@@ -169,26 +257,53 @@ export async function updateColumnInTable(
   // let's have this flag for weird changes, there is only so little we would like to change
   // that could break the app
   let noOp = false;
+  let somethingChanged = false;
   // for example a type change (say from int to boolean), can break stuff
-  if (currentColumnInfo.data_type !== newColumnSchema.type) {
+  if (!checkTypesAreEquivalent(currentColumnInfo.data_type, newColumnSchema.type, currentColumnInfo.column_default)) {
     // so we warn and set the noop flag
     console.log(colors.red("A column at " + tableName + "." + columnName +
       " has been changed type from " + currentColumnInfo.data_type + " to " +
       newColumnSchema.type + " this is a no-op"));
     noOp = true;
+    somethingChanged = true;
   }
 
+  // primary indexes are not nullable
+  const notNullNew = newColumnSchema.notNull || newColumnSchema.index?.type.toLowerCase() === "primary";
+
   // also to deny nulls, nulls are always active
-  if (currentColumnInfo.is_nullable !== !newColumnSchema.notNull && newColumnSchema.notNull) {
-    // this is a noop too, there might be nulls
-    console.log(colors.red("A column has changed from not being nullable to being nullable at " +
-      tableName + "." + columnName + " this is a no-op"));
-    noOp = true;
+  if (currentColumnInfo.is_nullable !== !notNullNew) {
+    if (notNullNew) {
+      // this is a noop too, there might be nulls
+      console.log(colors.red("A column has changed from being nullable to not being nullable at " +
+        tableName + "." + columnName + " this is a no-op"));
+      noOp = true;
+    }
+    somethingChanged = true;
   }
 
   // let's show a message for the column change
   if (!noOp) {
     console.log(colors.yellow("A column has changed at " + tableName + "." + columnName));
+    if (!await checkValuesAreEquivalent(
+      databaseConnection,
+      currentColumnInfo.column_default,
+      newColumnSchema.defaultTo,
+      newColumnSchema.type.toUpperCase().includes("SERIAL"),
+    )) {
+      console.log(colors.yellow(
+        "The default value of " + JSON.stringify(columnName) + " in " + JSON.stringify(tableName)  + " has changed from " +
+        JSON.stringify(currentColumnInfo.column_default) +
+        " to " +
+        JSON.stringify(typeof newColumnSchema.defaultTo === "undefined" ? null : newColumnSchema.defaultTo))
+      );
+      somethingChanged = true;
+    }
+  }
+
+  if (!somethingChanged) {
+    console.log(colors.yellow("but nothing has changed, leaving as it is"));
+    return;
   }
 
   const alterTableQuery = databaseConnection.getAlterTableBuilder();
@@ -207,7 +322,7 @@ export async function updateColumnInTable(
       await databaseConnection.query(alterTableQuery);
       return newColumnSchema;
     } catch (err) {
-      showErrorStackAndLogMessage(err);
+      await showErrorStackAndLogMessage(err);
     }
   }
 }
@@ -238,7 +353,7 @@ export async function createTable(
     finalTableSchema[columnName] = {
       type: columnData.type,
       notNull: columnData.notNull,
-      defaultTo: columnData.defaultTo,
+      defaultTo: convertValueToExpression(columnData.defaultTo),
     };
   });
 
@@ -249,7 +364,7 @@ export async function createTable(
       await databaseConnection.query(createTableQuery);
       return finalTableSchema;
     } catch (err) {
-      showErrorStackAndLogMessage(err);
+      await showErrorStackAndLogMessage(err);
       if (await yesno("Consider it successful? The table will be considered as properly added")) {
         return finalTableSchema;
       }
@@ -280,7 +395,7 @@ export async function updateTable(
     // we get the data from the column
     const newColumnSchema = newTableSchema[columnName];
 
-    const columnInfo = await databaseConnection.queryFirst("SELECT column_name, data_type, is_nullable, column_default FROM " +
+    const rawColumnInfo = await databaseConnection.queryFirst("SELECT column_name, data_type, is_nullable, column_default FROM " +
       "information_schema.columns WHERE table_schema = $1 AND table_name = $2 AND column_name = $3",
       [
         "public",
@@ -289,16 +404,27 @@ export async function updateTable(
       ]
     );
 
+    const columnInfo = {
+      column_name: rawColumnInfo.column_name,
+      data_type: rawColumnInfo.data_type,
+      is_nullable: rawColumnInfo.is_nullable === "YES",
+      column_default: rawColumnInfo.column_default,
+    };
+
     // if there was no such column
     if (!columnInfo) {
       await addMissingColumnToTable(databaseConnection, tableName, columnName, newColumnSchema);
       // Otherwise if there was just a change in the column basic information
       // that is because this is only in charge of the basic structure
     } else if (
-      // TODO are these checks any good???
-      columnInfo.data_type.toLowerCase() !== newColumnSchema.type.toLowerCase() ||
-      columnInfo.is_nullable !== !newColumnSchema.notNull ||
-      columnInfo.column_default !== newColumnSchema.defaultTo
+      columnInfo.is_nullable !== !(newColumnSchema.notNull || newColumnSchema.index?.type.toLowerCase() === "primary") ||
+      !checkTypesAreEquivalent(columnInfo.data_type, newColumnSchema.type, columnInfo.column_default) ||
+      !(await checkValuesAreEquivalent(
+        databaseConnection,
+        columnInfo.column_default,
+        newColumnSchema.defaultTo,
+        newColumnSchema.type.toUpperCase().includes("SERIAL"),
+      ))
     ) {
       await updateColumnInTable(
         databaseConnection,
@@ -319,7 +445,8 @@ export async function updateTable(
   );
 
   // now we loop in the current ones
-  for (const columnName of columnNames) {
+  for (const columnData of columnNames) {
+    const columnName = columnData.column_name;
     // grab this
     const newColumnSchema = newTableSchema[columnName];
 
@@ -356,7 +483,7 @@ export async function dropTable(
       );
       return null;
     } catch (err) {
-      showErrorStackAndLogMessage(err);
+      await showErrorStackAndLogMessage(err);
       if (await yesno("Consider it successful? The table will be considered as properly removed")) {
         return null;
       }

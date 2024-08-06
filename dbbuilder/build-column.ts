@@ -9,6 +9,23 @@ import { CreateTableBuilder } from "../database/CreateTableBuilder";
 import { AlterTableBuilder } from "../database/AlterTableBuilder";
 import { ISQLColumnDefinitionType } from "../base/Root/sql";
 
+export function escapeString(str: string) {
+  return "'" + Array.from(str).map((char: string) => char === "'" ? "\\'" : char).join("") + "'";
+}
+export function convertValueToExpression(
+  v: any
+) {
+  if (typeof v === "boolean") {
+    return v ? "TRUE" : "FALSE";
+  } else if (typeof v === "string") {
+    return escapeString(v);
+  } else if (typeof v === "number") {
+    return v.toString();
+  } else {
+    return escapeString(JSON.stringify(v)) + "::jsonb";
+  }
+}
+
 /**
  * Builds a type for the table
  * @param columnName the column name we want to create
@@ -33,7 +50,7 @@ export function buildColumn(
     name: columnName,
     type: actualType,
     notNull: columnData.notNull,
-    defaultTo: columnData.defaultTo,
+    defaultTo: convertValueToExpression(columnData.defaultTo),
   };
 
   if (tableBuilder instanceof CreateTableBuilder) {

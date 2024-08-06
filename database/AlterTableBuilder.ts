@@ -9,13 +9,9 @@ interface IAlterTableColumnData {
   name: string;
   type: string;
   notNull: boolean;
-  defaultTo?: ValueType;
-}
-
-interface IAlterTableColumnDataWithExpressionAsDefault {
-  name: string;
-  type: string;
-  notNull: boolean;
+  /**
+   * the default must be a self contained expression
+   */
   defaultTo?: string;
 }
 
@@ -28,7 +24,7 @@ export class AlterTableBuilder extends QueryBuilder {
    * Table name in question we are updating against
    */
   private tableName: string;
-  private columnRule: IAlterTableColumnDataWithExpressionAsDefault;
+  private columnRule: IAlterTableColumnData;
   private action: string;
   /**
    * Builds a new alter table query builder
@@ -50,24 +46,7 @@ export class AlterTableBuilder extends QueryBuilder {
     }
 
     this.action = action;
-
-    if (info.defaultTo) {
-      if (Array.isArray(info.defaultTo)) {
-        this.addBindingSources(info.defaultTo[1]);
-        this.columnRule = {
-          ...info,
-          defaultTo: info.defaultTo[0],
-        };
-      } else {
-        this.addBindingSource(info.defaultTo);
-        this.columnRule = {
-          ...info,
-          defaultTo: "?",
-        };
-      }
-    } else {
-      this.columnRule = info as any;
-    }
+    this.columnRule = info as any;
 
     return this;
   }
@@ -124,7 +103,12 @@ export class AlterTableBuilder extends QueryBuilder {
       return startBit +
         this.action + " " + quotedColumn + " TYPE " + this.columnRule.type + ", " +
         this.action + " " + quotedColumn + (this.columnRule.notNull ? " SET " : " DROP ") + "NOT NULL, " +
-        this.action + " " + quotedColumn + (this.columnRule.defaultTo ? " SET DEFAULT " + this.columnRule.defaultTo : " DROP DEFAULT");
+        this.action + " " + quotedColumn +
+        (
+          typeof this.columnRule.defaultTo !== "undefined" && this.columnRule !== null ?
+          " SET DEFAULT " + this.columnRule.defaultTo :
+          " DROP DEFAULT"
+        );
     }
   }
 }

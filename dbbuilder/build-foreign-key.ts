@@ -8,7 +8,7 @@
 import colors from "colors/safe";
 
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
-import { showErrorStackAndLogMessage, yesno } from ".";
+import { continueOrKill, showErrorStackAndLogMessage, yesno } from ".";
 import { DatabaseConnection } from "../database";
 import uuidv5 from "uuid/v5";
 
@@ -62,14 +62,19 @@ function findActionFor(
   k: string,
   name: string,
 ) {
-  const strEnd = k.split(name)[1].trimStart().toLowerCase();
+  // FOREIGN KEY ("MODULE_ID", "MODULE_VERSION") REFERENCES "MOD_course"(id, version) ON UPDATE CASCADE ON DELETE CASCADE
+  const afterSplit = k.split(name)[1];
+  if (!afterSplit) {
+    return "no action";
+  }
+  const strEnd = afterSplit.trimStart().toLowerCase();
 
   if (!strEnd) {
     return "no action";
   }
 
   return potentialForeignKeyActions.find((v) => {
-    return k.startsWith(v);
+    return strEnd.startsWith(v);
   }) || "no action";
 }
 
@@ -98,10 +103,17 @@ export async function buildForeignKeys(
     ],
   );
 
-  const allForeignKeysInPublic = await databaseConnection.queryRows(
+  let allForeignKeysInPublic = await databaseConnection.queryRows(
     "SELECT conrelid::regclass AS table_from, conname, pg_get_constraintdef(oid) FROM pg_constraint WHERE contype='f' AND " +
     "connamespace = 'public'::regnamespace ORDER  BY conrelid::regclass::text, contype DESC"
   );
+  allForeignKeysInPublic = allForeignKeysInPublic.map((v) => (
+    {
+      ...v,
+      // for some weird reason it comes quoted
+      table_from: JSON.parse(v.table_from),
+    }
+  ));
 
   // Now we want to check for foreign keys we start over, add foreign keys
   // later because we don't know what order were tables added
@@ -121,7 +133,7 @@ export async function buildForeignKeys(
     const newTableForeignKeys: IProcessedForeignKeys = {};
     const currentTableForeignKeys: IProcessedForeignKeys = {};
 
-    const foreignKeysForTable = allForeignKeysInPublic.filter((v) => v.table_fom === tableName);
+    const foreignKeysForTable = allForeignKeysInPublic.filter((v) => v.table_from === tableName);
 
     // first we grab all the foreign keys for that given table
     foreignKeysForTable.forEach((k) => {
@@ -130,19 +142,15 @@ export async function buildForeignKeys(
 
       // get the columns that it affects, for example
       // FOREIGN KEY ("MODULE_ID", "MODULE_VERSION") REFERENCES "MOD_course"(id, version) ON UPDATE CASCADE ON DELETE CASCADE
-      // and yes it will always be uppercase, so we want between FOREIGN KEY and REFERENCES
-      const columnsBase = parseColumns(k.pg_get_constraintdef, "FOREIGN KEY", "REFERENCES");
-      const columnsReferrenced = parseColumns(k.pg_get_constraintdef, "REFERENCES", "ON");
+      // and yes it will always be uppercase, so we want between FOREIGN KEY and ) since REFERENCES could be in our id somehow
+      const columnsBase = parseColumns(k.pg_get_constraintdef, "FOREIGN KEY", ")");
+      const columnsReferrenced = parseColumns(k.pg_get_constraintdef.split(")")[1], "REFERENCES", ")");
 
       // now we want the target table
-      let targetTable = k.pg_get_constraintdef.split("REFERENCES")[1].split("ON")[0];
-      const indexOfPharentesis = targetTable.split("(");
-
-      if (indexOfPharentesis === -1) {
-        return;
+      let targetTable = (k.pg_get_constraintdef as string).split(")")[1].split("REFERENCES")[1].split("(")[0].trim();
+      if (targetTable.startsWith("\"")) {
+        targetTable = JSON.parse(targetTable);
       }
-
-      targetTable = targetTable.substring(0, indexOfPharentesis);
 
       // now we grab the actions
       const deleteAction = findActionFor(k.pg_get_constraintdef, "ON DELETE");
@@ -213,6 +221,8 @@ export async function buildForeignKeys(
               `schema has unmatching tables ${newColumnSchema.foreignKey.table} over stored ` +
               `${newTableForeignKeys[actualId].targetTable}`,
             ));
+
+            await continueOrKill();
           }
 
           // now let's check if the delete action is congrugent
@@ -225,6 +235,8 @@ export async function buildForeignKeys(
               `schema has unmatching delete actions ${newColumnSchema.foreignKey.deleteAction} over stored ` +
               `${newTableForeignKeys[actualId].deleteAction}`,
             ));
+
+            await continueOrKill();
           }
 
           // now let's check if the update action is congrugent
@@ -237,6 +249,8 @@ export async function buildForeignKeys(
               `schema has unmatching update actions ${newColumnSchema.foreignKey.updateAction} over stored ` +
               `${newTableForeignKeys[actualId].updateAction}`,
             ));
+
+            await continueOrKill();
           }
         }
       }
@@ -287,7 +301,8 @@ export async function buildForeignKeys(
           (
             // the foreign key signature does not match
             newForeignKey.targetTable !== currentForeignKey.targetTable ||
-            newForeignKey.deleteAction !== currentForeignKey.deleteAction ||
+            newForeignKey.deleteAction.toLowerCase() !== currentForeignKey.deleteAction ||
+            newForeignKey.updateAction.toLowerCase() !== currentForeignKey.updateAction ||
             newForeignKeySourceColumnsStored.join(",") !== currentForeignKeySourceColumnsStored.join(",") ||
             newForeignKeyReferenceColumnsStored.join(",") !== currentForeignKeyReferenceColumnsStored.join(",")
           )
@@ -297,7 +312,8 @@ export async function buildForeignKeys(
         if (newForeignKey) {
           console.log(colors.yellow(
             `Foreign key '${foreignKeyId}' has been changed, ` +
-            `the current foreign key needs to be dropped`,
+            `the current foreign key needs to be dropped, current is ` +
+            `${JSON.stringify(currentForeignKey)} while new is ${JSON.stringify(newForeignKey)}`,
           ));
         } else {
           console.log(colors.yellow(
@@ -319,7 +335,7 @@ export async function buildForeignKeys(
               `ALTER TABLE ${JSON.stringify(tableName)} DROP CONSTRAINT ${JSON.stringify(actualId)}`,
             );
           } catch (err) {
-            showErrorStackAndLogMessage(err);
+            await showErrorStackAndLogMessage(err);
             wasSupposedToDropCurrentForeignKeyButDidnt = true;
           }
         } else {
@@ -372,7 +388,7 @@ export async function buildForeignKeys(
               `ON DELETE ${newForeignKey.deleteAction} ON UPDATE ${newForeignKey.updateAction}`
             );
           } catch (err) {
-            showErrorStackAndLogMessage(err);
+            await showErrorStackAndLogMessage(err);
           }
         }
       }

@@ -24,6 +24,13 @@ import read from "read";
 
 const fsAsync = fs.promises;
 
+export async function continueOrKill() {
+  const doContinue = await yesno("continue?");
+  if (!doContinue) {
+    process.exit(-1);
+  }
+}
+
 /**
  * Simple function to ask for a question
  * @param question the question to ask
@@ -107,16 +114,12 @@ export default async function build(version: string, action: "build" | "dump" | 
     return loadDump(version, databaseConnection, root);
   }
 
-  let optimal: ISQLSchemaDefinitionType;
-  let actual: ISQLSchemaDefinitionType;
-
-  
-
   // write the resulting actual
   let showAllDone = true;
   try {
     await buildDatabase(databaseConnection, getSQLTablesSchemaForRoot(root));
   } catch (err) {
+    console.log(colors.red(err.stack));
     console.log(colors.red("FAILED TO WRITE UPDATES TO THE DATABASE"));
     console.log(colors.red("PLEASE DO NOT ATTEMPT TO UPDATE THE SERVER IN THIS STATE AS THIS CAN LEAD TO DATA CORRUPTION"));
     console.log(colors.red("PLEASE RUN THIS SCRIPT AGAIN TO FIX THIS ONCE YOU FIX THE ISSUE"));
@@ -130,8 +133,10 @@ export default async function build(version: string, action: "build" | "dump" | 
   }
 };
 
-export function showErrorStackAndLogMessage(err: Error) {
+export async function showErrorStackAndLogMessage(err: Error) {
   console.log(colors.red(err.stack));
+
+  await continueOrKill();
 }
 
 /**

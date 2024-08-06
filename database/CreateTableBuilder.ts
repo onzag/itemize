@@ -9,13 +9,9 @@ interface ICreateTableColumnData {
   name: string;
   type: string;
   notNull: boolean;
-  defaultTo?: ValueType;
-}
-
-interface ICreateTableColumnDataWithExpressionAsDefault {
-  name: string;
-  type: string;
-  notNull: boolean;
+  /**
+   * the default must be a self contained expression
+   */
   defaultTo?: string;
 }
 
@@ -29,7 +25,7 @@ export class CreateTableBuilder extends QueryBuilder {
    */
   private tableName: string;
   private createIfNotExists: boolean;
-  private columns: ICreateTableColumnDataWithExpressionAsDefault[] = [];
+  private columns: ICreateTableColumnData[] = [];
 
   /**
    * Builds a new create table query builder
@@ -46,24 +42,7 @@ export class CreateTableBuilder extends QueryBuilder {
    * @returns itself
    */
   public addColumn(info: ICreateTableColumnData) {
-    if (info.defaultTo) {
-      if (Array.isArray(info.defaultTo)) {
-        this.addBindingSources(info.defaultTo[1]);
-        this.columns.push({
-          ...info,
-          defaultTo: info.defaultTo[0],
-        });
-      } else {
-        this.addBindingSource(info.defaultTo);
-        this.columns.push({
-          ...info,
-          defaultTo: "?",
-        });
-      }
-    } else {
-      this.columns.push(info as any);
-    }
-
+    this.columns.push(info as any);
     return this;
   }
 
@@ -109,7 +88,8 @@ export class CreateTableBuilder extends QueryBuilder {
 
     return "CREATE TABLE " + (this.createIfNotExists ? "IF NOT EXISTS " : "") + JSON.stringify(this.tableName) +
       "(" + this.columns.map((c) => {
-        return JSON.stringify(c.name) + " " + c.type + (c.notNull ? " NOT NULL" : "") + (c.defaultTo ? " DEFAULT " + c.defaultTo : "");
+        return JSON.stringify(c.name) + " " + c.type + (c.notNull ? " NOT NULL" : "") +
+        (typeof c.defaultTo !== "undefined" && c.defaultTo !== null ? " DEFAULT " + c.defaultTo : "");
       }).join(", ") + ")";
   }
 }

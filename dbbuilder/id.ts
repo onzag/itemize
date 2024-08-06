@@ -59,7 +59,7 @@ export async function postprocessIdTriggers(
 ): Promise<void> {
   const gatheredIdTriggeredTables: string[] = [];
 
-  const allIdColumns = await databaseConnection.queryFirst("SELECT table_name FROM " +
+  const allIdColumns = await databaseConnection.queryRows("SELECT table_name FROM " +
     "information_schema.columns WHERE table_schema = $1 AND column_name = $2",
     [
       "public",
