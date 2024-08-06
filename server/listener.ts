@@ -167,6 +167,30 @@ interface IServerListensList {
 const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";
 const CLUSTER_MANAGER_RESET = "CLUSTER_MANAGER_RESET";
 
+/**
+ * @ignore
+ */
+const customEventListenerRegex = /^\$[a-zA-Z-]+$/;
+
+export type CustomListenerEventHandler = (
+  /**
+   * data for the event
+   */
+  eventData: any,
+  /**
+   * may be missing if user is unidentified
+   */
+  userData: IServerSideTokenDataType,
+  /**
+   * the socket
+   */
+  socket: Socket,
+  /**
+   * listener context
+   */
+  listener: Listener,
+) => void;
+
 export class Listener {
   private io: IOServer;
 
@@ -199,6 +223,7 @@ export class Listener {
   private awaitingParentedSearchFeedbacks: { [sockedId: string]: IParentedSearchFeedbackRequest[] } = {};
   private awaitingPropertySearchFeedbacks: { [sockedId: string]: IPropertySearchFeedbackRequest[] } = {};
 
+  private customEvents: { [eventId: string]: CustomListenerEventHandler } = {};
 
   constructor(
     buildnumber: string,
@@ -234,6 +259,8 @@ export class Listener {
 
     this.globalRedisListener = this.globalRedisListener.bind(this);
     this.localRedisListener = this.localRedisListener.bind(this);
+
+    this.handleCustomEvent = this.handleCustomEvent.bind(this);
   }
   public init() {
     this.redisGlobalSub.redisClient.on("message", this.globalRedisListener);
@@ -360,6 +387,11 @@ export class Listener {
       });
       socket.on(OWNED_PARENTED_SEARCH_UNREGISTER_REQUEST, (request: IOwnedParentedSearchUnregisterRequest) => {
         this.ownedParentedSearchUnregister(socket, request);
+      });
+      Object.keys(this.customEvents).forEach((k) => {
+        socket.once(k, (data: any) => {
+          this.handleCustomEvent(k, socket, data);
+        });
       });
       socket.on("disconnect", () => {
         this.removeSocket(socket);
@@ -3690,5 +3722,47 @@ export class Listener {
       mergedIndexIdentifier: null,
     }
     this.redisLocalPub.redisClient.publish(CLUSTER_MANAGER_RESET, JSON.stringify(redisEvent));
+  }
+
+  private handleCustomEvent(
+    event: string,
+    socket: Socket,
+    data: any,
+  ) {
+    // get the listener
+    const listener = this.customEvents[event];
+    if (!listener) {
+      // what?
+      return;
+    }
+    // get the user data
+    const userData = (this.listeners[socket.id]?.user || null);
+    // call the listener
+    listener(data, userData, socket, this);
+  }
+
+  /**
+   * Adds a custom event listener to the listening pipeline
+   * the event id must start with $ sign and fit the criteria a-zA-Z- to be valid
+   * 
+   * @param event 
+   * @param handler 
+   */
+  public addCustomEventListener(
+    event: string,
+    handler: CustomListenerEventHandler,
+  ) {
+    if (!customEventListenerRegex.test(event)) {
+      throw new Error("Invalid custom event id " + JSON.stringify(event));
+    } else if (this.customEvents[event]) {
+      throw new Error("Custom event " + JSON.stringify(event) + " has already been registered");
+    }
+
+    this.customEvents[event] = handler;
+
+    Object.keys(this.listeners).forEach((sId) => {
+      const socket = this.listeners[sId].socket;
+      socket.once(event, this.handleCustomEvent.bind(this, event, socket))
+    });
   }
 }

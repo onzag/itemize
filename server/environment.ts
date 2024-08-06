@@ -131,16 +131,18 @@ export function buildEnvironmentInfo(
   delete postgresql.elasticLangAnalyzers;
   delete postgresql.dictionaries;
   
-  const elastic = postgresql.elastic;
+  const elastic = {...postgresql.elastic};
   delete elastic.auth;
 
-  const elasticLogs = postgresql.elasticLogs || elastic;
+  const elasticLogs = postgresql.elasticLogs ? {...postgresql.elasticLogs} : elastic;
   delete elasticLogs.auth;
 
-  const elasticAnalytics = postgresql.elasticAnalytics || elastic;
+  const elasticAnalytics = postgresql.elasticAnalytics ? {...postgresql.elasticAnalytics} : elastic;
   delete elasticAnalytics.auth;
 
   delete postgresql.elastic;
+  delete postgresql.elasticLogs;
+  delete postgresql.elasticAnalytics;
 
   return {
     nodeVersion: process.version,

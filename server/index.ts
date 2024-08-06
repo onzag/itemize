@@ -72,6 +72,8 @@ import { ElasticLoggerService } from "./services/elastic-logger";
 import { ElasticLocationService } from "./services/elastic-location";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { RQRootSchema, getRQSchemaForRoot } from "../base/Root/rq";
+import AnalyticsProvider, { ITrackOptions } from "./services/base/AnalyticsProvider";
+import { ElasticAnalyticsService } from "./services/elastic-analytics";
 
 export interface IServerPingDataPing {
   cpuUsageTotal: NodeJS.CpuUsage,
@@ -174,8 +176,22 @@ export interface ISSRConfig {
   },
 }
 
+/**
+ * Provides info about seo
+ */
 export interface ISEOConfig {
   seoRules: ISEORuleSet;
+}
+
+/**
+ * Provides info about analytics
+ */
+export interface IAnalyticsConfig {
+  analytics?: {
+    trackers?: {
+      [id: string]: ITrackOptions,
+    }
+  },
 }
 
 export interface IAppDataType {
@@ -209,6 +225,7 @@ export interface IAppDataType {
   loggingService: LoggingProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
+  analyticsService: AnalyticsProvider<any>;
   ussdService: USSDProvider<any>;
   registry: RegistryService;
   customServices: {
@@ -246,6 +263,7 @@ export interface IServiceCustomizationType {
   ussdServiceProvider?: IServiceProviderClassType<any>;
   userLocalizationProvider?: IServiceProviderClassType<any>;
   currencyFactorsProvider?: IServiceProviderClassType<any>;
+  analyticsProvider?: IServiceProviderClassType<any>;
   locationSearchProvider?: IServiceProviderClassType<any>;
   paymentProvider?: IServiceProviderClassType<any>;
   loggingServiceProvider?: IServiceProviderClassType<any>;
@@ -388,20 +406,13 @@ export async function getStorageProviders(
   return finalOutput;
 }
 
+export interface IInitializeServerConfig extends ISSRConfig, ISEOConfig, IServerCustomizationDataType, IAnalyticsConfig { };
+
 /**
  * Initializes the itemize server with its custom configuration
- * @param ssrConfig the server side rendering rules
- * @param custom the customization details
- * @param custom.customRouterEndpoint an endpoint to add a custom router, otherwise it gets
- * attached to the root
- * @param custom.customRouter a custom router to attach to the rest endpoint
- * @param custom.customTriggers a registry for custom triggers
+ * @param initConfig the initialization configuration
  */
-export async function initializeServer(
-  ssrConfig: ISSRConfig,
-  seoConfig: ISEOConfig,
-  custom: IServerCustomizationDataType = {},
-) {
+export async function initializeServer(initConfig: IInitializeServerConfig) {
   // for build database we just build the database
   if (INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "LOAD_DATABASE_DUMP") {
     build(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
@@ -618,8 +629,8 @@ export async function initializeServer(
     );
     const root = new Root(build);
 
-    if (custom.customSearchEngineIndexing) {
-      Object.keys(custom.customSearchEngineIndexing).forEach((v) => {
+    if (initConfig.customSearchEngineIndexing) {
+      Object.keys(initConfig.customSearchEngineIndexing).forEach((v) => {
         const idef = root.registry[v] as ItemDefinition;
         if (!(idef instanceof ItemDefinition)) {
           logger.error(
@@ -631,9 +642,9 @@ export async function initializeServer(
           );
         } else {
           idef.setCustomSearchEngineLimiterFn(
-            custom.customSearchEngineIndexing[v].version,
-            custom.customSearchEngineIndexing[v].fn,
-            custom.customSearchEngineIndexing[v].relevantColumns,
+            initConfig.customSearchEngineIndexing[v].version,
+            initConfig.customSearchEngineIndexing[v].fn,
+            initConfig.customSearchEngineIndexing[v].relevantColumns,
           );
         }
       });
@@ -796,7 +807,7 @@ export async function initializeServer(
       elasticConnection,
       dbConfig.elasticLangAnalyzers,
     ) : null;
-    
+
     const elasticLogsConnection = dbConfig.elasticLogs ? (
       dbConfig.elasticLogs.node === dbConfig.elastic?.node ? elasticConnection : new Client(dbConfig.elasticLogs)
     ) : elasticConnection;
@@ -900,7 +911,7 @@ export async function initializeServer(
         mailService,
         phoneService,
         registry,
-        custom.globalManagerInitialServerDataFunction,
+        initConfig.globalManagerInitialServerDataFunction,
       );
 
       if (serviceCustom && serviceCustom.customServices) {
@@ -928,6 +939,22 @@ export async function initializeServer(
         return;
       }
     }
+
+    logger.info(
+      {
+        functionName: "initializeServer",
+        message: "Initializing analytics provider",
+      },
+    );
+
+    const AnalyticsClass = (serviceCustom && serviceCustom.analyticsProvider) || ElasticAnalyticsService;
+    if (AnalyticsClass.getType() !== ServiceProviderType.LOCAL) {
+      throw new Error("Analytics provider class is not a local type");
+    }
+
+    const analyticsService: AnalyticsProvider<any> = initConfig.analytics?.trackers ?
+      (new AnalyticsClass(null, registry, configsObj, elasticConnection) as any):
+      null;
 
     // due to a bug in the types the create client function is missing
     // domainId and domainName
@@ -1031,7 +1058,7 @@ export async function initializeServer(
       cache,
       rawDB,
       server,
-      custom.customRoles || [],
+      initConfig.customRoles || [],
       config,
       sensitiveConfig,
     );
@@ -1210,8 +1237,17 @@ export async function initializeServer(
       rootPool: retrieveRootPool(root.rawData),
       rqSchema: getRQSchemaForRoot(root),
       langLocales,
-      ssrConfig,
-      seoConfig,
+      ssrConfig: {
+        mainComponent: initConfig.mainComponent,
+        rendererContext: initConfig.rendererContext,
+        appWrapper: initConfig.appWrapper,
+        collector: initConfig.collector,
+        mainWrapper: initConfig.mainWrapper,
+        ussdConfig: initConfig.ussdConfig,
+      },
+      seoConfig: {
+        seoRules: initConfig.seoRules,
+      },
       indexDevelopment: index.replace(/\$MODE/g, "development").replace(/\$BUILDNUMBER/g, buildnumber),
       indexProduction: index.replace(/\$MODE/g, "production").replace(/\$BUILDNUMBER/g, buildnumber),
       config,
@@ -1241,7 +1277,7 @@ export async function initializeServer(
       customServices,
       extraRegistries,
       registry,
-      customRoles: custom.customRoles || [],
+      customRoles: initConfig.customRoles || [],
       rawDB,
       elastic,
       elasticConnection,
@@ -1249,6 +1285,7 @@ export async function initializeServer(
       elasticAnalyticsConnection,
       express,
       domain,
+      analyticsService,
       // assigned later during rest setup
       userTokenQuery: null,
     };
@@ -1286,6 +1323,14 @@ export async function initializeServer(
     ussdService && await ussdService.initialize();
     locationSearchService && await locationSearchService.initialize();
     paymentService && await paymentService.initialize();
+    analyticsService && await analyticsService.initialize();
+
+    if (analyticsService && initConfig.analytics.trackers) {
+      await Promise.all(Object.keys(initConfig.analytics.trackers).map(async (tKey) => {
+        await analyticsService.initializeTrack(tKey, initConfig.analytics.trackers[tKey]);
+      }));
+    }
+
     // the storage clients are a none type and initialize immediately
     await Promise.all(customServicesInstances.map((i) => i.initialize()));
     await Promise.all(extraRegList.map((i) => extraRegistries[i].initialize()));
@@ -1318,6 +1363,8 @@ export async function initializeServer(
     const locationSearchServiceClassTrigger = locationSearchService && await LocationSearchClass.getTriggerRegistry();
     const paymentServiceInstanceTrigger = paymentService && await paymentService.getTriggerRegistry();
     const paymentServiceClassTrigger = paymentService && await PaymentClass.getTriggerRegistry();
+    const analyticsServiceClassTrigger = analyticsService && await AnalyticsClass.getTriggerRegistry();
+    const analyticsServiceInstanceTrigger = analyticsService && await analyticsService.getTriggerRegistry();
     const instanceTriggers = await Promise.all(storageClients.instancesUsed.map((i) => i.getTriggerRegistry()));
     const classTriggers = await Promise.all(storageClients.classesUsed.map((c) => c.getTriggerRegistry()));
     const instaceTriggersCustom = await Promise.all(customServicesInstances.map((i) => i.getTriggerRegistry()));
@@ -1335,12 +1382,14 @@ export async function initializeServer(
       locationSearchServiceClassTrigger,
       paymentServiceInstanceTrigger,
       paymentServiceClassTrigger,
+      analyticsServiceClassTrigger,
+      analyticsServiceInstanceTrigger,
     ].filter((r) => !!r);
 
     // now setting up the triggers
     appData.triggers = mergeTriggerRegistries(
       customUserTriggers,
-      custom.customTriggers,
+      initConfig.customTriggers,
       ...triggers,
     );
 
@@ -1362,6 +1411,8 @@ export async function initializeServer(
     const locationSearchServiceClassRouter = locationSearchService && await LocationSearchClass.getRouter(appData);
     const paymentServiceInstanceRouter = paymentService && await paymentService.getRouter(appData);
     const paymentServiceClassRouter = paymentService && await PaymentClass.getRouter(appData);
+    const analyticsClassRouter = analyticsService && await AnalyticsClass.getRouter(appData);
+    const analyticsRouter = analyticsService && await analyticsService.getRouter(appData);
     const instanceRouters = await Promise.all(storageClients.instancesUsed.map((i) => i.getRouter(appData)));
     const classRouters = await Promise.all(storageClients.classesUsed.map((c) => c.getRouter(appData)));
     const instaceRoutersCustom = await Promise.all(customServicesInstances.map((i) => i.getRouter(appData)));
@@ -1383,9 +1434,11 @@ export async function initializeServer(
       paymentServiceClassRouter,
       ussdServiceInstanceRouter,
       ussdServiceClassRouter,
+      analyticsClassRouter,
+      analyticsRouter,
     ].filter((r) => !!r);
 
-    if (custom.callback) {
+    if (initConfig.callback) {
       logger.info(
         {
           functionName: "initializeServer",
@@ -1393,7 +1446,7 @@ export async function initializeServer(
         },
       );
 
-      await custom.callback(appData);
+      await initConfig.callback(appData);
     }
 
     logger.info(
@@ -1402,7 +1455,15 @@ export async function initializeServer(
         message: "Setting up endpoints",
       },
     );
-    initializeApp(appData, custom, routers);
+    initializeApp(appData, {
+      callback: initConfig.callback,
+      customRoles: initConfig.customRoles,
+      customRouter: initConfig.customRouter,
+      customRouterEndpoint: initConfig.customRouterEndpoint,
+      customSearchEngineIndexing: initConfig.customSearchEngineIndexing,
+      customTriggers: initConfig.customTriggers,
+      globalManagerInitialServerDataFunction: initConfig.globalManagerInitialServerDataFunction,
+    }, routers);
 
     logger.info(
       {
