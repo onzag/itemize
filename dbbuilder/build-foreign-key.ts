@@ -12,6 +12,14 @@ import { showErrorStackAndLogMessage, yesno } from ".";
 import { DatabaseConnection } from "../database";
 import uuidv5 from "uuid/v5";
 
+const potentialForeignKeyActions = [
+  "no action",
+  "restrict",
+  "cascade",
+  "set null",
+  "set default",
+];
+
 interface IProcessedForeignKeyColumn {
   level: number;
   columnName: string;
@@ -25,6 +33,44 @@ interface IProcessedForeignKeys {
     updateAction: string;
     columns: IProcessedForeignKeyColumn[];
   };
+}
+
+function parseColumns(
+  k: string,
+  betweenA: string,
+  betweenB: string,
+): string[] {
+  let columnsStr = k.split(betweenA)[1].split(betweenB)[0].trim();
+
+  const indexOfPharentesis = columnsStr.indexOf("(");
+  columnsStr = columnsStr.substring(indexOfPharentesis + 1).trimStart();
+  if (columnsStr[columnsStr.length - 1] === ")") {
+    columnsStr = columnsStr.substring(0, columnsStr.length - 1).trimEnd();
+  }
+
+  return columnsStr.split(",").map((v) => {
+    const trimmed = v.trim();
+    if (trimmed.startsWith("\"")) {
+      return JSON.parse(trimmed);
+    } else {
+      return trimmed;
+    }
+  });
+}
+
+function findActionFor(
+  k: string,
+  name: string,
+) {
+  const strEnd = k.split(name)[1].trimStart().toLowerCase();
+
+  if (!strEnd) {
+    return "no action";
+  }
+
+  return potentialForeignKeyActions.find((v) => {
+    return k.startsWith(v);
+  }) || "no action";
 }
 
 const NAMESPACE = "23ab4609-df49-4fdf-921b-4704adb284f3";
@@ -44,27 +90,78 @@ export async function buildForeignKeys(
   databaseConnection: DatabaseConnection,
   newDatabaseSchema: ISQLSchemaDefinitionType,
 ): Promise<void> {
+  const allTablesInDb = await databaseConnection.queryRows(
+    "SELECT table_name FROM information_schema.tables WHERE " +
+    "table_schema = $1 AND table_type = 'BASE TABLE'",
+    [
+      "public",
+    ],
+  );
+
+  const allForeignKeysInPublic = await databaseConnection.queryRows(
+    "SELECT conrelid::regclass AS table_from, conname, pg_get_constraintdef(oid) FROM pg_constraint WHERE contype='f' AND " +
+    "connamespace = 'public'::regnamespace ORDER  BY conrelid::regclass::text, contype DESC"
+  );
+
   // Now we want to check for foreign keys we start over, add foreign keys
   // later because we don't know what order were tables added
-  for (const tableName of Object.keys(newDatabaseSchema)) {
+  // So we want to loop into each table
+  for (const tableInfo of allTablesInDb) {
+    const tableName = tableInfo.table_name as string;
 
-    // the result table schema for that specific table
-    const newTableSchema = newDatabaseSchema[tableName];
-    const currentTableSchema = currentDatabaseSchema[tableName];
-
-    // we cannot operate unless there's a current table schema this could
-    // mean a table was not added or something
-    if (!currentTableSchema) {
+    if (!tableName.startsWith("MOD_") || !newDatabaseSchema[tableName]) {
       continue;
     }
 
-    // now we copy the current table schema
-    finalSchema[tableName] = { ...currentTableSchema };
+    // the result table schema for that specific table
+    const newTableSchema = newDatabaseSchema[tableName];
 
     // so now we check the indexes for that we need to gather them
     // in the proper form
     const newTableForeignKeys: IProcessedForeignKeys = {};
     const currentTableForeignKeys: IProcessedForeignKeys = {};
+
+    const foreignKeysForTable = allForeignKeysInPublic.filter((v) => v.table_fom === tableName);
+
+    // first we grab all the foreign keys for that given table
+    foreignKeysForTable.forEach((k) => {
+      // this is the foreign key name
+      const foreignKeyName = k.conname;
+
+      // get the columns that it affects, for example
+      // FOREIGN KEY ("MODULE_ID", "MODULE_VERSION") REFERENCES "MOD_course"(id, version) ON UPDATE CASCADE ON DELETE CASCADE
+      // and yes it will always be uppercase, so we want between FOREIGN KEY and REFERENCES
+      const columnsBase = parseColumns(k.pg_get_constraintdef, "FOREIGN KEY", "REFERENCES");
+      const columnsReferrenced = parseColumns(k.pg_get_constraintdef, "REFERENCES", "ON");
+
+      // now we want the target table
+      let targetTable = k.pg_get_constraintdef.split("REFERENCES")[1].split("ON")[0];
+      const indexOfPharentesis = targetTable.split("(");
+
+      if (indexOfPharentesis === -1) {
+        return;
+      }
+
+      targetTable = targetTable.substring(0, indexOfPharentesis);
+
+      // now we grab the actions
+      const deleteAction = findActionFor(k.pg_get_constraintdef, "ON DELETE");
+      const updateAction = findActionFor(k.pg_get_constraintdef, "ON UPDATE");
+
+      // and can set the foreign key that was generated
+      currentTableForeignKeys[foreignKeyName] = {
+        columns: columnsBase.map((v, index) => {
+          return ({
+            columnName: v,
+            level: index,
+            referencesColumn: columnsReferrenced[index],
+          })
+        }),
+        targetTable,
+        deleteAction,
+        updateAction,
+      }
+    });
 
     // so we loop in each column to see in an foreign key has been specified
     // at this point both newTableSchema and currentTableSchema should have
@@ -72,74 +169,23 @@ export async function buildForeignKeys(
     for (const columnName of Object.keys(newTableSchema)) {
       // this way
       const newColumnSchema = newTableSchema[columnName];
-      const currentColumnSchema = currentTableSchema[columnName];
-
-      // if the current has an index specified
-      if (currentColumnSchema && currentColumnSchema.foreignKey) {
-        // we need to check if we have one index with the same id, if we don't
-        if (!currentTableForeignKeys[currentColumnSchema.foreignKey.id]) {
-          // we create this new index with only that column
-          currentTableForeignKeys[currentColumnSchema.foreignKey.id] = {
-            targetTable: currentColumnSchema.foreignKey.table,
-            deleteAction: currentColumnSchema.foreignKey.deleteAction,
-            updateAction: currentColumnSchema.foreignKey.updateAction,
-            columns: [{
-              level: currentColumnSchema.foreignKey.level,
-              columnName,
-              referencesColumn: currentColumnSchema.foreignKey.column,
-            }],
-          };
-        } else {
-          // if we do we push the column
-          currentTableForeignKeys[currentColumnSchema.foreignKey.id].columns.push({
-            level: currentColumnSchema.foreignKey.level,
-            columnName,
-            referencesColumn: currentColumnSchema.foreignKey.column,
-          });
-          // let's check that the table is congrugent
-          if (
-            currentColumnSchema.foreignKey.table !==
-            currentTableForeignKeys[currentColumnSchema.foreignKey.id].targetTable
-          ) {
-            console.log(colors.red(
-              `Foreign key with id ${currentColumnSchema.foreignKey.id} in current schema` +
-              `schema has unmatching tables ${currentColumnSchema.foreignKey.table} over stored ` +
-              `${currentTableForeignKeys[currentColumnSchema.foreignKey.id].targetTable}`,
-            ));
-          }
-
-          // now let's check if the delete action is congrugent
-          if (
-            currentColumnSchema.foreignKey.deleteAction !==
-            currentTableForeignKeys[currentColumnSchema.foreignKey.id].deleteAction
-          ) {
-            console.log(colors.red(
-              `Foreign key with id ${currentColumnSchema.foreignKey.id} in current schema` +
-              `schema has unmatching delete actions ${currentColumnSchema.foreignKey.deleteAction} over stored ` +
-              `${currentTableForeignKeys[currentColumnSchema.foreignKey.id].deleteAction}`,
-            ));
-          }
-
-          // now let's check if the update action is congrugent
-          if (
-            currentColumnSchema.foreignKey.updateAction !==
-            currentTableForeignKeys[currentColumnSchema.foreignKey.id].updateAction
-          ) {
-            console.log(colors.red(
-              `Foreign key with id ${currentColumnSchema.foreignKey.id} in current schema` +
-              `schema has unmatching update actions ${currentColumnSchema.foreignKey.updateAction} over stored ` +
-              `${currentTableForeignKeys[currentColumnSchema.foreignKey.id].updateAction}`,
-            ));
-          }
-        }
-      }
 
       // now let's check the new does it have a foreign key
       if (newColumnSchema.foreignKey) {
+
+        let actualId = tableName + "__" + newColumnSchema.foreignKey.id;
+        if (actualId.length > MAX_PG_FK_SIZE) {
+          actualId = makeIdOutOf(actualId);
+          console.log(colors.yellow(
+            `Foreign key for '${tableName + "__" + newColumnSchema.foreignKey.id}' is too long` +
+            ` so it is renamed to ${actualId} this is consistent and as so nothing has to be done`,
+          ));
+        }
+
         // if it has not yet been stored
-        if (!newTableForeignKeys[newColumnSchema.foreignKey.id]) {
+        if (!newTableForeignKeys[actualId]) {
           // create one new with only that columm
-          newTableForeignKeys[newColumnSchema.foreignKey.id] = {
+          newTableForeignKeys[actualId] = {
             targetTable: newColumnSchema.foreignKey.table,
             deleteAction: newColumnSchema.foreignKey.deleteAction,
             updateAction: newColumnSchema.foreignKey.updateAction,
@@ -151,7 +197,7 @@ export async function buildForeignKeys(
           };
         } else {
           // otherwise add the column
-          newTableForeignKeys[newColumnSchema.foreignKey.id].columns.push({
+          newTableForeignKeys[actualId].columns.push({
             level: newColumnSchema.foreignKey.level,
             columnName,
             referencesColumn: newColumnSchema.foreignKey.column,
@@ -160,36 +206,36 @@ export async function buildForeignKeys(
           // let's check that the table is congrugent
           if (
             newColumnSchema.foreignKey.table !==
-            newTableForeignKeys[newColumnSchema.foreignKey.id].targetTable
+            newTableForeignKeys[actualId].targetTable
           ) {
             console.log(colors.red(
               `Foreign key with id ${newColumnSchema.foreignKey.id} in new schema` +
               `schema has unmatching tables ${newColumnSchema.foreignKey.table} over stored ` +
-              `${newTableForeignKeys[newColumnSchema.foreignKey.id].targetTable}`,
+              `${newTableForeignKeys[actualId].targetTable}`,
             ));
           }
 
           // now let's check if the delete action is congrugent
           if (
             newColumnSchema.foreignKey.deleteAction !==
-            newTableForeignKeys[newColumnSchema.foreignKey.id].deleteAction
+            newTableForeignKeys[actualId].deleteAction
           ) {
             console.log(colors.red(
               `Foreign key with id ${newColumnSchema.foreignKey.id} in new schema` +
               `schema has unmatching delete actions ${newColumnSchema.foreignKey.deleteAction} over stored ` +
-              `${newTableForeignKeys[newColumnSchema.foreignKey.id].deleteAction}`,
+              `${newTableForeignKeys[actualId].deleteAction}`,
             ));
           }
 
           // now let's check if the update action is congrugent
           if (
             newColumnSchema.foreignKey.updateAction !==
-            newTableForeignKeys[newColumnSchema.foreignKey.id].updateAction
+            newTableForeignKeys[actualId].updateAction
           ) {
             console.log(colors.red(
               `Foreign key with id ${newColumnSchema.foreignKey.id} in new schema` +
               `schema has unmatching update actions ${newColumnSchema.foreignKey.updateAction} over stored ` +
-              `${newTableForeignKeys[newColumnSchema.foreignKey.id].updateAction}`,
+              `${newTableForeignKeys[actualId].updateAction}`,
             ));
           }
         }
@@ -272,17 +318,6 @@ export async function buildForeignKeys(
             await databaseConnection.query(
               `ALTER TABLE ${JSON.stringify(tableName)} DROP CONSTRAINT ${JSON.stringify(actualId)}`,
             );
-
-            // now we need to update each column affected
-            currentForeignKeySourceColumnsStored.forEach((columnName) => {
-              // copy the column information to reflect the update
-              finalSchema[tableName][columnName] = {
-                ...currentDatabaseSchema[tableName][columnName],
-              };
-              // and now delete the foreign key
-              delete finalSchema[tableName][columnName].foreignKey;
-            });
-
           } catch (err) {
             showErrorStackAndLogMessage(err);
             wasSupposedToDropCurrentForeignKeyButDidnt = true;
@@ -328,39 +363,14 @@ export async function buildForeignKeys(
           "create the foreign key?",
         )) {
           try {
-            let actualId = tableName + "__" + foreignKeyId;
-            if (actualId.length > MAX_PG_FK_SIZE) {
-              actualId = makeIdOutOf(actualId);
-              console.log(colors.yellow(
-                `Foreign key for '${tableName + "__" + foreignKeyId}' is too long` +
-                ` so it is renamed to ${actualId} this is consistent and as so nothing has to be done`,
-              ));
-            }
+
             await databaseConnection.query(
-              `ALTER TABLE ${JSON.stringify(tableName)} ADD CONSTRAINT ${JSON.stringify(actualId)} ` +
+              `ALTER TABLE ${JSON.stringify(tableName)} ADD CONSTRAINT ${JSON.stringify(foreignKeyId)} ` +
               `FOREIGN KEY (${newForeignKeySourceColumnsStored.map((c) => JSON.stringify(c)).join(",")}) ` +
               `REFERENCES ${JSON.stringify(newForeignKey.targetTable)} ` +
               `(${newForeignKeyReferenceColumnsStored.map((c) => JSON.stringify(c)).join(",")}) ` +
               `ON DELETE ${newForeignKey.deleteAction} ON UPDATE ${newForeignKey.updateAction}`
             );
-
-            // now we need to update each affected column
-            newForeignKeySourceColumnsStored.forEach((columnName, index) => {
-              // copy the column information to reflect the update
-              finalSchema[tableName][columnName] = {
-                ...currentDatabaseSchema[tableName][columnName],
-              };
-              // and now set the index
-              finalSchema[tableName][columnName].foreignKey = {
-                id: foreignKeyId,
-                table: newForeignKey.targetTable,
-                level: index,
-                column: newForeignKeyReferenceColumnsStored[index],
-                deleteAction: newForeignKey.deleteAction,
-                updateAction: newForeignKey.updateAction,
-              };
-            });
-
           } catch (err) {
             showErrorStackAndLogMessage(err);
           }
@@ -368,6 +378,4 @@ export async function buildForeignKeys(
       }
     }
   }
-
-  return finalSchema;
 }
