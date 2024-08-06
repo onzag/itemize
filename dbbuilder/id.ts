@@ -56,19 +56,24 @@ export async function prepareIdTrigger(
  */
 export async function postprocessIdTriggers(
   databaseConnection: DatabaseConnection,
-  currentDatabaseSchema: ISQLSchemaDefinitionType,
 ): Promise<void> {
   const gatheredIdTriggeredTables: string[] = [];
-  Object.keys(currentDatabaseSchema).forEach((tableName) => {
-    const tableSchema = currentDatabaseSchema[tableName];
-    const isIdTable = Object.keys(tableSchema).some((columnName) => {
-      const columnSchema = tableSchema[columnName];
-      return columnSchema.type === "ID" && columnName === "id";
-    });
-    if (isIdTable) {
+
+  const allIdColumns = await databaseConnection.queryFirst("SELECT table_name FROM " +
+    "information_schema.columns WHERE table_schema = $1 AND column_name = $2",
+    [
+      "public",
+      "id",
+    ]
+  );
+
+  for (const tableInfo of allIdColumns) {
+    const tableName = tableInfo.table_name;
+
+    if (tableName.startsWith("MOD_")) {
       gatheredIdTriggeredTables.push(tableName);
     }
-  });
+  }
 
   await Promise.all(gatheredIdTriggeredTables.map(async (idTableName) => {
     await databaseConnection.query(

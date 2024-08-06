@@ -107,102 +107,19 @@ export default async function build(version: string, action: "build" | "dump" | 
     return loadDump(version, databaseConnection, root);
   }
 
-  let isCorrupted = false;
-  try {
-    isCorrupted = JSON.parse(await fsAsync.readFile("db-status.corruption.json", "utf-8"));
-  } catch {
-    // DO nothing
-  }
-
   let optimal: ISQLSchemaDefinitionType;
   let actual: ISQLSchemaDefinitionType;
 
-  if (!isCorrupted) {
-    // let's get the result by progressively building on top of it
-    optimal = getSQLTablesSchemaForRoot(root);
-
-    // Retrieve the past migration configuration
-    // if available
-    let currentDatabaseSchema: ISQLSchemaDefinitionType = {};
-    const schemaTableExists = (await databaseConnection.queryFirst(
-      `SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'schema') AS "exists"`,
-    )).exists;
-    if (schemaTableExists) {
-      const currentSchemaData = (await databaseConnection.queryFirst(
-        `SELECT "schema", "created_at" FROM "public"."schema" WHERE "status" = 'actual' ORDER BY "id" DESC LIMIT 1`,
-      ));
-      if (currentSchemaData) {
-        console.log(colors.yellow("Found existing schema created at"), currentSchemaData.created_at);
-        currentDatabaseSchema = JSON.parse(currentSchemaData.schema);
-      } else {
-        console.log(colors.yellow("Could not find a Previous Schema File..."));
-      }
-    } else {
-      await databaseConnection.queryFirst(
-        `CREATE TABLE "schema" (` +
-        `"id" SERIAL PRIMARY KEY,` +
-        `"schema" TEXT NOT NULL,` +
-        `"status" TEXT NOT NULL,` +
-        `"created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW()` +
-        `)`
-      );
-      console.log(colors.yellow("Could not find a Previous Schema File..."));
-    }
-
-    // this function will modify actual
-    // for the actual executed functions
-    try {
-      actual = await buildDatabase(databaseConnection, currentDatabaseSchema, optimal);
-    } catch (err) {
-      console.error(err.stack);
-      return;
-    }
-
-    await fsAsync.writeFile(
-      "db-status.json",
-      JSON.stringify(actual, null, 2),
-    );
-
-    await fsAsync.writeFile(
-      "db-status.optimal.json",
-      JSON.stringify(optimal, null, 2),
-    );
-  } else {
-    try {
-      actual = JSON.parse(await fsAsync.readFile("db-status.json", "utf-8"));
-      optimal = JSON.parse(await fsAsync.readFile("db-status.optimal.json", "utf-8"));
-    } catch {
-      console.log(colors.red("FAILED TO FIX STATED CORRUPTION"));
-      process.exit(1);
-    }
-  }
+  
 
   // write the resulting actual
   let showAllDone = true;
   try {
-    await databaseConnection.query(
-      `INSERT INTO "schema" ("schema", "status") VALUES ($1, $2), ($3, $4)`,
-      [
-        JSON.stringify(actual),
-        "actual",
-        JSON.stringify(optimal),
-        "optimal",
-      ]
-    );
-
-    await fsAsync.writeFile(
-      "db-status.corruption.json",
-      "false",
-    );
+    await buildDatabase(databaseConnection, getSQLTablesSchemaForRoot(root));
   } catch (err) {
     console.log(colors.red("FAILED TO WRITE UPDATES TO THE DATABASE"));
     console.log(colors.red("PLEASE DO NOT ATTEMPT TO UPDATE THE SERVER IN THIS STATE AS THIS CAN LEAD TO DATA CORRUPTION"));
     console.log(colors.red("PLEASE RUN THIS SCRIPT AGAIN TO FIX THIS ONCE YOU FIX THE ISSUE"));
-
-    await fsAsync.writeFile(
-      "db-status.corruption.json",
-      "true",
-    );
 
     showAllDone = false;
   }
@@ -227,20 +144,16 @@ export function showErrorStackAndLogMessage(err: Error) {
  */
 async function buildDatabase(
   databaseConnection: DatabaseConnection,
-  currentDatabaseSchema: ISQLSchemaDefinitionType,
   newDatabaseSchema: ISQLSchemaDefinitionType,
-): Promise<ISQLSchemaDefinitionType> {
+): Promise<void> {
   await prepareExtensions(databaseConnection, newDatabaseSchema);
   await prepareIdTrigger(databaseConnection);
 
-  let transitoryCurrentSchema = await buildTables(databaseConnection, currentDatabaseSchema, newDatabaseSchema);
-  transitoryCurrentSchema = await buildIndexes(databaseConnection, transitoryCurrentSchema, newDatabaseSchema);
-  transitoryCurrentSchema = await buildForeignKeys(databaseConnection, transitoryCurrentSchema, newDatabaseSchema);
+  await buildTables(databaseConnection, newDatabaseSchema);
+  await buildIndexes(databaseConnection, newDatabaseSchema);
+  await buildForeignKeys(databaseConnection, newDatabaseSchema);
 
   await postprocessIdTriggers(
     databaseConnection,
-    transitoryCurrentSchema,
   );
-
-  return transitoryCurrentSchema;
 }

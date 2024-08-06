@@ -39,40 +39,63 @@ interface IProcessedIndexes {
  */
 export async function buildIndexes(
   databaseConnection: DatabaseConnection,
-  currentDatabaseSchema: ISQLSchemaDefinitionType,
   newDatabaseSchema: ISQLSchemaDefinitionType,
-): Promise<ISQLSchemaDefinitionType> {
-  // index creation requires a current database schema
-  // this is because the buildTables should have ran first
-  if (!currentDatabaseSchema) {
-    throw new Error("A current database schema should exist");
-  }
-
-  // we make a copy of our current schema
-  const finalSchema: ISQLSchemaDefinitionType = {
-    ...currentDatabaseSchema,
-  };
+): Promise<void> {
+  const allTablesInDb = await databaseConnection.queryRows(
+    "SELECT table_name FROM information_schema.tables WHERE " +
+    "table_schema = $1 AND table_type = 'BASE TABLE'",
+    [
+      "public",
+    ],
+  );
 
   // So we want to loop into each table
-  for (const tableName of Object.keys(newDatabaseSchema)) {
-    // the result table schema for that specific table
-    const newTableSchema = newDatabaseSchema[tableName];
-    const currentTableSchema = currentDatabaseSchema[tableName];
+  for (const tableInfo of allTablesInDb) {
+    const tableName = tableInfo.table_name as string;
 
-    // we cannot operate unless there's a current table schema this could
-    // mean a table was not added or something
-    if (!currentTableSchema) {
-      console.log(colors.red("Can't add indexes at " + tableName));
+    if (!tableName.startsWith("MOD_") || !newDatabaseSchema[tableName]) {
       continue;
     }
 
-    // now we copy the current table schema
-    finalSchema[tableName] = {...currentTableSchema};
+    // the result table schema for that specific table
+    const newTableSchema = newDatabaseSchema[tableName];;
 
     // so now we check the indexes for that we need to gather them
     // in the proper form
-    const newTableIndexes: IProcessedIndexes  = {};
+    const newTableIndexes: IProcessedIndexes = {};
     const currentTableIndexes: IProcessedIndexes = {};
+
+    // well I just copied this from ChadGPT because I can't
+    // fathom how this works, modified it a little but I have no clue how this works
+    // and I won't bother to unpack this code
+    const allIndexesInTableInformation = await databaseConnection.queryFirst("SELECT i.relname AS index_name," +
+      " a.attname AS column_name, am.amname AS index_type, ix.indisunique AS is_unique, ix.indisprimary AS is_primary, k.ordinality AS column_position" +
+      " FROM pg_class t JOIN pg_index ix ON t.oid = ix.indrelid JOIN pg_class i ON i.oid = ix.indexrelid JOIN pg_attribute a ON a.attrelid = t.oid JOIN" +
+      " pg_am am ON am.oid = i.relam JOIN unnest(ix.indkey) WITH ORDINALITY AS k(attnum, ordinality) ON a.attnum = k.attnum WHERE" +
+      " t.relkind = 'r' AND t.relname = $1", [tableName]);
+
+    // example output for MOD_users
+    //        index_name         |  column_name   | index_type | is_unique | is_primary | column_position 
+    //----------------------------+----------------+------------+-----------+------------+-----------------
+    //MOD_users_PRIMARY_KEY      | id             | btree      | t         | t          |               1
+    //MOD_users_PRIMARY_KEY      | version        | btree      | t         | t          |               2
+    //MOD_users_PARENT_INDEX     | parent_id      | btree      | f         | f          |               1
+    //MOD_users_PARENT_INDEX     | parent_version | btree      | f         | f          |               2
+    //MOD_users_PARENT_INDEX     | parent_type    | btree      | f         | f          |               3
+    //MOD_users_CREATED_BY_INDEX | created_by     | btree      | f         | f          |               1
+    allIndexesInTableInformation.forEach((indexInfo) => {
+      if (!currentTableIndexes[indexInfo.index_name]) {
+        currentTableIndexes[indexInfo.index_name] = {
+          columns: [],
+          type: (indexInfo.primary ? "primary" : (indexInfo.is_unique ? "unique" : indexInfo.index_type.toLowerCase())),
+        }
+      }
+      // we set the array by position
+      currentTableIndexes[indexInfo.index_name].columns.push({
+        columnName: indexInfo.column_name,
+        level: indexInfo.column_position,
+      });
+    });
 
     // so we loop in each column to see in an index has been specified
     // at this point both newTableSchema and currentTableSchema should have
@@ -80,50 +103,26 @@ export async function buildIndexes(
     for (const columnName of Object.keys(newTableSchema)) {
       // this way
       const newColumnSchema = newTableSchema[columnName];
-      const currentColumnSchema = currentTableSchema[columnName];
-
-      if (!currentColumnSchema) {
-        // this column failed at some point during the process
-        console.log(colors.red("Can't add index at " + tableName + " at " + columnName));
-        continue;
-      }
-
-      // if the current has an index specified
-      if (currentColumnSchema.index) {
-        // we need to check if we have one index with the same id, if we don't
-        if (!currentTableIndexes[currentColumnSchema.index.id]) {
-          // we create this new index with only that column
-          currentTableIndexes[currentColumnSchema.index.id] = {
-            type: currentColumnSchema.index.type,
-            columns: [{
-              level: currentColumnSchema.index.level,
-              columnName,
-            }],
-          };
-        } else {
-          // if we do we push the column
-          currentTableIndexes[currentColumnSchema.index.id].columns.push({
-            level: currentColumnSchema.index.level,
-            columnName,
-          });
-          // let's check that the type is congrugent
-          if (currentColumnSchema.index.type !== currentTableIndexes[currentColumnSchema.index.id].type) {
-            console.log(colors.red(
-              `Index with id ${currentColumnSchema.index.id} in current schema` +
-              `schema has unmatching types ${currentColumnSchema.index.type} over stored ` +
-              `${currentTableIndexes[currentColumnSchema.index.id].type} on columns ` +
-              `${currentTableIndexes[currentColumnSchema.index.id].columns.join(", ")}`,
-            ));
-          }
-        }
-      }
 
       // now let's check the new does it have an index?
       if (newColumnSchema.index) {
+        // pg indexes however cannot be longer than 63 characters, so we crop then
+        // this thing is safe so we ensure to crop at 60 characters
+        const indexId = tableName + "_" + newColumnSchema.index.id;
+        
+        let pgIndexName = indexId;
+        if (pgIndexName.length > MAX_PG_INDEX_SIZE) {
+          pgIndexName = makeIdOutOf(indexId);
+          console.log(colors.yellow(
+            `Index '${indexId}' is too long` +
+            ` so it is renamed to ${pgIndexName} this is consistent and as so nothing has to be done`,
+          ));
+        }
+
         // if it has not yet been stored
-        if (!newTableIndexes[newColumnSchema.index.id]) {
+        if (!newTableIndexes[pgIndexName]) {
           // create one new with only that columm
-          newTableIndexes[newColumnSchema.index.id] = {
+          newTableIndexes[pgIndexName] = {
             type: newColumnSchema.index.type,
             columns: [{
               level: newColumnSchema.index.level,
@@ -132,17 +131,17 @@ export async function buildIndexes(
           };
         } else {
           // otherwise add the column
-          newTableIndexes[newColumnSchema.index.id].columns.push({
+          newTableIndexes[pgIndexName].columns.push({
             level: newColumnSchema.index.level,
             columnName,
           });
           // notify if there's a mismatch
-          if (newColumnSchema.index.type !== newTableIndexes[newColumnSchema.index.id].type) {
+          if (newColumnSchema.index.type !== newTableIndexes[pgIndexName].type) {
             console.log(colors.red(
-              `Index with id ${newColumnSchema.index.id} in new schema ` +
+              `Index with id ${indexId} in new schema ` +
               `has unmatching types ${newColumnSchema.index.type} over stored ` +
-              `${newTableIndexes[newColumnSchema.index.id].type} on columns ` +
-              `${newTableIndexes[newColumnSchema.index.id].columns.join(", ")}`,
+              `${newTableIndexes[pgIndexName].type} on columns ` +
+              `${newTableIndexes[pgIndexName].columns.join(", ")}`,
             ));
           }
         }
@@ -153,21 +152,11 @@ export async function buildIndexes(
     // a list of all the unique ids
     const allIndexes = new Set(Object.keys(newTableIndexes).concat(Object.keys(currentTableIndexes)));
     // so now we loop in each
-    for (const indexId of allIndexes) {
+    for (const pgIndexId of allIndexes) {
       // either of these might be undefined
-      const newIndex = newTableIndexes[indexId];
-      const currentIndex = currentTableIndexes[indexId];
-
-      // pg indexes however cannot be longer than 63 characters, so we crop then
-      // this thing is safe so we ensure to crop at 60 characters
-      let pgIndexName = tableName + "_" + indexId;
-      if (pgIndexName.length > MAX_PG_INDEX_SIZE) {
-        pgIndexName = makeIdOutOf(pgIndexName);
-        console.log(colors.yellow(
-          `Index '${indexId}' is too long` +
-          ` so it is renamed to ${pgIndexName} this is consistent and as so nothing has to be done`,
-        ));
-      }
+      const newIndex = newTableIndexes[pgIndexId];
+      // the current index is named by the pgIndexName
+      const currentIndex = currentTableIndexes[pgIndexId];
 
       const newIndexColumnsSorted = newIndex && newIndex.columns.sort((a, b) => {
         return a.level - b.level;
@@ -176,6 +165,9 @@ export async function buildIndexes(
       const currentIndexColumnsSorted = currentIndex && currentIndex.columns.sort((a, b) => {
         return a.level - b.level;
       }).map((c) => c.columnName);
+
+      const joinedNewColumns = newIndexColumnsSorted && newIndexColumnsSorted.join(",");
+      const joinedCurrentColumns = currentIndexColumnsSorted && currentIndexColumnsSorted.join(",");
 
       // this variable is a helper, basically we cannot over
       // set indexes, so we need to drop the current if there
@@ -193,19 +185,19 @@ export async function buildIndexes(
           (
             // the index signature does not match
             currentIndex.type !== newIndex.type ||
-            currentIndexColumnsSorted.join(",") !== newIndexColumnsSorted.join(",")
+            joinedCurrentColumns !== joinedNewColumns
           )
         )
       ) {
         // show a proper message, update or removed
         if (newIndex) {
           console.log(colors.yellow(
-            `Index '${indexId}' of type ${currentIndex.type} has` +
+            `Index '${pgIndexId}' of type ${currentIndex.type} on columns ${joinedCurrentColumns} has` +
             ` been changed, the current index needs to be dropped`,
           ));
         } else {
           console.log(colors.yellow(
-            `Index '${indexId}' of type ${currentIndex.type} has` +
+            `Index '${pgIndexId}' of type ${currentIndex.type} on columns ${joinedCurrentColumns} has` +
             ` been dropped`,
           ));
         }
@@ -218,24 +210,13 @@ export async function buildIndexes(
           try {
             if (currentIndex.type !== "primary") {
               await databaseConnection.query(
-                `DROP INDEX IF EXISTS ${JSON.stringify(pgIndexName)}`,
+                `DROP INDEX IF EXISTS ${JSON.stringify(pgIndexId)}`,
               );
             } else {
               await databaseConnection.query(
-                `ALTER TABLE ${JSON.stringify(tableName)} DROP CONSTRAINT ${JSON.stringify(pgIndexName)}`,
+                `ALTER TABLE ${JSON.stringify(tableName)} DROP CONSTRAINT ${JSON.stringify(pgIndexId)}`,
               );
             }
-
-            // now we need to update each column affected
-            currentIndexColumnsSorted.forEach((columnName) => {
-              // copy the column information to reflect the update
-              finalSchema[tableName][columnName] = {
-                ...currentDatabaseSchema[tableName][columnName],
-              };
-              // and now delete the index
-              delete finalSchema[tableName][columnName].index;
-            });
-
           } catch (err) {
             showErrorStackAndLogMessage(err);
             wasSupposedToDropCurrentIndexButDidnt = true;
@@ -261,14 +242,14 @@ export async function buildIndexes(
           // this is an update
           (
             newIndex.type !== currentIndex.type ||
-            currentIndexColumnsSorted.join(",") !== newIndexColumnsSorted.join(",")
+            joinedCurrentColumns !== joinedNewColumns
           )
         )
       ) {
         // show the message that the index needs to be created
         console.log(colors.yellow(
-          `Index '${indexId}' of type ${newIndex.type} ` +
-          ` must now be created which affects columns ${newIndexColumnsSorted.join(", ")}`,
+          `Index '${pgIndexId}' of type ${newIndex.type} ` +
+          ` must now be created which affects columns ${joinedNewColumns}`,
         ));
 
         // ask on whether we create the index
@@ -278,35 +259,20 @@ export async function buildIndexes(
           try {
             if (newIndex.type === "unique") {
               await databaseConnection.query(
-                `CREATE UNIQUE INDEX ${JSON.stringify(pgIndexName)} ON ` +
+                `CREATE UNIQUE INDEX ${JSON.stringify(pgIndexId)} ON ` +
                 `${JSON.stringify(tableName)} (${newIndexColumnsSorted.map((c) => JSON.stringify(c)).join(", ")})`
               );
             } else if (newIndex.type === "primary") {
               await databaseConnection.query(
                 `ALTER TABLE ${JSON.stringify(tableName)} ADD CONSTRAINT ` +
-                `${JSON.stringify(pgIndexName)} PRIMARY KEY (${newIndexColumnsSorted.map((c) => JSON.stringify(c)).join(", ")})`
+                `${JSON.stringify(pgIndexId)} PRIMARY KEY (${newIndexColumnsSorted.map((c) => JSON.stringify(c)).join(", ")})`
               );
             } else {
               await databaseConnection.query(
-                `CREATE INDEX ${JSON.stringify(pgIndexName)} ON ` +
+                `CREATE INDEX ${JSON.stringify(pgIndexId)} ON ` +
                 `${JSON.stringify(tableName)} USING ${newIndex.type}(${newIndexColumnsSorted.map((c) => JSON.stringify(c)).join(", ")})`
               );
             }
-
-            // now we need to update each affected column
-            newIndexColumnsSorted.forEach((columnName, index) => {
-              // copy the column information to reflect the update
-              finalSchema[tableName][columnName] = {
-                ...currentDatabaseSchema[tableName][columnName],
-              };
-              // and now set the index
-              finalSchema[tableName][columnName].index = {
-                id: indexId,
-                type: newIndex.type,
-                level: index,
-              };
-            });
-
           } catch (err) {
             showErrorStackAndLogMessage(err);
           }
@@ -314,6 +280,4 @@ export async function buildIndexes(
       }
     }
   }
-
-  return finalSchema;
 }

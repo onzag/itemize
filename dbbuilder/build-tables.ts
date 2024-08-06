@@ -112,31 +112,27 @@ export async function dropExtraColumnInTable(
   databaseConnection: DatabaseConnection,
   tableName: string,
   currentColumnName: string,
-  currentColumnSchema: ISQLColumnDefinitionType,
 ) {
   // if we find it notify
   console.log(colors.yellow("A column at " + tableName + " has been dropped, named " + currentColumnName));
-
-  let transactionalColumnSchema = {
-    ...currentColumnSchema,
-  };
 
   // ask, for dropping things it's safe to leave
   if (await yesno("Do you want to drop the column? it's safe to leave it as it is")) {
     // execute if possible
     try {
-      if (transactionalColumnSchema.foreignKey) {
-        let actualId = tableName + "__" + transactionalColumnSchema.foreignKey.id;
-        if (actualId.length > MAX_PG_FK_SIZE) {
-          actualId = makeIdOutOf(actualId);
-        }
-        
+      const foreignKeys = await databaseConnection.queryRows(
+        "SELECT conname FROM pg_constraint WHERE conrelid = $1::regclass AND confkey IS NOT NULL AND " +
+        "conkey @> (SELECT ARRAY(SELECT attnum FROM pg_attribute WHERE attrelid = $1::regclass AND attname = '$2'))",
+        [
+          "public." + tableName,
+          currentColumnName,
+        ]
+      );
+      for (const fkKey of foreignKeys) {
         await databaseConnection.query(
-          `ALTER TABLE ${JSON.stringify(tableName)} DROP CONSTRAINT ${JSON.stringify(actualId)}`,
+          `ALTER TABLE ${JSON.stringify(tableName)} DROP CONSTRAINT ${JSON.stringify(fkKey.conname)}`,
         );
       }
-
-      transactionalColumnSchema.foreignKey = null;
 
       await databaseConnection.query(
         `ALTER TABLE ${JSON.stringify(tableName)} DROP COLUMN ${JSON.stringify(currentColumnName)}`,
@@ -146,13 +142,7 @@ export async function dropExtraColumnInTable(
     } catch (err) {
       // if not change the result schema
       showErrorStackAndLogMessage(err);
-      if (await yesno("Consider it successful? The column will be considered as properly removed")) {
-        return null;
-      }
-      return transactionalColumnSchema;
     }
-  } else {
-    return transactionalColumnSchema;
   }
 }
 
@@ -170,22 +160,26 @@ export async function updateColumnInTable(
   tableName: string,
   columnName: string,
   newColumnSchema: ISQLColumnDefinitionType,
-  currentColumnSchema: ISQLColumnDefinitionType,
-): Promise<ISQLColumnDefinitionType> {
+  currentColumnInfo: {
+    data_type: string;
+    is_nullable: boolean;
+    column_default: any;
+  },
+) {
   // let's have this flag for weird changes, there is only so little we would like to change
   // that could break the app
   let noOp = false;
   // for example a type change (say from int to boolean), can break stuff
-  if (currentColumnSchema.type !== newColumnSchema.type) {
+  if (currentColumnInfo.data_type !== newColumnSchema.type) {
     // so we warn and set the noop flag
     console.log(colors.red("A column at " + tableName + "." + columnName +
-      " has been changed type from " + currentColumnSchema.type + " to " +
+      " has been changed type from " + currentColumnInfo.data_type + " to " +
       newColumnSchema.type + " this is a no-op"));
     noOp = true;
   }
 
   // also to deny nulls, nulls are always active
-  if (!!currentColumnSchema.notNull !== !!newColumnSchema.notNull && newColumnSchema.notNull) {
+  if (currentColumnInfo.is_nullable !== !newColumnSchema.notNull && newColumnSchema.notNull) {
     // this is a noop too, there might be nulls
     console.log(colors.red("A column has changed from not being nullable to being nullable at " +
       tableName + "." + columnName + " this is a no-op"));
@@ -214,10 +208,7 @@ export async function updateColumnInTable(
       return newColumnSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
-      return currentColumnSchema;
     }
-  } else {
-    return currentColumnSchema;
   }
 }
 
@@ -283,56 +274,62 @@ export async function updateTable(
   databaseConnection: DatabaseConnection,
   tableName: string,
   newTableSchema: ISQLTableDefinitionType,
-  currentTableSchema: ISQLTableDefinitionType,
-): Promise<ISQLTableDefinitionType> {
-  const finalTableSchema: ISQLTableDefinitionType = {
-    ...currentTableSchema,
-  };
-
+) {
   // we need to check what changed, so we go thru every single column
   for (const columnName of Object.keys(newTableSchema)) {
     // we get the data from the column
     const newColumnSchema = newTableSchema[columnName];
-    const currentColumnSchema = currentTableSchema[columnName];
+
+    const columnInfo = await databaseConnection.queryFirst("SELECT column_name, data_type, is_nullable, column_default FROM " +
+      "information_schema.columns WHERE table_schema = $1 AND table_name = $2 AND column_name = $3",
+      [
+        "public",
+        tableName,
+        columnName,
+      ]
+    );
 
     // if there was no such column
-    if (!currentColumnSchema) {
-      finalTableSchema[columnName] =
-        await addMissingColumnToTable(databaseConnection, tableName, columnName, newColumnSchema);
+    if (!columnInfo) {
+      await addMissingColumnToTable(databaseConnection, tableName, columnName, newColumnSchema);
       // Otherwise if there was just a change in the column basic information
       // that is because this is only in charge of the basic structure
     } else if (
-      currentColumnSchema.type !== newColumnSchema.type ||
-      currentColumnSchema.notNull !== newColumnSchema.notNull ||
-      currentColumnSchema.defaultTo !== newColumnSchema.defaultTo
+      // TODO are these checks any good???
+      columnInfo.data_type.toLowerCase() !== newColumnSchema.type.toLowerCase() ||
+      columnInfo.is_nullable !== !newColumnSchema.notNull ||
+      columnInfo.column_default !== newColumnSchema.defaultTo
     ) {
-      finalTableSchema[columnName] =
-        await updateColumnInTable(databaseConnection, tableName, columnName, newColumnSchema, currentColumnSchema);
+      await updateColumnInTable(
+        databaseConnection,
+        tableName,
+        columnName,
+        newColumnSchema,
+        columnInfo,
+      );
     }
   }
 
+  const columnNames = await databaseConnection.queryRows(
+    "SELECT column_name FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2",
+    [
+      "public",
+      tableName,
+    ],
+  );
+
   // now we loop in the current ones
-  for (const columnName of Object.keys(currentTableSchema)) {
+  for (const columnName of columnNames) {
     // grab this
     const newColumnSchema = newTableSchema[columnName];
-    const currentColumnSchema = currentTableSchema[columnName];
 
     // we want to find if there are deleted column
     // currentColumnSchema might be null in some situation this has happened in the past
     // so it's worth a check that the value is set, even when it shouldn't be
-    if (!newColumnSchema && currentColumnSchema) {
-      finalTableSchema[columnName] =
-        await dropExtraColumnInTable(databaseConnection, tableName, columnName, currentColumnSchema);
+    if (!newColumnSchema) {
+      await dropExtraColumnInTable(databaseConnection, tableName, columnName);
     }
   }
-
-  Object.keys(finalTableSchema).forEach((key) => {
-    if (finalTableSchema[key] === null) {
-      delete finalTableSchema[key];
-    }
-  });
-
-  return finalTableSchema;
 }
 
 /**
@@ -346,7 +343,6 @@ export async function updateTable(
 export async function dropTable(
   databaseConnection: DatabaseConnection,
   tableName: string,
-  currentTableSchema: ISQLTableDefinitionType,
 ): Promise<ISQLTableDefinitionType> {
   // we can assume it's meant to be dropped
   console.log(colors.yellow("Table for " + tableName + " is not required anymore"));
@@ -364,10 +360,7 @@ export async function dropTable(
       if (await yesno("Consider it successful? The table will be considered as properly removed")) {
         return null;
       }
-      return currentTableSchema;
     }
-  } else {
-    return currentTableSchema;
   }
 }
 
@@ -381,48 +374,49 @@ export async function dropTable(
  */
 export async function buildTables(
   databaseConnection: DatabaseConnection,
-  currentDatabaseSchema: ISQLSchemaDefinitionType,
   newDatabaseSchema: ISQLSchemaDefinitionType,
-): Promise<ISQLSchemaDefinitionType> {
-  const finalSchema: ISQLSchemaDefinitionType = {};
+): Promise<void> {
 
   // so we start by looping, we use an of-loop because we want
   // to keep things sync, despite being an async function
   for (const tableName of Object.keys(newDatabaseSchema)) {
-    const currentTableSchema = currentDatabaseSchema[tableName];
     const newTableSchema = newDatabaseSchema[tableName];
 
+    const tableExists = await databaseConnection.queryFirst(
+      "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name=$1 AND table_schema=$2)",
+      [
+        tableName,
+        "public",
+      ]
+    );
+
     // if there is no current schema
-    if (!currentTableSchema) {
-      finalSchema[tableName] =
-        await createTable(databaseConnection, tableName, newTableSchema);
+    if (!tableExists.exists) {
+      await createTable(databaseConnection, tableName, newTableSchema);
       // So if there is an current schema and this is an update
     } else {
-      finalSchema[tableName] =
-        await updateTable(databaseConnection, tableName, newTableSchema, currentTableSchema);
+      await updateTable(databaseConnection, tableName, newTableSchema);
     }
   }
+
+  const allTablesInDb = await databaseConnection.queryRows(
+    "SELECT table_name FROM information_schema.tables WHERE " +
+    "table_schema = $1 AND table_type = 'BASE TABLE'",
+    [
+      "public",
+    ],
+  );
 
   // now we want to check for dropped tables, by looping on the previous
   // migration config
-  for (const tableName of Object.keys(currentDatabaseSchema)) {
+  for (const tableDataRow of allTablesInDb) {
     // if we don't find any table data in the new config
-    if (!newDatabaseSchema[tableName]) {
+    if (!newDatabaseSchema[tableDataRow.table_name] && tableDataRow.table_name.startsWith("MOD_")) {
       // we call the drop
-      finalSchema[tableName] =
-        await dropTable(
-          databaseConnection,
-          tableName,
-          currentDatabaseSchema[tableName],
-        );
+      await dropTable(
+        databaseConnection,
+        tableDataRow.table_name,
+      );
     }
   }
-
-  Object.keys(finalSchema).forEach((key) => {
-    if (finalSchema[key] === null) {
-      delete finalSchema[key];
-    }
-  });
-
-  return finalSchema;
 }

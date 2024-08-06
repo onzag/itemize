@@ -42,20 +42,8 @@ export const MAX_PG_FK_SIZE = 60;
  */
 export async function buildForeignKeys(
   databaseConnection: DatabaseConnection,
-  currentDatabaseSchema: ISQLSchemaDefinitionType,
   newDatabaseSchema: ISQLSchemaDefinitionType,
-): Promise<ISQLSchemaDefinitionType> {
-  // foreign key creation requires a current database schema
-  // this is because the buildTables should have ran first
-  if (!currentDatabaseSchema) {
-    throw new Error("A current database schema should exist");
-  }
-
-  // we make a copy of our current schema
-  const finalSchema: ISQLSchemaDefinitionType = {
-    ...currentDatabaseSchema,
-  };
-
+): Promise<void> {
   // Now we want to check for foreign keys we start over, add foreign keys
   // later because we don't know what order were tables added
   for (const tableName of Object.keys(newDatabaseSchema)) {
