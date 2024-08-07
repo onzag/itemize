@@ -222,10 +222,28 @@ export class Cache {
   private serverData: IServerDataType;
   private listener: Listener;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+
+  /**
+   * The memory cache is used to hold a value for a certain amount
+   * of milliseconds after a query is executed and resolve
+   * any subsequent values to that if memory cache has been enabled
+   */
   private memoryCache: {
     [key: string]: {
       value: ISQLTableRowValue
     };
+  } = {};
+
+  /**
+   * The combine cache is used for when requests are running
+   * to fetch a value and many requests going through the cache
+   * run at the same time to fetch the same value
+   * 
+   * this will mean they will be combined and resolve all at the 
+   * same time with the same value
+   */
+  private combineCache: {
+    [key: string]: Promise<ISQLTableRowValue>,
   } = {};
   private appData: IAppDataType;
   private currentlySetting: {
@@ -3333,6 +3351,7 @@ export class Cache {
     id: string,
     version: string,
     options: {
+      doNotCombine?: boolean,
       useMemoryCache?: boolean,
       useMemoryCacheMs?: number,
       doNotEnsure?: boolean,
@@ -3368,19 +3387,191 @@ export class Cache {
       return this.memoryCache[idefQueryIdentifier].value as T;
     }
 
-    // whether we need to refresh
-    let refresh = false;
-    let refreshWasDeleted = false;
+    // what requests can be combined with others currently
+    // running, well if do not combine is active
+    // then we dont combine, otherwise things like doNotEnsure
+    // are mean for efficiency purposes
+    // but a combination is more effective than anything
+    // doNotFallbackToDB may seem like a good one too
+    // but if the other succeeds then it's like it
+    // is in the cache
+    const cantCombine =
+      options.doNotCombine;
 
-    if (!options.forceRefresh) {
-      let currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
-      // we do not need to refresh the value
-      if (currentValue && !options.doNotEnsure) {
-        const rowResultLastMod: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
+    // if we are allowed to combine with a running
+    // request for the same item
+    if (!cantCombine && this.combineCache[idefQueryIdentifier]) {
+      // we try
+      try {
+        // await for the promise that should be there still
+        const value = await this.combineCache[idefQueryIdentifier];
+
+        // now we can store in the memory cache if we are meant to
+        // maybe the other one also uses memory cache
+        // in any case it doesn't hurt
+        if (memCache) {
+          const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
+          this.memoryCache[idefQueryIdentifier] = {
+            value,
+          };
+          setTimeout(() => {
+            delete this.memoryCache[idefQueryIdentifier];
+          }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
+        }
+
+        // now we can return the value
+        return value as T;
+      } catch (err) {
+        // otherwise the other method call for the same
+        // object failed, log the error and throw it
+        logger.error(
+          {
+            className: "Cache",
+            methodName: "requestValue",
+            message: "Received error while waiting for combination cache response",
+            serious: true,
+            err,
+            data: {
+              idefTable,
+              moduleTable,
+              id,
+              version,
+            },
+          }
+        );
+        throw err;
+      }
+    }
+
+    // this is however what we do to determine
+    // whether we create a combination point
+    const cantCreateCombinationPoint =
+      options.doNotFallbackToDb ||
+      options.doNotEnsure ||
+      // the combination point already exists
+      // by someone else
+      this.combineCache[idefQueryIdentifier];
+
+    let resolveCombinationPoint: (r: ISQLTableRowValue) => void = null;
+    let rejectCombinationPoint: (err: Error) => void = null;
+    if (!cantCreateCombinationPoint) {
+      this.combineCache[idefQueryIdentifier] = new Promise((resolve, reject) => {
+        resolveCombinationPoint = resolve;
+        rejectCombinationPoint = reject;
+      });
+    }
+
+    try {
+      // whether we need to refresh
+      let refresh = false;
+      let refreshWasDeleted = false;
+
+      if (!options.forceRefresh) {
+        let currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
+        // we do not need to refresh the value
+        if (currentValue && !options.doNotEnsure) {
+          const rowResultLastMod: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
+            // let's remember versions as null do not exist in the database, instead it uses
+            // the invalid empty string "" value
+            await this.databaseConnection.queryFirst(
+              `SELECT "last_modified" FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "version" = $2 ` +
+              `LIMIT 1`,
+              [
+                id,
+                version || "",
+              ],
+            ),
+          );
+
+          // it's there but does it match our redis
+          if (rowResultLastMod) {
+            // well it does not, redis says it's gone
+            if (!currentValue.value) {
+              // refresh please
+              refresh = true;
+            } else if (currentValue.value.last_modified !== rowResultLastMod.last_modified) {
+              refresh = true;
+            }
+            // it's not there
+          } else {
+            // but this says it does
+            if (currentValue.value) {
+              // we refresh but also say that we know it was deleted
+              refresh = true;
+              refreshWasDeleted = true;
+            }
+          }
+        } else if (!currentValue) {
+          // I mean we need to refresh if we got no value
+          refresh = true;
+        }
+        // otherwise we got a value and we do not use the recheck
+        // so we are going to go with that
+
+        // if we are not refreshing or it was deleted
+        if (!refresh || refreshWasDeleted) {
+          // if it was deleted
+          if (refreshWasDeleted) {
+            // force the damn thing
+            this.forceCacheInto(idefTable, id, version, null, false);
+            currentValue = {
+              value: null,
+            }
+          }
+
+          // store in memcache
+          if (memCache) {
+            this.memoryCache[idefQueryIdentifier] = currentValue;
+            setTimeout(() => {
+              delete this.memoryCache[idefQueryIdentifier];
+            }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
+          }
+
+          // if we can and have created a combination point
+          if (!cantCreateCombinationPoint) {
+            // delete it so none else sees it anymore
+            delete this.combineCache[idefQueryIdentifier];
+            // resolve it
+            resolveCombinationPoint && resolveCombinationPoint(currentValue.value);
+          }
+          return currentValue.value as T
+        }
+      } else {
+        refresh = true;
+      }
+
+      // we do not fall back to DB
+      if (options.doNotFallbackToDb) {
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "requestValue",
+            message: "Not found in memory or refresh expected; but doNotFallbackToDb is set",
+          },
+        );
+
+        options.onNotFallenBackToDbAndNotFound && options.onNotFallenBackToDbAndNotFound();
+
+        // THIS CANT CREATE A COMBINATION POINT NOT WORTH CHECKING
+        return null;
+      }
+
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Cache",
+          methodName: "requestValue",
+          message: "Not found in memory or refresh expected; requesting database",
+        },
+      );
+
+      try {
+        const queryValue: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
           // let's remember versions as null do not exist in the database, instead it uses
           // the invalid empty string "" value
           await this.databaseConnection.queryFirst(
-            `SELECT "last_modified" FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "version" = $2 ` +
+            `SELECT * FROM ${JSON.stringify(moduleTable)} JOIN ${JSON.stringify(idefTable)} ` +
+            `ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version" ` +
+            `WHERE "id" = $1 AND "version" = $2 ` +
             `LIMIT 1`,
             [
               id,
@@ -3388,125 +3579,52 @@ export class Cache {
             ],
           ),
         );
+        // we don't wait for this
+        this.forceCacheInto(idefTable, id, version, queryValue, false);
 
-        // it's there but does it match our redis
-        if (rowResultLastMod) {
-          // well it does not, redis says it's gone
-          if (!currentValue.value) {
-            // refresh please
-            refresh = true;
-          } else if (currentValue.value.last_modified !== rowResultLastMod.last_modified) {
-            refresh = true;
-          }
-          // it's not there
-        } else {
-          // but this says it does
-          if (currentValue.value) {
-            // we refresh but also say that we know it was deleted
-            refresh = true;
-            refreshWasDeleted = true;
-          }
-        }
-      } else if (!currentValue) {
-        // I mean we need to refresh if we got no value
-        refresh = true;
-      }
-      // otherwise we got a value and we do not use the recheck
-      // so we are going to go with that
-
-      // if we are not refreshing or it was deleted
-      if (!refresh || refreshWasDeleted) {
-        // if it was deleted
-        if (refreshWasDeleted) {
-          // force the damn thing
-          this.forceCacheInto(idefTable, id, version, null, false);
-          currentValue = {
-            value: null,
-          }
-        }
-
-        // store in memcache
         if (memCache) {
-          this.memoryCache[idefQueryIdentifier] = currentValue;
+          const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
+          this.memoryCache[idefQueryIdentifier] = {
+            value: queryValue,
+          };
           setTimeout(() => {
             delete this.memoryCache[idefQueryIdentifier];
           }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
         }
 
-        return currentValue.value as T
-      }
-    } else {
-      refresh = true;
-    }
-
-    // we do not fall back to DB
-    if (options.doNotFallbackToDb) {
-      CAN_LOG_DEBUG && logger.debug(
-        {
-          className: "Cache",
-          methodName: "requestValue",
-          message: "Not found in memory or refresh expected; but doNotFallbackToDb is set",
-        },
-      );
-
-      options.onNotFallenBackToDbAndNotFound && options.onNotFallenBackToDbAndNotFound();
-
-      return null;
-    }
-
-    CAN_LOG_DEBUG && logger.debug(
-      {
-        className: "Cache",
-        methodName: "requestValue",
-        message: "Not found in memory or refresh expected; requesting database",
-      },
-    );
-
-    try {
-      const queryValue: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
-        // let's remember versions as null do not exist in the database, instead it uses
-        // the invalid empty string "" value
-        await this.databaseConnection.queryFirst(
-          `SELECT * FROM ${JSON.stringify(moduleTable)} JOIN ${JSON.stringify(idefTable)} ` +
-          `ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version" ` +
-          `WHERE "id" = $1 AND "version" = $2 ` +
-          `LIMIT 1`,
-          [
-            id,
-            version || "",
-          ],
-        ),
-      );
-      // we don't wait for this
-      this.forceCacheInto(idefTable, id, version, queryValue, false);
-
-      if (memCache) {
-        const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
-        this.memoryCache[idefQueryIdentifier] = {
-          value: queryValue,
-        };
-        setTimeout(() => {
-          delete this.memoryCache[idefQueryIdentifier];
-        }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
-      }
-
-      return queryValue as T;
-    } catch (err) {
-      logger.error(
-        {
-          className: "Cache",
-          methodName: "requestValue",
-          message: "Intercepted database request error with error information",
-          serious: true,
-          err,
-          data: {
-            idefTable,
-            moduleTable,
-            id,
-            version,
-          },
+        // again if we can create it
+        if (!cantCreateCombinationPoint) {
+          // delete it since we are done
+          delete this.combineCache[idefQueryIdentifier];
+          // resolve it so the others catch the value
+          resolveCombinationPoint && resolveCombinationPoint(queryValue);
         }
-      );
+        return queryValue as T;
+      } catch (err) {
+        logger.error(
+          {
+            className: "Cache",
+            methodName: "requestValue",
+            message: "Intercepted database request error with error information",
+            serious: true,
+            err,
+            data: {
+              idefTable,
+              moduleTable,
+              id,
+              version,
+            },
+          }
+        );
+        throw err;
+      }
+    } catch (err) {
+      if (!cantCreateCombinationPoint) {
+        // delete it so none else sees it anymore
+        delete this.combineCache[idefQueryIdentifier];
+        // reject it, we have failed
+        rejectCombinationPoint && rejectCombinationPoint(err);
+      }
       throw err;
     }
   }
