@@ -842,6 +842,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // and then we get the value
       const rqValue = await rqQuery(
         listQuery,
+        {
+          remoteListener: this.props.remoteListener,
+        },
       );
 
       if (this.state.currentSearchTime !== currentSearchLoadTime || this.isUnmounted) {

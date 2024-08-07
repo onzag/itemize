@@ -8,7 +8,7 @@
  * @module
  */
 
-import { IRQSearchRecord } from "../rq-querier";
+import type { IRQEndpointValue, IRQSearchRecord } from "../rq-querier";
 
 // EVENTS
 
@@ -828,4 +828,18 @@ export function generateOwnedParentedSearchMergedIndexIdentifier(
   parentVersion: string,
 ) {
   return "OWNED_PARENTED_SEARCH." + idefOrModSearchIsAgainst + "." + createdBy + "." + parentType + "." + parentId + "." + (parentVersion || "");
+}
+
+// WS protocol
+export const RQ_REQUEST = "rq";
+export interface IWSRQRequest {
+  uuid: string;
+  target: string;
+  request: any;
+}
+
+export const RQ_RESPONSE = "rq-res";
+export interface IWSRQResponse {
+  uuid: string;
+  response: IRQEndpointValue;
 }

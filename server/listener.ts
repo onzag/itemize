@@ -76,13 +76,18 @@ import {
   generatePropertySearchMergedIndexIdentifier,
   IPropertySearchRecordsEvent,
   PROPERTY_SEARCH_RECORDS_EVENT,
+  RQ_REQUEST,
+  IWSRQRequest,
+  IWSRQResponse,
+  RQ_RESPONSE,
 } from "../base/remote-protocol";
-import { IRQSearchRecord } from "../rq-querier";
+import { IRQSearchRecord, IRQValue } from "../rq-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from "./logger";
 import {
   SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
-  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+  ENDPOINT_ERRORS
 } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
@@ -96,6 +101,9 @@ import { ItemizeRawDB } from "./raw-db";
 import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
 import { RegistryService } from "./services/registry";
 import { NanoSecondComposedDate } from "../nanodate";
+import type { RQRootSchema } from "../base/Root/rq";
+import { EndpointError, EndpointErrorType } from "../base/errors";
+import { processArgs, processFields } from "./rq";
 
 const ajv = new Ajv();
 
@@ -225,6 +233,8 @@ export class Listener {
 
   private customEvents: { [eventId: string]: CustomListenerEventHandler } = {};
 
+  private rqSchemaWResolvers: RQRootSchema = null;
+
   constructor(
     buildnumber: string,
     redisGlobalSub: ItemizeRedisClient,
@@ -261,6 +271,10 @@ export class Listener {
     this.localRedisListener = this.localRedisListener.bind(this);
 
     this.handleCustomEvent = this.handleCustomEvent.bind(this);
+    this.handleRQRequest = this.handleRQRequest.bind(this);
+  }
+  public setRQSchemaWithResolvers(rqSchemaWResolvers: RQRootSchema) {
+    this.rqSchemaWResolvers = rqSchemaWResolvers;
   }
   public init() {
     this.redisGlobalSub.redisClient.on("message", this.globalRedisListener);
@@ -387,6 +401,9 @@ export class Listener {
       });
       socket.on(OWNED_PARENTED_SEARCH_UNREGISTER_REQUEST, (request: IOwnedParentedSearchUnregisterRequest) => {
         this.ownedParentedSearchUnregister(socket, request);
+      });
+      socket.on(RQ_REQUEST, (request: IWSRQRequest) => {
+        this.handleRQRequest(socket, request);
       });
       Object.keys(this.customEvents).forEach((k) => {
         socket.once(k, (data: any) => {
@@ -1501,6 +1518,9 @@ export class Listener {
     this.awaitingOwnedSearchFeedbacks[socket.id].push(request);
 
     const removeAwaiting = () => {
+      if (!this.awaitingOwnedSearchFeedbacks[socket.id]) {
+        return;
+      }
       const currentIndex = this.awaitingOwnedSearchFeedbacks[socket.id].indexOf(request);
       if (currentIndex !== -1) {
         this.awaitingOwnedSearchFeedbacks[socket.id].splice(currentIndex, 1);
@@ -1827,6 +1847,9 @@ export class Listener {
     this.awaitingPropertySearchFeedbacks[socket.id].push(request);
 
     const removeAwaiting = () => {
+      if (!this.awaitingPropertySearchFeedbacks[socket.id]) {
+        return;
+      }
       const currentIndex = this.awaitingPropertySearchFeedbacks[socket.id].indexOf(request);
       if (currentIndex !== -1) {
         this.awaitingPropertySearchFeedbacks[socket.id].splice(currentIndex, 1);
@@ -2141,6 +2164,9 @@ export class Listener {
     this.awaitingParentedSearchFeedbacks[socket.id].push(request);
 
     const removeAwaiting = () => {
+      if (!this.awaitingParentedSearchFeedbacks[socket.id]) {
+        return;
+      }
       const currentIndex = this.awaitingParentedSearchFeedbacks[socket.id].indexOf(request);
       if (currentIndex !== -1) {
         this.awaitingParentedSearchFeedbacks[socket.id].splice(currentIndex, 1);
@@ -2469,6 +2495,9 @@ export class Listener {
     this.awaitingOwnedParentedSearchFeedbacks[socket.id].push(request);
 
     const removeAwaiting = () => {
+      if (!this.awaitingOwnedParentedSearchFeedbacks[socket.id]) {
+        return;
+      }
       const currentIndex = this.awaitingOwnedParentedSearchFeedbacks[socket.id].indexOf(request);
       if (currentIndex !== -1) {
         this.awaitingOwnedParentedSearchFeedbacks[socket.id].splice(currentIndex, 1);
@@ -2799,6 +2828,9 @@ export class Listener {
     this.awaitingBasicFeedbacks[socket.id].push(request);
 
     const removeAwaiting = () => {
+      if (!this.awaitingBasicFeedbacks[socket.id]) {
+        return;
+      }
       const currentIndex = this.awaitingBasicFeedbacks[socket.id].indexOf(request);
       if (currentIndex !== -1) {
         this.awaitingBasicFeedbacks[socket.id].splice(currentIndex, 1);
@@ -3764,5 +3796,129 @@ export class Listener {
       const socket = this.listeners[sId].socket;
       socket.once(event, this.handleCustomEvent.bind(this, event, socket))
     });
+  }
+
+  public async handleRQRequest(
+    socket: Socket,
+    request: IWSRQRequest,
+  ) {
+    const token = this.listeners[socket.id]?.token || null;
+
+    if (!this.rqSchemaWResolvers) {
+      const response: IWSRQResponse = {
+        uuid: request.uuid,
+        response: {
+          errors: [
+            {
+              error: {
+                code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+                message: "This server was exposed to the client but it cannot handle rq over websockets",
+              },
+              source: request.target,
+            }
+          ],
+          data: null,
+        }
+      }
+      socket.emit(RQ_RESPONSE, response);
+      return;
+    }
+
+    const name = request.request.n || request.target;
+
+    const schemaRegion =
+      this.rqSchemaWResolvers.query[name] ||
+      this.rqSchemaWResolvers.mutation[name];
+
+    if (!schemaRegion) {
+      const response: IWSRQResponse = {
+        uuid: request.uuid,
+        response: {
+          errors: [
+            {
+              error: {
+                code: ENDPOINT_ERRORS.UNSPECIFIED,
+                message: "Invalid request query location at " + request.target,
+              },
+              source: request.target,
+            }
+          ],
+          data: null,
+        }
+      }
+      socket.emit(RQ_RESPONSE, response);
+      return;
+    }
+
+    try {
+          // our already processed arguments
+    const args = request.request.args;
+    // add the token if it uses it
+    if (typeof args.token === "undefined") {
+      args.token = token;
+    }
+    // we have no capacity to handle files
+    // not over websockets
+    // if files present this will burst into an error
+    processArgs(null, schemaRegion.args, args, "");
+    const fields = processFields(
+      schemaRegion.stdFields,
+      schemaRegion.ownFields,
+      request.request.f,
+    );
+
+      // it must exist because it has been checked
+      const value: IRQValue = await schemaRegion.resolve({
+        args,
+        fields,
+      });
+      const response: IWSRQResponse = {
+        uuid: request.uuid,
+        response: {
+          data: {
+            [request.target]: value,
+          },
+        }
+      }
+      socket.emit(RQ_RESPONSE, response);
+      return;
+    } catch (err) {
+      if (err instanceof EndpointError) {
+        const response: IWSRQResponse = {
+          uuid: request.uuid,
+          response: {
+            errors: [
+              {
+                error: err.data,
+                source: request.target,
+              }
+            ],
+            data: null,
+          }
+        }
+        socket.emit(RQ_RESPONSE, response);
+        return;
+      } else {
+        // log error
+        const err: EndpointErrorType = {
+          message: "Internal Server Error while processing " + request.target,
+          code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+        };
+        const response: IWSRQResponse = {
+          uuid: request.uuid,
+          response: {
+            errors: [
+              {
+                error: err,
+                source: request.target,
+              }
+            ],
+            data: null,
+          }
+        }
+        socket.emit(RQ_RESPONSE, response);
+        return;
+      }
+    }
   }
 }

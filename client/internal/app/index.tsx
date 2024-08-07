@@ -295,6 +295,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
         listenerUUID: this.remoteListener.getUUID(),
         language: "en",
         cacheStore: true,
+      }, {
+        remoteListener: this.remoteListener,
       });
 
       // Ignore errors, we just go for success

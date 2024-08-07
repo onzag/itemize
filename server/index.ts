@@ -74,6 +74,7 @@ import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { RQRootSchema, getRQSchemaForRoot } from "../base/Root/rq";
 import AnalyticsProvider, { ITrackOptions } from "./services/base/AnalyticsProvider";
 import { ElasticAnalyticsService } from "./services/elastic-analytics";
+import { resolversRQ } from "./resolvers";
 
 export interface IServerPingDataPing {
   cpuUsageTotal: NodeJS.CpuUsage,
@@ -198,6 +199,7 @@ export interface IAppDataType {
   root: Root;
   rootPool: Pool<Root>,
   rqSchema: RQRootSchema;
+  rqSchemaWithResolvers: RQRootSchema;
   langLocales: ILangLocalesType;
   ssrConfig: ISSRConfig;
   seoConfig: ISEOConfig;
@@ -1236,6 +1238,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       root,
       rootPool: retrieveRootPool(root.rawData),
       rqSchema: getRQSchemaForRoot(root),
+      rqSchemaWithResolvers: null,
       langLocales,
       ssrConfig: {
         mainComponent: initConfig.mainComponent,
@@ -1289,6 +1292,11 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       // assigned later during rest setup
       userTokenQuery: null,
     };
+    appData.rqSchemaWithResolvers = getRQSchemaForRoot(
+      root,
+      resolversRQ(appData),
+    );
+    appData.listener.setRQSchemaWithResolvers(appData.rqSchemaWithResolvers);
 
     // inform the cache about this app data
     cache.setAppData(appData);

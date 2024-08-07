@@ -88,7 +88,13 @@ function processSingleArg(
         message: "argument " + varErr + " should be string as it's binary to mark a file id",
       });
     } else {
-      if (!files[argValue]) {
+      if (!files) {
+        // no support for files
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "This endpoint does not support file upload",
+        });
+      } else if (!files[argValue]) {
         const container: IFilesAwaiter = {
           capacitor: null,
           isResolved: false,
@@ -153,7 +159,7 @@ function processSingleArg(
   }
 }
 
-function processArgs(files: IFilesAwaiterContainer, schema: { [id: string]: RQArg }, args: IRQArgs, prefixErrr: string) {
+export function processArgs(files: IFilesAwaiterContainer, schema: { [id: string]: RQArg }, args: IRQArgs, prefixErrr: string) {
   if (typeof args !== "object" || args === null || typeof args === "undefined" || Array.isArray(args)) {
     throw new EndpointError({
       code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -213,7 +219,7 @@ function processArgs(files: IFilesAwaiterContainer, schema: { [id: string]: RQAr
 
 type IFieldsHelper = string | IFieldsHelper[];
 
-function processFields(
+export function processFields(
   stdFields: {[id: string]: RQField},
   ownFields: {[id: string]: RQField},
   fieldsSrc: IFieldsHelper,

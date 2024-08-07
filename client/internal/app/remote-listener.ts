@@ -60,9 +60,13 @@ import {
   IPropertySearchFeedbackRequest,
   PROPERTY_SEARCH_FEEDBACK_REQUEST,
   PROPERTY_SEARCH_RECORDS_EVENT,
+  IWSRQRequest,
+  IWSRQResponse,
+  RQ_REQUEST,
+  RQ_RESPONSE,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
-import type { IRQSearchRecord } from "../../../rq-querier";
+import type { IRQEndpointValue, IRQSearchRecord } from "../../../rq-querier";
 
 const SLOW_POLLING_MIN_TIME = 60 * 1000;
 const SLOW_POLLING_TIME_BETWEEN_REQUESTS = 5 * 1000;
@@ -82,6 +86,8 @@ export interface IRemoteListenerRecordsCallbackArg {
   createdRecords: IRQSearchRecord[];
   deletedRecords: IRQSearchRecord[];
 }
+
+interface AwaitingRequestType { event: IWSRQRequest, resolve: (v: IRQEndpointValue) => void, reject: (err: Error) => void };
 
 type RemoteListenerRecordsCallback = (arg: IRemoteListenerRecordsCallbackArg) => void;
 
@@ -104,6 +110,11 @@ export class RemoteListener {
    * Time when a last feedback was requested
    */
   private slowPoolingTimer: any;
+
+  /**
+   * Timer to kill awaiting rq requests if no connection is achieved
+   */
+  private killAwaitingRqRequestsTimer: any;
 
   /**
    * Awaiting search requests to prevent spamming
@@ -318,7 +329,7 @@ export class RemoteListener {
   /**
    * The token that has been set
    */
-  private token: string = null;
+  public token: string = null;
   /**
    * Whether it's ready to attach events
    */
@@ -347,6 +358,11 @@ export class RemoteListener {
   private listenerCount: number = 0;
 
   /**
+   * awaiting rq requests using the websocket method
+   */
+  private awaitingRQRequests: AwaitingRequestType[] = [];
+
+  /**
    * Instantiates a new remote listener
    * @param root the root we are using for it
    */
@@ -366,6 +382,7 @@ export class RemoteListener {
     this.onError = this.onError.bind(this);
     this.pushTestingInfo = this.pushTestingInfo.bind(this);
     this.executeSlowPollingFeedbacks = this.executeSlowPollingFeedbacks.bind(this);
+    this.onRQResponseReceived = this.onRQResponseReceived.bind(this);
 
     this.root = root;
     this.listeners = {};
@@ -376,6 +393,7 @@ export class RemoteListener {
     this.connectionListeners = [];
     this.connectionOnConnectOnceListeners = [];
     this.appUpdatedListeners = [];
+    this.awaitingRQRequests = [];
     this.lastRecievedBuildNumber = window.BUILD_NUMBER;
     this.setupTime = (new Date()).getTime();
 
@@ -395,6 +413,7 @@ export class RemoteListener {
     this.socket.on(OWNED_PARENTED_SEARCH_RECORDS_EVENT, this.onOwnedParentedSearchRecordsEvent);
     this.socket.on(ERROR_EVENT, this.onError);
     this.socket.on(CURRENCY_FACTORS_UPDATED_EVENT, this.triggerCurrencyFactorsHandler);
+    this.socket.on(RQ_RESPONSE, this.onRQResponseReceived)
   }
 
   /**
@@ -2010,6 +2029,9 @@ export class RemoteListener {
   private async onConnect() {
     this.offline = false;
 
+    // prevent killing awaiting rq requests
+    clearTimeout(this.killAwaitingRqRequestsTimer);
+
     this.slowPoolingTimer = setTimeout(this.executeSlowPollingFeedbacks, SLOW_POLLING_MIN_TIME);
 
     // we attach any detached requests, all of them are
@@ -2058,6 +2080,10 @@ export class RemoteListener {
     this.connectionListeners.slice().forEach((l) => l());
     this.connectionOnConnectOnceListeners.slice().forEach((l) => l());
     this.connectionOnConnectOnceListeners = [];
+
+    this.awaitingRQRequests.forEach((r) => {
+      this.queueAwaitingRequest(r);
+    });
   }
 
   private async executeSlowPollingFeedbacks() {
@@ -2261,5 +2287,78 @@ export class RemoteListener {
     // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
     // Javascript is like that so I must make a copy of the array because JavaScript
     this.connectionListeners.slice().forEach((l) => l());
+
+    // one second grace time before failing
+    this.killAwaitingRqRequestsTimer = setTimeout(() => {
+      this.awaitingRQRequests.forEach((r) => r.reject(new Error("Can't Connect")));
+      this.awaitingRQRequests = [];
+    }, 1000);
+  }
+
+  public async makeRQRequest(target: string, request: any) {
+    const requestUUID = uuid.v4();
+
+    const event = {
+      target,
+      request,
+      uuid: requestUUID,
+    };
+
+    return new Promise<IRQEndpointValue>((resolve, reject) => {
+      const awaitingRequest = {
+        event,
+        resolve,
+        reject,
+      };
+      this.queueAwaitingRequest(awaitingRequest);
+      this.awaitingRQRequests.push(awaitingRequest);
+
+      setTimeout(() => {
+        this.onRQRequestTimeout(requestUUID)
+      }, 10000);
+    });
+  }
+
+  private queueAwaitingRequest(request: AwaitingRequestType) {
+    if (this.socket.connected) {
+      // and then emit it
+      this.pushTestingInfo(
+        "rqRequest",
+        request.event,
+      );
+      this.socket.emit(
+        RQ_REQUEST,
+        request.event,
+      );
+    }
+  }
+
+  public onRQResponseReceived(response: IWSRQResponse) {
+    const awaitingRespectiveRequestIndex = this.awaitingRQRequests.findIndex((v) => v.event.uuid === response.uuid);
+    
+    // it has returned before?
+    if (awaitingRespectiveRequestIndex === -1) {
+      console.warn("The response for a given promise that is awaiting " + JSON.stringify(response) + " returned early for some reason");
+      return;
+    }
+
+    const request = this.awaitingRQRequests[awaitingRespectiveRequestIndex];
+    request.resolve(response.response);
+
+    this.awaitingRQRequests.splice(awaitingRespectiveRequestIndex, 1);
+  }
+
+  public onRQRequestTimeout(uuid: string) {
+    const requestIndex = this.awaitingRQRequests.findIndex((v) => v.event.uuid === uuid);
+
+    // it has returned correctly
+    if (requestIndex === -1) {
+      return;
+    }
+
+    const request = this.awaitingRQRequests[requestIndex];
+    request.reject(new Error("Timeout"));
+
+    this.awaitingRQRequests.splice(requestIndex, 1);
   }
 }

@@ -261,6 +261,9 @@ async function resolveGenericFunction(
       if (err instanceof EndpointError) {
         throw err;
       }
+      
+      resolvers.logError(err, resolveToUse, mod);
+
       throw new EndpointError({
         message: "Internal Server Error",
         code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,

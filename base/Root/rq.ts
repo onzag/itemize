@@ -108,6 +108,8 @@ export interface IRQResolversType {
   addItemDefinition: FRQIdefResolverType;
   editItemDefinition: FRQIdefResolverType;
   deleteItemDefinition: FRQIdefResolverType;
+
+  logError: (err: Error, resolveUsed: string, itemDefinitionOrModule: ItemDefinition | Module) => void;
 }
 
 /**

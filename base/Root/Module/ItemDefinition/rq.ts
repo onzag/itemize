@@ -413,6 +413,9 @@ async function resolveGenericFunction(
       if (err instanceof EndpointError) {
         throw err;
       }
+
+      resolvers.logError(err, resolveToUse, itemDefinition);
+
       // otherwise this is an internal server error
       // the user shouldn't receive that
       throw new EndpointError({

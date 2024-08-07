@@ -1014,6 +1014,7 @@ export async function runGetQueryFor(
   const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
+    remoteListener: options.remoteListener,
   });
 
   // now we got to check for errors
@@ -1103,6 +1104,7 @@ export async function runDeleteQueryFor(
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
   },
+  options: IRunQueryOptions,
 ): Promise<{
   error: EndpointErrorType,
 }> {
@@ -1132,6 +1134,7 @@ export async function runDeleteQueryFor(
   const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
+    remoteListener: options.remoteListener,
   });
 
   // now we got to check for errors
@@ -1334,6 +1337,7 @@ export async function runAddQueryFor(
   const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
+    remoteListener: options.remoteListener,
   });
 
   // now we got to check for errors
@@ -1438,6 +1442,7 @@ export async function runEditQueryFor(
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
   },
+  options: IRunQueryOptions,
 ): Promise<{
   error: EndpointErrorType,
   value: IRQValue,
@@ -1451,6 +1456,7 @@ export async function runEditQueryFor(
   const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
+    remoteListener: options.remoteListener,
   });
 
   // now we got to check for errors
@@ -2064,6 +2070,7 @@ export async function runSearchQueryFor(
     rqValue = await rqQuery(query, {
       merge: arg.waitAndMerge,
       progresser: arg.progresser,
+      remoteListener: searchOptions.remoteListener,
     });
 
     const data = rqValue && rqValue.data && rqValue.data[queryName];
@@ -2091,6 +2098,7 @@ export async function runSearchQueryFor(
     rqValue = await rqQuery(query, {
       merge: arg.waitAndMerge,
       progresser: arg.progresser,
+      remoteListener: searchOptions.remoteListener,
     });
 
     const data = rqValue && rqValue.data && rqValue.data[queryName];

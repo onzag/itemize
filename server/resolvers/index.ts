@@ -5,6 +5,7 @@ import { editItemDefinitionFnRQ } from "./actions/edit";
 import { IAppDataType } from "..";
 import { deleteItemDefinitionFnRQ } from "./actions/delete";
 import { IRQResolversType } from "../../base/Root/rq";
+import { logger } from "../logger";
 
 export function resolversRQ(appData: IAppDataType): IRQResolversType {
   return {
@@ -18,5 +19,17 @@ export function resolversRQ(appData: IAppDataType): IRQResolversType {
     deleteItemDefinition: deleteItemDefinitionFnRQ(appData),
     getItemDefinitionList: getItemDefinitionListFnRQ(appData),
     getModuleList: getModuleListFnRQ(appData),
+
+    logError(err, resolveUsed, itemDefinitionOrModule) {
+      logger.error({
+        message: "Internal Server Error while executing resolver",
+        functionName: resolveUsed,
+        err,
+        serious: true,
+        data: {
+          itemDefinitionOrModule: itemDefinitionOrModule.getQualifiedPathName(),
+        },
+      });
+    },
   };
 }

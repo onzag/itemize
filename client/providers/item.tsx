@@ -4472,6 +4472,8 @@ export class ActualItemProvider extends
       language: this.props.localeData.language,
       listenerUUID: this.props.remoteListener.getUUID(),
       cacheStore: this.props.longTermCaching,
+    }, {
+      remoteListener: this.props.remoteListener,
     });
 
     if (error) {
@@ -5018,6 +5020,8 @@ export class ActualItemProvider extends
         cacheStore: this.props.longTermCaching,
         waitAndMerge: options.waitAndMerge,
         progresser: options.progresser,
+      }, {
+        remoteListener: this.props.remoteListener,
       });
 
       value = totalValues.value;

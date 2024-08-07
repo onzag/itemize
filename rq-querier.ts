@@ -13,6 +13,7 @@ import equals from "deep-equal";
 import { requestFieldsAreContained } from "./rq-util";
 import type { ReadStream } from "fs";
 import type { RQField, RQQuery, RQRootSchema } from "./base/Root/rq";
+import type { RemoteListener } from "./client/internal/app/remote-listener";
 
 /**
  * Search results as they are provided
@@ -636,7 +637,7 @@ function buildRQFields(
 
 function buildRQThing(rqSchema: RQRootSchema, ...queries: IRQQueryObj[]) {
   const qs: any = {};
-  const tokens: {[key: string]: number} = {};
+  const tokens: { [key: string]: number } = {};
 
   queries.forEach((query) => {
     const targetInQuestion = rqSchema ? (rqSchema.mutation[query.name] || rqSchema.query[query.name]) : null;
@@ -682,7 +683,7 @@ function buildRQThing(rqSchema: RQRootSchema, ...queries: IRQQueryObj[]) {
       }
     });
   }
-  return [qs, mostUsedToken ? {token: mostUsedToken} : null];
+  return [qs, mostUsedToken ? { token: mostUsedToken } : null];
 }
 
 /**
@@ -766,7 +767,9 @@ export async function oldXMLHttpRequest(
  * @param options.host a host, required when running in NodeJS
  * @param options.merge whether to merge rq queries in one, adds delay to the queries, might be unwanted
  * @param options.mergeMS how many ms of delay to add, default 70
- * @param options.progresser to track progress
+ * @param options.progresser to track progress, giving this option will disable websocket protocol
+ * @param options.remoteListener to use the websocket protocol when available, note that if you provide this
+ * it will use the websocket and not merge or anything unless it fails to execute over it
  * @returns a promise for a rq endpoint value
  */
 export async function rqQuery(query: RQQueryBuilder, options?: {
@@ -774,6 +777,7 @@ export async function rqQuery(query: RQQueryBuilder, options?: {
   merge?: boolean;
   mergeMS?: number;
   progresser?: (arg: IXMLHttpRequestProgressInfo) => void;
+  remoteListener?: RemoteListener,
 }): Promise<IRQEndpointValue> {
   const host = (options && options.host) || "";
   const merge = options && options.merge;
@@ -805,6 +809,63 @@ export async function rqQuery(query: RQQueryBuilder, options?: {
         resolve(response);
       });
     });
+  }
+
+  const [rqOperations, rqHeaders] = query.getRQOperations();
+  const tokenToUse = (rqHeaders?.token || null);
+  const allOperations = Object.keys(rqOperations);
+  const singleOperation = allOperations.length === 1;
+  const baseOperation = allOperations[0];
+
+  if (
+    // must be a single operation for a query to go through ws
+    singleOperation &&
+    // no alias and naming
+    !rqOperations.n &&
+    // must have a remote listener set
+    options?.remoteListener &&
+    // no attachments
+    query.getAttachments().length === 0 &&
+    // no progresser
+    !options?.progresser &&
+    !options?.remoteListener.isOffline() &&
+    // and be the same token
+    options?.remoteListener.token === tokenToUse
+  ) {
+    QUERIES_IN_NETWORK.push(query);
+
+    let reply: IRQEndpointValue;
+
+    try {
+      reply =
+        await options.remoteListener.makeRQRequest(baseOperation, rqOperations[baseOperation]);
+    } catch (err) {
+      reply = {
+        data: null,
+        errors: [
+          {
+            error: {
+              message: "Failed to connect to the server",
+              code: ENDPOINT_ERRORS.CANT_CONNECT,
+            },
+          },
+        ],
+      };
+    }
+
+    query.informReply(reply);
+
+    // small window of time to delete the query in the network
+    // to allow delayed requests
+    //setTimeout(() => {
+    const index = QUERIES_IN_NETWORK.findIndex((q) => q === query);
+    if (index !== -1) {
+      QUERIES_IN_NETWORK.splice(index, 1);
+    }
+    // }, 70);
+
+    // return the reply
+    return reply;
   }
 
   // if we are allowed to merge and not concerned with full speed but rather full optimal
@@ -876,7 +937,6 @@ export async function rqQuery(query: RQQueryBuilder, options?: {
 
   // building the form data
   const formDataRq = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
-  const [rqOperations, rqHeaders] = query.getRQOperations();
   formDataRq.append("rq", process.env.NODE_ENV === "development" ? JSON.stringify(rqOperations, null, 2) : JSON.stringify(rqOperations));
 
   // now let's get all the attachents and append them to the form data

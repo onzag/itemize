@@ -58,10 +58,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
       maxFiles: MAX_FILES_PER_REQUEST,
       maxFieldSize: MAX_FIELD_SIZE,
       jsonSchema: appData.rqSchema,
-      schema: getRQSchemaForRoot(
-        appData.root,
-        resolversRQ(appData),
-      ),
+      schema: appData.rqSchemaWithResolvers,
     }),
   );
 
