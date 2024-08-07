@@ -180,23 +180,29 @@ const CLUSTER_MANAGER_RESET = "CLUSTER_MANAGER_RESET";
  */
 const customEventListenerRegex = /^\$[a-zA-Z-]+$/;
 
+export interface ICustomListenerInfo {
+  /**
+   * may be missing if user is unidentified
+   */
+  userData: IServerSideTokenDataType;
+  /**
+   * the socket
+   */
+  socket: Socket;
+  /**
+   * listener context
+   */
+  listener: Listener;
+}
+
+export type CustomListenerDisconnectHandler = (info: ICustomListenerInfo) => void;
+
 export type CustomListenerEventHandler = (
   /**
    * data for the event
    */
   eventData: any,
-  /**
-   * may be missing if user is unidentified
-   */
-  userData: IServerSideTokenDataType,
-  /**
-   * the socket
-   */
-  socket: Socket,
-  /**
-   * listener context
-   */
-  listener: Listener,
+  info: ICustomListenerInfo,
 ) => void;
 
 export class Listener {
@@ -232,6 +238,7 @@ export class Listener {
   private awaitingPropertySearchFeedbacks: { [sockedId: string]: IPropertySearchFeedbackRequest[] } = {};
 
   private customEvents: { [eventId: string]: CustomListenerEventHandler } = {};
+  private customDisconnectEvents: CustomListenerDisconnectHandler[] = [];
 
   private rqSchemaWResolvers: RQRootSchema = null;
 
@@ -3677,6 +3684,8 @@ export class Listener {
       return;
     }
 
+    this.customDisconnectEvents.forEach((l) => l({userData: listenerData.user, socket, listener: this}));
+
     CAN_LOG_DEBUG && logger.debug(
       {
         className: "Listener",
@@ -3770,17 +3779,20 @@ export class Listener {
     // get the user data
     const userData = (this.listeners[socket.id]?.user || null);
     // call the listener
-    listener(data, userData, socket, this);
+    listener(data, {userData, socket, listener: this});
   }
 
   /**
    * Adds a custom event listener to the listening pipeline
    * the event id must start with $ sign and fit the criteria a-zA-Z- to be valid
    * 
+   * the event listener gets added once and only once, it is
+   * not allowed to stack
+   * 
    * @param event 
    * @param handler 
    */
-  public addCustomEventListener(
+  public registerCustomEventListener(
     event: string,
     handler: CustomListenerEventHandler,
   ) {
@@ -3796,6 +3808,15 @@ export class Listener {
       const socket = this.listeners[sId].socket;
       socket.once(event, this.handleCustomEvent.bind(this, event, socket))
     });
+  }
+
+  /**
+   * Adds a handler for a disconnect event
+   * 
+   * @param handler 
+   */
+  public addCustomDisconnectEventListener(handler: CustomListenerDisconnectHandler) {
+    this.customDisconnectEvents.push(handler);
   }
 
   public async handleRQRequest(

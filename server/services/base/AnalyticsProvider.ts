@@ -4,6 +4,13 @@ import { RegistryService } from "../registry";
 import { Router } from "express";
 import { IAppDataType } from "../../";
 import { IServerSideTokenDataType } from "../../resolvers/basic";
+import { ICustomListenerInfo } from "../../listener";
+import uuidv5 from "uuid/v5";
+
+const NAMESPACE = "23ab4609-df49-5fdf-921b-4714adb284f3";
+export function makeIdOutOf(str: string) {
+  return "ANON" + uuidv5(str, NAMESPACE).replace(/-/g, "");
+}
 
 export enum TrackTimedStatus {
   /**
@@ -43,7 +50,7 @@ export interface ITrackOptions {
    * Whether this track will store one hit per user or many
    * hits per user with different accumulating weights
    */
-  manyHitsPerUser: boolean;
+  clientWillUpsert: boolean;
   /**
    * whether this track is exposed, normally you want this to be true
    * unless the track is being used exclusively with server side analytics
@@ -53,12 +60,49 @@ export interface ITrackOptions {
    * unless is exposed by other means
    */
   exposed: boolean;
+  /**
+   * All values must have a context specified to them
+   */
+  clientMustSpecifyContext: boolean;
+  /**
+   * All values must have a context specified to them
+   */
+  clientMustNotSpecifyContext: boolean;
+  /**
+   * Whether the user can specify the weight
+   */
+  clientCanSpecifyWeight: boolean;
+  /**
+   * A data validator for the incoming data, if not provided
+   * the track is not allowed to have any data from client providers
+   * 
+   * @param data 
+   * @returns 
+   */
+  dataValidator?: (data: any) => boolean;
+  /**
+   * Use for validating context
+   * 
+   * it will provide null if no context specified
+   * 
+   * @param context 
+   * @returns 
+   */
+  contextValidator?: (context: string) => boolean;
+  /**
+   * if can specify weight use this to validate a valid weight
+   * by default it will provide 1 if no weight specified
+   * @param weight 
+   * @returns 
+   */
+  weightValidator?: (weight: number) => boolean;
 }
 
 /**
  * @ignore
  */
 const trackRegex = /^[a-zA-Z0-9_-]+$/;
+const timezoneRegex = /^(?:Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])$/;
 
 // analytics events
 export interface IAnalyticsPayload {
@@ -66,6 +110,7 @@ export interface IAnalyticsPayload {
   context?: string;
   data?: any;
   timezone: string;
+  weight?: number;
   timeslice?: {
     start: number;
     end: number;
@@ -106,23 +151,144 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     //this.onAnalyticsHit = this.onAnalyticsHit.bind(this);
   }
 
+  private validateAnalyticPayload(
+    data: IAnalyticsPayload,
+    info: ICustomListenerInfo,
+  ): boolean {
+    if (typeof data.track !== "string" || !this.tracks[data.track]?.exposed) {
+      info.listener.emitError(info.socket, "Invalid track provided in analytics request", data);
+      return false;
+    }
+
+    const track = this.tracks[data.track];
+
+    if (typeof data.data !== "undefined" && data.data !== null) {
+      if (typeof data.data !== "object") {
+        info.listener.emitError(info.socket, "Invalid data provided in analytics request", data);
+        return false;
+      }
+
+      if (!track.dataValidator) {
+        info.listener.emitError(info.socket, "The track in the request does not support data from clients", data);
+        return false;
+      }
+
+      if (!track.dataValidator(data.data)) {
+        info.listener.emitError(info.socket, "The track has rejected the data", data);
+        return false;
+      }
+    }
+
+    if (typeof data.timezone !== "string" || !timezoneRegex.test(data.timezone)) {
+      info.listener.emitError(info.socket, "Invalid timezone provided in analytics request", data);
+      return false;
+    }
+
+    if (typeof data.context !== "undefined" && data.context !== null && typeof data.context !== "string") {
+      info.listener.emitError(info.socket, "Invalid context provided in analytics request", data);
+      return false;
+    }
+
+    if (typeof data.context !== "string" && track.clientMustSpecifyContext) {
+      info.listener.emitError(info.socket, "The given track must provide a context", data);
+      return false;
+    }
+
+    if (typeof data.context === "string" && track.clientMustNotSpecifyContext) {
+      info.listener.emitError(info.socket, "The given track must not provide a context", data);
+      return false;
+    }
+
+    if (track.contextValidator && !track.contextValidator(data.context)) {
+      info.listener.emitError(info.socket, "The context was rejected by the validator", data);
+      return false;
+    }
+
+    if ((!info.userData || !info.userData.id) && !track.allowAnonymous) {
+      info.listener.emitError(info.socket, "The track does not allow for anonymous data", data);
+      return false;
+    }
+
+    if (typeof data.timeslice !== "undefined" && data.timeslice !== null) {
+      if (track.timed !== "UNTRUSTED") {
+        info.listener.emitError(info.socket, "Track is not an untrusted timed track yet a timeslice was provided", data);
+        return false;
+      }
+      if (typeof data.timeslice !== "object") {
+        info.listener.emitError(info.socket, "Invalid timeslice provided", data);
+        return false;
+      }
+      if (typeof data.timeslice.start !== "number" || data.timeslice.start < 0 || isNaN((new Date(data.timeslice.start)).getTime())) {
+        info.listener.emitError(info.socket, "Invalid timeslice provided (start is not a number, too large, or less than 0)", data);
+        return false;
+      }
+      if (typeof data.timeslice.end !== "number" || data.timeslice.end < data.timeslice.start || isNaN((new Date(data.timeslice.end)).getTime())) {
+        info.listener.emitError(info.socket, "Invalid timeslice provided (end is not a number, too large, or less than start)", data);
+        return false;
+      }
+    }
+
+    if (typeof data.weight !== "undefined" && data.weight !== null && typeof data.weight !== "number") {
+      info.listener.emitError(info.socket, "Invalid weight provided in analytics request", data);
+      return false;
+    }
+
+    if (data.weight && data.weight !== 1 && !track.clientCanSpecifyWeight) {
+      info.listener.emitError(info.socket, "Weight is not allowed to be specified by the client", data);
+      return false;
+    }
+
+    const assumedWeight = typeof data.weight === "number" ? data.weight : 1;
+    if (!track.weightValidator(assumedWeight)) {
+      info.listener.emitError(info.socket, "Weight validator rejected a weight of " + assumedWeight, data);
+      return false;
+    }
+
+    return true;
+  }
+
   private onAnalyticsHit(
     data: IAnalyticsPayload,
-    userData: IServerSideTokenDataType,
+    info: ICustomListenerInfo,
   ) {
-    
+    if (!this.validateAnalyticPayload(data, info)) {
+      return;
+    }
+
+    const socketAddr = info.socket.handshake.address;
+    const anonymous = !info.userData?.id;
+
+    const track = this.tracks[data.track];
+
+    this.hit(
+      data.track,
+      info.userData?.id || AnalyticsProvider.createUserIdFromIp(socketAddr),
+      {
+        anonymous,
+        context: data.context,
+        upsert: track.clientWillUpsert,
+        weight: typeof data.weight === "number" ? data.weight : 1,
+        data: data.data,
+        timezone: data.timezone,
+        timeSlice: data.timeslice ? {
+          trusted: false,
+          start: new Date(data.timeslice.start),
+          end: new Date(data.timeslice.end),
+        } : null,
+      }
+    )
   }
 
   public initialize(): void {
-    //this.localAppData.listener.addCustomEventListener(ANALYTICS_HIT_REQUEST, this.onAnalyticsHit);
+    this.localAppData.listener.registerCustomEventListener(ANALYTICS_HIT_REQUEST, this.onAnalyticsHit);
   }
 
   public getTrackFor(id: string) {
     return this.tracks[id] || null;
   }
 
-  public static createUserIdFromIp(ipAddr: string) {
-
+  public static createUserIdFromIp(ipAddr: string): string {
+    return makeIdOutOf(ipAddr);
   }
 
   /**
@@ -132,21 +298,20 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
    * @param options.weight the weight that is used to track with, expect a positive integer
    * @param options.upsert it will add a new value or update an existing one
    * @param options.context a secondary reference within the track, this is used for example with urls
-   * @param options.anonymousUser this hit was caused by an anonymous user
    * 
    * @override
    */
   public async hit(track: string, userId: string, options: {
     weight: number;
     context: string;
-    anonymousUser: boolean;
     upsert: boolean;
+    anonymous: boolean;
     data?: any;
+    timezone: string;
     timeSlice?: {
       trusted: boolean;
       start: Date;
-      stop: Date;
-      timezone: string;
+      end: Date;
     }
   }): Promise<void> {
     return null;
@@ -212,8 +377,8 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     if (!trackInfo || trackInfo.timed !== TrackTimedStatus.TRUSTED) {
       const err = new Error(
         trackInfo.timed !== TrackTimedStatus.TRUSTED ?
-        ("The track at " + track + " is not a trusted track") :
-        ("There's no track for " + track)
+          ("The track at " + track + " is not a trusted track") :
+          ("There's no track for " + track)
       );
       this.logError({
         message: err.message,
@@ -270,7 +435,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
    */
   public async stopTrackingTrustedTime(track: string, userId: string, options: {
     context?: string;
-    anonymousUser?: boolean;
+    anonymous?: boolean;
     timezone: string;
     data: any;
   }) {
@@ -305,14 +470,14 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     await this.hit(track, userId, {
       weight: stop.getTime() - value.start.getTime(),
-      anonymousUser: !!options.anonymousUser,
+      anonymous: !!options.anonymous,
       context: options.context,
-      upsert: trackInfo.manyHitsPerUser ? false : true,
+      upsert: trackInfo.clientWillUpsert,
       data: options.data,
+      timezone: options.timezone,
       timeSlice: {
         start: value.start,
-        stop,
-        timezone: options.timezone,
+        end: stop,
         trusted: true,
       },
     });
