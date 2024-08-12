@@ -1,6 +1,7 @@
 import { initializeServer } from "@onzag/itemize/server";
 import { localeReplacer } from "@onzag/itemize/util";
 import { TrackTimedStatus } from "@onzag/itemize/server/services/base/AnalyticsProvider";
+import { genericAnalyticsDataValidator } from "@onzag/itemize/client/components/analytics/util";
 
 // Check the client for info on these, we are replicating what is used in the client somewhat
 import React from "react";
@@ -35,74 +36,88 @@ import { styleCollector } from "@onzag/itemize/client/fast-prototyping/collector
 // outdated apps only exists for that session
 
 initializeServer(
-  {
-    // These are the same as of the client side
-    rendererContext,
-    mainComponent: React.createElement(App, null),
-    mainWrapper,
-    appWrapper,
-    // the style collector which collects style for material UI SSR
-    collector: styleCollector,
-    seoRules: {
-      "/": {
-        crawable: true,
-      },
-      "profile/:id": {
-        crawable: true,
-        collect: {
-          itemOrModule: "users/user",
-        },
-      },
-    },
-    analytics: {
-      // feel free to add many other metrics
-      // these metrics are the default that are used
-      // accross the application in <ItemProvider timeTrackAt="item" />
-      // will work out of the box, and the <LocationTracker at="page" atOffline="page_offline" />
-      // and when performing a signin the trackAt: "conversions" option will allow to track this
-      // as well as the <BasicUserTracker at="basic" />
-      // note that user must have given their consent which is checked
-      // at consent property value of the user for non-anonymous tracks
-      trackers: {
-        // default analytics trackers
-        // tracks user pages and how much time users spend at a given page
-        // online only trusted timer
-        page: {
-          timed: TrackTimedStatus.TRUSTED,
-          allowAnonymous: true,
-          manyHitsPerUser: true,
-          exposed: true,
-        },
-        // tracks user pages and how much time users spend at a given page
-        // including offline times
-        page_offline: {
-          timed: TrackTimedStatus.UNTRUSTED,
-          allowAnonymous: false,
-          manyHitsPerUser: true,
-          exposed: true,
-        },
-        // tracks user engagement with a given item
-        item: {
-          timed: TrackTimedStatus.UNTRUSTED,
-          allowAnonymous: false,
-          manyHitsPerUser: true,
-          exposed: true,
-        },
-        // tracks user conversions that sign in for the first time
-        conversions: {
-          timed: TrackTimedStatus.NO,
-          allowAnonymous: false,
-          manyHitsPerUser: true,
-          exposed: true,
-        },
-        // tracks user's basic information
-        basic: {
-          timed: TrackTimedStatus.NO,
-          allowAnonymous: false,
-          manyHitsPerUser: false,
-          exposed: true,
-        }
-      }
-    }
-  },
+	{
+		// These are the same as of the client side
+		rendererContext,
+		mainComponent: React.createElement(App, null),
+		mainWrapper,
+		appWrapper,
+		// the style collector which collects style for material UI SSR
+		collector: styleCollector,
+		seoRules: {
+			"/": {
+				crawable: true,
+			},
+			"profile/:id": {
+				crawable: true,
+				collect: {
+					itemOrModule: "users/user",
+				},
+			},
+		},
+		analytics: {
+			// feel free to add many other metrics
+			// these metrics are the default that are used
+			// accross the application in <ItemProvider timeTrackAt="item" timeTrackDataFn={genericAnalyticsDataRetriever} />
+			// will work out of the box, and the <LocationTracker at="page" atOffline="page_offline" trackDataFn={genericAnalyticsDataRetriever} />
+			// and when performing a signin the trackAt: "conversions" option will allow to track this
+			// as well as the <BasicUserTracker at="basic" trackDataFn={genericAnalyticsDataRetriever}/>
+			// note that user must have given their consent which is checked
+			// at consent property value of the user for non-anonymous tracks
+			trackers: {
+				// default analytics trackers
+				// tracks user pages and how much time users spend at a given page
+				// online only trusted timer
+				page: {
+					timed: TrackTimedStatus.TRUSTED,
+					allowAnonymous: true,
+					clientMustSpecifyContext: true,
+					clientTrustedTrackingLimit: 2,
+					contextValidator: (context) => {
+						try {
+							new URL("https://test.com" + context);
+						} catch {
+							return false;
+						}
+					},
+					exposed: true,
+					dataValidator: genericAnalyticsDataValidator,
+					clientWillUpsert: false,
+				},
+				// tracks user pages and how much time users spend at a given page
+				// including offline times
+				page_offline: {
+					timed: TrackTimedStatus.UNTRUSTED,
+					allowAnonymous: false,
+					clientMustSpecifyContext: true,
+					contextValidator: (context) => {
+						try {
+							new URL("https://test.com" + context);
+						} catch {
+							return false;
+						}
+					},
+					exposed: true,
+					dataValidator: genericAnalyticsDataValidator,
+					clientWillUpsert: false,
+				},
+				// tracks user engagement with a given item
+				item: {
+					timed: TrackTimedStatus.UNTRUSTED,
+					allowAnonymous: false,
+					dataValidator: genericAnalyticsDataValidator,
+					exposed: true,
+					clientWillUpsert: true,
+				},
+				// tracks user's opening the app
+				basic: {
+					timed: TrackTimedStatus.NO,
+					allowAnonymous: true,
+					clientWillUpsert: false,
+					dataValidator: genericAnalyticsDataValidator,
+					exposed: true,
+				}
+			}
+		}
+	},
 );

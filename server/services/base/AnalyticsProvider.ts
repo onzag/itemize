@@ -63,15 +63,24 @@ export interface ITrackOptions {
   /**
    * All values must have a context specified to them
    */
-  clientMustSpecifyContext: boolean;
+  clientMustSpecifyContext?: boolean;
   /**
    * All values must have a context specified to them
    */
-  clientMustNotSpecifyContext: boolean;
+  clientMustNotSpecifyContext?: boolean;
   /**
    * Whether the user can specify the weight
+   * 
+   * does not hold in timed requests
    */
-  clientCanSpecifyWeight: boolean;
+  clientCanSpecifyWeight?: boolean;
+  /**
+   * the tracking limit for trusted timed tracking
+   * for this track, defaults to 50
+   * 
+   * does not hold in untimed requests
+   */
+  clientTrustedTrackingLimit?: number;
   /**
    * A data validator for the incoming data, if not provided
    * the track is not allowed to have any data from client providers
@@ -79,7 +88,7 @@ export interface ITrackOptions {
    * @param data 
    * @returns 
    */
-  dataValidator?: (data: any) => boolean;
+  dataValidator?: (data: any, userData: IServerSideTokenDataType) => boolean;
   /**
    * Use for validating context
    * 
@@ -104,23 +113,60 @@ export interface ITrackOptions {
 const trackRegex = /^[a-zA-Z0-9_-]+$/;
 const timezoneRegex = /^(?:Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])$/;
 
-// analytics events
-export interface IAnalyticsPayload {
+export interface IAnalyticsTimetrackEndPayload {
+  /**
+   * The track that is to be used
+   */
   track: string;
+  /**
+   * relating context, you can only track onto
+   * one context at a time, including the null
+   * context
+   */
   context?: string;
+}
+
+export interface IAnalyticsTimetrackStartPayload extends IAnalyticsTimetrackEndPayload {
+  /**
+   * data related to the track
+   */
   data?: any;
+  /**
+   * timezone where the event occurs
+   */
   timezone: string;
+}
+
+// analytics events
+export interface IAnalyticsPayload extends IAnalyticsTimetrackStartPayload {
+  /**
+ * weight of the hit, if not provided it counts
+ * as one
+ */
   weight?: number;
+  /**
+   * the time slice that is to be informed
+   */
   timeslice?: {
+    /**
+     * start of slice
+     */
     start: number;
+    /**
+     * end of slice
+     */
     end: number;
   }
 }
 
+/**
+ * @ignore
+ */
+const validProperties = ["track", "context", "data", "timezone", "weight", "timeslice"];
+
 export const ANALYTICS_HIT_REQUEST = "$analytics-hit-request";
 export const ANALYTICS_TIMETRACK_START_REQUEST = "$analytics-timetrack-start";
 export const ANALYTICS_TIMETRACK_END_REQUEST = "$analytics-timetrack-end";
-export const ANALYTICS_TIMETRACK_INFORM_REQUEST = "$analytics-timetrack-inform";
 
 /**
  * The currency factors provider base class is an interface class that should
@@ -132,9 +178,13 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
   private timedTracking: {
     [userId: string]: {
-      [contextId: string]: {
-        start: Date;
-        anonymous: boolean;
+      [trackId: string]: {
+        [contextId: string]: {
+          start: Date;
+          anonymous: boolean;
+          data: any;
+          timezone: string;
+        }
       }
     }
   } = {};
@@ -152,7 +202,8 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
   }
 
   private validateAnalyticPayload(
-    data: IAnalyticsPayload,
+    type: "payload" | "timetrack-start" | "timetrack-end",
+    data: IAnalyticsPayload | IAnalyticsTimetrackStartPayload | IAnalyticsTimetrackEndPayload,
     info: ICustomListenerInfo,
   ): boolean {
     if (typeof data.track !== "string" || !this.tracks[data.track]?.exposed) {
@@ -162,26 +213,38 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     const track = this.tracks[data.track];
 
-    if (typeof data.data !== "undefined" && data.data !== null) {
-      if (typeof data.data !== "object") {
-        info.listener.emitError(info.socket, "Invalid data provided in analytics request", data);
+    if (type === "payload" || type === "timetrack-end") {
+      if (typeof (data as IAnalyticsPayload).data !== "undefined" && (data as IAnalyticsPayload).data !== null) {
+        if (typeof (data as IAnalyticsPayload).data !== "object") {
+          info.listener.emitError(info.socket, "Invalid data provided in analytics request", data);
+          return false;
+        }
+
+        if (!track.dataValidator) {
+          info.listener.emitError(info.socket, "The track in the request does not support data from clients", data);
+          return false;
+        }
+
+        if (!track.dataValidator((data as IAnalyticsPayload).data, info.userData)) {
+          info.listener.emitError(info.socket, "The track has rejected the data", data);
+          return false;
+        }
+      }
+
+      if (typeof (data as IAnalyticsPayload).timezone !== "string" || !timezoneRegex.test((data as IAnalyticsPayload).timezone)) {
+        info.listener.emitError(info.socket, "Invalid timezone provided in analytics request", data);
+        return false;
+      }
+    } else {
+      if (typeof (data as IAnalyticsPayload).data !== "undefined") {
+        info.listener.emitError(info.socket, "Data was provided where it is not supported", data);
         return false;
       }
 
-      if (!track.dataValidator) {
-        info.listener.emitError(info.socket, "The track in the request does not support data from clients", data);
+      if (typeof (data as IAnalyticsPayload).timezone !== "undefined") {
+        info.listener.emitError(info.socket, "Timezone was provided where it is not supported", data);
         return false;
       }
-
-      if (!track.dataValidator(data.data)) {
-        info.listener.emitError(info.socket, "The track has rejected the data", data);
-        return false;
-      }
-    }
-
-    if (typeof data.timezone !== "string" || !timezoneRegex.test(data.timezone)) {
-      info.listener.emitError(info.socket, "Invalid timezone provided in analytics request", data);
-      return false;
     }
 
     if (typeof data.context !== "undefined" && data.context !== null && typeof data.context !== "string") {
@@ -199,6 +262,11 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       return false;
     }
 
+    if (typeof data.context === "string" && data.context === "") {
+      info.listener.emitError(info.socket, "The context cannot be empty string", data);
+      return false;
+    }
+
     if (track.contextValidator && !track.contextValidator(data.context)) {
       info.listener.emitError(info.socket, "The context was rejected by the validator", data);
       return false;
@@ -209,39 +277,69 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       return false;
     }
 
-    if (typeof data.timeslice !== "undefined" && data.timeslice !== null) {
-      if (track.timed !== "UNTRUSTED") {
-        info.listener.emitError(info.socket, "Track is not an untrusted timed track yet a timeslice was provided", data);
-        return false;
+    if (type === "payload") {
+      if (typeof (data as IAnalyticsPayload).timeslice !== "undefined" && (data as IAnalyticsPayload).timeslice !== null) {
+        if (track.timed !== "UNTRUSTED") {
+          info.listener.emitError(info.socket, "Track is not an untrusted timed track yet a timeslice was provided", data);
+          return false;
+        }
+        if (typeof (data as IAnalyticsPayload).timeslice !== "object") {
+          info.listener.emitError(info.socket, "Invalid timeslice provided", data);
+          return false;
+        }
+        if (
+          typeof (data as IAnalyticsPayload).timeslice.start !== "number" ||
+          (
+            data as IAnalyticsPayload).timeslice.start < 0 ||
+          isNaN((new Date((data as IAnalyticsPayload).timeslice.start)).getTime()
+          )
+        ) {
+          info.listener.emitError(info.socket, "Invalid timeslice provided (start is not a number, too large, or less than 0)", data);
+          return false;
+        }
+        if (
+          typeof (data as IAnalyticsPayload).timeslice.end !== "number" ||
+          (
+            data as IAnalyticsPayload).timeslice.end < (data as IAnalyticsPayload).timeslice.start ||
+          isNaN((new Date((data as IAnalyticsPayload).timeslice.end)).getTime()
+          )
+        ) {
+          info.listener.emitError(info.socket, "Invalid timeslice provided (end is not a number, too large, or less than start)", data);
+          return false;
+        }
       }
-      if (typeof data.timeslice !== "object") {
-        info.listener.emitError(info.socket, "Invalid timeslice provided", data);
-        return false;
-      }
-      if (typeof data.timeslice.start !== "number" || data.timeslice.start < 0 || isNaN((new Date(data.timeslice.start)).getTime())) {
-        info.listener.emitError(info.socket, "Invalid timeslice provided (start is not a number, too large, or less than 0)", data);
-        return false;
-      }
-      if (typeof data.timeslice.end !== "number" || data.timeslice.end < data.timeslice.start || isNaN((new Date(data.timeslice.end)).getTime())) {
-        info.listener.emitError(info.socket, "Invalid timeslice provided (end is not a number, too large, or less than start)", data);
+    } else {
+      if (typeof (data as IAnalyticsPayload).timeslice !== "undefined") {
+        info.listener.emitError(info.socket, "Timeslice was provided where it is not supported", data);
         return false;
       }
     }
 
-    if (typeof data.weight !== "undefined" && data.weight !== null && typeof data.weight !== "number") {
-      info.listener.emitError(info.socket, "Invalid weight provided in analytics request", data);
-      return false;
+    if (type === "payload") {
+      if ((data as IAnalyticsPayload).weight && (data as IAnalyticsPayload).weight !== 1 && !track.clientCanSpecifyWeight) {
+        info.listener.emitError(info.socket, "Weight is not allowed to be specified by the client", data);
+        return false;
+      }
+
+      const assumedWeight = typeof (data as IAnalyticsPayload).weight === "number" ? (data as IAnalyticsPayload).weight : 1;
+      if (!track.weightValidator(assumedWeight)) {
+        info.listener.emitError(info.socket, "Weight validator rejected a weight of " + assumedWeight, data);
+        return false;
+      }
+    } else {
+      if (typeof (data as IAnalyticsPayload).weight !== "undefined") {
+        info.listener.emitError(info.socket, "Weight was provided where it is not supported", data);
+        return false;
+      }
     }
 
-    if (data.weight && data.weight !== 1 && !track.clientCanSpecifyWeight) {
-      info.listener.emitError(info.socket, "Weight is not allowed to be specified by the client", data);
-      return false;
-    }
+    const allKeys = Object.keys(data);
 
-    const assumedWeight = typeof data.weight === "number" ? data.weight : 1;
-    if (!track.weightValidator(assumedWeight)) {
-      info.listener.emitError(info.socket, "Weight validator rejected a weight of " + assumedWeight, data);
-      return false;
+    for (const key of allKeys) {
+      if (!validProperties.includes(key)) {
+        info.listener.emitError(info.socket, "unknown property " + JSON.stringify(key), data);
+        return false;
+      }
     }
 
     return true;
@@ -251,7 +349,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     data: IAnalyticsPayload,
     info: ICustomListenerInfo,
   ) {
-    if (!this.validateAnalyticPayload(data, info)) {
+    if (!this.validateAnalyticPayload("payload", data, info)) {
       return;
     }
 
@@ -279,8 +377,81 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     )
   }
 
+  private onAnalyticsTimeTrackStart(
+    data: IAnalyticsTimetrackStartPayload,
+    info: ICustomListenerInfo,
+  ) {
+    if (!this.validateAnalyticPayload("timetrack-start", data, info)) {
+      return;
+    }
+
+    const socketAddr = info.socket.handshake.address;
+    const anonymous = !info.userData?.id;
+
+    try {
+      this.startTrackingTrustedTime(
+        data.track,
+        info.userData?.id || AnalyticsProvider.createUserIdFromIp(socketAddr),
+        {
+          anonymous,
+          context: data.context || null,
+          silent: true,
+          timezone: data.timezone,
+          data: data.data,
+        },
+      );
+    } catch (err) {
+      info.listener.emitError(info.socket, err.message, data);
+    }
+  }
+
+  private onAnalyticsTimeTrackEnd(
+    data: IAnalyticsTimetrackEndPayload,
+    info: ICustomListenerInfo,
+  ) {
+    if (!this.validateAnalyticPayload("timetrack-end", data, info)) {
+      return;
+    }
+
+    const socketAddr = info.socket.handshake.address;
+
+    try {
+      this.stopTrackingTrustedTime(
+        data.track,
+        info.userData?.id || AnalyticsProvider.createUserIdFromIp(socketAddr),
+        {
+          context: data.context || null,
+        },
+      );
+    } catch (err) {
+      info.listener.emitError(info.socket, err.message, data);
+    }
+  }
+
   public initialize(): void {
-    this.localAppData.listener.registerCustomEventListener(ANALYTICS_HIT_REQUEST, this.onAnalyticsHit);
+    this.localAppData.listener.registerCustomEventListener(ANALYTICS_HIT_REQUEST, this.onAnalyticsHit.bind(this));
+    this.localAppData.listener.registerCustomEventListener(ANALYTICS_TIMETRACK_START_REQUEST, this.onAnalyticsTimeTrackStart.bind(this));
+    this.localAppData.listener.registerCustomEventListener(ANALYTICS_TIMETRACK_END_REQUEST, this.onAnalyticsTimeTrackEnd.bind(this));
+    this.localAppData.listener.addCustomDisconnectEventListener((info) => {
+      const socketAddr = info.socket.handshake.address;
+      const userId = info.userData?.id;
+      const anonId = AnalyticsProvider.createUserIdFromIp(socketAddr);
+
+      for (const userIdToUntrack of [userId, anonId]) {
+        if (userIdToUntrack && this.timedTracking[userIdToUntrack]) {
+          const tracksInUser = Object.keys(this.timedTracking[userIdToUntrack]);
+          tracksInUser.forEach((track) => {
+            const contextsBeingTrackedInTrack = Object.keys(this.timedTracking[userIdToUntrack][track]);
+
+            contextsBeingTrackedInTrack.forEach((context) => {
+              this.stopTrackingTrustedTime(track, userIdToUntrack, {
+                context,
+              });
+            });
+          });
+        }
+      }
+    });
   }
 
   public getTrackFor(id: string) {
@@ -350,6 +521,67 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       });
       throw err;
     }
+
+    if (options.clientCanSpecifyWeight && options.timed !== "NO") {
+      const err = new Error("Track is timed yet clientCanSpecifyWeight is true");
+      this.logError({
+        message: err.message,
+        className: "AnalyticsProvider",
+        methodName: "initializeTrack",
+        data: {
+          track,
+          options,
+        },
+        err: err,
+      });
+      throw err;
+    }
+
+    if (options.clientMustNotSpecifyContext && options.clientMustSpecifyContext) {
+      const err = new Error("Track has been defined in a contradictory manner where both clientMustNotSpecifyContext and clientMustSpecifyContext are set");
+      this.logError({
+        message: err.message,
+        className: "AnalyticsProvider",
+        methodName: "initializeTrack",
+        data: {
+          track,
+          options,
+        },
+        err: err,
+      });
+      throw err;
+    }
+
+    if (options.weightValidator && options.timed !== "NO") {
+      const err = new Error("Track is timed yet weightValidator is set");
+      this.logError({
+        message: err.message,
+        className: "AnalyticsProvider",
+        methodName: "initializeTrack",
+        data: {
+          track,
+          options,
+        },
+        err: err,
+      });
+      throw err;
+    }
+
+    if (options.clientTrustedTrackingLimit && options.timed !== "TRUSTED") {
+      const err = new Error("Track is not a trusted timed yet clientTrustedTrackingLimit is set");
+      this.logError({
+        message: err.message,
+        className: "AnalyticsProvider",
+        methodName: "initializeTrack",
+        data: {
+          track,
+          options,
+        },
+        err: err,
+      });
+      throw err;
+    }
+
     await this.createTrackIfNotExist(track, options);
     this.tracks[track] = options;
   }
@@ -370,7 +602,10 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
    */
   public startTrackingTrustedTime(track: string, userId: string, options: {
     context?: string;
-    anonymousUser?: boolean;
+    anonymous?: boolean;
+    silent?: boolean;
+    timezone: string;
+    data?: any;
   }) {
     const trackInfo = this.tracks[track];
 
@@ -380,42 +615,74 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
           ("The track at " + track + " is not a trusted track") :
           ("There's no track for " + track)
       );
-      this.logError({
-        message: err.message,
-        className: "AnalyticsProvider",
-        methodName: "startTrackingTrustedTime",
-        data: {
-          track,
-          userId,
-          options,
-        },
-        err: err,
-      });
+      if (!options.silent) {
+        this.logError({
+          message: err.message,
+          className: "AnalyticsProvider",
+          methodName: "startTrackingTrustedTime",
+          data: {
+            track,
+            userId,
+            options,
+          },
+          err: err,
+        });
+      }
       throw err;
     }
 
     if (!this.timedTracking[userId]) {
       this.timedTracking[userId] = {};
     }
-    if (!this.timedTracking[userId][options.context || ""]) {
-      this.timedTracking[userId][options.context || ""] = {
-        anonymous: options.anonymousUser,
+
+    if (!this.timedTracking[userId][track]) {
+      this.timedTracking[userId][track] = {};
+    }
+
+    const currentTimedTracksForUserInTrack = Object.keys(this.timedTracking[userId][track]).length;
+
+    if (currentTimedTracksForUserInTrack >= (trackInfo.clientTrustedTrackingLimit || 50)) {
+      const message = "Exceeded the security limit of timed tracking requests for the given user at the track";
+      const err = new Error(message);
+      if (!options.silent) {
+        this.logError({
+          message,
+          className: "AnalyticsProvider",
+          methodName: "startTrackingTrustedTime",
+          data: {
+            track,
+            userId,
+            options,
+            currentTimedTracksForUserInTrack,
+          },
+          err: err,
+        });
+      }
+      throw err;
+    } else if (!this.timedTracking[userId][track][options.context || ""]) {
+      this.timedTracking[userId][track][options.context || ""] = {
+        anonymous: options.anonymous,
         start: (new Date()),
+        data: options.data || null,
+        timezone: options.timezone,
       }
     } else {
-      const message = "Attemtped to start tracking trusted time, but the timer was never started, this indicates a potential memory leak";
+      const message = "Attemtped to start tracking trusted time, but the timer has already started, this indicates a potential memory leak";
       const err = new Error(message);
-      this.logError({
-        message,
-        className: "AnalyticsProvider",
-        methodName: "startTrackingTrustedTime",
-        data: {
-          track,
-          userId,
-          options,
-        },
-        err: err,
-      });
+      if (!options.silent) {
+        this.logError({
+          message,
+          className: "AnalyticsProvider",
+          methodName: "startTrackingTrustedTime",
+          data: {
+            track,
+            userId,
+            options,
+          },
+          err: err,
+        });
+      }
+      throw err;
     }
   }
 
@@ -435,12 +702,13 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
    */
   public async stopTrackingTrustedTime(track: string, userId: string, options: {
     context?: string;
-    anonymous?: boolean;
-    timezone: string;
-    data: any;
   }) {
     // no track
-    if (!this.timedTracking[userId] || !this.timedTracking[userId][options.context || ""]) {
+    if (
+      !this.timedTracking[userId] ||
+      !this.timedTracking[userId][track] ||
+      !this.timedTracking[userId][track][options.context || ""]
+    ) {
       const message = "Attemtped to stop tracking trusted time, but the timer was never started, this indicates a potential memory leak";
       const err = new Error(message);
       this.logError({
@@ -457,8 +725,12 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       return;
     }
 
-    const value = this.timedTracking[userId][options.context || ""];
-    delete this.timedTracking[userId][options.context || ""];
+    const value = this.timedTracking[userId][track][options.context || ""];
+    delete this.timedTracking[userId][track][options.context || ""];
+
+    if (Object.keys(this.timedTracking[userId][track]).length === 0) {
+      delete this.timedTracking[userId][track];
+    }
 
     if (Object.keys(this.timedTracking[userId]).length === 0) {
       delete this.timedTracking[userId];
@@ -470,11 +742,11 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     await this.hit(track, userId, {
       weight: stop.getTime() - value.start.getTime(),
-      anonymous: !!options.anonymous,
+      anonymous: !!value.anonymous,
       context: options.context,
       upsert: trackInfo.clientWillUpsert,
-      data: options.data,
-      timezone: options.timezone,
+      data: value.data,
+      timezone: value.timezone,
       timeSlice: {
         start: value.start,
         end: stop,
