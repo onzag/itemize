@@ -15,7 +15,7 @@ import { ISQLTableDefinitionType, ISQLTableRowValue } from "../base/Root/sql";
 import { yesno } from ".";
 import { getSQLTableDefinitionForModule } from "../base/Root/Module/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
-import { getStorageProviders, IServiceCustomizationType } from "../server";
+import { getStorageProvider, IServiceCustomizationType } from "../server";
 import StorageProvider from "../server/services/base/StorageProvider";
 import { RegistryService } from "../server/services/registry";
 import { DatabaseConnection } from "../database";
@@ -70,7 +70,9 @@ export async function copyFilesFor(
         // and a read stream for our local
         const readStream = fs.createReadStream(localFilePath);
         // and we pipe it!
-        await uploadClient.upload(remoteFilePath, readStream, false);
+        // TODOContainerId save must be forceful at a given cluster we need cluster keys or something
+        // to make a 
+        await uploadClient.save(remoteFilePath, readStream);
       }
     }
   } catch {
@@ -108,32 +110,6 @@ export default async function loadDump(configVersion: string, databaseConnection
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
 
-  const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(
-    await fsAsync.readFile(path.join("config", configVersion === "development" ? "redis.sensitive.json" : `redis.${configVersion}.sensitive.json`), "utf8"),
-  );
-
-  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(
-    await fsAsync.readFile(path.join("config", configVersion === "development" ? "db.sensitive.json" : `db.${configVersion}.sensitive.json`), "utf8"),
-  );
-
-  const registry = new RegistryService({
-    databaseConnection,
-    registryTable: REGISTRY_IDENTIFIER,
-  }, null, {
-    config,
-    redisConfig,
-    dbConfig,
-    sensitiveConfig,
-  });
-  await registry.initialize();
-
-  // and the upload containers
-  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, dbConfig, redisConfig, serviceCustom.storageServiceProviders, registry);
-
-  // inform the users
-  console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
-    colors.yellow(Object.keys(cloudClients).join(", ")));
-
   // now we need to find our dump
   let dumpContents: string = null;
   try {
@@ -169,44 +145,40 @@ export default async function loadDump(configVersion: string, databaseConnection
       // inform the user we are loading this row
       console.log("loading dump for: " + row.type + " " + row.id + " " + row.version);
 
-      // this is where we are going to store our files
-      // by default same as the row specifies
-      let targetContainerId: string = row.container_id;
+      // // so if we have a load config
+      // if (dumpConfig.load) {
+      //   // now if our current target container is not in our
+      //   // supported list, and we have a primary container that is
+      //   if (
+      //     !cloudClients[targetContainerId] &&
+      //     dumpConfig.load.primaryContainerId &&
+      //     cloudClients[dumpConfig.load.primaryContainerId]
+      //   ) {
+      //     // use that one
+      //     targetContainerId = dumpConfig.load.primaryContainerId;
+      //   }
 
-      // so if we have a load config
-      if (dumpConfig.load) {
-        // now if our current target container is not in our
-        // supported list, and we have a primary container that is
-        if (
-          !cloudClients[targetContainerId] &&
-          dumpConfig.load.primaryContainerId &&
-          cloudClients[dumpConfig.load.primaryContainerId]
-        ) {
-          // use that one
-          targetContainerId = dumpConfig.load.primaryContainerId;
-        }
+      //   // now let's go to the version mapper which has priority over that
+      //   if (dumpConfig.load.versionMapper && dumpConfig.load.versionMapper[version]) {
+      //     // and we will try to find in the array in order an available container id
+      //     const originalContainerId = targetContainerId;
+      //     targetContainerId = dumpConfig.load.versionMapper[version].find((c) => {
+      //       return !!cloudClients[c];
+      //     }) || originalContainerId;
+      //   }
 
-        // now let's go to the version mapper which has priority over that
-        if (dumpConfig.load.versionMapper && dumpConfig.load.versionMapper[version]) {
-          // and we will try to find in the array in order an available container id
-          const originalContainerId = targetContainerId;
-          targetContainerId = dumpConfig.load.versionMapper[version].find((c) => {
-            return !!cloudClients[c];
-          }) || originalContainerId;
-        }
-
-        // this is the same but for the previous container id
-        if (dumpConfig.load.previousContainerIdMapper && dumpConfig.load.previousContainerIdMapper[row.container_id]) {
-          const originalContainerId = targetContainerId;
-          targetContainerId = dumpConfig.load.previousContainerIdMapper[row.container_id].find((c) => {
-            return !!cloudClients[c];
-          }) || originalContainerId;
-        }
-      }
+      //   // this is the same but for the previous container id
+      //   if (dumpConfig.load.previousContainerIdMapper && dumpConfig.load.previousContainerIdMapper[row.container_id]) {
+      //     const originalContainerId = targetContainerId;
+      //     targetContainerId = dumpConfig.load.previousContainerIdMapper[row.container_id].find((c) => {
+      //       return !!cloudClients[c];
+      //     }) || originalContainerId;
+      //   }
+      // }
 
       // and now we try to see if the row already exists
       const result: ISQLTableRowValue = await databaseConnection.queryFirst(
-        `SELECT "type", "created_by", "created_at", "edited_by", "container_id" FROM ${JSON.stringify(mod.getQualifiedPathName())} ` +
+        `SELECT "type", "created_by", "created_at", "edited_by" FROM ${JSON.stringify(mod.getQualifiedPathName())} ` +
         `WHERE "id" = $1 AND "version" = $2 LIMIT 1`,
         [
           id,
@@ -283,7 +255,7 @@ export default async function loadDump(configVersion: string, databaseConnection
           });
 
           // we change these in the module row, the container always changes to the target
-          moduleRows.container_id = targetContainerId;
+          // moduleRows.container_id = targetContainerId;
           // last modified has to change
           moduleRows.last_modified = [
             "NOW()",
@@ -357,7 +329,7 @@ export default async function loadDump(configVersion: string, databaseConnection
         });
 
         // note the difference, the creator is always uspecified
-        moduleRows.container_id = targetContainerId;
+        // moduleRows.container_id = targetContainerId;
         moduleRows.last_modified = ["NOW()", []];
         moduleRows.created_at = ["NOW()", []];
         moduleRows.created_by = UNSPECIFIED_OWNER;
@@ -397,31 +369,31 @@ export default async function loadDump(configVersion: string, databaseConnection
         const resultRemoteModPath = path.join(hostname, resultModBasePath);
 
         // if there's a container id where this information is already stored
-        if (foundContainerId) {
-          // we got to get that container
-          const client = cloudClients[foundContainerId];
-          // maybe?
-          if (!client) {
-            console.log("Could not retrieve a client for: " + colors.yellow(foundContainerId));
-          } else {
-            // and delete everything in the remote, just in case, as there might be conflicts
-            await client.removeFolder(resultRemoteIdefPath);
-            await client.removeFolder(resultRemoteModPath);
-          }
-        }
+        // if (foundContainerId) {
+        //   // we got to get that container
+        //   const client = cloudClients[foundContainerId];
+        //   // maybe?
+        //   if (!client) {
+        //     console.log("Could not retrieve a client for: " + colors.yellow(foundContainerId));
+        //   } else {
+        //     // and delete everything in the remote, just in case, as there might be conflicts
+        //     await client.removeFolder(resultRemoteIdefPath);
+        //     await client.removeFolder(resultRemoteModPath);
+        //   }
+        // }
 
-        // otherwise we have to store the files
-        if (targetContainerId) {
-          // and now we go in
-          const targetClient = cloudClients[targetContainerId];
-          if (!targetClient) {
-            console.log("Could not retrieve a client for: " + colors.yellow(targetContainerId));
-          } else {
-            // and copy the files
-            await copyFilesFor(targetClient, resultLocalIdefPath, resultRemoteIdefPath);
-            await copyFilesFor(targetClient, resultLocalModPath, resultRemoteModPath);
-          }
-        }
+        // // otherwise we have to store the files
+        // if (targetContainerId) {
+        //   // and now we go in
+        //   const targetClient = cloudClients[targetContainerId];
+        //   if (!targetClient) {
+        //     console.log("Could not retrieve a client for: " + colors.yellow(targetContainerId));
+        //   } else {
+        //     // and copy the files
+        //     await copyFilesFor(targetClient, resultLocalIdefPath, resultRemoteIdefPath);
+        //     await copyFilesFor(targetClient, resultLocalModPath, resultRemoteModPath);
+        //   }
+        // }
       }
     }
 

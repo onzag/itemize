@@ -17,7 +17,6 @@ import {
   validateParentingRules,
   runPolicyCheck,
   splitArgsInRQQuery,
-  validateContainerIdIsReal,
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
   validateCustomId,
@@ -91,8 +90,6 @@ export async function addItemDefinition(
     // check that the user is logged in, for adding, only logged users
     // are valid
     await validateTokenIsntBlocked(appData.cache, tokenData);
-    const containerId: string = resolverArgs.args.container_id;
-    validateContainerIdIsReal(containerId, appData.sensitiveConfig);
 
     // now we must check if we are parenting
     const isParenting = !!(
@@ -523,7 +520,6 @@ export async function addItemDefinition(
         createdBy: finalOwner,
         language: resolverArgs.args.language,
         dictionary,
-        containerId,
         parent: isNowParenting ? {
           id: rqValueToConvert.parent_id as string,
           version: rqValueToConvert.parent_version as string,

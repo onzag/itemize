@@ -519,20 +519,16 @@ function resolveFile(
   config: IConfigRawJSONDataType,
 ): IRQFile {
   const domain = process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
-
-  const containerId: string = (originalState.rqOriginalFlattenedValue &&
-    originalState.rqOriginalFlattenedValue.container_id as string) || null;
-
   const idef = root.registry[originalState.itemDefQualifiedName] as ItemDefinition;
 
   return fileURLAbsoluter(
     domain,
-    config.containersHostnamePrefixes,
+    config.defaultCluster,
+    config.clusterSubdomains,
     file,
     idef,
     originalState.forId,
     originalState.forVersion,
-    containerId,
     include ? idef.getIncludeFor(include) : null,
     idef.getPropertyDefinitionFor(propertyId, true),
     false,

@@ -185,15 +185,6 @@ export interface IPropertyEntryMainHandlerProps<ValueType extends PropertyDefini
    */
   property: PropertyDefinition;
   /**
-   * A current container id where the things are currently stored
-   * this value can be null for new items as it only expresses where things
-   * are "currently" stored not where they will be stored once submit is done
-   * 
-   * Automatically Provided check base.tsx
-   * retrieved from the applied value from the item-definition.tsx context in the given slot
-   */
-  containerId: string;
-  /**
    * The state of the property definition, same as property.getState or property.getStateNoExternalChecking
    * but this value is more efficient to access
    * 

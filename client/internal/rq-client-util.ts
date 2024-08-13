@@ -544,7 +544,6 @@ export function getFieldsAndArgs(
  * to specify a blob this function will do such job
  * @param argumentsForQuery 
  * @param argumentsFoundFilePaths 
- * @param originalContainerIdOfContent 
  * @param itemDefinitionInstance 
  * @param config 
  * @param forId 
@@ -553,7 +552,6 @@ export function getFieldsAndArgs(
 export async function reprocessQueryArgumentsForFiles(
   argumentsForQuery: any,
   argumentsFoundFilePaths: Array<[string, string] | [string]>,
-  originalContainerIdOfContent: string,
   itemDefinitionInstance: ItemDefinition,
   config: IConfigRawJSONDataType,
   forId: string,
@@ -571,7 +569,6 @@ export async function reprocessQueryArgumentsForFiles(
         // and reprocess the value
         argumentsForQuery[path[0]][path[1]] = await reprocessFileArgument(argumentsForQuery[path[0]][path[1]], {
           config: config,
-          containerId: originalContainerIdOfContent,
           forId: forId || null,
           forVersion: forVersion || null,
           include,
@@ -582,7 +579,6 @@ export async function reprocessQueryArgumentsForFiles(
         // and for standard raw properties
         argumentsForQuery[path[0]] = await reprocessFileArgument(argumentsForQuery[path[0]], {
           config: config,
-          containerId: originalContainerIdOfContent,
           forId: forId || null,
           forVersion: forVersion || null,
           include: null,
@@ -613,7 +609,6 @@ export async function reprocessFileArgument(
     property: PropertyDefinition;
     forId: string;
     forVersion: string;
-    containerId: string;
   }
 ): Promise<IRQFile | IRQFile[]> {
   // for array we recurse as an array
@@ -635,12 +630,12 @@ export async function reprocessFileArgument(
   const domain = process.env.NODE_ENV === "production" ? options.config.productionHostname : options.config.developmentHostname;
   const absolutedFile = fileURLAbsoluter(
     domain,
-    options.config.containersHostnamePrefixes,
+    options.config.defaultCluster,
+    options.config.clusterSubdomains,
     files,
     options.itemDefinition,
     options.forId,
     options.forVersion,
-    options.containerId,
     options.include,
     options.property,
     false,
@@ -1172,7 +1167,6 @@ export function getAddQueryFor(
     cacheStore: boolean,
     forId: string,
     forVersion: string,
-    containerId: string,
     waitAndMerge?: boolean,
   },
 ): RQQueryBuilder {
@@ -1189,8 +1183,6 @@ export function getAddQueryFor(
   if (arg.forVersion) {
     args.version = arg.forVersion;
   }
-
-  args.container_id = arg.containerId;
 
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
   const query = buildRQMutation(rqSchema, {
@@ -1302,9 +1294,6 @@ function preserveBlobFilesInValue(
  * @param arg.cacheStore whether to store the results of the addition process as a get query
  * @param arg.forId a for id is used along forVersion to create a new version for the given id
  * @param arg.forVersion a for version is used to start versioning the query element
- * @param arg.containerId the container id to use for storage, should be calculated by the client
- * as long as it's valid the server comply; the container id should depend on the location of
- * the user
  * @returns a promise with an error, the fields that can be used to retrieve the same value in a get
  * query, and the value that was retrieved
  */
@@ -1319,7 +1308,6 @@ export async function runAddQueryFor(
     cacheStore: boolean,
     forId: string,
     forVersion: string,
-    containerId: string,
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
   },

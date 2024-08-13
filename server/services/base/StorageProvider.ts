@@ -1,34 +1,10 @@
 import type { ReadStream } from "fs";
 import type { Readable } from "stream";
-import { IServiceProviderClassType, ServiceProvider, ServiceProviderType } from "..";
-import { RegistryService } from "../registry";
-
-export interface IStorageProvidersObject {
-  [id: string]: StorageProvider<any>,
-}
+import { ServiceProvider, ServiceProviderType } from "..";
 
 export default class StorageProvider<T> extends ServiceProvider<T> {
   public static getType() {
     return ServiceProviderType.NONE;
-  }
-
-  public prefix: string;
-  public id: string;
-
-  public setPrefix(prefix: string) {
-    this.prefix = prefix;
-  }
-
-  public setId(id: string) {
-    this.id = id;
-  }
-
-  public getPrefix() {
-    return this.prefix;
-  }
-
-  public getId() {
-    return this.id;
   }
 
   /**
@@ -39,11 +15,9 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * 
    * @param at the remote file to use
    * @param readStream the stream to read from
-   * @param mustBeVerified a boolean that specifies whether the resouce must
-   * be verified and return a 200 when requested
    * @override
    */
-  public async upload(at: string, readStream: ReadStream | Readable, mustBeVerified: boolean): Promise<void> {
+  public async save(at: string, readStream: ReadStream | Readable): Promise<void> {
 
   }
 
@@ -53,7 +27,17 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param at the remote file to download
    * @override
    */
-  public download(at: string): ReadStream {
+  public read(at: string): ReadStream {
+    return null;
+  }
+
+  /**
+   * This function is necessary for downloading a file
+   * 
+   * @param url the remote file to download
+   * @override
+   */
+  public readRemote(url: string): ReadStream {
     return null;
   }
 
@@ -71,7 +55,19 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
   }
 
   /**
-   * It's executed to verify whether a given remote resource
+   * This function is executed for removing folders
+   * in other providers
+   * 
+   * NECESSARY FOR CORE ITEMIZE TO FUNCTION
+   * 
+   * @param url 
+   */
+  public async removeRemoteFolder(url: string): Promise<void> {
+
+  }
+
+  /**
+   * It's executed to verify whether a given resource
    * exists
    * 
    * NECESSARY FOR CORE ITEMIZE TO FUNCTION
@@ -79,24 +75,23 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param at the resource to check for
    * @override
    */
-   public async exists(at: string): Promise<boolean> {
+  public async exists(at: string): Promise<boolean> {
     return false;
   }
 
   /**
-   * This function is executed once an entire folder
-   * is requested to be downloaded locally in the given
-   * local path
+   * It's executed to verify whether a given resource
+   * exists
    * 
-   * NECESSARY FOR DUMPING TO FUNCTION
+   * NECESSARY FOR CORE ITEMIZE TO FUNCTION
    * 
-   * @param remotePath the remote path
-   * @param localPath the local path
+   * @param url the resource to check for
    * @override
    */
-  public async dumpFolder(remotePath: string, localPath: string): Promise<void> {
-
+  public async existsRemote(url: string): Promise<boolean> {
+    return false;
   }
+
 
   /**
    * Should copy a folder from one container to another target container, note that during
@@ -106,22 +101,23 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * 
    * @param remotePath 
    * @param targetPath 
-   * @param target
    * @override
    */
-  public async copyFolder(remotePath: string, targetPath: string, target: StorageProvider<any>) {
+  public async copyFile(sourcePath: string, targetPath: string) {
 
   }
 
   /**
-   * It's executed to read files
+   * Should copy a folder from one container to another target container, note that during
+   * calls the target container may be itself, optimize if necessary for such calls
    * 
-   * NECESSARY FOR SEO TO FUNCTION
+   * NECESSARY FOR ITEMIZE CDN TO FUNCTION
    * 
-   * @param at the file to read
+   * @param sourceUrl 
+   * @param targetPath 
    * @override
    */
-  public async read(at: string): Promise<string> {
-    return "";
+  public async copyRemoteFile(sourceUrl: string, targetPath: string) {
+
   }
 }

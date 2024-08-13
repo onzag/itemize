@@ -12,24 +12,25 @@ import {
   UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES_RQ, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY
 } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../base/Root/sql";
-import { IRQSearchRecord, IRQArgs, IRQValue } from "../rq-querier";
+import { IRQSearchRecord, IRQArgs, IRQValue, IRQFile } from "../rq-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
 import { convertRQValueToSQLValueForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertRQValueToSQLValueForModule } from "../base/Root/Module/sql";
-import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
+import { deleteEveryPossibleFileFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
 import { IServerDataType, IAppDataType } from ".";
 import { logger } from "./logger";
 import { jwtSign } from "./token";
-import { ISensitiveConfigRawJSONDataType } from "../config";
-import { IStorageProvidersObject } from "./services/base/StorageProvider";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
+import StorageProvider from "./services/base/StorageProvider";
 import { ItemizeRedisClient } from "./redis";
 import Module from "../base/Root/Module";
+import Include from "../base/Root/Module/ItemDefinition/Include";
 import { DatabaseConnection } from "../database";
 import { IManyValueType } from "../database/base";
 import { WithBuilder } from "../database/WithBuilder";
@@ -40,6 +41,8 @@ import type PropertyDefinition from "../base/Root/Module/ItemDefinition/Property
 
 import {
   CAN_LOG_DEBUG,
+  CLUSTER_ID,
+  NODE_ENV,
 } from "./environment";
 import type { ItemizeElasticClient } from "./elastic";
 import type { ItemizeRawDB } from "./raw-db";
@@ -118,7 +121,6 @@ export interface ICreationOptions extends IWritingOptions {
   createdBy?: string;
   language: string;
   dictionary: string;
-  containerId: string;
   parent?: {
     id: string,
     version: string,
@@ -129,7 +131,6 @@ export interface ICreationOptions extends IWritingOptions {
 export interface ICopyOptions<T = ISQLTableRowValue> extends IWritingOptions {
   targetId?: string;
   targetVersion?: string;
-  targetContainerId?: string;
   targetCreatedBy?: string;
   targetParent?: {
     id: string;
@@ -146,7 +147,6 @@ export interface IUpdateOptions extends IBasicOptions {
   editedBy?: string;
   language: string;
   dictionary: string;
-  containerId?: string;
   reparent?: {
     id: string,
     version: string,
@@ -217,11 +217,12 @@ export class Cache {
   private databaseConnection: DatabaseConnection;
   private elastic: ItemizeElasticClient;
   private domain: string;
-  private storageClients: IStorageProvidersObject;
+  private storageClient: StorageProvider<any>;
   private root: Root;
   private serverData: IServerDataType;
   private listener: Listener;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  private config: IConfigRawJSONDataType;
 
   /**
    * The memory cache is used to hold a value for a certain amount
@@ -268,7 +269,8 @@ export class Cache {
     databaseConnection: DatabaseConnection,
     elastic: ItemizeElasticClient,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
-    storageClients: IStorageProvidersObject,
+    config: IConfigRawJSONDataType,
+    storageClient: StorageProvider<any>,
     domain: string,
     root: Root,
     initialServerData: IServerDataType
@@ -277,9 +279,10 @@ export class Cache {
     this.elastic = elastic;
     this.databaseConnection = databaseConnection;
     this.root = root;
-    this.storageClients = storageClients;
+    this.storageClient = storageClient;
     this.serverData = initialServerData;
     this.sensitiveConfig = sensitiveConfig;
+    this.config = config;
     this.domain = domain;
 
     // we inform of new server data here in the cache
@@ -1181,8 +1184,6 @@ export class Cache {
       }));
     }
 
-    const containerExists = options.containerId && this.storageClients[options.containerId];
-
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready
     const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertRQValueToSQLValueForItemDefinition(
@@ -1191,7 +1192,7 @@ export class Cache {
       itemDefinition,
       rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
-      containerExists ? this.storageClients[options.containerId] : null,
+      this.storageClient,
       this.domain,
       // if this is a copy that is passing a SQL value and not specifying a language
       // then use what is found in the sql row and copy it
@@ -1204,7 +1205,7 @@ export class Cache {
       itemDefinition.getParentModule(),
       rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
-      containerExists ? this.storageClients[options.containerId] : null,
+      this.storageClient,
       this.domain,
       options.language ? options.language : (isSQLType ? value as ISQLTableRowValue : null),
       options.dictionary ? options.dictionary : (isSQLType ? value as ISQLTableRowValue : null),
@@ -1226,7 +1227,6 @@ export class Cache {
     ];
     sqlModData.created_by = options.createdBy || UNSPECIFIED_OWNER;
     sqlModData.version = options.version || "";
-    sqlModData.container_id = options.containerId;
 
     if (!options.forId && options.version) {
       throw new EndpointError({
@@ -1651,20 +1651,104 @@ export class Cache {
       ...options.targetOverrides,
     } : currentValueSrc;
 
-    const allModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${id}.${version || ""}`;
-    const allItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${id}.${version || ""}`;
-
-    const currentContainerId = (valueToStore as ISQLTableRowValue).container_id;
-    const currentStorageClient = this.storageClients[currentContainerId];
-    const targetStorageClient = this.storageClients[options.targetContainerId || currentContainerId];
-
-    const hasModuleFiles = await currentStorageClient.exists(allModuleFilesLocation);
-    const hasIdefFiles = await currentStorageClient.exists(allItemFilesLocation);
-
-    let storedModuleFiles = false;
-    let storedIdefFiles = false;
-    let targetModuleFilesLocation: string;
-    let targetItemFilesLocation: string;
+    let copiedAtLeastOneFile = false;
+    const collectedFiles: Array<{
+      file: IRQFile, url: string, local: boolean, localpath: string,
+      pref: PropertyDefinition, include: Include
+    }> = [];
+    itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((propDef) => {
+      const desc = propDef.getPropertyDefinitionDescription();
+      if (desc.rqRepresentsFile) {
+        const propertyLocationId = propDef.getId();
+        if (!currentValueSrc[propertyLocationId]) {
+          return;
+        }
+        try {
+          const parsedValue = JSON.parse(currentValueSrc[propertyLocationId]);
+          if (desc.rq.array) {
+            parsedValue.forEach((v) => {
+              collectedFiles.push({
+                file: v,
+                pref: propDef,
+                include: null,
+                ...resolveFileForCopying(v, this.config, id, version, itemDefinition, null, propDef),
+              });
+            })
+          } else {
+            collectedFiles.push({
+              file: parsedValue,
+              pref: propDef,
+              include: null,
+              ...resolveFileForCopying(parsedValue, this.config, id, version, itemDefinition, null, propDef),
+            });
+          }
+        } catch (err) {
+          logger.error(
+            {
+              className: "Cache",
+              methodName: "requestCopy",
+              message: "Could not copy value due to missing/corrupted file information at " + id,
+              err: err,
+              data: {
+                propertyId: id,
+                id,
+                version,
+                item: itemDefinition.getQualifiedPathName(),
+              },
+            }
+          );
+          throw err;
+        }
+      }
+    });
+    itemDefinition.getAllIncludes().forEach((include) => {
+      include.getSinkingProperties().forEach((propDef) => {
+        const desc = propDef.getPropertyDefinitionDescription();
+        if (desc.rqRepresentsFile) {
+          const propertyLocationId = include.getPrefixedQualifiedIdentifier() + propDef.getId();
+          if (!currentValueSrc[propertyLocationId]) {
+            return;
+          }
+          try {
+            const parsedValue = JSON.parse(currentValueSrc[propertyLocationId]);
+            if (desc.rq.array) {
+              parsedValue.forEach((v) => {
+                collectedFiles.push({
+                  file: v,
+                  pref: propDef,
+                  include,
+                  ...resolveFileForCopying(v, this.config, id, version, itemDefinition, include, propDef),
+                });
+              })
+            } else {
+              collectedFiles.push({
+                file: parsedValue,
+                pref: propDef,
+                include,
+                ...resolveFileForCopying(parsedValue, this.config, id, version, itemDefinition, include, propDef),
+              });
+            }
+          } catch (err) {
+            logger.error(
+              {
+                className: "Cache",
+                methodName: "requestCopy",
+                message: "Could not copy value due to missing/corrupted file information at " + id,
+                err: err,
+                data: {
+                  include: include.getId(),
+                  propertyId: id,
+                  id,
+                  version,
+                  item: itemDefinition.getQualifiedPathName(),
+                },
+              }
+            );
+            throw err;
+          }
+        }
+      });
+    });
 
     try {
       const value = await this.requestCreation(
@@ -1672,7 +1756,6 @@ export class Cache {
         valueToStore,
         {
           ...options,
-          containerId: options.targetContainerId || currentContainerId,
           dictionary: null,
           language: null,
           forId: options.targetId,
@@ -1686,64 +1769,46 @@ export class Cache {
         },
       );
 
-      targetModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${value.id}.${value.version || ""}`;
-      targetItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${value.id}.${value.version || ""}`;
+      await Promise.all(collectedFiles.map(async (collectedFile) => {
+        const targetPath = resolveFileTargetForCopying(
+          collectedFile.file,
+          value.id,
+          value.version,
+          itemDefinition,
+          collectedFile.include,
+          collectedFile.pref,
+        );
 
-      if (hasModuleFiles) {
-        await currentStorageClient.copyFolder(allModuleFilesLocation, targetModuleFilesLocation, targetStorageClient);
-        storedModuleFiles = true;
-      }
-
-      if (hasIdefFiles) {
-        await currentStorageClient.copyFolder(allItemFilesLocation, targetItemFilesLocation, targetStorageClient);
-        storedIdefFiles = true;
-      }
+        try {
+          if (collectedFile.local) {
+            await this.storageClient.copyFile(collectedFile.localpath, targetPath);
+            copiedAtLeastOneFile = true;
+          } else {
+            await this.storageClient.copyRemoteFile(collectedFile.url, targetPath);
+            copiedAtLeastOneFile = true;
+          }
+        } catch (err) {
+          logger.error(
+            {
+              className: "Cache",
+              methodName: "requestCopy",
+              message: "Failed to copy a file, proceeded silently but the user will experience errors",
+              serious: true,
+              err,
+              data: {
+                id,
+                version,
+                targetId: options.targetId,
+                targetVersion: options.targetVersion,
+                item: itemDefinition.getQualifiedPathName(),
+              },
+            }
+          );
+        }
+      }));
 
       return value as T;
     } catch (err) {
-      if (storedModuleFiles) {
-        (async () => {
-          try {
-            await targetStorageClient.removeFolder(targetModuleFilesLocation);
-          } catch (err2) {
-            logger.error(
-              {
-                className: "Cache",
-                methodName: "requestCopy",
-                message: "Could not remove orphaned folder",
-                orphan: true,
-                err: err2,
-                data: {
-                  targetModuleFilesLocation,
-                  targetContainerId: options.targetContainerId,
-                },
-              }
-            );
-          }
-        })();
-      }
-
-      if (storedIdefFiles) {
-        (async () => {
-          try {
-            await targetStorageClient.removeFolder(targetItemFilesLocation);
-          } catch (err2) {
-            logger.error(
-              {
-                className: "Cache",
-                methodName: "requestCopy",
-                message: "Could not remove orphaned folder",
-                orphan: true,
-                err: err2,
-                data: {
-                  targetItemFilesLocation,
-                  targetContainerId: options.targetContainerId,
-                },
-              }
-            );
-          }
-        })();
-      }
 
       logger.error(
         {
@@ -1753,13 +1818,11 @@ export class Cache {
           serious: true,
           err,
           data: {
-            targetItemFilesLocation,
-            targetModuleFilesLocation,
-            targetContainerId: options.targetContainerId,
             id,
             version,
             targetId: options.targetId,
             targetVersion: options.targetVersion,
+            item: itemDefinition.getQualifiedPathName(),
           },
         }
       );
@@ -1895,8 +1958,7 @@ export class Cache {
         className: "Cache",
         methodName: "requestUpdate",
         message: "Requesting update for " + selfTable + " at module " +
-          moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + options.dictionary + " and " +
-          "container id " + options.containerId,
+          moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + options.dictionary
       },
     );
 
@@ -1966,8 +2028,6 @@ export class Cache {
       }
     });
 
-    const containerExists = options.containerId && this.storageClients[options.containerId];
-
     // and we now build both queries for updating
     // we are telling by setting the partialFields variable
     // that we only want the editingFields to be returned
@@ -1979,7 +2039,7 @@ export class Cache {
       itemDefinition,
       update,
       currentValueAsRQ,
-      containerExists ? this.storageClients[options.containerId] : null,
+      this.storageClient,
       this.domain,
       options.language,
       options.dictionary,
@@ -1991,7 +2051,7 @@ export class Cache {
       itemDefinition.getParentModule(),
       update,
       currentValueAsRQ,
-      containerExists ? this.storageClients[options.containerId] : null,
+      this.storageClient,
       this.domain,
       options.language,
       options.dictionary,
@@ -2594,7 +2654,7 @@ export class Cache {
         let results: ISQLTableRowValue[];
         try {
           results = await this.databaseConnection.queryRows(
-            `SELECT "id", "version", "type", "container_id" FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` +
+            `SELECT "id", "version", "type" FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` +
             `parent_id = $1 AND parent_version = $2 AND parent_type = $3`,
             [
               id,
@@ -2721,7 +2781,7 @@ export class Cache {
     // this helper function will allow us to delete all the files
     // for a given version, if we are dropping all version this is useful
     // we want to delete files
-    const deleteFilesInContainer = async (containerId: string, specifiedVersion: string) => {
+    const deleteAllPotentialFilesForItem = async (specifiedVersion: string) => {
       // first we need to find if we have any file type in either the property
       // definitions of the prop extensions, any will do
       const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
@@ -2729,48 +2789,30 @@ export class Cache {
       const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
         .some((pdef) => pdef.getPropertyDefinitionDescription().rqRepresentsFile);
 
-      const containerExists = this.storageClients && this.storageClients[containerId];
-
       // for item definition found files
       if (someFilesInItemDef) {
-        // we need to ensure the container exists and is some value
-        if (containerExists) {
-          // and now we can try to delete everything in there
-          // for our given domain and with the handle mysite.com/MOD_x__IDEF_y/id.version
-          // that will delete literally everything for the given id.version combo
-          try {
-            await deleteEverythingInFilesContainerId(
-              this.domain,
-              this.storageClients[containerId],
-              itemDefinition,
-              id + "." + (specifiedVersion || null),
-            );
-          } catch (err) {
-            logger.error(
-              {
-                className: "Cache",
-                methodName: "requestDelete",
-                message: "Could not remove all the files for item definition storage",
-                serious: true,
-                err,
-                data: {
-                  domain: this.domain,
-                  containerId,
-                  itemDefinition: itemDefinition.getQualifiedPathName(),
-                  id,
-                  version: specifiedVersion || null,
-                },
-              }
-            );
-          }
-        } else {
+        try {
+          await deleteEveryPossibleFileFor(
+            this.domain,
+            this.config.clusterSubdomains,
+            this.storageClient,
+            itemDefinition,
+            id + "." + (specifiedVersion || null),
+          );
+        } catch (err) {
           logger.error(
             {
               className: "Cache",
               methodName: "requestDelete",
-              message: "Item for " + selfTable + " contains a file field but no container id for data storage is available",
+              message: "Could not remove all the files for item definition storage",
+              serious: true,
+              orphan: true,
+              err,
               data: {
-                containerId,
+                domain: this.domain,
+                itemDefinition: itemDefinition.getQualifiedPathName(),
+                id,
+                version: specifiedVersion || null,
               },
             }
           );
@@ -2779,40 +2821,28 @@ export class Cache {
 
       // this is doing exactly the same but for the module
       if (someFilesInModule) {
-        if (containerExists) {
-          try {
-            await deleteEverythingInFilesContainerId(
-              this.domain,
-              this.storageClients[containerId],
-              itemDefinition.getParentModule(),
-              id + "." + (specifiedVersion || null),
-            );
-          } catch (err) {
-            logger.error(
-              {
-                className: "Cache",
-                methodName: "requestDelete",
-                message: "Could not remove all the files for module storage",
-                serious: true,
-                err,
-                data: {
-                  domain: this.domain,
-                  containerId,
-                  module: itemDefinition.getParentModule().getQualifiedPathName(),
-                  id,
-                  version: specifiedVersion || null,
-                },
-              }
-            );
-          }
-        } else {
+        try {
+          await deleteEveryPossibleFileFor(
+            this.domain,
+            this.config.clusterSubdomains,
+            this.storageClient,
+            itemDefinition.getParentModule(),
+            id + "." + (specifiedVersion || null),
+          );
+        } catch (err) {
           logger.error(
             {
               className: "Cache",
               methodName: "requestDelete",
-              message: "Item for " + selfTable + " at module contains a file field but no container id for data storage is available",
+              message: "Could not remove all the files for module storage",
+              serious: true,
+              orphan: true,
+              err,
               data: {
-                containerId,
+                domain: this.domain,
+                module: itemDefinition.getParentModule().getQualifiedPathName(),
+                id,
+                version: specifiedVersion || null,
               },
             }
           );
@@ -2881,7 +2911,7 @@ export class Cache {
           options.listenerUUID || null,
         );
         // we don't await for this delete to happen
-        deleteFilesInContainer(row.container_id, record.version);
+        deleteAllPotentialFilesForItem(record.version);
       } catch (err) {
         logger.error(
           {
@@ -2953,7 +2983,7 @@ export class Cache {
       // as for the module, this is always going to be retrieved
       const returningElementsModule = needSideEffects ?
         "*" :
-        `"id","version","parent_id","parent_type","parent_version","container_id","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
+        `"id","version","parent_id","parent_type","parent_version","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
 
       // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
@@ -3842,5 +3872,70 @@ export class Cache {
     // is happening in a transaction that we just hooked into, so we gotta consume the events
     // later on once we have succeeded
     return newRawDB;
+  }
+}
+
+/**
+ * @ignore
+ */
+function resolveFileTargetForCopying(
+  file: IRQFile,
+  id: string,
+  version: string,
+  itemDefinition: ItemDefinition,
+  include: Include,
+  property: PropertyDefinition,
+) {
+  return (
+    property.isExtension() ?
+      itemDefinition.getParentModule().getQualifiedPathName() :
+      itemDefinition.getQualifiedPathName()
+  ) + "/" +
+    id + "." + (version || "") + "/" +
+    (include ? include.getId() + "/" : "") +
+    property.getId() + "/" +
+    file.id + "/" + file.url;
+}
+
+/**
+ * @ignore
+ */
+function resolveFileForCopying(
+  file: IRQFile,
+  config: IConfigRawJSONDataType,
+  id: string,
+  version: string,
+  itemDefinition: ItemDefinition,
+  include: Include,
+  property: PropertyDefinition,
+) {
+  const clusterID = file.cluster || config.defaultCluster;
+  const localpath = (
+    property.isExtension() ?
+      itemDefinition.getParentModule().getQualifiedPathName() :
+      itemDefinition.getQualifiedPathName()
+  ) + "/" +
+    id + "." + (version || "") + "/" +
+    (include ? include.getId() + "/" : "") +
+    property.getId() + "/" +
+    file.id + "/" + file.url;
+
+  if (clusterID === CLUSTER_ID) {
+    return {
+      local: true,
+      url: null as string,
+      localpath,
+    };
+  }
+
+  // TODOContainerId
+
+  const domain = NODE_ENV === "development" ? config.developmentHostname : config.productionHostname;
+  const url = "https://" + config.clusterSubdomains[clusterID] + "." + domain + "/rest/uploads/_/" + localpath;
+
+  return {
+    local: false,
+    localpath,
+    url,
   }
 }

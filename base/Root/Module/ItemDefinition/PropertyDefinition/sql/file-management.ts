@@ -20,7 +20,8 @@ import { logger } from "../../../../../../server/logger";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 import {
-  CAN_LOG_DEBUG
+  CAN_LOG_DEBUG,
+  CLUSTER_ID
 } from "../../../../../../server/environment";
 
 /**
@@ -221,7 +222,7 @@ function processOneFileAndItsSameIDReplacement(
             const includeLocationPath = include ?
               path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
             const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
-            const fileLocationPath = path.join(domain, propertyLocationPath, oldVersion.id);
+            const fileLocationPath = path.join(propertyLocationPath, oldVersion.id);
             try {
               await uploadsClient.removeFolder(fileLocationPath);
             } catch (err) {
@@ -263,17 +264,19 @@ function processOneFileAndItsSameIDReplacement(
         value: {
           ...newVersionWithoutSrc,
           url: "",
+          cluster: CLUSTER_ID,
         },
         consumeStreams: () => null,
       };
     }
 
     // otherwise if we had an old value, we reject
-    // any url change, and use the old url
+    // any url and cluster change, and use the old url
     return {
       value: {
         ...newVersionWithoutSrc,
         url: oldVersion.url,
+        cluster: oldVersion.cluster,
       },
       consumeStreams: () => null,
     };
@@ -288,6 +291,7 @@ function processOneFileAndItsSameIDReplacement(
       value: {
         ...newVersionWithoutSrc,
         url: oldVersion.url,
+        cluster: oldVersion.cluster,
       },
       consumeStreams: () => null,
     };
@@ -298,6 +302,7 @@ function processOneFileAndItsSameIDReplacement(
   const value = {
     ...newVersionWithoutSrc,
     url: curatedFileName,
+    cluster: CLUSTER_ID,
   };
 
   // now we check if it's an image
@@ -339,6 +344,7 @@ function processOneFileAndItsSameIDReplacement(
   const valueWithStream = {
     ...newVersion,
     url: curatedFileName,
+    cluster: CLUSTER_ID,
   };
   return {
     value,
@@ -382,23 +388,33 @@ function processOneFileAndItsSameIDReplacement(
 /**
  * Deletes the folder that contains all
  * the file data
- * @param domain the domain we are working with
  * @param uploadsClient the uploads client
  * @param itemDefinitionOrModule the item definition or module in question
  * @param idVersionId the transitory id to drop
  * @returns a void promise from when this is done
  */
-export function deleteEverythingInFilesContainerId(
+export async function deleteEveryPossibleFileFor(
   domain: string,
+  clusterSubdomains: {[key: string]: string},
   uploadsClient: StorageProvider<any>,
   itemDefinitionOrModule: ItemDefinition | Module,
   idVersionId: string,
 ): Promise<void> {
   // find the transitory location path
   const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
-  const filesContainerPath = path.join(domain, idefOrModLocationPath, idVersionId);
+  const filesContainerPath = path.join(idefOrModLocationPath, idVersionId);
 
-  return uploadsClient.removeFolder(filesContainerPath);
+  await uploadsClient.removeFolder(filesContainerPath);
+  await Promise.all(Object.keys(clusterSubdomains).map(async (clusterId) => {
+    if (clusterId === CLUSTER_ID) {
+      return;
+    }
+
+    await uploadsClient.removeRemoteFolder(
+      "https://" + (clusterSubdomains[clusterId] ? clusterSubdomains[clusterId] + "." : "") +
+      domain + "/" + filesContainerPath
+    );
+  }));
 }
 
 /**
@@ -484,5 +500,5 @@ export async function sqlUploadPipeFile(
     data: { path: finalLocation },
   });
 
-  await uploadsClient.upload(finalLocation, readStream, true);
+  await uploadsClient.save(finalLocation, readStream);
 }

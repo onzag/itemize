@@ -516,14 +516,13 @@ export function parseDateTime(datetime: string) {
 /**
  * Converts a file to its absolute URL counterpart
  * @param domain the domain that is being used according to the env
- * @param containerHostnamePrefixes the containers hostnames prefixes that allow
+ * @param clusterPrefixes the containers hostnames prefixes that allow
  * to identify the url prefix to access a given container
  * @param file the file to convert
  * @param itemDefinition the item definition this file is in and stored as, it is required even
  * for prop extensions, because every stored value has an item definition attached to it
  * @param id the id
  * @param version the version
- * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
  * @param cacheable whether the resulting url should be cached
@@ -531,14 +530,14 @@ export function parseDateTime(datetime: string) {
  */
 export function fileURLAbsoluter(
   domain: string,
-  containerHostnamePrefixes: {
+  defaultCluster: string,
+  clusterSubdomains: {
     [key: string]: string,
   },
   file: IRQFile,
   itemDefinition: ItemDefinition,
   id: string,
   version: string,
-  containerId: string,
   include: Include,
   property: PropertyDefinition,
   cacheable: boolean,
@@ -556,33 +555,26 @@ export function fileURLAbsoluter(
     return file;
   }
 
-  if (!containerId) {
-    console.warn("fileURLAbsoluter: no container id specified");
+  if (!file.cluster) {
+    console.warn("fileURLAbsoluter: file with id: " + file.id + " and url " + file.url +
+        " has no cluster, using default " + JSON.stringify(defaultCluster) + " as fallback");
+  }
+
+  const clusterID = file.cluster || defaultCluster;
+
+  let subdomain: string = clusterSubdomains[clusterID];
+  if (typeof subdomain !== "string") {
+    console.warn("fileURLAbsoluter: there's no cluster subdomain for cluster " + file.cluster);
     return null;
   }
 
-  let prefix: string = containerHostnamePrefixes[containerId];
-  if (!prefix) {
-    console.warn("fileURLAbsoluter: there's no container prefix for container id: " + containerId);
-    return null;
-  }
-
-  // if it doesn't end in / this means we need to add it
-  if (prefix[prefix.length - 1] !== "/") {
-    prefix += "/";
-  }
-  // and now we add the domain /mysite.com/ where all the data shall be stored for
-  // that container
-  prefix += domain + "/";
-  // if it doesn't start with /, which means it's not a local url but its own domain eg. container.com/KEY/mysite.com/
-  // we want to add https to it
-  if (prefix.indexOf("/") !== 0) {
-    prefix = "https://" + prefix;
-  }
+  // the subdomain is not used because this works like a CDN
+  // unless forceFullURLs is used otherwise urls are always relative and give
+  // the clusterId where the file was stored
+  let prefix = `${subdomain && forceFullURLs ? "https://" + subdomain + "." + domain : ""}/rest/uploads/${clusterID}/`;
 
   // now here we have a local url but we are forcing full urls
-  // eg /uploads/mysite.com/ when using local uploads which are not the best
-  // but can be of use during development
+  // eg /uploads/mysite.com/ when using local uploads
   if (forceFullURLs && prefix.indexOf("/") === 0) {
     // we force it to have the domain
     prefix = "https://" + domain + prefix;
@@ -615,7 +607,6 @@ export function fileURLAbsoluter(
  * for prop extensions, because every stored value has an item definition attached to it
  * @param id the id
  * @param version the version
- * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
  * @param cacheable whether the resulting urls should be cacheable
@@ -623,6 +614,7 @@ export function fileURLAbsoluter(
  */
 export function fileArrayURLAbsoluter(
   domain: string,
+  defaultCluster: string,
   containerHostnamePrefixes: {
     [key: string]: string,
   },
@@ -630,7 +622,6 @@ export function fileArrayURLAbsoluter(
   itemDefinition: ItemDefinition,
   id: string,
   version: string,
-  containerId: string,
   include: Include,
   property: PropertyDefinition,
   cacheable: boolean,
@@ -640,7 +631,7 @@ export function fileArrayURLAbsoluter(
   }
   return files.map(
     (file) =>
-      fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property, cacheable)
+      fileURLAbsoluter(domain, defaultCluster, containerHostnamePrefixes, file, itemDefinition, id, version, include, property, cacheable)
   );
 }
 
@@ -731,12 +722,14 @@ export function createFakeFileValue(id: string, name: string, url: string, type?
     size: typeof size === "number" ? size : null,
     type: type || null,
     url,
+    cluster: null,
   }
 }
 
 /**
  * Creates a real image value to prefill with that can be used to generate
  * values that can be submitted
+ * 
  * @param id 
  * @param file 
  * @param objectURL 
@@ -760,6 +753,7 @@ export function createRealFileValue(
     size: file.size,
     src: file,
     metadata: null,
+    cluster: null,
   };
 
   if (imageMetadataGeneratorInfo) {
@@ -770,27 +764,6 @@ export function createRealFileValue(
 
   return value;
 }
-
-/**
- * Provides the container id for a given matching region
- * @param config 
- * @param country 
- * @returns 
- */
-export function getContainerIdFromMappers(config: IConfigRawJSONDataType, country: string) {
-  let containerId: string
-  Object.keys(config.containersRegionMappers).forEach((mapper) => {
-    if (mapper.split(";").includes(country)) {
-      containerId = config.containersRegionMappers[mapper];
-    }
-  });
-  if (!containerId) {
-    containerId = config.containersRegionMappers["*"];
-  }
-
-  return containerId;
-}
-
 
 const numberRegex = /^\+?[0-9]+$/;
 

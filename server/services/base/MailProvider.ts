@@ -17,11 +17,11 @@ import type { IRQValue } from "../../../rq-querier";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { ServiceProvider, ServiceProviderType } from "..";
-import { FORCE_ALL_OUTBOUND_MAIL_TO, NODE_ENV } from "../../environment";
+import { FORCE_ALL_OUTBOUND_MAIL_TO, CLUSTER_ID, NODE_ENV } from "../../environment";
 import type { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { IOTriggerActions, ITriggerRegistry } from "../../resolvers/triggers";
 import path from "path";
-import { escapeHtml, formatDateTime, getContainerIdFromMappers } from "../../../util";
+import { escapeHtml, formatDateTime } from "../../../util";
 import { SECONDARY_JWT_KEY, UNSPECIFIED_OWNER } from "../../../constants";
 import { isRTL, languages } from "../../../imported-resources";
 import uuid from "uuid";
@@ -307,6 +307,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       size,
       type,
       metadata: extraArgs && extraArgs.widthXHeight ? extraArgs.widthXHeight.join("x") : "",
+      cluster: null,
       src: new Promise(async (resolve, reject) => {
         try {
           const urlInfo = new URL(url);
@@ -348,6 +349,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       type,
       metadata: extraArgs && extraArgs.widthXHeight ? extraArgs.widthXHeight.join("x") : "",
       src: fs.createReadStream(filepath),
+      cluster: null,
     }
 
     return basicFile;
@@ -371,6 +373,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       size,
       type,
       metadata: extraArgs && extraArgs.widthXHeight ? extraArgs.widthXHeight.join("x") : "",
+      cluster: null,
     }
 
     if (!extraArgs || !extraArgs.storeInFileThenReadAgain) {
@@ -686,7 +689,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 actualItemDefinition,
                 arg.id,
                 arg.version || null,
-                templateValue.container_id,
                 null,
                 mediaProperty,
                 false,
@@ -1224,10 +1226,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     if (potentialSender && potentialSender.e_validated && this.storageIdef && !isAnUnsubscribeSoloEmail) {
       // store email in senders outbox, the email may be invalid and not have been received by
       // anyone if no such user exists, but we are storing it anyway
-      const senderContainerId = getContainerIdFromMappers(
-        this.appConfig,
-        potentialSender.app_country,
-      );
       const replyOf = replyOfIdBase ? await this.onEmailReceivedReplyResolver(
         replyOfIdBase + "+" + potentialSender.id,
         data,
@@ -1294,7 +1292,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           dictionary: specifiedDictionary ||
             this.localAppData.databaseConfig.dictionaries[potentialSender.app_language] ||
             this.localAppData.databaseConfig.dictionaries["*"],
-          containerId: senderContainerId,
           parent,
           createdBy: potentialSender.id,
           // ensure we populate the stored messages
@@ -1364,10 +1361,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         // attach a new message for it in the idef
         if (this.storageIdef) {
           const isSpam = data.spam || shouldReceiveAllowed === "SPAM";
-          const targetContainerId = getContainerIdFromMappers(
-            this.appConfig,
-            user.app_country,
-          );
 
           const replyOf = replyOfIdBase ? await this.onEmailReceivedReplyResolver(
             replyOfIdBase + "+" + user.id,
@@ -1404,16 +1397,10 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           let messageForUser: ISQLTableRowValue;
           // if the message has already been stored in another run
           // the reason is that the stream can likely only be consumed
-          // once and we wanted to release it as soon as possible, copying
-          // between storage, specially if it's the same storage is likely
-          // to be more beneficial and rather quicker
+          // once and we wanted to release it as soon as possible
           if (storedMessages.length) {
             // more efficiency to copy in the same container
-            let bestMatchStoredMessage = storedMessages.find((m) => m.container_id === targetContainerId);
-            if (!bestMatchStoredMessage) {
-              // just pick the first one to copy
-              bestMatchStoredMessage = storedMessages[0];
-            }
+            const bestMatchStoredMessage = storedMessages[0];
 
             // this should be effective, very effective
             messageForUser = await this.localAppData.cache.requestCopy(
@@ -1423,7 +1410,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               {
                 targetId: idBase + "+" + user.id,
                 targetVersion: null,
-                targetContainerId,
                 targetCreatedBy: user.id,
                 targetParent: parent,
                 currentRawValueSQL: bestMatchStoredMessage,
@@ -1480,7 +1466,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 ifAlreadyExistsCall(v) {
                   storedMessages.push(v);
                 },
-                containerId: targetContainerId,
               },
             );
           }
@@ -1625,7 +1610,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * id
    * username
    * real_name or actual_name if available
-   * container_id
    * app_country
    * email
    * e_notifications if available
@@ -2008,7 +1992,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     if (attachments.length || cidAttachmentsToAttach.length) {
       const processAttachment = (property: string, v: PropertyDefinitionSupportedFileType) => {
         const location = path.join(
-          NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname,
           this.storageIdef.getQualifiedPathName(),
           message.id + "." + (message.version || ""),
           property,
@@ -2023,7 +2006,14 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           src: new Promise((resolve) => {
             resolve({
               createReadStream: () => {
-                return this.localAppData.storage[message.container_id].download(location);
+                const clusterId = v.cluster || this.localAppData.config.defaultCluster;
+                if (CLUSTER_ID === clusterId) {
+                  return this.localAppData.storage.read(location);
+                }
+                const domain = NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname;
+                const subdomain = this.localAppData.config.clusterSubdomains[clusterId];
+                const remotePath = "https://" + (!subdomain ? "" : subdomain + ".") + domain + "/rest/uploads/_/" + location; 
+                return this.localAppData.storage.readRemote(remotePath);
               }
             })
           }),
@@ -2135,7 +2125,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }));
   }
 
-  private async forwardMessages(message: ISQLTableRowValue, user: ISQLTableRowValue, containerID: string, isSpam: boolean, cache: Cache) {
+  private async forwardMessages(message: ISQLTableRowValue, user: ISQLTableRowValue, isSpam: boolean, cache: Cache) {
     let parent: any = null;
     if (message.parent_id) {
       const expectedParentIdForUser = message.parent_id.split("+")[0] + "+" + user.id;
@@ -2160,7 +2150,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           // chain has broken
         } else {
           // forward that message too
-          await this.forwardMessages(replyOfSelf, user, containerID, isSpam, cache);
+          await this.forwardMessages(replyOfSelf, user, isSpam, cache);
         }
       } else {
         // matching reply found, this will be connected
@@ -2194,7 +2184,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       {
         targetId: message.id.split("+")[0] + "+" + user.id,
         targetVersion: null,
-        targetContainerId: containerID,
         targetCreatedBy: user.id,
         targetParent: parent,
         targetOverrides: {
@@ -2616,13 +2605,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                         return;
                       }
 
-                      // let's make a copy of our current message and send it to the relevant
-                      // user, this should pop up straight away
-                      const userContainerId = getContainerIdFromMappers(
-                        this.appConfig,
-                        targetUser.app_country,
-                      );
-
                       // so the user replied to some specific message
                       // that such user has in memory, but each user has their
                       // own ids for their own message that is a copy
@@ -2645,7 +2627,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                           await this.forwardMessages(
                             replyOf,
                             targetUser,
-                            userContainerId,
                             isSpam,
                             arg.appData.cache,
                           );
@@ -2680,7 +2661,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                         {
                           targetId: arg.id.split("+")[0] + "+" + targetUser.id,
                           targetVersion: null,
-                          targetContainerId: userContainerId,
                           currentRawValueSQL: arg.newValueSQL,
                           targetParent: replyBasedParent,
                           targetOverrides: {

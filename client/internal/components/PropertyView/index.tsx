@@ -50,15 +50,6 @@ export interface IPropertyViewRendererProps<ValueType extends PropertyDefinition
  */
 export interface IPropertyViewMainHandlerProps<ValueType extends PropertyDefinitionSupportedType, RendererPropsType> {
   /**
-   * A current container id where the things are currently stored
-   * this value can be null for new items as it only expresses where things
-   * are "currently" stored not where they will be stored once submit is done
-   * 
-   * Automatically Provided check base.tsx
-   * retrieved from the applied value from the item-definition.tsx context in the given slot
-   */
-  containerId: string;
-  /**
    * An optional include, or null, where the property is encountered
    * 
    * Automatically Provided check base.tsx
@@ -389,7 +380,6 @@ export function RawBasePropertyView(props: {
                     include={null}
                     forId={null}
                     forVersion={null}
-                    containerId={null}
                     state={{
                       userSet: false,
                       default: null,

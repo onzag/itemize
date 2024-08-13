@@ -461,7 +461,6 @@ export async function editItemDefinition(
         editedBy: tokenData.id,
         language: resolverArgs.args.language,
         dictionary,
-        containerId: wholeSqlStoredValue.container_id as string,
         listenerUUID: resolverArgs.args.listener_uuid || null,
         reparent: isReparenting ? {
           id: rqValueToConvert.parent_id as string,

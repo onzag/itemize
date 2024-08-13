@@ -507,6 +507,7 @@ export default class PropertyDefinition {
       type: src.type,
       url,
       src,
+      cluster: null,
     }
   }
 

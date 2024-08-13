@@ -488,11 +488,11 @@ export default function restServices(appData: IAppDataType) {
     };
 
     await Promise.all(instances.map(async (i) => {
-      if (!i.data || !i.data.environment || !i.data.environment.INSTANCE_GROUP_ID) {
+      if (!i.data || !i.data.environment || !i.data.environment.CLUSTER_ID) {
         return;
       }
 
-      const groupId = i.data.environment.INSTANCE_GROUP_ID;
+      const groupId = i.data.environment.CLUSTER_ID;
 
       const currentTime = (new Date()).getTime();
       const createdTime = (new Date(i.timestamp)).getTime();

@@ -261,12 +261,12 @@ export default class PropertyEntryFile
           const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
           return fileURLAbsoluter(
             domain,
-            this.props.config.containersHostnamePrefixes,
+            this.props.config.defaultCluster,
+            this.props.config.clusterSubdomains,
             v,
             this.props.itemDefinition,
             this.props.forId,
             this.props.forVersion,
-            this.props.containerId,
             this.props.include,
             this.props.property,
             this.props.cacheFiles,

@@ -112,7 +112,6 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
             this.props.itemDefinition,
             this.props.forId,
             this.props.forVersion || null,
-            this.props.containerId,
             this.props.include,
             mediaProperty,
             this.props.cacheFiles,

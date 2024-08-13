@@ -862,29 +862,6 @@ export function getDictionary(appData: IAppDataType, args: any): string {
 }
 
 /**
- * Validates and checks that a given container id is valid
- * to store data in
- * @param containerId the container id
- * @param sensitiveConfig the sensitive config
- */
-export function validateContainerIdIsReal(
-  containerId: string,
-  sensitiveConfig: ISensitiveConfigRawJSONDataType,
-) {
-  if (
-    (
-      !sensitiveConfig.containers || !sensitiveConfig.containers[containerId]
-    ) &&
-    sensitiveConfig.localContainer !== containerId
-  ) {
-    throw new EndpointError({
-      message: "Container id " + containerId + " does not exist",
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  }
-}
-
-/**
  * Validates the current token isn't blocked whether it is said so
  * by the rules of the session id, user is removed, or invalid credentials
  * @param cache the appdata cache instance

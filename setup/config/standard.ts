@@ -167,22 +167,20 @@ export async function standardConfigSetup(
         nullifyFalseValues: true,
       },
       {
-        variableName: "containersRegionMappers",
-        type: "strobject",
-        message: "Now you need to specify the container region mappers, as a comma separated list of ; separated countries (ISO uppercase) " +
-        "* is a desired and expected value for the default value, you should map all the countries, * maps the default value",
-        defaultValue: {
-          "*": "MAIN",
-        },
+        variableName: "defaultCluster",
+        message: "The id for the default cluster when a cluster identification is not found, used to deal with data corruption cases, for development " +
+        "you may want to use the UNIDENTIFIED value",
+        defaultValue: "UNIDENTIFIED",
+        nullifyFalseValues: true,
       },
       {
-        variableName: "containersHostnamePrefixes",
+        variableName: "clusterSubdomains",
         type: "strobject",
-        message: "Now you need to specify the container region mappers, as a comma separated list of values for the given containers "+
-        "the values must be an url (without protocol) where the upload files are hosted for the given container, if you trail the url " +
-        "with a / it specifies a url that is in our own domain",
+        message: "Now you need to specify the cluster subdomains as a comma separated list of values, each cluster has a name that is specified the name " +
+        "of the default development cluster is \"UNSPECIFIED\" which you may want to map to an empty subdomain to use locally, however in production " +
+        "you want it to be equal to your cluster id",
         defaultValue: {
-          "MAIN": "/uploads"
+          "UNIDENTIFIED": "",
         },
       },
     ],

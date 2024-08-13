@@ -4988,18 +4988,14 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
         );
-        const originalContainerIdOfContent = appliedValue &&
-          appliedValue.rawValue &&
-          appliedValue.rawValue.container_id as string;
 
         // so if we have an applied value we have stored content about
-        if (originalContainerIdOfContent) {
+        if (appliedValue) {
           // now we can start refetching all those values to get them
           // back as files
           await reprocessQueryArgumentsForFiles(
             argumentsForQuery,
             argumentsFoundFilePaths,
-            originalContainerIdOfContent,
             this.props.itemDefinitionInstance,
             this.props.config,
             this.props.forId || null,
@@ -5028,17 +5024,6 @@ export class ActualItemProvider extends
       error = totalValues.error;
       getQueryFields = totalValues.getQueryFields;
     } else {
-      // otherwise it is an add query
-      let containerId: string
-      Object.keys(this.props.config.containersRegionMappers).forEach((mapper) => {
-        if (mapper.split(";").includes(this.props.localeData.country)) {
-          containerId = this.props.config.containersRegionMappers[mapper];
-        }
-      });
-      if (!containerId) {
-        containerId = this.props.config.containersRegionMappers["*"];
-      }
-
       // if we are submitting to add to a different element to our own
       // basically copying what we have in this item definition into
       // another of another kind, either new with undefined id or
@@ -5048,18 +5033,14 @@ export class ActualItemProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
       );
-      const originalContainerIdOfContent = appliedValue &&
-        appliedValue.rawValue &&
-        appliedValue.rawValue.container_id as string;
 
       // so if we have an applied value we have stored content about
-      if (originalContainerIdOfContent) {
+      if (appliedValue) {
         // now we can start refetching all those values to get them
         // back as files
         await reprocessQueryArgumentsForFiles(
           argumentsForQuery,
           argumentsFoundFilePaths,
-          originalContainerIdOfContent,
           this.props.itemDefinitionInstance,
           this.props.config,
           this.props.forId || null,
@@ -5079,7 +5060,6 @@ export class ActualItemProvider extends
         forId: submitForId || null,
         forVersion: submitForVersion || null,
         waitAndMerge: options.waitAndMerge,
-        containerId,
         progresser: options.progresser,
       }, {
         remoteListener: this.props.remoteListener,

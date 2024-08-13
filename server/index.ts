@@ -30,7 +30,6 @@ import { retrieveRootPool } from "./rootpool";
 import { ISEORuleSet } from "./seo";
 import { initializeApp } from "./initialize";
 import { LocalStorageService } from "./services/local-storage";
-import { OpenstackService } from "./services/openstack";
 import { IPStackService } from "./services/ipstack";
 import { MailgunService } from "./services/mailgun";
 import { HereMapsService } from "./services/here";
@@ -41,7 +40,7 @@ import LocationSearchProvider from "./services/base/LocationSearchProvider";
 import MailProvider from "./services/base/MailProvider";
 import PhoneProvider from "./services/base/PhoneProvider";
 import type LoggingProvider from "./services/base/LoggingProvider";
-import StorageProvider, { IStorageProvidersObject } from "./services/base/StorageProvider";
+import StorageProvider from "./services/base/StorageProvider";
 import UserLocalizationProvider from "./services/base/UserLocalizationProvider";
 import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient, setupRedisClient } from "./redis";
@@ -154,11 +153,8 @@ types.setTypeParser(DATE_OID, (val) => val);
 // we need the async fs
 const fsAsync = fs.promises;
 
-// now in order to build the database in the cheat mode, we don't need express
-export const app =
-  INSTANCE_MODE === "BUILD_DATABASE" ||
-    INSTANCE_MODE === "LOAD_DATABASE_DUMP" ||
-    INSTANCE_MODE === "CLEAN_STORAGE" ? null : express();
+// express startup
+export const app = express();
 
 /**
  * Specifies the SSR configuration for the multiple pages
@@ -219,7 +215,7 @@ export interface IAppDataType {
   redisLocalSub: ItemizeRedisClient;
   buildnumber: string;
   triggers: ITriggerRegistry;
-  storage: IStorageProvidersObject;
+  storage: StorageProvider<any>;
   logger: ILoggerType;
   mailService: MailProvider<any>;
   phoneService: PhoneProvider<any>;
@@ -254,12 +250,8 @@ export interface IServerDataType {
   }
 }
 
-export interface IStorageProviders {
-  [type: string]: IServiceProviderClassType<any>;
-}
-
 export interface IServiceCustomizationType {
-  storageServiceProviders?: IStorageProviders;
+  storageServiceProvider?: IServiceProviderClassType<any>;
   mailServiceProvider?: IServiceProviderClassType<any>;
   phoneServiceProvider?: IServiceProviderClassType<any>;
   ussdServiceProvider?: IServiceProviderClassType<any>;
@@ -314,24 +306,14 @@ export interface IServerCustomizationDataType {
   globalManagerInitialServerDataFunction?: InitialExecutionServerDataFn,
 }
 
-export async function getStorageProviders(
+export async function getStorageProvider(
   config: IConfigRawJSONDataType,
   sensitiveConfig: ISensitiveConfigRawJSONDataType,
   dbConfig: IDBConfigRawJSONDataType,
   redisConfig: IRedisConfigRawJSONDataType,
-  storageServiceProviders: IStorageProviders,
+  StorageProviderClass: IServiceProviderClassType<any>,
   registry: RegistryService,
-): Promise<{
-  cloudClients: IStorageProvidersObject;
-  instancesUsed: StorageProvider<any>[];
-  classesUsed: IServiceProviderClassType<any>[];
-}> {
-  const finalOutput = {
-    instancesUsed: [] as StorageProvider<any>[],
-    classesUsed: [] as IServiceProviderClassType<any>[],
-    cloudClients: {} as IStorageProvidersObject,
-  };
-
+): Promise<[StorageProvider<any>, IServiceProviderClassType<any>]> {
   const configsObj = {
     config,
     sensitiveConfig,
@@ -339,73 +321,11 @@ export async function getStorageProviders(
     redisConfig,
   };
 
-  if (sensitiveConfig.localContainer) {
-    let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
-    if (!prefix) {
-      logger && logger.error(
-        {
-          functionName: "initializeServer",
-          message: "Could not find prefix for local container '" + sensitiveConfig.localContainer + "'",
-          serious: true,
-        },
-      );
-      throw new Error("Could not find prefix for local container " + sensitiveConfig.localContainer);
-    }
-    if (prefix.indexOf("/") !== 0) {
-      prefix = "https://" + prefix;
-    }
-    const localClient = new LocalStorageService(null, registry, configsObj);
-    localClient.setPrefix(prefix);
-    localClient.setId(sensitiveConfig.localContainer);
+  const ServiceClass: IServiceProviderClassType<any> = StorageProviderClass || LocalStorageService;
+  const client: StorageProvider<any> = (new ServiceClass(null, registry, configsObj)) as any;
+  await client.initialize();
 
-    await localClient.initialize();
-    finalOutput.instancesUsed.push(localClient);
-    // typescript for some reason misses the types
-    if (!finalOutput.classesUsed.includes(LocalStorageService as any)) {
-      finalOutput.classesUsed.push(LocalStorageService as any);
-    }
-    finalOutput.cloudClients[sensitiveConfig.localContainer] = localClient;
-  }
-
-  if (sensitiveConfig.containers) {
-    await Promise.all(Object.keys(sensitiveConfig.containers).map(async (containerIdX) => {
-      const containerData = sensitiveConfig.containers[containerIdX];
-      let prefix = config.containersHostnamePrefixes[containerIdX];
-      if (!prefix) {
-        logger && logger.error(
-          {
-            functionName: "initializeServer",
-            message: "Could not find prefix for container in '" + containerIdX + "'",
-            serious: true,
-          },
-        );
-        throw new Error("Could not find prefix for container in " + containerIdX);
-      }
-      if (prefix.indexOf("/") !== 0) {
-        prefix = "https://" + prefix;
-      }
-
-      const type = containerData.type;
-      const ServiceClass: IServiceProviderClassType<any> = (storageServiceProviders && storageServiceProviders[type]) || OpenstackService;
-
-      if (ServiceClass.getType() !== ServiceProviderType.NONE) {
-        throw new Error("The service class for storage is not of type NONE");
-      }
-
-      const client: StorageProvider<any> = (new ServiceClass(containerData.config, registry, configsObj)) as any;
-      client.setPrefix(prefix);
-      client.setId(containerIdX);
-      await client.initialize();
-      finalOutput.instancesUsed.push(client);
-      // typescript misses the types
-      if (!finalOutput.classesUsed.includes(ServiceClass as any)) {
-        finalOutput.classesUsed.push(ServiceClass as any);
-      }
-      finalOutput.cloudClients[containerIdX] = client;
-    }));
-  }
-
-  return finalOutput;
+  return [client, ServiceClass];
 }
 
 export interface IInitializeServerConfig extends ISSRConfig, ISEOConfig, IServerCustomizationDataType, IAnalyticsConfig { };
@@ -415,12 +335,6 @@ export interface IInitializeServerConfig extends ISSRConfig, ISEOConfig, IServer
  * @param initConfig the initialization configuration
  */
 export async function initializeServer(initConfig: IInitializeServerConfig) {
-  // for build database we just build the database
-  if (INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "LOAD_DATABASE_DUMP") {
-    build(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
-    return;
-  }
-
   // now we try to read the basic configuration
   try {
     logger.info(
@@ -481,12 +395,9 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       redisConfig,
     };
 
-    const mayUseLoggerService =
-      INSTANCE_MODE !== "CLEAN_STORAGE";
-
-    const LoggingServiceClass = mayUseLoggerService ? (serviceCustom && serviceCustom.loggingServiceProvider) || (
+    const LoggingServiceClass = (serviceCustom && serviceCustom.loggingServiceProvider) || (
       dbConfig.elastic || dbConfig.elasticLogs ? ElasticLoggerService : null
-    ) : null;
+    );
     const loggingService: LoggingProvider<any> = LoggingServiceClass ? new LoggingServiceClass(
       sensitiveConfig.logging,
       null,
@@ -611,15 +522,13 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
 
     let redisGlobalClient: ItemizeRedisClient;
 
-    if (INSTANCE_MODE !== "CLEAN_STORAGE") {
-      logger.info(
-        {
-          functionName: "initializeServer",
-          message: "Initializing redis global cache client",
-        },
-      );
-      redisGlobalClient = await setupRedisClient("global", redisConfig.global);
-    }
+    logger.info(
+      {
+        functionName: "initializeServer",
+        message: "Initializing redis global cache client",
+      },
+    );
+    redisGlobalClient = await setupRedisClient("global", redisConfig.global);
 
     const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
@@ -715,6 +624,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
         null,
         null,
         sensitiveConfig,
+        config,
         null,
         domain,
         root,
@@ -785,13 +695,52 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       },
     );
     const databaseConnection = new DatabaseConnection(dbConnectionConfig);
+
+    logger.info(
+      {
+        functionName: "initializeServer",
+        message: "Initializing registry",
+      },
+    );
+    const registry = new RegistryService({
+      databaseConnection,
+      registryTable: REGISTRY_IDENTIFIER,
+    }, null, configsObj);
+    await registry.initialize();
+
+
+    // due to a bug in the types the create client function is missing
+    // domainId and domainName
+    logger.info(
+      {
+        functionName: "initializeServer",
+        message: "Initializing cloud clients",
+      },
+    );
+
+    const [storageClient, StorageClientClass] = await getStorageProvider(
+      config,
+      sensitiveConfig,
+      dbConfig,
+      redisConfig,
+      serviceCustom && serviceCustom.storageServiceProvider,
+      registry,
+    );
+
+    logger.info(
+      {
+        functionName: "initializeServer",
+        message: "Setting up raw db",
+      },
+    );
     const rawDB = new ItemizeRawDB(
       redisGlobalClient,
       redisPub,
       redisSub,
-
       databaseConnection,
       root,
+      config,
+      storageClient,
     );
 
     if (dbConfig.elastic) {
@@ -816,18 +765,6 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     const elasticAnalyticsConnection = dbConfig.elasticAnalytics ? (
       dbConfig.elasticAnalytics.node === dbConfig.elastic?.node ? elasticConnection : new Client(dbConfig.elasticAnalytics)
     ) : elasticConnection;
-
-    logger.info(
-      {
-        functionName: "initializeServer",
-        message: "Initializing registry",
-      },
-    );
-    const registry = new RegistryService({
-      databaseConnection,
-      registryTable: REGISTRY_IDENTIFIER,
-    }, null, configsObj);
-    await registry.initialize();
 
     if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       logger.info(
@@ -955,48 +892,8 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     }
 
     const analyticsService: AnalyticsProvider<any> = initConfig.analytics?.trackers ?
-      (new AnalyticsClass(null, registry, configsObj, elasticConnection) as any):
+      (new AnalyticsClass(null, registry, configsObj, elasticConnection) as any) :
       null;
-
-    // due to a bug in the types the create client function is missing
-    // domainId and domainName
-    logger.info(
-      {
-        functionName: "initializeServer",
-        message: "Initializing cloud clients",
-      },
-    );
-
-    const storageClients = await getStorageProviders(
-      config,
-      sensitiveConfig,
-      dbConfig,
-      redisConfig,
-      serviceCustom && serviceCustom.storageServiceProviders,
-      registry,
-    );
-
-    if (INSTANCE_MODE === "CLEAN_STORAGE") {
-      logger.info(
-        {
-          functionName: "initializeServer",
-          message: "Cleaning storage",
-        },
-      );
-
-      await Promise.all(Object.keys(storageClients.cloudClients).map(async (containerId) => {
-        logger.info(
-          {
-            functionName: "initializeServer",
-            message: "Cleaning " + containerId + " data for " + domain,
-          },
-        );
-        const client = storageClients.cloudClients[containerId];
-        await client.removeFolder(domain);
-      }));
-
-      process.exit(0);
-    }
 
     // RETRIEVING INITIAL SERVER DATA
     logger.info(
@@ -1034,7 +931,17 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
         message: "Initializing cache instance",
       },
     );
-    const cache = new Cache(redisClient, databaseConnection, elastic, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
+    const cache = new Cache(
+      redisClient,
+      databaseConnection,
+      elastic,
+      sensitiveConfig,
+      config,
+      storageClient,
+      domain,
+      root,
+      serverData,
+    );
     logger.info(
       {
         functionName: "initializeServer",
@@ -1274,7 +1181,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       mailService,
       phoneService,
       ussdService,
-      storage: storageClients.cloudClients,
+      storage: storageClient,
       logger,
       loggingService,
       customServices,
@@ -1316,7 +1223,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     ussdService && ussdService.setupLocalResources(appData);
     locationSearchService && locationSearchService.setupLocalResources(appData);
     paymentService && paymentService.setupLocalResources(appData);
-    storageClients.instancesUsed.forEach((i) => i.setupLocalResources(appData));
+    storageClient && storageClient.setupLocalResources(appData);
     customServicesInstances.forEach((i) => i.setupLocalResources(appData));
 
     logger.info(
@@ -1354,7 +1261,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     phoneService && phoneService.execute();
     locationSearchService && locationSearchService.execute();
     paymentService && paymentService.execute();
-    storageClients.instancesUsed.forEach((i) => i.execute());
+    storageClient && storageClient.execute();
     customServicesInstances.forEach((i) => i.execute());
 
     logger.info(
@@ -1373,15 +1280,15 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     const paymentServiceClassTrigger = paymentService && await PaymentClass.getTriggerRegistry();
     const analyticsServiceClassTrigger = analyticsService && await AnalyticsClass.getTriggerRegistry();
     const analyticsServiceInstanceTrigger = analyticsService && await analyticsService.getTriggerRegistry();
-    const instanceTriggers = await Promise.all(storageClients.instancesUsed.map((i) => i.getTriggerRegistry()));
-    const classTriggers = await Promise.all(storageClients.classesUsed.map((c) => c.getTriggerRegistry()));
+    const storageClientTrigger = storageClient && await storageClient.getTriggerRegistry();
+    const storageClientClassTrigger = StorageClientClass && await StorageClientClass.getTriggerRegistry();
     const instaceTriggersCustom = await Promise.all(customServicesInstances.map((i) => i.getTriggerRegistry()));
     const classTriggersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getTriggerRegistry()));
     const triggers = [
-      ...instanceTriggers,
-      ...classTriggers,
       ...instaceTriggersCustom,
       ...classTriggersCustom,
+      storageClientTrigger,
+      storageClientClassTrigger,
       userLocalizationInstanceTrigger,
       userLocalizationClassTrigger,
       mailServiceInstanceTrigger,
@@ -1421,15 +1328,15 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     const paymentServiceClassRouter = paymentService && await PaymentClass.getRouter(appData);
     const analyticsClassRouter = analyticsService && await AnalyticsClass.getRouter(appData);
     const analyticsRouter = analyticsService && await analyticsService.getRouter(appData);
-    const instanceRouters = await Promise.all(storageClients.instancesUsed.map((i) => i.getRouter(appData)));
-    const classRouters = await Promise.all(storageClients.classesUsed.map((c) => c.getRouter(appData)));
+    const storageClientRouter = storageClient && await storageClient.getRouter(appData);
+    const storageClientClassRouter = StorageClientClass && await StorageClientClass.getRouter(appData);
     const instaceRoutersCustom = await Promise.all(customServicesInstances.map((i) => i.getRouter(appData)));
     const classRoutersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getRouter(appData)));
     const routers = [
-      ...instanceRouters,
-      ...classRouters,
       ...instaceRoutersCustom,
       ...classRoutersCustom,
+      storageClientRouter,
+      storageClientClassRouter,
       userLocalizationInstanceRouter,
       userLocalizationClassRouter,
       mailServiceInstanceRouter,

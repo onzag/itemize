@@ -52,6 +52,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
         type: "string",
         required: true,
       },
+      cluster: {
+        type: "string",
+      },
     },
     ownFields: {
       src: {

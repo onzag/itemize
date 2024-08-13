@@ -125,7 +125,7 @@ export interface IElasticSchemaDefinitionType {
   [indexName: string]: IElasticIndexDefinitionType;
 }
 
-export type ConsumeStreamsFnType = (propertyLocationId: string) => Promise<void>;
+export type ConsumeStreamsFnType = (idVersionHandle: string) => Promise<void>;
 
 /**
  * A sql composed row value

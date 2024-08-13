@@ -291,8 +291,8 @@ export function convertRQValueToSQLValueForModule(
 
   return {
     value: result,
-    consumeStreams: async (containerId: string) => {
-      await Promise.all(consumeStreamsFns.map(fn => fn(containerId)));
+    consumeStreams: async (idVersionHandle: string) => {
+      await Promise.all(consumeStreamsFns.map(fn => fn(idVersionHandle)));
     }
   };
 }

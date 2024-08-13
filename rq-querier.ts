@@ -95,6 +95,11 @@ export interface IRQFile {
    */
   size: number;
   /**
+     * source cluster where
+     * the file was stored, unspecified for the main
+     */
+  cluster: string;
+  /**
    * optional metadata, might be null, usually constains width and
    * height, set by the client, is limited to 128 characters
    * 
@@ -476,6 +481,7 @@ export class RQQueryBuilder {
         size: arg.size as number,
         src: arg.src as any,
         metadata: arg.metadata as any,
+        cluster: arg.cluster as any,
       };
       // and add it to our list
       this.foundUnprocessedArgFiles.push(detectedUnprocessedFile);

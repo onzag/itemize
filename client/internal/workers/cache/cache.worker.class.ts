@@ -810,7 +810,6 @@ export default class CacheWorker {
     itemDef: ItemDefinition,
     include: Include,
     property: PropertyDefinition,
-    containerId: string,
     id: string,
     version: string,
   ) {
@@ -826,24 +825,25 @@ export default class CacheWorker {
 
     const domain = process.env.NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname;
 
-    let prefix: string = this.config.containersHostnamePrefixes[containerId];
+    const defaultCluster = this.config.defaultCluster;
 
-    if (!prefix) {
+    if (!file.cluster) {
+      console.warn("fileURLAbsoluter: file with id: " + file.id + " and url " + file.url +
+          " has no cluster, using default " + JSON.stringify(defaultCluster) + " as fallback");
+    }
+  
+    const clusterID = file.cluster || defaultCluster;
+  
+    const subdomain: string = this.config.clusterSubdomains[clusterID];
+    if (typeof subdomain !== "string") {
+      console.warn("fileURLAbsoluter: there's no cluster subdomain for cluster " + file.cluster);
       return null;
     }
-
-    // if it doesn't end in / this means we need to add it
-    if (prefix[prefix.length - 1] !== "/") {
-      prefix += "/";
-    }
-    // and now we add the domain /mysite.com/ where all the data shall be stored for
-    // that container
-    prefix += domain + "/";
-    // if it doesn't start with /, which means it's not a local url but its own domain eg. container.com/KEY/mysite.com/
-    // we want to add https to it
-    if (prefix.indexOf("/") !== 0) {
-      prefix = "https://" + prefix;
-    }
+  
+    // the subdomain is not used because this works like a CDN
+    // unless forceFullURLs is used otherwise urls are always relative and give
+    // the clusterId where the file was stored
+    const prefix = `/rest/uploads/${clusterID}/`;
 
     return (
       prefix +
@@ -864,7 +864,6 @@ export default class CacheWorker {
     itemDef: ItemDefinition,
     include: Include,
     property: PropertyDefinition,
-    containerId: string,
     id: string,
     version: string,
   ) {
@@ -872,7 +871,7 @@ export default class CacheWorker {
       return;
     }
 
-    const finalUrl: string = this._fileURLAbsoluter(file, itemDef, include, property, containerId, id, version);
+    const finalUrl: string = this._fileURLAbsoluter(file, itemDef, include, property, id, version);
     if (!finalUrl) {
       return;
     }
@@ -909,7 +908,6 @@ export default class CacheWorker {
     itemDef: ItemDefinition,
     include: Include,
     property: PropertyDefinition,
-    containerId: string,
     id: string,
     version: string,
   ) {
@@ -936,9 +934,9 @@ export default class CacheWorker {
     }
 
     if (Array.isArray(value)) {
-      await Promise.all(value.map((v) => this.obtainOneFile(v as any, itemDef, include, property, containerId, id, version)))
+      await Promise.all(value.map((v) => this.obtainOneFile(v as any, itemDef, include, property, id, version)))
     } else {
-      await this.obtainOneFile(value as any, itemDef, include, property, containerId, id, version);
+      await this.obtainOneFile(value as any, itemDef, include, property, id, version);
     }
   }
 
@@ -996,17 +994,15 @@ export default class CacheWorker {
     const type = queryName.replace(PREFIX_GET, "");
     const idef = this.root.registry[type] as ItemDefinition;
 
-    const containerId = partialValue && partialValue.container_id as string;
-
     try {
-      if (containerId && partialValue) {
+      if (partialValue) {
         await Promise.all(idef.getAllPropertyDefinitionsAndExtensions().map(async (p) => {
-          await this.processFilesAt(partialValue, idef, null, p, containerId, id, version);
+          await this.processFilesAt(partialValue, idef, null, p, id, version);
         }));
 
         await Promise.all(idef.getAllIncludes().map(async (i) => {
           await Promise.all(i.getSinkingProperties().map(async (sp) => {
-            await this.processFilesAt(partialValue, idef, i, sp, containerId, id, version);
+            await this.processFilesAt(partialValue, idef, i, sp, id, version);
           }));
         }));
       }

@@ -12,21 +12,21 @@ if (NODE_ENV !== "development" && NODE_ENV !== "production") {
   process.exit(1);
 }
 export const PORT: number = process.env.PORT ? (parseInt(process.env.PORT) || 8000) : 8000;
-export const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
+export const CLUSTER_ID = process.env.CLUSTER_ID || "UNIDENTIFIED";
 
-if (INSTANCE_GROUP_ID === "GLOBAL") {
-  console.error("Invalid reserved INSTANCE_GROUP_ID ", INSTANCE_GROUP_ID);
+if (CLUSTER_ID === "GLOBAL") {
+  console.error("Invalid reserved CLUSTER_ID ", CLUSTER_ID);
   process.exit(1);
 }
 
-export const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
+export const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 export const GLOBAL_MANAGER_MODE: "ABSOLUTE" | "ELASTIC" | "SERVER_DATA" | "SERVICES" = process.env.GLOBAL_MANAGER_MODE || "ABSOLUTE" as any;
 export const GLOBAL_MANAGER_SERVICES: string[] = (process.env.GLOBAL_MANAGER_SERVICES && process.env.GLOBAL_MANAGER_SERVICES.split(",").map((s) => s.trim())) || [];
 export const INSTANCE_UUID =
   INSTANCE_MODE + "_" +
   (INSTANCE_MODE === "GLOBAL_MANAGER" ? GLOBAL_MANAGER_MODE + "_" : "") +
   (INSTANCE_MODE === "GLOBAL_MANAGER" && GLOBAL_MANAGER_MODE === "SERVICES" ? (GLOBAL_MANAGER_SERVICES.join(",") || "ALL_SERVICES") + "_" : "") +
-  INSTANCE_GROUP_ID + "_" + uuid.v4().replace(/-/g, "");
+  CLUSTER_ID + "_" + uuid.v4().replace(/-/g, "");
 export const INSTANCE_CREATION_TIME = new Date();
 export const INSTANCE_LOG_FILE = `logs/info.${INSTANCE_UUID}.log`;
 export const INSTANCE_LOG_ERROR_FILE = `logs/error.${INSTANCE_UUID}.log`;
@@ -38,10 +38,7 @@ if (
   INSTANCE_MODE !== "CLUSTER_MANAGER" &&
   INSTANCE_MODE !== "GLOBAL_MANAGER" &&
   INSTANCE_MODE !== "ABSOLUTE" &&
-  INSTANCE_MODE !== "EXTENDED" &&
-  INSTANCE_MODE !== "BUILD_DATABASE" &&
-  INSTANCE_MODE !== "LOAD_DATABASE_DUMP" &&
-  INSTANCE_MODE !== "CLEAN_STORAGE"
+  INSTANCE_MODE !== "EXTENDED"
 ) {
   fs.writeFileSync(INSTANCE_LOG_ERROR_FILE, JSON.stringify({
     error: "Unknown INSTANCE_MODE",
@@ -80,7 +77,7 @@ export const FORCE_ELASTIC_REBUILD = process.env.FORCE_ELASTIC_REBUILD === "true
 export const FORCE_CONSOLE_LOGS = process.env.FORCE_CONSOLE_LOGS === "true";
 
 export const ENVIRONMENT_DETAILS = {
-  INSTANCE_GROUP_ID,
+  CLUSTER_ID,
   INSTANCE_MODE,
   INSTANCE_UUID,
   INSTANCE_CREATION_TIME,

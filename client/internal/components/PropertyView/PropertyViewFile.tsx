@@ -79,12 +79,12 @@ export default class PropertyViewFile
         const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
         value = fileURLAbsoluter(
           domain,
-          this.props.config.containersHostnamePrefixes,
+          this.props.config.defaultCluster,
+          this.props.config.clusterSubdomains,
           value,
           this.props.itemDefinition,
           this.props.forId,
           this.props.forVersion,
-          this.props.containerId,
           this.props.include,
           this.props.property,
           this.props.cacheFiles,
@@ -111,12 +111,12 @@ export default class PropertyViewFile
       const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
       currentValue = fileURLAbsoluter(
         domain,
-        this.props.config.containersHostnamePrefixes,
+        this.props.config.defaultCluster,
+        this.props.config.clusterSubdomains,
         currentValue,
         this.props.itemDefinition,
         this.props.forId,
         this.props.forVersion,
-        this.props.containerId,
         this.props.include,
         this.props.property,
         this.props.cacheFiles,

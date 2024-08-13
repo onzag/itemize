@@ -124,22 +124,18 @@ export interface IConfigRawJSONDataType {
    * as emails get added there
    */
   mailStorage: string;
-
   /**
-   * Uploads info, maps countries to containers id
-   * "*" asterisk represents a special match that will match all the non-matching
-   * the value should be container id
+   * The default cluster to use when no cluster name is known at a file
    */
-  containersRegionMappers: {
-    [countries: string]: string;
-  };
+  defaultCluster: string;
   /**
-   * the hostname prefixes for a given container id, as where the information is stored
-   * must not contain http or https protocol
-   * eg. myopenstackprovider.com/mycontainer/AUTH_123/ or whatever custom domain you have got
+   * the subdomain for a given cluster
+   * for example
+   * FI: fi and if your website is app.com
+   * the file will be searched at fi.app.com/uploads/...
    */
-  containersHostnamePrefixes: {
-    [containerId: string]: string;
+  clusterSubdomains: {
+    [clusterId: string]: string;
   };
   /**
    * Special custom configuration
@@ -198,27 +194,27 @@ export interface IDumpConfigRawJSONDataType {
    */
   load: {
     /**
-     * Map previous containers that have been dumped to new
-     * containers, the previous container id mapper has priority over
+     * Map previous clusters that have been dumped to new
+     * cluster, the previous cluster mapper has priority over
      * the version mapper, it will try to get one
      * from the list in order of priority
      */
-    previousContainerIdMapper?: {
-      [containerId: string]: string[];
+    clusterIdToClusterId?: {
+      [clusterId: string]: string[];
     },
     /**
-     * Specifies a container based on a version, it will try to get one
+     * Specifies a cluster based on a version, it will try to get one
      * from the list in order of priority
      */
-    versionMapper?: {
+    versionToClusterId?: {
       [version: string]: string[];
     },
     /**
-     * If none of the version mappers nor the previous container id mappers match
-     * and the previous container id is not found in the current configuration
-     * this container will be used instead
+     * If none of the version mappers nor the previous cluster match
+     * and the previous cluster is not found in the current configuration
+     * this cluster will be used instead
      */
-    primaryContainerId: string;
+    primaryClusterId: string;
   },
 }
 
@@ -259,24 +255,6 @@ export interface ISensitiveConfigRawJSONDataType {
    * The logging service information
    */
   logging: any;
-  /**
-   * The containers, they should match the previously given
-   * containers id
-   */
-  containers: {
-    [containerId: string]: {
-      type: string;
-      config: any;
-    }
-  };
-  /**
-   * A local container (if any)
-   */
-  localContainer: string;
-  /**
-   * The default container id used when required, eg. creating an admin
-   */
-  defaultContainerID: string;
   /**
    * A development key, allows to use development files in its full form on the production
    * interface
@@ -406,31 +384,6 @@ export const rawSensitiveConfigSchema = {
     adminKey: {
       type: "string",
     },
-    containers: {
-      type: ["object", "null"],
-      additionalProperties: {
-        type: "object",
-        properties: {
-          type: {
-            type: "string",
-          },
-          config: {
-            type: "object",
-            additionalProperties: {}
-          },
-        },
-        required: [
-          "type",
-          "config",
-        ],
-      },
-    },
-    localContainer: {
-      type: "string",
-    },
-    defaultContainerID: {
-      type: "string",
-    },
     custom: {
       type: "object",
       additionalProperties: {}
@@ -450,7 +403,6 @@ export const rawSensitiveConfigSchema = {
     "phone",
     "ussd",
     "logging",
-    "defaultContainerID",
     "devKey",
     "adminKey",
   ],
@@ -540,7 +492,7 @@ export const dumpConfigSchema = {
     load: {
       type: "object",
       properties: {
-        previousContainerIdMapper: {
+        clusterIdToClusterId: {
           type: "object",
           additionalProperties: {
             type: "array",
@@ -549,7 +501,7 @@ export const dumpConfigSchema = {
             },
           }
         },
-        versionMapper: {
+        versionToClusterId: {
           type: "object",
           additionalProperties: {
             type: "array",
@@ -558,12 +510,12 @@ export const dumpConfigSchema = {
             },
           }
         },
-        primaryContainerId: {
+        primaryClusterId: {
           type: "string",
         },
       },
       required: [
-        "primaryContainerId",
+        "primaryClusterId",
       ],
     }
   },
@@ -678,14 +630,10 @@ export const rawConfigSchema = {
     mailStorage: {
       type: ["string", "null"],
     },
-    containersRegionMappers: {
-      type: "object",
-      additionalProperties: {
-        type: "string",
-      },
-      minProperties: 1,
+    defaultCluster: {
+      type: "string",
     },
-    containersHostnamePrefixes: {
+    clusterSubdomains: {
       type: "object",
       additionalProperties: {
         type: "string",
@@ -720,8 +668,8 @@ export const rawConfigSchema = {
     "productionHostname",
     "mailDomain",
     "mailStorage",
-    "containersRegionMappers",
-    "containersHostnamePrefixes",
+    "clusterSubdomains",
+    "defaultCluster",
   ],
 };
 

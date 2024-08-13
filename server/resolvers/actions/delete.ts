@@ -68,7 +68,6 @@ export async function deleteItemDefinition(
   // gather the created_by and blocked_at to check the rights
   // of the user
   let userId: string;
-  let containerId: string;
   const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
     {
       policyTypes: ["delete"],
@@ -138,7 +137,6 @@ export async function deleteItemDefinition(
         if (itemDefinition.isOwnerObjectId()) {
           userId = content.id;
         }
-        containerId = content.container_id;
 
         // if the content is blocked, and our role has no special access
         // to moderation fields, then this content cannot be removed

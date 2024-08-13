@@ -19,6 +19,7 @@ const fakefile: PropertyDefinitionSupportedFileType = {
   size: 0,
   type: "",
   url: "",
+  cluster: null,
 }
 
 /**
@@ -50,6 +51,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
       url: {
         type: "string",
         required: true,
+      },
+      cluster: {
+        type: "string",
       },
     },
     ownFields: {

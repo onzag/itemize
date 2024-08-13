@@ -227,10 +227,10 @@ async function dumpAllFromModuleRecursive(
  * concatenated and separated by a dot
  * @param client the cloud client
  */
-async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, client: StorageProvider<any>) {
+async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, clusterSubdomains: {[key: string]: string}) {
   try {
     await client.dumpFolder(
-      domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/",
+      qualifiedPathName + "/" + idVersionHandle + "/",
       path.join("dump", qualifiedPathName, idVersionHandle),
     );
   } catch (err) {
@@ -242,36 +242,18 @@ async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHa
  * Performs the copy of the data that is necessary for a given row
  * @param row the row in question
  * @param root the root
- * @param cloudClients all the cloud clients
  * @param domain the domain in question
  */
-async function copyDataOf(row: ISQLTableRowValue, root: Root, cloudClients: IStorageProvidersObject, domain: string) {
+async function copyDataOf(row: ISQLTableRowValue, root: Root, clusterSubdomains: {[key: string]: string}, domain: string) {
   console.log("dumping files of: " + colors.green(row.type + " " + row.id + " " + row.version));
 
   // so we need the idef and the module
   const idef = root.registry[row.type] as ItemDefinition;
   const mod = idef.getParentModule();
 
-  // and now we'll see our container and download the data from there
-  let idUsed = row.container_id;
-  let client = cloudClients[idUsed];
-  if (!client) {
-    console.log(
-      colors.red(
-        "The expected container " +
-        idUsed +
-        " for this object does not exist in your configuration as such files cannot be copied"
-      )
-    );
-    return;
-  }
-
-  // we can log this what container we are using
-  console.log(colors.yellow("Using: ") + idUsed);
-
   // and now we can attempt to copy the data for it
-  await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), client);
-  await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), client);
+  await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), clusterSubdomains);
+  await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), clusterSubdomains);
 }
 
 /**
@@ -282,44 +264,13 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, cloudClients: ISto
  */
 export default async function dump(version: string, databaseConnection: DatabaseConnection, root: Root) {
 
-  // We will need all these config
-  const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(
-    await fsAsync.readFile(path.join("config", version === "development" ? "index.sensitive.json" : `index.${version}.sensitive.json`), "utf8"),
-  );
-
   const config: IConfigRawJSONDataType = JSON.parse(
     await fsAsync.readFile(path.join("config", "index.json"), "utf8"),
-  );
-
-  const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(
-    await fsAsync.readFile(path.join("config", version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`), "utf8"),
-  );
-
-  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(
-    await fsAsync.readFile(path.join("config", version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`), "utf8"),
   );
 
   const dumpConfig: IDumpConfigRawJSONDataType = JSON.parse(
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
-
-  const registry = new RegistryService({
-    databaseConnection,
-    registryTable: REGISTRY_IDENTIFIER,
-  }, null, {
-    config,
-    redisConfig,
-    dbConfig,
-    sensitiveConfig,
-  });
-  await registry.initialize();
-
-  // and our containers
-  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, dbConfig, redisConfig, serviceCustom.storageServiceProviders, registry);
-
-  // we can specify we have loaded them
-  console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
-    colors.yellow(Object.keys(cloudClients).join(", ")));
 
   // and now we can start dumping
   let final: ISQLTableRowValue[] = [];
@@ -425,7 +376,7 @@ export default async function dump(version: string, databaseConnection: Database
         await copyDataOf(
           row,
           root,
-          cloudClients,
+          config.clusterSubdomains,
           version === "development" ?
             config.developmentHostname :
             config.productionHostname

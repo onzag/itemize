@@ -98,7 +98,7 @@ import { findLastRecordDate } from "./resolvers/actions/search";
 import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
 import { convertSQLValueToRQValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { ItemizeRawDB } from "./raw-db";
-import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
+import { CAN_LOG_DEBUG, CLUSTER_ID, INSTANCE_MODE, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
 import { RegistryService } from "./services/registry";
 import { NanoSecondComposedDate } from "../nanodate";
 import type { RQRootSchema } from "../base/Root/rq";
@@ -452,7 +452,7 @@ export class Listener {
     this.onReceiveKickEvent(userId);
     const redisEvent: IRedisEvent = {
       type: SERVER_USER_KICK_IDENTIFIER,
-      serverInstanceGroupId: INSTANCE_GROUP_ID,
+      serverInstanceGroupId: CLUSTER_ID,
       data: {
         userId,
       },
@@ -650,7 +650,7 @@ export class Listener {
       const redisEvent: IRedisEvent = {
         type: CLUSTER_MANAGER_REGISTER_SS,
         request,
-        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        serverInstanceGroupId: CLUSTER_ID,
         source: "local",
         mergedIndexIdentifier: null,
       }
@@ -3259,7 +3259,7 @@ export class Listener {
       const redisEvent: IRedisEvent = {
         event: this.awaitingBasicEvent[mergedIndexIdentifier],
         listenerUUID,
-        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : CLUSTER_ID,
         source: "global",
         mergedIndexIdentifier,
         type: CHANGED_FEEDBACK_EVENT,
@@ -3277,7 +3277,7 @@ export class Listener {
           data: {
             event: redisEvent.event,
             listenerUUID,
-            serverInstanceGroupId: INSTANCE_GROUP_ID,
+            serverInstanceGroupId: CLUSTER_ID,
           },
         },
       );
@@ -3310,7 +3310,7 @@ export class Listener {
         event: this.awaitingOwnedSearchEvents[mergedIndexIdentifier],
         listenerUUID,
         mergedIndexIdentifier,
-        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : CLUSTER_ID,
         source: "global",
       };
 
@@ -3356,7 +3356,7 @@ export class Listener {
         event: this.awaitingPropertySearchEvents[mergedIndexIdentifier],
         listenerUUID,
         mergedIndexIdentifier,
-        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : CLUSTER_ID,
         source: "global",
       };
 
@@ -3402,7 +3402,7 @@ export class Listener {
         listenerUUID,
         mergedIndexIdentifier,
         type: PARENTED_SEARCH_RECORDS_EVENT,
-        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : CLUSTER_ID,
         source: "global",
       }
 
@@ -3449,7 +3449,7 @@ export class Listener {
         listenerUUID,
         mergedIndexIdentifier,
         type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
-        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : CLUSTER_ID,
         source: "global",
       }
 
@@ -3551,12 +3551,12 @@ export class Listener {
 
     if (redisEvent.type === SERVER_USER_KICK_IDENTIFIER) {
       const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
-      if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
+      if (serverInstanceGroupId === CLUSTER_ID) {
         CAN_LOG_DEBUG && logger.debug(
           {
             className: "Listener",
             methodName: "globalRedisListener",
-            message: "Our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + "; ignoring event",
+            message: "Our own instance group id " + CLUSTER_ID + " was the emitter of " + channel + "; ignoring event",
           },
         );
       } else if (redisEvent.data && redisEvent.data.userId === "number") {
@@ -3577,14 +3577,14 @@ export class Listener {
       );
 
       const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
-      if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
+      if (serverInstanceGroupId === CLUSTER_ID) {
         // when we were the originators, our local cache is expected
         // to have been updated, as such, we literally don't care
         CAN_LOG_DEBUG && logger.debug(
           {
             className: "Listener",
             methodName: "globalRedisListener",
-            message: "Our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + "; ignoring event",
+            message: "Our own instance group id " + CLUSTER_ID + " was the emitter of " + channel + "; ignoring event",
           },
         );
       } else {
@@ -3758,7 +3758,7 @@ export class Listener {
     );
     const redisEvent: IRedisEvent = {
       type: CLUSTER_MANAGER_RESET,
-      serverInstanceGroupId: INSTANCE_GROUP_ID,
+      serverInstanceGroupId: CLUSTER_ID,
       source: "local",
       mergedIndexIdentifier: null,
     }

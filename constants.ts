@@ -708,7 +708,6 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
   "version",
   "type",
-  "container_id",
   "blocked_at",
   "blocked_by",
   "blocked_until",
@@ -784,10 +783,6 @@ export const RESERVED_BASE_PROPERTIES_RQ: {
   parent_type: {
     type: "string",
     description: "If exists, a parent type of this item",
-  },
-  container_id: {
-    type: "string",
-    description: "The storage location id where data is stored",
   },
   created_at: {
     type: "string",
@@ -917,10 +912,6 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       level: 2,
     },
   },
-  container_id: {
-    type: "TEXT",
-    notNull: true,
-  },
   created_at: {
     type: "TIMESTAMPTZ",
     notNull: true,
@@ -996,9 +987,6 @@ export const RESERVED_BASE_PROPERTIES_ELASTIC: IElasticIndexDefinitionType = {
       null_value: "?NULL",
     },
     parent_type: {
-      type: "keyword",
-    },
-    container_id: {
       type: "keyword",
     },
     created_at: {
@@ -1543,11 +1531,6 @@ export const RESERVED_ADD_PROPERTIES_RQ: {[id: string]: RQArg} = {
   parent_type: {
     type: "string",
     description: "a parent item definition qualified path (must be specified with parent_id)",
-  },
-  container_id: {
-    type: "string",
-    required: true,
-    description: "the storage id where storage data is stored according to definitions",
   },
   for_id: {
     type: "string",

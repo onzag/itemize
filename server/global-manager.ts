@@ -288,7 +288,6 @@ export class GlobalManager {
         created_at: ["NOW()", []],
         created_by: UNSPECIFIED_OWNER,
         version: "",
-        container_id: this.sensitiveConfig.defaultContainerID,
       };
 
       const sqlIdefData: IManyValueType = {

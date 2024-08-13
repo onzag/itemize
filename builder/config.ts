@@ -102,65 +102,22 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
       );
     }
 
-    if (!data.containersRegionMappers["*"]) {
+    if (!data.clusterSubdomains["*"]) {
       throw new CheckUpError(
-        "The containers regions mappers is missing the asterisk (*) property",
-        traceback.newTraceToBit("containersRegionMappers"),
+        "The cluster subdomain is missing the asterisk (*) property, use it to specify your default cluster and its subdomain",
+        traceback.newTraceToBit("clusterSubdomains"),
       );
     }
-
-    Object.keys(data.containersRegionMappers).forEach((regions) => {
-      const target = data.containersRegionMappers[regions];
-      if (regions !== "*") {
-        const countriesForRegion = regions.split(",").map((c) => c.trim());
-        countriesForRegion.forEach((c) => {
-          if (!countries[c]) {
-            throw new CheckUpError(
-              "Invalid country code " + c,
-              traceback.newTraceToBit("containersRegionMappers").newTraceToBit(regions),
-            );
-          }
-        });
-      }
-
-      if (!data.containersHostnamePrefixes[target]) {
-        console.warn(
-          "There's no container hostname prefix specified for " + target +
-          " but it's mentioned in regions " + regions +
-          " as such file support is unavailable for such container"
-        );
-      } else {
-        if (
-          data.containersHostnamePrefixes[target].startsWith("http") ||
-          data.containersHostnamePrefixes[target].startsWith("//:")
-        ) {
-          throw new CheckUpError(
-            "Invalid container hostname prefix, a protocol shouldn't be provided, https assumed",
-            traceback.newTraceToBit("containersHostnamePrefixes").newTraceToBit(target),
-          );
-        }
-      }
-    });
   };
   const standardConfig = await extractOneConfig<IConfigRawJSONDataType>(
     checkConfig, "index", null, false, standardConfigCheckerCallback,
   );
 
-  const sensitiveConfigCheckerCallback = (data: ISensitiveConfigRawJSONDataType, traceback: Traceback) => {
-    Object.keys(standardConfig.containersHostnamePrefixes).forEach((containerId) => {
-      if ((!data.containers || !data.containers[containerId]) && data.localContainer !== containerId) {
-        throw new CheckUpError(
-          "Could not find container information for container " + containerId + " in sensitive config",
-          data.containers ? traceback.newTraceToBit("containers") : traceback,
-        );
-      }
-    });
-  };
   const sensitiveConfig = await extractOneConfig<ISensitiveConfigRawJSONDataType>(
-    checkSensitiveConfig, "index", null, true, sensitiveConfigCheckerCallback,
+    checkSensitiveConfig, "index", null, true,
   );
   await extractOneConfig(
-    checkSensitiveConfig, "index", "production", true, sensitiveConfigCheckerCallback,
+    checkSensitiveConfig, "index", "production", true,
   );
 
   const redisConfig = await extractOneConfig<IRedisConfigRawJSONDataType>(

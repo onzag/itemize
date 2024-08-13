@@ -319,11 +319,6 @@ export function EntryViewReadSet(
     }
   }
 
-  // now we need to get the container id, the container id refers to where the data was stored
-  // in the server side information container, we might have one already
-  const containerId: string = (itemContextualValue.state.rqOriginalFlattenedValue &&
-    itemContextualValue.state.rqOriginalFlattenedValue.container_id as string) || null;
-
   // so now we can start in conditional rendering
   if (type === "read") {
     // so if we have a property state (which will not exist in meta properties)
@@ -343,12 +338,12 @@ export function EntryViewReadSet(
         if (!propertyDescription.rq.array) {
           const value = fileURLAbsoluter(
             domain,
-            config.containersHostnamePrefixes,
+            config.defaultCluster,
+            config.clusterSubdomains,
             props.useAppliedValue ? propertyState.stateAppliedValue as IRQFile : propertyState.value as IRQFile,
             itemContextualValue.idef,
             itemContextualValue.forId,
             itemContextualValue.forVersion,
-            containerId,
             includeContextualValue && includeContextualValue.include,
             property,
             !!props.cacheFiles,
@@ -362,12 +357,12 @@ export function EntryViewReadSet(
         } else {
           const value = fileArrayURLAbsoluter(
             domain,
-            config.containersHostnamePrefixes,
+            config.defaultCluster,
+            config.clusterSubdomains,
             props.useAppliedValue ? propertyState.stateAppliedValue as IRQFile[] : propertyState.value as IRQFile[],
             itemContextualValue.idef,
             itemContextualValue.forId,
             itemContextualValue.forVersion,
-            containerId,
             includeContextualValue && includeContextualValue.include,
             property,
             !!props.cacheFiles,
@@ -461,7 +456,6 @@ export function EntryViewReadSet(
           state={propertyState}
           capitalize={props.capitalize}
           renderer={props.renderer}
-          containerId={containerId}
           rendererArgs={props.rendererArgs}
           forId={itemContextualValue.forId}
           forVersion={itemContextualValue.forVersion}
@@ -607,7 +601,6 @@ export function EntryViewReadSet(
         onChange={onChange}
         onRestore={onRestore}
         forceInvalid={props.showAsInvalid}
-        containerId={containerId}
         forId={itemContextualValue.forId}
         forVersion={itemContextualValue.forVersion}
         poked={isPoked}

@@ -255,7 +255,7 @@ export default async function build(version: string, buildID: string, userat: st
     await fsAsync.writeFile(
       path.join("deployments", buildID, "systemd", serviceName),
       contentOfFile
-        .replace("$INSTANCE_GROUP_ID", buildID)
+        .replace("$CLUSTER_ID", buildID)
         .replace("$NODE_ENV", version)
         .replace("$WORKDIR", "/home/" + username + "/" + buildID)
         .replace("$USER", username)

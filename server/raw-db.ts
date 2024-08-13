@@ -30,15 +30,16 @@ import uuidv5 from "uuid/v5";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
-import type { IAppDataType, IStorageProviders } from "../server";
+import type { IAppDataType } from "../server";
 import { DeclareCursorBuilder } from "../database/DeclareCursorBuilder";
 import { CloseCursorBuilder } from "../database/CloseCursorBuilder";
 import { FetchOrMoveFromCursorBuilder } from "../database/FetchOrMoveFromCursorBuilder";
-import type { IRQSearchRecord } from "../rq-querier";
-import { IStorageProvidersObject } from "./services/base/StorageProvider";
-import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
+import { deleteEveryPossibleFileFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { analyzeModuleForPossibleParent } from "./cache";
 import { Listener } from "./listener";
+import { IConfigRawJSONDataType } from "../config";
+import { NODE_ENV } from "./environment";
+import StorageProvider from "./services/base/StorageProvider";
 
 type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -115,6 +116,9 @@ export class ItemizeRawDB {
 
   public databaseConnection: DatabaseConnection;
 
+  private config: IConfigRawJSONDataType;
+  private uploadsClient: StorageProvider<any>;
+
   /**
    * Builds a new instance of the change informer
    * @param redisPub the redis publish instance
@@ -127,6 +131,8 @@ export class ItemizeRawDB {
     redisSub: ItemizeRedisClient,
     databaseConnection: DatabaseConnection,
     root: Root,
+    config: IConfigRawJSONDataType,
+    uploadsClient: StorageProvider<any>,
   ) {
     this.redisPub = redisPub;
     this.redisSub = redisSub;
@@ -159,6 +165,9 @@ export class ItemizeRawDB {
       null,
       null,
     );
+
+    this.config = config;
+    this.uploadsClient = uploadsClient;
   }
 
   /**
@@ -208,7 +217,7 @@ export class ItemizeRawDB {
    * @returns a new instance of raw db
    */
   public hookInto(connection: DatabaseConnection, options: { transacting?: boolean, singleClient?: boolean } = {}): ItemizeRawDB {
-    const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, connection, this.root);
+    const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, connection, this.root, this.config, this.uploadsClient);
     newRawDB.setupElastic(this.elastic);
     if (options.transacting) {
       newRawDB.transacting = true;
@@ -231,7 +240,7 @@ export class ItemizeRawDB {
   } = {}): Promise<T> {
     let newRawDB: ItemizeRawDB;
     const rs = await this.databaseConnection.startTransaction(async (transactingClient) => {
-      newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
+      newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root, this.config, this.uploadsClient);
       newRawDB.setupElastic(this.elastic);
       newRawDB.transacting = true;
       return await fn(newRawDB);
@@ -255,7 +264,15 @@ export class ItemizeRawDB {
   } = {}): Promise<T> {
     let newRawDB: ItemizeRawDB;
     const rs = await this.databaseConnection.startSingleClientOperation(async (transactingClient) => {
-      newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
+      newRawDB = new ItemizeRawDB(
+        this.redisGlobal,
+        this.redisPub,
+        this.redisSub,
+        transactingClient,
+        this.root,
+        this.config,
+        this.uploadsClient,
+      );
       newRawDB.setupElastic(this.elastic);
       newRawDB.singleClientMode = true;
       return await fn(newRawDB);
@@ -292,9 +309,8 @@ export class ItemizeRawDB {
    * Will convert a rq style value into a full row SQL value in order to execute many value
    * types functionality and directly insert values in a safer way
    * 
-   * Note that this method is incapable of passing the required data for consuming stream which means
-   * that if you set a value for a file and are working with files this will inevitably fail because
-   * its incapable to access the storage provider and unable to consume streams
+   * note that this function will now work with files but you must call consumeStreams afterwards
+   * in order for the streams to be consumed and fed to the uploader
    * 
    * Raw writes on the database are after all dangerous
    *
@@ -316,8 +332,9 @@ export class ItemizeRawDB {
     dictionary: string,
     partialFields?: any,
   ): {
-    modSQL: ISQLTableRowValue
-    itemSQL: ISQLTableRowValue
+    modSQL: ISQLTableRowValue,
+    itemSQL: ISQLTableRowValue,
+    consumeStreams: (id: string, version: string) => Promise<void>
   } {
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
     const mod = itemDefinition.getParentModule();
@@ -328,11 +345,11 @@ export class ItemizeRawDB {
       mod,
       value,
       null,
-      null,
-      null,
+      this.uploadsClient,
+      NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname,
       dictionary,
       partialFields,
-    ).value;
+    );
 
     const itemSQL = convertRQValueToSQLValueForItemDefinition(
       appData.cache.getServerData(),
@@ -340,15 +357,22 @@ export class ItemizeRawDB {
       itemDefinition,
       value,
       null,
-      null,
-      null,
+      this.uploadsClient,
+      NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname,
       dictionary,
       partialFields,
-    ).value;
+    );
+
+    const consumeStreams = async (id: string, version: string) => {
+      const idVersionHandle = id + "." + (version || "");
+      await modSQL.consumeStreams(idVersionHandle);
+      await itemSQL.consumeStreams(idVersionHandle);
+    }
 
     return {
-      modSQL,
-      itemSQL,
+      modSQL: modSQL.value,
+      itemSQL: itemSQL.value,
+      consumeStreams,
     };
   }
 
@@ -1449,10 +1473,7 @@ export class ItemizeRawDB {
     itemDefinitionOrModule: ItemDefinition | Module | string,
     id: string,
     version: string,
-    deleteFiles?: {
-      domain: string;
-      storage: IStorageProvidersObject;
-    } | false,
+    deleteFiles?: boolean,
     deleter: {
       where?: (builder: WhereBuilder) => void;
       useJoinedWhere?: boolean;
@@ -1477,10 +1498,7 @@ export class ItemizeRawDB {
   public async performBatchRawDBDelete(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     where: (builder: WhereBuilder) => void,
-    deleteFiles?: {
-      domain: string;
-      storage: IStorageProvidersObject;
-    } | false,
+    deleteFiles?: boolean,
     deleter: {
       useJoinedWhere?: boolean;
       useJoinedReturn?: boolean;
@@ -1549,7 +1567,7 @@ export class ItemizeRawDB {
       // this helper function will allow us to delete all the files
       // for a given version, if we are dropping all version this is useful
       // we want to delete files
-      const deleteFilesInContainer = !deleteFiles ? null : async (containerId: string, id: string, specifiedVersion: string) => {
+      const deleteFilesForItem = !deleteFiles ? null : async (id: string, specifiedVersion: string) => {
         // first we need to find if we have any file type in either the property
         // definitions of the prop extensions, any will do
         const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
@@ -1557,48 +1575,34 @@ export class ItemizeRawDB {
         const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
           .some((pdef) => pdef.getPropertyDefinitionDescription().rqRepresentsFile);
 
-        const containerExists = deleteFiles && deleteFiles[containerId];
+        const domain = NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname;
 
         // for item definition found files
         if (someFilesInItemDef) {
-          // we need to ensure the container exists and is some value
-          if (containerExists) {
-            // and now we can try to delete everything in there
-            // for our given domain and with the handle mysite.com/MOD_x__IDEF_y/id.version
-            // that will delete literally everything for the given id.version combo
-            try {
-              await deleteEverythingInFilesContainerId(
-                deleteFiles.domain,
-                deleteFiles.storage[containerId],
-                itemDefinition,
-                id + "." + (specifiedVersion || null),
-              );
-            } catch (err) {
-              logger.error(
-                {
-                  className: "ItemizeRawDB",
-                  methodName: "performBatchRawDBDelete",
-                  message: "Could not remove all the files for item definition storage",
-                  serious: true,
-                  err,
-                  data: {
-                    domain: deleteFiles.domain,
-                    containerId,
-                    itemDefinition: itemDefinition.getQualifiedPathName(),
-                    id,
-                    version: specifiedVersion || null,
-                  },
-                }
-              );
-            }
-          } else {
+          // and now we can try to delete everything in there
+          // for our given domain and with the handle mysite.com/MOD_x__IDEF_y/id.version
+          // that will delete literally everything for the given id.version combo
+          try {
+            await deleteEveryPossibleFileFor(
+              domain,
+              this.config.clusterSubdomains,
+              this.uploadsClient,
+              itemDefinition,
+              id + "." + (specifiedVersion || null),
+            );
+          } catch (err) {
             logger.error(
               {
                 className: "ItemizeRawDB",
                 methodName: "performBatchRawDBDelete",
-                message: "Item for " + selfTable + " contains a file field but no container id for data storage is available",
+                message: "Could not remove all the files for item definition storage",
+                serious: true,
+                err,
                 data: {
-                  containerId,
+                  domain,
+                  itemDefinition: itemDefinition.getQualifiedPathName(),
+                  id,
+                  version: specifiedVersion || null,
                 },
               }
             );
@@ -1607,40 +1611,27 @@ export class ItemizeRawDB {
 
         // this is doing exactly the same but for the module
         if (someFilesInModule) {
-          if (containerExists) {
-            try {
-              await deleteEverythingInFilesContainerId(
-                deleteFiles.domain,
-                deleteFiles.storage[containerId],
-                itemDefinition.getParentModule(),
-                id + "." + (specifiedVersion || null),
-              );
-            } catch (err) {
-              logger.error(
-                {
-                  className: "ItemizeRawDB",
-                  methodName: "performBatchRawDBDelete",
-                  message: "Could not remove all the files for module storage",
-                  serious: true,
-                  err,
-                  data: {
-                    domain: deleteFiles.domain,
-                    containerId,
-                    module: itemDefinition.getParentModule().getQualifiedPathName(),
-                    id,
-                    version: specifiedVersion || null,
-                  },
-                }
-              );
-            }
-          } else {
+          try {
+            await deleteEveryPossibleFileFor(
+              domain,
+              this.config.clusterSubdomains,
+              this.uploadsClient,
+              itemDefinition.getParentModule(),
+              id + "." + (specifiedVersion || null),
+            );
+          } catch (err) {
             logger.error(
               {
                 className: "ItemizeRawDB",
                 methodName: "performBatchRawDBDelete",
-                message: "Item for " + selfTable + " at module contains a file field but no container id for data storage is available",
+                message: "Could not remove all the files for module storage",
+                serious: true,
+                err,
                 data: {
-                  containerId,
+                  domain,
+                  module: itemDefinition.getParentModule().getQualifiedPathName(),
+                  id,
+                  version: specifiedVersion || null,
                 },
               }
             );
@@ -1703,7 +1694,7 @@ export class ItemizeRawDB {
       // as for the module, this is always going to be retrieved
       const returningElementsModule = deleter.returningAll ?
         "*" :
-        `"id","version","parent_id","parent_type","parent_version","container_id","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
+        `"id","version","parent_id","parent_type","parent_version","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
       // COPIED FROM CACHE
 
       const unversionedsToDelete = typeSorts[type].unversioned as ISQLTableRowValue[];
@@ -1815,7 +1806,7 @@ export class ItemizeRawDB {
       // COPYING FROM CACHE OUT
       // and now we can see all what we have dropped
       allVersionsDropped.forEach(async (row) => {
-        deleteFilesInContainer && deleteFilesInContainer(row.container_id, row.id, row.version || null);
+        deleteFilesForItem && deleteFilesForItem(row.id, row.version || null);
         const modulesThatMightBeSetAsChildOf: Module[] =
           this.root.getAllModules().map(analyzeModuleForPossibleParent.bind(this, itemDefinition)).flat() as Module[];
 
@@ -1908,12 +1899,6 @@ export class ItemizeRawDB {
       dangerousForceElasticUpdate?: boolean;
     }
   ) {
-    inserter.values.forEach((v) => {
-      if (!v.moduleTableInsert.container_id) {
-        throw new Error("moduleTableInsert is missing container id");
-      }
-    });
-
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
     const mod = itemDefinition.getParentModule();
 
