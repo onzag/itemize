@@ -16,10 +16,11 @@ import Module from "../base/Root/Module";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, REGISTRY_IDENTIFIER } from "../constants";
 import { yesno } from ".";
-import { getStorageProviders, IServiceCustomizationType } from "../server";
-import StorageProvider, { IStorageProvidersObject } from "../server/services/base/StorageProvider";
+import { IServiceCustomizationType } from "../server";
+import StorageProvider from "../server/services/base/StorageProvider";
 import { RegistryService } from "../server/services/registry";
 import { DatabaseConnection } from "../database";
+import { LocalStorageService } from "../server/services/local-storage";
 
 let serviceCustom: IServiceCustomizationType = {};
 try {
@@ -75,7 +76,7 @@ async function dumpFromIdef(
       // and query each of them
       let query = baseQuery;
       let bindings: string[];
-  
+
       // if it's versioned (this means we are sure only getting one)
       let isVersioned = Array.isArray(specific);
 
@@ -83,7 +84,7 @@ async function dumpFromIdef(
       if (isVersioned) {
         bindings = [
           specific[0],
-          specific[1] || "",
+          specific[1] || "",
         ];
         query += ` WHERE "id" = $1 AND "version" = $2`;
       } else {
@@ -168,7 +169,7 @@ async function dumpFromModule(
       if (isVersioned) {
         bindings = [
           specific[0],
-          specific[1] || "",
+          specific[1] || "",
         ];
         query += ` WHERE "id" = $1 AND "version" = $2`;
       } else {
@@ -227,11 +228,15 @@ async function dumpAllFromModuleRecursive(
  * concatenated and separated by a dot
  * @param client the cloud client
  */
-async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, clusterSubdomains: {[key: string]: string}) {
+async function copyDataAt(
+  qualifiedPathName: string,
+  idVersionHandle: string,
+  storageService: StorageProvider<any>,
+) {
   try {
-    await client.dumpFolder(
-      qualifiedPathName + "/" + idVersionHandle + "/",
-      path.join("dump", qualifiedPathName, idVersionHandle),
+    await storageService.dumpFolderFromAllSources(
+      path.join(qualifiedPathName, idVersionHandle),
+      path.join("./dump", qualifiedPathName, idVersionHandle),
     );
   } catch (err) {
     console.log(colors.red(err.message));
@@ -244,7 +249,7 @@ async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHa
  * @param root the root
  * @param domain the domain in question
  */
-async function copyDataOf(row: ISQLTableRowValue, root: Root, clusterSubdomains: {[key: string]: string}, domain: string) {
+async function copyDataOf(row: ISQLTableRowValue, root: Root, storageService: StorageProvider<any>) {
   console.log("dumping files of: " + colors.green(row.type + " " + row.id + " " + row.version));
 
   // so we need the idef and the module
@@ -252,8 +257,8 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, clusterSubdomains:
   const mod = idef.getParentModule();
 
   // and now we can attempt to copy the data for it
-  await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), clusterSubdomains);
-  await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), clusterSubdomains);
+  await copyDataAt(mod.getQualifiedPathName(), row.id + "." + (row.version || ""), storageService);
+  await copyDataAt(idef.getQualifiedPathName(), row.id + "." + (row.version || ""), storageService);
 }
 
 /**
@@ -262,7 +267,14 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, clusterSubdomains:
  * @param databaseConnection the database instance to read from
  * @param root the root instance
  */
-export default async function dump(version: string, databaseConnection: DatabaseConnection, root: Root) {
+export default async function dump(
+  version: string,
+  databaseConnection: DatabaseConnection,
+  root: Root,
+) {
+  const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(
+    await fsAsync.readFile(path.join("config", version === "development" ? "index.sensitive.json" : `index.${version}.sensitive.json`), "utf8"),
+  );
 
   const config: IConfigRawJSONDataType = JSON.parse(
     await fsAsync.readFile(path.join("config", "index.json"), "utf8"),
@@ -271,6 +283,34 @@ export default async function dump(version: string, databaseConnection: Database
   const dumpConfig: IDumpConfigRawJSONDataType = JSON.parse(
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
+
+  const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(
+    await fsAsync.readFile(path.join("config", version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`), "utf8"),
+  );
+
+  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(
+    await fsAsync.readFile(path.join("config", version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`), "utf8"),
+  );
+
+  const registry = new RegistryService({
+    databaseConnection,
+    registryTable: REGISTRY_IDENTIFIER,
+  }, null, {
+    config,
+    redisConfig,
+    dbConfig,
+    sensitiveConfig,
+  });
+  await registry.initialize();
+
+  const StorageProviderClass = serviceCustom.storageServiceProvider || LocalStorageService;
+  const storageService = new StorageProviderClass(null, registry, {
+    config,
+    dbConfig,
+    redisConfig,
+    sensitiveConfig,
+  });
+  await storageService.initialize();
 
   // and now we can start dumping
   let final: ISQLTableRowValue[] = [];
@@ -369,17 +409,13 @@ export default async function dump(version: string, databaseConnection: Database
       console.log("emiting " + colors.green("dump/dump.json"));
       // write it
       await fsAsync.writeFile("dump/dump.json", JSON.stringify(final, null, 2));
-
       // and now we need to fetch all these files for the dump
       for (const row of final) {
         // so we pass them one at a time
         await copyDataOf(
           row,
           root,
-          config.clusterSubdomains,
-          version === "development" ?
-            config.developmentHostname :
-            config.productionHostname
+          storageService as any,
         );
       }
     }

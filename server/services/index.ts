@@ -139,7 +139,18 @@ export class ServiceProvider<T> {
     this.globalRedisPub = globalPub;
     this.globalRedisSub = globalSub;
     this.globalRoot = root;
-    this.globalRawDB = new ItemizeRawDB(globalClient, globalPub, globalSub, this.globalDatabaseConnection, this.globalRoot);
+    this.globalRawDB = new ItemizeRawDB(
+      globalClient,
+      globalPub,
+      globalSub,
+      this.globalDatabaseConnection,
+      this.globalRoot,
+      this.appConfig,
+      // No uploads client global manager cannot handle file uploads
+      // via raw db because it has no place to store these files
+      // so they are exposed
+      null,
+    );
     this.globalCustomServices = globalCustomServices;
     this.globalMailProvider = globalMailProvider;
     this.globalPhoneProvider = globalPhoneProvider;

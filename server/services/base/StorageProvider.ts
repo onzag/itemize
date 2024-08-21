@@ -1,10 +1,106 @@
-import type { ReadStream } from "fs";
 import type { Readable } from "stream";
 import { ServiceProvider, ServiceProviderType } from "..";
 
+import express from "express";
+import { jwtSign } from "../../token";
+import { httpRequest } from "../../request";
+import { CLUSTER_ID, NODE_ENV } from "../../environment";
+
+import path from "path";
+import https from "https";
+
+/**
+ * The storage provide determines how files are to be stored in the cluster,
+ * there's one particular thing and that is that files are always retrieved
+ * over the /uploads/:clusterid endpoint building a cdn
+ * based on the cluster
+ * 
+ * you may use your own custom solution, as you wish, based on redirects, S3, hard drive, etc...
+ * By default itemize will ship with local-storage for using hard drive based storage
+ */
 export default class StorageProvider<T> extends ServiceProvider<T> {
+  public storageJWTKey: string = null;
+  public domain: string = null;
+
   public static getType() {
     return ServiceProviderType.NONE;
+  }
+
+  public async initialize(): Promise<void> {
+    this.storageJWTKey = await this.registry.createJWTSecretFor("STORAGE_KEY");
+
+    this.domain = NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname;
+  }
+
+  /**
+   * Default behaviour when receiving a request in order to solve a file
+   * 
+   * @param req the express request
+   * @param res the express response
+   * @param next the express next
+   * 
+   * Sxpect the request to come from /uploads/:clusterid/...
+   * 
+   * @override
+   */
+  public serve(req: express.Request, res: express.Response, next: (err?: Error) => void) {
+    
+  }
+
+  /**
+   * Used to list the files at a given location path
+   * 
+   * NECESSARY FOR DUMPING
+   * 
+   * @param at
+   * @override 
+   */
+  public async listOwnFiles(at: string): Promise<string[]> {
+    return null;
+  }
+
+  /**
+   * It's executed to verify whether a given resource
+   * exists
+   * 
+   * @param url the resource to check for
+   */
+  public async listFilesAt(at: string, clusterId: string): Promise<string[]> {
+    if (clusterId === CLUSTER_ID) {
+      return this.listOwnFiles(at);
+    }
+
+    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+
+    if (!subdomain) {
+      throw new Error("Cluster " + clusterId + " does not exist");
+    }
+
+    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
+
+    const url2 = new URL(url);
+    const token = await jwtSign({ pathname: url2.pathname }, this.storageJWTKey);
+    
+    this.logDebug({
+      className: "LocalStorageService",
+      methodName: "removeRemoteFolder",
+      message: "Attempting to list files at " + url,
+    });
+
+    const res = await httpRequest<string[]>({
+      method: "GET",
+      host: url2.host,
+      path: url2.pathname,
+      isHttps: true,
+      returnNonOk: true,
+      headers: {
+        token,
+        Accept: "application/json",
+      },
+      processAsJSON: true,
+    });
+
+    return res.data;
   }
 
   /**
@@ -17,8 +113,18 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param readStream the stream to read from
    * @override
    */
-  public async save(at: string, readStream: ReadStream | Readable): Promise<void> {
+  public async save(at: string, readStream: NodeJS.ReadableStream | Readable): Promise<void> {
 
+  }
+
+  /**
+   * This function is nasyncecessary for downloading a file
+   * 
+   * @param at the remote file to download
+   * @override
+   */
+  public readOwn(at: string): NodeJS.ReadableStream {
+    return null;
   }
 
   /**
@@ -27,18 +133,21 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param at the remote file to download
    * @override
    */
-  public read(at: string): ReadStream {
-    return null;
-  }
+  public readAt(at: string, clusterId: string): NodeJS.ReadableStream {
+    if (clusterId === CLUSTER_ID) {
+      return this.readOwn(at);
+    }
 
-  /**
-   * This function is necessary for downloading a file
-   * 
-   * @param url the remote file to download
-   * @override
-   */
-  public readRemote(url: string): ReadStream {
-    return null;
+    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+
+    if (!subdomain) {
+      throw new Error("Cluster " + clusterId + " does not exist");
+    }
+
+    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
+
+    const stream = https.get(url);
+    return stream as unknown as NodeJS.ReadableStream;
   }
 
   /**
@@ -50,7 +159,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param at the remote folder to remove
    * @override
    */
-  public async removeFolder(at: string): Promise<void> {
+  public async removeOwnPath(at: string): Promise<void> {
 
   }
 
@@ -60,10 +169,59 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * 
    * NECESSARY FOR CORE ITEMIZE TO FUNCTION
    * 
-   * @param url 
+   * You may override at will, but since the endpoint already has a DELETE action
+   * you may only need to handle removePath
+   * 
+   * @param at 
    */
-  public async removeRemoteFolder(url: string): Promise<void> {
+  public async removePathAt(at: string, clusterId: string): Promise<void> {
+    if (clusterId === CLUSTER_ID) {
+      return this.removeOwnPath(at);
+    }
 
+    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+
+    if (!subdomain) {
+      throw new Error("Cluster " + clusterId + " does not exist");
+    }
+
+    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
+
+    const url2 = new URL(url);
+    const token = await jwtSign({ pathname: url2.pathname }, this.storageJWTKey);
+
+    this.logDebug({
+      className: "LocalStorageService",
+      methodName: "removeRemoteFolder",
+      message: "Attempting to remove remote file " + url,
+    });
+
+    const res = await httpRequest({
+      method: "DELETE",
+      host: url2.host,
+      path: url2.pathname,
+      headers: {
+        token,
+      },
+      isHttps: true,
+      returnNonOk: true,
+    });
+
+    if (res.response.statusCode === 200) {
+      return;
+    } else {
+      const err = new Error("Failed to remove file at " + url);
+      this.logError({
+        className: "LocalStorageService",
+        methodName: "removeRemoteFolder",
+        message: err.message,
+        err: err,
+        data: {
+          url,
+        }
+      });
+      throw err;
+    }
   }
 
   /**
@@ -75,7 +233,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param at the resource to check for
    * @override
    */
-  public async exists(at: string): Promise<boolean> {
+  public async existsOwn(at: string): Promise<boolean> {
     return false;
   }
 
@@ -83,13 +241,38 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * It's executed to verify whether a given resource
    * exists
    * 
-   * NECESSARY FOR CORE ITEMIZE TO FUNCTION
-   * 
-   * @param url the resource to check for
-   * @override
+   * @param at the resource to check for
    */
-  public async existsRemote(url: string): Promise<boolean> {
-    return false;
+  public async existsAt(at: string, clusterId: string): Promise<boolean> {
+    if (clusterId === CLUSTER_ID) {
+      return this.existsOwn(at);
+    }
+
+    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+
+    if (!subdomain) {
+      throw new Error("Cluster " + clusterId + " does not exist");
+    }
+
+    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
+
+    const url2 = new URL(url);
+    
+    this.logDebug({
+      className: "LocalStorageService",
+      methodName: "existsRemote",
+      message: "Attempting check existance of remote file " + url,
+    });
+
+    const res = await httpRequest({
+      method: "HEAD",
+      host: url2.host,
+      path: url2.pathname,
+      isHttps: true,
+      returnNonOk: true,
+    });
+
+    return res.response.statusCode === 200;
   }
 
 
@@ -97,13 +280,13 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * Should copy a folder from one container to another target container, note that during
    * calls the target container may be itself, optimize if necessary for such calls
    * 
-   * NECESSARY FOR CUSTOM SERVER COPY CALLS TO FUNCTION
+   * NECESSARY FOR CACHE COPY CALLS TO FUNCTION
    * 
    * @param remotePath 
    * @param targetPath 
    * @override
    */
-  public async copyFile(sourcePath: string, targetPath: string) {
+  public async copyOwn(at: string, targetPath: string, options: {dump?: boolean} = {}): Promise<void> {
 
   }
 
@@ -117,7 +300,31 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param targetPath 
    * @override
    */
-  public async copyRemoteFile(sourceUrl: string, targetPath: string) {
+  public async copyRemoteAt(at: string, clusterId: string, localTargetPath: string, options: {dump?: boolean} = {}): Promise<{found: boolean}> {
+    return null;
+  }
 
+  /**
+   * required for dumping
+   * 
+   * @param at
+   */
+  public async dumpFolderFromAllSources(at: string, localBaseDirectory: string): Promise<void> {
+    const filesToCopyNCluster: {[filePath: string]: string} = {};
+
+    await Promise.all(Object.keys(this.appConfig.clusterSubdomains).map(async (clusterId: string) => {
+      const filesAtThatCluster = await this.listFilesAt(at, clusterId);
+      filesAtThatCluster.forEach((f) => {
+        if (!filesToCopyNCluster[f] || clusterId === CLUSTER_ID) {
+          filesToCopyNCluster[f] = clusterId;
+        }
+      });
+    }));
+
+    await Promise.all(Object.keys(filesToCopyNCluster).map(async (filePath) => {
+      const clusterId = filesToCopyNCluster[filePath];
+
+      await this.copyRemoteAt(filePath, clusterId, localBaseDirectory, {dump: true});
+    }));
   }
 }

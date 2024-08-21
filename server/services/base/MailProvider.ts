@@ -17,7 +17,7 @@ import type { IRQValue } from "../../../rq-querier";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { ServiceProvider, ServiceProviderType } from "..";
-import { FORCE_ALL_OUTBOUND_MAIL_TO, CLUSTER_ID, NODE_ENV } from "../../environment";
+import { FORCE_ALL_OUTBOUND_MAIL_TO, NODE_ENV } from "../../environment";
 import type { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { IOTriggerActions, ITriggerRegistry } from "../../resolvers/triggers";
 import path from "path";
@@ -2003,17 +2003,11 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
         return {
           ...v,
-          src: new Promise((resolve) => {
+          src: new Promise(async (resolve) => {
             resolve({
               createReadStream: () => {
                 const clusterId = v.cluster || this.localAppData.config.defaultCluster;
-                if (CLUSTER_ID === clusterId) {
-                  return this.localAppData.storage.read(location);
-                }
-                const domain = NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname;
-                const subdomain = this.localAppData.config.clusterSubdomains[clusterId];
-                const remotePath = "https://" + (!subdomain ? "" : subdomain + ".") + domain + "/rest/uploads/_/" + location; 
-                return this.localAppData.storage.readRemote(remotePath);
+                return this.localAppData.storage.readAt(location, clusterId);
               }
             })
           }),

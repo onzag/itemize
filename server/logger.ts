@@ -3,24 +3,15 @@ import Transport from "winston-transport";
 import { FORCE_CONSOLE_LOGS, INSTANCE_LOG_ERROR_FILE, INSTANCE_LOG_FILE, INSTANCE_MODE, INSTANCE_UUID, LOG_LEVEL, NODE_ENV } from "./environment";
 import type LoggingProvider from "./services/base/LoggingProvider";
 
-const disableLogger = (
-  INSTANCE_MODE === "BUILD_DATABASE" ||
-  INSTANCE_MODE === "LOAD_DATABASE_DUMP"
-);
+const standardInfoTransport = new winston.transports.File({
+  level: "info",
+  filename: INSTANCE_LOG_FILE,
+});
 
-const standardInfoTransport = disableLogger ? null : (
-  new winston.transports.File({
-    level: "info",
-    filename: INSTANCE_LOG_FILE,
-  })
-);
-
-const standardErrorTransport = disableLogger ? null : (
-  new winston.transports.File({
-    level: "error",
-    filename: INSTANCE_LOG_ERROR_FILE,
-  })
-);
+const standardErrorTransport = new winston.transports.File({
+  level: "error",
+  filename: INSTANCE_LOG_ERROR_FILE,
+});
 
 export interface IItemizeLoggingStructure<T> {
   message: string;
@@ -47,7 +38,7 @@ export interface IItemizeFinalLoggingObject extends IItemizeLoggingStructure<any
 }
 
 // building the logger
-const rawLogger: winston.Logger = disableLogger ? null : winston.createLogger({
+const rawLogger: winston.Logger = winston.createLogger({
   // buggy typescript somehow the definitions change all the time and will not work
   level: (LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info")) as any,
   format: winston.format.combine(
@@ -128,10 +119,10 @@ export interface IItemizePingObjectGenerator<D, S> {
       currentTimeMs: number;
       firstTimeMs: number;
     }
-  ) => {status: S, doNotStore: boolean},
+  ) => { status: S, doNotStore: boolean },
 };
 
-export interface IItemizePingObject<D, S> {}
+export interface IItemizePingObject<D, S> { }
 
 /**
  * @ignore
@@ -146,7 +137,7 @@ function defaultRegisterPing(pingId: string) {
   pingsRegistered.push(pingId);
 }
 
-export const logger = disableLogger ? null : {
+export const logger = {
   info: converterFn.bind(null, "info") as (arg: IItemizeLoggingStructure<any>) => void,
   debug: converterFn.bind(null, "debug") as (arg: IItemizeLoggingStructure<any>) => void,
   error: converterFn.bind(null, "error") as (arg: IItemizeLoggingErrorStructure<any>) => void,
@@ -193,10 +184,6 @@ class LoggingProviderTransport extends Transport {
 }
 
 export function extendLoggerWith(p: LoggingProvider<any>) {
-  if (disableLogger) {
-    return;
-  }
-
   const infoTransport = new LoggingProviderTransport({
     level: "info",
   }, p);
@@ -205,7 +192,7 @@ export function extendLoggerWith(p: LoggingProvider<any>) {
 
   rawLogger.remove(standardInfoTransport);
   rawLogger.remove(standardErrorTransport);
-  
+
   logger.createPing = (arg) => {
     p.createPing(INSTANCE_UUID, arg);
     p.addLogDataDestroyedListener(async (instanceId: string) => {

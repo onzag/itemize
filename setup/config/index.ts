@@ -126,7 +126,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
 
   newArg.dumpConfig = dumpConfigRequest(
     newArg.dumpConfig,
-    newArg.sensitiveConfigDevelopment,
+    newArg.standardConfig,
   );
 
   return newArg;

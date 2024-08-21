@@ -38,7 +38,7 @@ import { deleteEveryPossibleFileFor } from "../base/Root/Module/ItemDefinition/P
 import { analyzeModuleForPossibleParent } from "./cache";
 import { Listener } from "./listener";
 import { IConfigRawJSONDataType } from "../config";
-import { NODE_ENV } from "./environment";
+import { INSTANCE_MODE, NODE_ENV } from "./environment";
 import StorageProvider from "./services/base/StorageProvider";
 
 type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
@@ -364,6 +364,9 @@ export class ItemizeRawDB {
     );
 
     const consumeStreams = async (id: string, version: string) => {
+      if (INSTANCE_MODE === "GLOBAL_MANAGER") {
+        throw new Error("Global Manager cannot handle file uploads as it has no exposed uploads manager to speak to a client");
+      }
       const idVersionHandle = id + "." + (version || "");
       await modSQL.consumeStreams(idVersionHandle);
       await itemSQL.consumeStreams(idVersionHandle);
@@ -1575,8 +1578,6 @@ export class ItemizeRawDB {
         const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
           .some((pdef) => pdef.getPropertyDefinitionDescription().rqRepresentsFile);
 
-        const domain = NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname;
-
         // for item definition found files
         if (someFilesInItemDef) {
           // and now we can try to delete everything in there
@@ -1584,7 +1585,6 @@ export class ItemizeRawDB {
           // that will delete literally everything for the given id.version combo
           try {
             await deleteEveryPossibleFileFor(
-              domain,
               this.config.clusterSubdomains,
               this.uploadsClient,
               itemDefinition,
@@ -1599,7 +1599,6 @@ export class ItemizeRawDB {
                 serious: true,
                 err,
                 data: {
-                  domain,
                   itemDefinition: itemDefinition.getQualifiedPathName(),
                   id,
                   version: specifiedVersion || null,
@@ -1613,7 +1612,6 @@ export class ItemizeRawDB {
         if (someFilesInModule) {
           try {
             await deleteEveryPossibleFileFor(
-              domain,
               this.config.clusterSubdomains,
               this.uploadsClient,
               itemDefinition.getParentModule(),
@@ -1628,7 +1626,6 @@ export class ItemizeRawDB {
                 serious: true,
                 err,
                 data: {
-                  domain,
                   module: itemDefinition.getParentModule().getQualifiedPathName(),
                   id,
                   version: specifiedVersion || null,

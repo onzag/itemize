@@ -9,17 +9,16 @@ import { IAppDataType, IServerCustomizationDataType, app } from ".";
 import { logger } from "./logger";
 import express from "express";
 import path from "path";
-import { resolversRQ } from "./resolvers";
 import { MAX_FILES_PER_REQUEST, MAX_FILE_SIZE, MAX_FIELD_SIZE } from "../constants";
 import restServices, { secureEndpointRouter } from "./rest";
 import { getMode } from "./mode";
 import { userRestServices } from "./user/rest";
-import { NODE_ENV, NO_SEO } from "./environment";
+import { CLUSTER_ID, NODE_ENV, NO_SEO } from "./environment";
 
 import { ssrGenerator } from "./ssr/generator";
 import { SEOGenerator } from "./seo/generator";
-import { getRQSchemaForRoot } from "../base/Root/rq";
 import { rqSystem } from "./rq";
+import { jwtVerify } from "./token";
 
 /**
  * Initializes the server application with its configuration
@@ -82,27 +81,118 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     res.sendFile(path.resolve(path.join("dist", "data", "service.worker.production.js")));
   });
 
-  if (appData.sensitiveConfig.localContainer) {
-    logger.info(
-      {
-        functionName: "initializeApp",
-        message: "Initializing an uploads endpoint for the cluster",
-      },
-    );
+  logger.info(
+    {
+      functionName: "initializeApp",
+      message: "Initializing an uploads endpoint for the cluster",
+    },
+  );
 
-    app.use(
-      "/uploads",
-      express.static("uploads", {
-        cacheControl: true,
-        maxAge: 0,
-        immutable: true,
-        etag: true,
-        dotfiles: "allow",
-        lastModified: true,
-        index: false,
-      })
-    );
-  }
+  // create it at the uploads endpoint
+  app.use(
+    "/uploads/:clusterid",
+    async (req, res, next) => {
+      // first lets check the cluster is being asked for the file
+      const subdomainOfCluster = appData.config.clusterSubdomains[req.params.clusterid];
+      if (!subdomainOfCluster) {
+        res.status(404).end("Cluster does not exist");
+        return;
+      }
+
+      if (!req.path) {
+        res.status(400).end("Missing file path");
+        return;
+      }
+
+      let pathOfFile = path.normalize(req.path.replace(`/uploads/${req.params.clusterid}`, ""));
+      // single or double dots kinda sus
+      if (pathOfFile.startsWith(".")) {
+        res.status(400).end("Invalid file path");
+        return;
+      }
+      if (!pathOfFile.startsWith("/")) {
+        pathOfFile = "/" + pathOfFile;
+      }
+
+      if (req.method === "GET") {
+        if (!appData.storage.existsOwn(pathOfFile)) {
+          // we are the cluster, yet we don't have that file
+          if (req.params.clusterid === CLUSTER_ID) {
+            res.status(404).end("File does not exist");
+            return;
+          }
+
+          try {
+            // copy the file from the other cluster
+            const status = await appData.storage.copyRemoteAt(
+              pathOfFile,
+              req.params.clusterid,
+              pathOfFile,
+            );
+
+            if (!status.found) {
+              res.status(404).end("File does not exist at remote cluster");
+              return;
+            }
+          } catch (err) {
+            logger.error(
+              {
+                functionName: "initializeApp",
+                message: "Failed to copy remote file to rebuild CDN",
+                err,
+              },
+            );
+          }
+        }
+
+        appData.storage.serve(req, res, next);
+      } else if (req.method === "DELETE") {
+        if (req.params.clusterid !== CLUSTER_ID) {
+          res.status(400).end("A delete request must be done to the respective cluster that owns the subdomain, requested: " +
+            JSON.stringify(req.params.clusterid) + " but the respondant is: " + JSON.stringify(CLUSTER_ID));
+          return;
+        }
+
+        const token = req.headers["token"];
+
+        if (!token || typeof token !== "string") {
+          res.status(403).end("Missing token in headers");
+          return;
+        }
+
+        try {
+          const verifyToken = await jwtVerify(token, appData.storage.storageJWTKey) as any;
+
+          let expectedPathOfFile = verifyToken.pathname;
+          if (!pathOfFile.startsWith("/")) {
+            expectedPathOfFile = "/" + expectedPathOfFile;
+          }
+
+          if (expectedPathOfFile !== pathOfFile) {
+            res.status(403).end("Token does not grant removal of the given path");
+            return;
+          }
+        } catch (err) {
+          res.status(403).end("Invalid token");
+          return;
+        };
+
+        appData.storage.removeOwnPath(pathOfFile);
+      } else if (req.method === "HEAD") {
+        if (req.params.clusterid !== CLUSTER_ID) {
+          res.status(400).end("A head request must be done to the respective cluster that owns the subdomain, requested: " +
+            JSON.stringify(req.params.clusterid) + " but the respondant is: " + JSON.stringify(CLUSTER_ID));
+          return;
+        }
+
+        res.status(appData.storage.existsOwn(pathOfFile) ? 200 : 404).end();
+        return;
+      } else {
+        res.status(400).end("Invalid method");
+        return;
+      }
+    }
+  );
 
   const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
   const host = "https://" + hostname;

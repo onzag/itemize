@@ -144,14 +144,6 @@ export class ServerTest extends Test {
     }
   }
   public describe() {
-    if (this.testingInfo.sensitiveConfig.localContainer) {
-      this.warn(
-        "You are using a local container named " +
-        this.testingInfo.sensitiveConfig.localContainer +
-        " local containers will not work on multicluster builds"
-      );
-    }
-
     // this.it(
     //   "Should return the right buildnumber",
     //   async () => {

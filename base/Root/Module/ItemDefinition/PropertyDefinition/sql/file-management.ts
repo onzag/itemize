@@ -224,7 +224,7 @@ function processOneFileAndItsSameIDReplacement(
             const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
             const fileLocationPath = path.join(propertyLocationPath, oldVersion.id);
             try {
-              await uploadsClient.removeFolder(fileLocationPath);
+              await uploadsClient.removeOwnPath(fileLocationPath);
             } catch (err) {
               logger.error(
                 {
@@ -394,7 +394,6 @@ function processOneFileAndItsSameIDReplacement(
  * @returns a void promise from when this is done
  */
 export async function deleteEveryPossibleFileFor(
-  domain: string,
   clusterSubdomains: {[key: string]: string},
   uploadsClient: StorageProvider<any>,
   itemDefinitionOrModule: ItemDefinition | Module,
@@ -404,15 +403,10 @@ export async function deleteEveryPossibleFileFor(
   const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
   const filesContainerPath = path.join(idefOrModLocationPath, idVersionId);
 
-  await uploadsClient.removeFolder(filesContainerPath);
   await Promise.all(Object.keys(clusterSubdomains).map(async (clusterId) => {
-    if (clusterId === CLUSTER_ID) {
-      return;
-    }
-
-    await uploadsClient.removeRemoteFolder(
-      "https://" + (clusterSubdomains[clusterId] ? clusterSubdomains[clusterId] + "." : "") +
-      domain + "/" + filesContainerPath
+    await uploadsClient.removePathAt(
+      filesContainerPath,
+      clusterId,
     );
   }));
 }

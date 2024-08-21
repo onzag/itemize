@@ -1653,8 +1653,9 @@ export class Cache {
 
     let copiedAtLeastOneFile = false;
     const collectedFiles: Array<{
-      file: IRQFile, url: string, local: boolean, localpath: string,
-      pref: PropertyDefinition, include: Include
+      file: IRQFile, local: boolean, path: string,
+      pref: PropertyDefinition, include: Include,
+      clusterId: string,
     }> = [];
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((propDef) => {
       const desc = propDef.getPropertyDefinitionDescription();
@@ -1781,10 +1782,10 @@ export class Cache {
 
         try {
           if (collectedFile.local) {
-            await this.storageClient.copyFile(collectedFile.localpath, targetPath);
+            await this.storageClient.copyOwn(collectedFile.path, targetPath);
             copiedAtLeastOneFile = true;
           } else {
-            await this.storageClient.copyRemoteFile(collectedFile.url, targetPath);
+            await this.storageClient.copyRemoteAt(collectedFile.path, collectedFile.clusterId, targetPath);
             copiedAtLeastOneFile = true;
           }
         } catch (err) {
@@ -2793,7 +2794,6 @@ export class Cache {
       if (someFilesInItemDef) {
         try {
           await deleteEveryPossibleFileFor(
-            this.domain,
             this.config.clusterSubdomains,
             this.storageClient,
             itemDefinition,
@@ -2823,7 +2823,6 @@ export class Cache {
       if (someFilesInModule) {
         try {
           await deleteEveryPossibleFileFor(
-            this.domain,
             this.config.clusterSubdomains,
             this.storageClient,
             itemDefinition.getParentModule(),
@@ -3909,8 +3908,8 @@ function resolveFileForCopying(
   include: Include,
   property: PropertyDefinition,
 ) {
-  const clusterID = file.cluster || config.defaultCluster;
-  const localpath = (
+  const clusterId = file.cluster || config.defaultCluster;
+  const path = (
     property.isExtension() ?
       itemDefinition.getParentModule().getQualifiedPathName() :
       itemDefinition.getQualifiedPathName()
@@ -3920,22 +3919,9 @@ function resolveFileForCopying(
     property.getId() + "/" +
     file.id + "/" + file.url;
 
-  if (clusterID === CLUSTER_ID) {
-    return {
-      local: true,
-      url: null as string,
-      localpath,
-    };
-  }
-
-  // TODOContainerId
-
-  const domain = NODE_ENV === "development" ? config.developmentHostname : config.productionHostname;
-  const url = "https://" + config.clusterSubdomains[clusterID] + "." + domain + "/rest/uploads/_/" + localpath;
-
   return {
-    local: false,
-    localpath,
-    url,
-  }
+    local: clusterId === CLUSTER_ID,
+    path,
+    clusterId,
+  };
 }
