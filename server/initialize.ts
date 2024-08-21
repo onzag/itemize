@@ -187,6 +187,48 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
 
         res.status(appData.storage.existsOwn(pathOfFile) ? 200 : 404).end();
         return;
+      } else if (req.method === "POST") {
+        if (req.params.clusterid !== CLUSTER_ID) {
+          res.status(400).end("A post request must be done to the respective cluster that owns the subdomain, requested: " +
+            JSON.stringify(req.params.clusterid) + " but the respondant is: " + JSON.stringify(CLUSTER_ID));
+          return;
+        }
+
+        const token = req.headers["token"];
+
+        if (!token || typeof token !== "string") {
+          res.status(403).end("Missing token in headers");
+          return;
+        }
+
+        try {
+          const verifyToken = await jwtVerify(token, appData.storage.storageJWTKey) as any;
+
+          let expectedPathOfFile = verifyToken.pathname;
+          if (!pathOfFile.startsWith("/")) {
+            expectedPathOfFile = "/" + expectedPathOfFile;
+          }
+
+          if (expectedPathOfFile !== pathOfFile) {
+            res.status(403).end("Token does not grant add/modify to the given path");
+            return;
+          }
+        } catch (err) {
+          res.status(403).end("Invalid token");
+          return;
+        };
+
+        try {
+          // pipe the stream directly to the storage
+          // it should save it to a file
+          await appData.storage.save(
+            pathOfFile,
+            req,
+          );
+          res.status(200).end();
+        } catch (err) {
+          res.status(500).end("Internal Server Error");
+        }
       } else {
         res.status(400).end("Invalid method");
         return;

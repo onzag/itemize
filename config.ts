@@ -215,6 +215,21 @@ export interface IDumpConfigRawJSONDataType {
      * this cluster will be used instead
      */
     primaryClusterId: string;
+
+    /**
+     * Every row in itemize is created by a given creator
+     * if the environment user ids don't match use this map to force to
+     * the dump into a specific user with a name
+     */
+    userIdToUserWithName?: {
+      [createdBy: string]: string;
+    }
+
+    /**
+     * If a value is not found in the userIdToUserId map this one will be used instead
+     * if not specified the original value will be kept
+     */
+    forceUserIdToUserWithName?: string;
   },
 }
 
@@ -499,6 +514,7 @@ export const dumpConfigSchema = {
             items: {
               type: "string",
             },
+            minItems: 1,
           }
         },
         versionToClusterId: {
@@ -508,11 +524,29 @@ export const dumpConfigSchema = {
             items: {
               type: "string",
             },
+            minItems: 1,
           }
         },
         primaryClusterId: {
           type: "string",
         },
+        userIdToUserWithName: {
+          type: "object",
+          additionalProperties: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            minItems: 1,
+          }
+        },
+        forceUserIdToUserWithName: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          minItems: 1,
+        }
       },
       required: [
         "primaryClusterId",

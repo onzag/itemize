@@ -1,16 +1,16 @@
-import { ReadStream } from "fs";
 import http from "http";
 import https from "https";
 import FormDataNode from "form-data";
 import { CAN_LOG_DEBUG } from "./environment";
 import { logger } from "./logger";
+import type { Readable } from "stream";
 
 interface IHTTPRequestInfo {
   isHttps: boolean;
   host: string;
   path: string;
   method: string;
-  stream?: ReadStream;
+  stream?: NodeJS.ReadableStream | Readable;
   formData?: { [key: string]: any };
   formDataRaw?: FormDataNode;
   urlEncoded?: { [key: string]: string | string[] };
@@ -52,7 +52,7 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
   let hasFiredError = false;
   return new Promise((resolve, reject) => {
     try {
-      let stream: ReadStream = data.stream;
+      let stream: NodeJS.ReadableStream | Readable = data.stream;
       let headers = data.headers || {};
       if (data.formData) {
         const formData = new FormDataNode();

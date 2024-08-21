@@ -5,6 +5,7 @@ import { ServiceProviderType } from ".";
 import StorageProvider from "./base/StorageProvider";
 import express from "express";
 import https from "http";
+import { CLUSTER_ID } from "../environment";
 
 // get a static router
 const expressStatic = express.static("uploads", {
@@ -57,21 +58,19 @@ export class LocalStorageService extends StorageProvider<null> {
     return rs;
   }
 
-  public async save(at: string, readStream: ReadStream): Promise<void> {
-    const remote = at;
-    const targetPath = remote.split("/");
-
-    if (targetPath[0] === "") {
-      targetPath.shift();
+  public async save(at: string, readStream: ReadStream, options: {dump?: boolean} = {}): Promise<void> {
+    const targetAt = options.dump ? at : path.normalize(path.join("uploads", at));
+    if (!options.dump && targetAt.startsWith("..")) {
+      throw new Error("It's not allowed to go upstream of uploads")
     }
 
-    const fileName = targetPath.pop();
+    const targetPath = path.dirname(targetAt);
 
-    await fsAsync.mkdir(path.join("uploads", ...targetPath), {
+    await fsAsync.mkdir(targetPath, {
       recursive: true,
     });
 
-    const writeStream = fs.createWriteStream(path.join("uploads", ...targetPath, fileName));
+    const writeStream = fs.createWriteStream(targetAt);
     readStream.pipe(writeStream);
 
     return new Promise((resolve, reject) => {
@@ -151,7 +150,7 @@ export class LocalStorageService extends StorageProvider<null> {
    * @param targetPath 
    * @override
    */
-  public async copyOwn(at: string, targetPath: string, options: { dump?: boolean } = {}): Promise<void> {
+  public async copyOwn(at: string, targetPath: string, options: { dump?: boolean } = {}): Promise<{found: boolean}> {
     const srcWUploads = path.normalize(path.join("uploads", at));
     if (srcWUploads.startsWith("..")) {
       throw new Error("It's not allowed to go upstream of uploads")
@@ -160,16 +159,20 @@ export class LocalStorageService extends StorageProvider<null> {
     if (!options.dump && actualTargetPath.startsWith("..")) {
       throw new Error("It's not allowed to go upstream of uploads as a target path with no dump option");
     }
+    let foundSomething = false;
     try {
       const self = await fsAsync.stat(srcWUploads);
       if (self.isDirectory()) {
         const files = await fsAsync.readdir(srcWUploads);
         await Promise.all(files.map(async (file) => {
-          await this.copyOwn(
+          const copyOwnRes = await this.copyOwn(
             path.join(at, file),
             path.join(targetPath, file),
             options,
           );
+          if (copyOwnRes.found) {
+            foundSomething = true;
+          }
         }))
       } else if (self.isFile()) {
         const dirname = path.dirname(actualTargetPath);
@@ -179,13 +182,12 @@ export class LocalStorageService extends StorageProvider<null> {
           await fsAsync.mkdir(dirname, { recursive: true });
         }
         await fsAsync.copyFile(srcWUploads, actualTargetPath);
+        foundSomething = true;
       }
     } catch {
       // DO nothing, can't access directory, must not even exist
     }
-  }
 
-  public async copyRemoteAt(at: string, clusterId: string, localTargetPath: string, options: {dump?: boolean} = {}): Promise<{found: boolean}> {
-    return null;
+    return {found: foundSomething};
   }
 }

@@ -44,7 +44,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @override
    */
   public serve(req: express.Request, res: express.Response, next: (err?: Error) => void) {
-    
+
   }
 
   /**
@@ -80,7 +80,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
 
     const url2 = new URL(url);
     const token = await jwtSign({ pathname: url2.pathname }, this.storageJWTKey);
-    
+
     this.logDebug({
       className: "LocalStorageService",
       methodName: "removeRemoteFolder",
@@ -113,8 +113,49 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param readStream the stream to read from
    * @override
    */
-  public async save(at: string, readStream: NodeJS.ReadableStream | Readable): Promise<void> {
+  public async save(at: string, readStream: NodeJS.ReadableStream | Readable, options: {dump?: boolean} = {}): Promise<void> {
 
+  }
+
+  public async saveRemote(at: string, clusterId: string, readStream: NodeJS.ReadableStream | Readable, options: {alwaysUseHttp?: boolean} = {}) {
+    if (!options.alwaysUseHttp && clusterId === CLUSTER_ID) {
+      return this.save(at, readStream);
+    }
+
+    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+
+    if (!subdomain) {
+      throw new Error("Cluster " + clusterId + " does not exist");
+    }
+
+    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
+
+    const url2 = new URL(url);
+    const token = await jwtSign({ pathname: url2.pathname }, this.storageJWTKey);
+
+    this.logDebug({
+      className: "LocalStorageService",
+      methodName: "saveRemote",
+      message: "Attempting to upload file at " + url,
+    });
+
+    const res = await httpRequest<string[]>({
+      method: "POST",
+      host: url2.host,
+      path: url2.pathname,
+      isHttps: true,
+      returnNonOk: true,
+      headers: {
+        token,
+      },
+      stream: readStream,
+    });
+
+    if (res.response.statusCode !== 200) {
+      throw new Error("File failed to upload at " + url);
+    }
+
+    return;
   }
 
   /**
@@ -257,7 +298,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
     const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
 
     const url2 = new URL(url);
-    
+
     this.logDebug({
       className: "LocalStorageService",
       methodName: "existsRemote",
@@ -286,8 +327,8 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param targetPath 
    * @override
    */
-  public async copyOwn(at: string, targetPath: string, options: {dump?: boolean} = {}): Promise<void> {
-
+  public async copyOwn(at: string, targetPath: string, options: { dump?: boolean } = {}): Promise<{ found: boolean }> {
+    return null;
   }
 
   /**
@@ -298,10 +339,64 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * 
    * @param sourceUrl 
    * @param targetPath 
-   * @override
    */
-  public async copyRemoteAt(at: string, clusterId: string, localTargetPath: string, options: {dump?: boolean} = {}): Promise<{found: boolean}> {
-    return null;
+  public async copyRemoteAt(at: string, clusterId: string, localTargetPath: string, options: { dump?: boolean } = {}): Promise<{ found: boolean }> {
+    if (!options.dump && clusterId === CLUSTER_ID) {
+      return this.copyOwn(at, localTargetPath, options);
+    }
+
+    // get the file list for the remote
+    const fileList = await this.listFilesAt(at, clusterId);
+
+    // if the file list lenght is greater than zero
+    if (fileList.length === 0) {
+      return { found: false };
+    }
+
+    // grab the subdomain for that
+    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+
+    // no subdomain no fun
+    if (!subdomain) {
+      throw new Error("Cluster " + clusterId + " does not exist");
+    }
+
+    // now we can loop over these files we are meant to download
+    await Promise.all(fileList.map(async (fileToDownload) => {
+      // grab the url
+      const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, fileToDownload);
+
+      const url2 = new URL(url);
+  
+      this.logDebug({
+        className: "LocalStorageService",
+        methodName: "copyRemoteAt",
+        message: "Attempting to copy file at " + url,
+      });
+  
+      // do a http request for them
+      const res = await httpRequest<string[]>({
+        method: "GET",
+        host: url2.host,
+        path: url2.pathname,
+        isHttps: true,
+        returnNonOk: true,
+        processAsJSON: true,
+        dontProcessResponse: true,
+      });
+
+      // we grab the file path that comes after the path we want to save
+      // from the files to download that we got for the given path, we simply replaced the base
+      // we provided
+      const filePathItself = fileToDownload.replace(at, "");
+
+      // and save them locally, basically replacing that base with out target
+      await this.save(path.join(localTargetPath, filePathItself), res.response, options);
+    }));
+    
+    return {
+      found: true,
+    };
   }
 
   /**
@@ -310,7 +405,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param at
    */
   public async dumpFolderFromAllSources(at: string, localBaseDirectory: string): Promise<void> {
-    const filesToCopyNCluster: {[filePath: string]: string} = {};
+    const filesToCopyNCluster: { [filePath: string]: string } = {};
 
     await Promise.all(Object.keys(this.appConfig.clusterSubdomains).map(async (clusterId: string) => {
       const filesAtThatCluster = await this.listFilesAt(at, clusterId);
@@ -324,7 +419,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
     await Promise.all(Object.keys(filesToCopyNCluster).map(async (filePath) => {
       const clusterId = filesToCopyNCluster[filePath];
 
-      await this.copyRemoteAt(filePath, clusterId, localBaseDirectory, {dump: true});
+      await this.copyRemoteAt(filePath, clusterId, localBaseDirectory, { dump: true });
     }));
   }
 }
