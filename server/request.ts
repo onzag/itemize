@@ -21,6 +21,9 @@ interface IHTTPRequestInfo {
   auth?: string;
   noDebug?: boolean;
   port?: string | number;
+  maxAttempts?: number;
+  maxAttemptsRetryTime?: number;
+  maxAttemptsRetryTimeDuplicateEachTime?: boolean;
 }
 
 interface IHTTPResponse<T> {
@@ -28,7 +31,13 @@ interface IHTTPResponse<T> {
   data: T;
 }
 
-export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>> {
+const wait = (time: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time);
+  });
+};
+
+export async function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>> {
   if (data.formData && data.stream) {
     throw new Error("Cannot use form data and stream at the same time in request");
   }
@@ -41,6 +50,14 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
     throw new Error("Cannot use stream and url ecoded at the same time in request");
   }
 
+  if (typeof data.maxAttempts === "number" && data.maxAttempts <= 0) {
+    throw new Error("maxAttempts cannot be less or equal to zero");
+  }
+
+  if (typeof data.maxAttemptsRetryTime === "number" && data.maxAttemptsRetryTime <= 0) {
+    throw new Error("maxAttemptsRetryTime cannot be less or equal to zero");
+  }
+
   if (CAN_LOG_DEBUG && !data.noDebug) {
     logger.debug({
       message: "HTTP request",
@@ -49,6 +66,29 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
     });
   }
 
+  if (typeof data.maxAttempts === "undefined" || data.maxAttempts === null || data.maxAttempts === 1) {
+    return httpRequestOriginal(data);
+  } else {
+    let attempts = 0;
+    while (true) {
+      try {
+        attempts++;
+        const res = await httpRequestOriginal<T>(data);
+        return res;
+      } catch (err) {
+        if (attempts >= data.maxAttempts) {
+          throw err;
+        }
+
+        await wait(
+          (data.maxAttemptsRetryTime || 2000)*(data.maxAttemptsRetryTimeDuplicateEachTime ? (2**attempts) : 1),
+        );
+      }
+    }
+  }
+}
+
+function httpRequestOriginal<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>> {
   let hasFiredError = false;
   return new Promise((resolve, reject) => {
     try {

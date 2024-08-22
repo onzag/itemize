@@ -13,7 +13,7 @@ import { MAX_FILES_PER_REQUEST, MAX_FILE_SIZE, MAX_FIELD_SIZE } from "../constan
 import restServices, { secureEndpointRouter } from "./rest";
 import { getMode } from "./mode";
 import { userRestServices } from "./user/rest";
-import { CLUSTER_ID, NODE_ENV, NO_SEO } from "./environment";
+import { CLUSTER_ID, INSTANCE_UUID, NODE_ENV, NO_SEO } from "./environment";
 
 import { ssrGenerator } from "./ssr/generator";
 import { SEOGenerator } from "./seo/generator";
@@ -61,6 +61,10 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     }),
   );
 
+  app.get("/uuid", (req, res) => {
+    res.status(200).end(INSTANCE_UUID);
+  });
+
   // service worker setup
   app.get("/sw.development.js", (req, res) => {
     if (reprocessedCache["/service.worker.development.js"]) {
@@ -94,7 +98,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     async (req, res, next) => {
       // first lets check the cluster is being asked for the file
       const subdomainOfCluster = appData.config.clusterSubdomains[req.params.clusterid];
-      if (!subdomainOfCluster) {
+      if (typeof subdomainOfCluster !== "string") {
         res.status(404).end("Cluster does not exist");
         return;
       }
@@ -115,37 +119,77 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
       }
 
       if (req.method === "GET") {
-        if (!appData.storage.existsOwn(pathOfFile)) {
-          // we are the cluster, yet we don't have that file
-          if (req.params.clusterid === CLUSTER_ID) {
-            res.status(404).end("File does not exist");
+        if (req.headers.accept === "application/json") {
+          if (req.params.clusterid !== CLUSTER_ID) {
+            res.status(400).end("A GET request for application/json must be done to the respective cluster that owns the subdomain, requested: " +
+              JSON.stringify(req.params.clusterid) + " but the respondant is: " + JSON.stringify(CLUSTER_ID));
+            return;
+          }
+  
+          const token = req.headers["token"];
+  
+          if (!token || typeof token !== "string") {
+            res.status(403).end("Missing token in headers");
             return;
           }
 
           try {
-            // copy the file from the other cluster
-            const status = await appData.storage.copyRemoteAt(
-              pathOfFile,
-              req.params.clusterid,
-              pathOfFile,
-            );
-
-            if (!status.found) {
-              res.status(404).end("File does not exist at remote cluster");
+            const verifyToken = await jwtVerify(token, appData.storage.storageJWTKey) as any;
+  
+            let expectedPathOfFile = verifyToken.pathname;
+            if (!pathOfFile.startsWith("/")) {
+              expectedPathOfFile = "/" + expectedPathOfFile;
+            }
+  
+            if (expectedPathOfFile !== pathOfFile) {
+              res.status(403).end("Token does not grant listing of the given path");
               return;
             }
           } catch (err) {
-            logger.error(
-              {
-                functionName: "initializeApp",
-                message: "Failed to copy remote file to rebuild CDN",
-                err,
-              },
-            );
-          }
-        }
+            res.status(403).end("Invalid token");
+            return;
+          };
 
-        appData.storage.serve(req, res, next);
+          const filesList = await appData.storage.listOwnFiles(pathOfFile);
+
+          res.setHeader("content-type", "application/json; charset=utf-8");
+          res.status(200).end(JSON.stringify(filesList));
+        } else {
+          if (!await appData.storage.existsOwn(pathOfFile)) {
+            // we are the cluster, yet we don't have that file
+            if (req.params.clusterid === CLUSTER_ID) {
+              res.status(404).end("File does not exist");
+              return;
+            }
+  
+            try {
+              // copy the file from the other cluster
+              const status = await appData.storage.copyRemoteAt(
+                pathOfFile,
+                req.params.clusterid,
+                pathOfFile,
+              );
+  
+              if (!status.found) {
+                res.status(404).end("File does not exist at remote cluster");
+                return;
+              }
+            } catch (err) {
+              logger.error(
+                {
+                  functionName: "initializeApp",
+                  message: "Failed to copy remote file to rebuild CDN",
+                  err,
+                },
+              );
+  
+              res.status(500).end("Failed connection to remote cluster");
+              return;
+            }
+          }
+  
+          appData.storage.serve(req, res, next);
+        }
       } else if (req.method === "DELETE") {
         if (req.params.clusterid !== CLUSTER_ID) {
           res.status(400).end("A delete request must be done to the respective cluster that owns the subdomain, requested: " +

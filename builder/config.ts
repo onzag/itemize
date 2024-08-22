@@ -101,13 +101,6 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
         traceback.newTraceToBit("fallbackLanguage"),
       );
     }
-
-    if (!data.clusterSubdomains["*"]) {
-      throw new CheckUpError(
-        "The cluster subdomain is missing the asterisk (*) property, use it to specify your default cluster and its subdomain",
-        traceback.newTraceToBit("clusterSubdomains"),
-      );
-    }
   };
   const standardConfig = await extractOneConfig<IConfigRawJSONDataType>(
     checkConfig, "index", null, false, standardConfigCheckerCallback,

@@ -74,6 +74,7 @@ import { RQRootSchema, getRQSchemaForRoot } from "../base/Root/rq";
 import AnalyticsProvider, { ITrackOptions } from "./services/base/AnalyticsProvider";
 import { ElasticAnalyticsService } from "./services/elastic-analytics";
 import { resolversRQ } from "./resolvers";
+import { checkClusterSanityAfterListen, checkClusterSanityBeforeListen } from "./sanity";
 
 export interface IServerPingDataPing {
   cpuUsageTotal: NodeJS.CpuUsage,
@@ -406,6 +407,23 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     loggingService && await loggingService.initialize();
     loggingService && extendLoggerWith(loggingService);
 
+    const isSaneBeforeListen = await checkClusterSanityBeforeListen(config, buildnumber);
+
+    if (!isSaneBeforeListen) {
+      // enter death loop to prevent this server from causing further damage
+      while (true) {
+        logger.error({
+          functionName: "initializeServer",
+          message: "Server is deemed unhealthy before listen, entering death loop",
+          serious: true,
+        });
+
+        // repeat message every 10 minutes
+        // death loop will prevent restarting
+        await wait(1000 * 60 * 10);
+      }
+    }
+
     // redis configuration despite instructions actually tries to use null
     // values as it checks for undefined so we need to strip these if null
     Object.keys(redisConfig.cache).forEach((key) => {
@@ -707,7 +725,6 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       registryTable: REGISTRY_IDENTIFIER,
     }, null, configsObj);
     await registry.initialize();
-
 
     // due to a bug in the types the create client function is missing
     // domainId and domainName
@@ -1224,6 +1241,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     locationSearchService && locationSearchService.setupLocalResources(appData);
     paymentService && paymentService.setupLocalResources(appData);
     storageClient && storageClient.setupLocalResources(appData);
+    analyticsService && analyticsService.setupLocalResources(appData);
     customServicesInstances.forEach((i) => i.setupLocalResources(appData));
 
     logger.info(
@@ -1394,6 +1412,29 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
         },
       );
     });
+
+    await wait(2000);
+
+    const isSaneAfterListen = await checkClusterSanityAfterListen(config, appData.storage, buildnumber);
+
+    if (!isSaneAfterListen) {
+      // stops server from accepting new connections
+      server.close();
+
+      // enter death loop to prevent this server from causing further damage
+      while (true) {
+        logger.error({
+          functionName: "initializeServer",
+          message: "Server is deemed unhealthy, entering death loop",
+          serious: true,
+        });
+
+        // repeat message every 10 minutes
+        // death loop will prevent restarting
+        await wait(1000 * 60 * 10);
+      }
+    }
+
   } catch (err) {
     logger.error(
       {

@@ -4,8 +4,6 @@ import path from "path";
 import { ServiceProviderType } from ".";
 import StorageProvider from "./base/StorageProvider";
 import express from "express";
-import https from "http";
-import { CLUSTER_ID } from "../environment";
 
 // get a static router
 const expressStatic = express.static("uploads", {
@@ -116,28 +114,23 @@ export class LocalStorageService extends StorageProvider<null> {
   public async existsOwn(at: string): Promise<boolean> {
     const localPath = path.join("uploads", at);
 
-    let exists = true;
+    let existsAndFile = true;
     try {
-      await fsAsync.access(localPath, fs.constants.F_OK);
+      const stat = await fsAsync.stat(localPath);
+      existsAndFile = stat.isFile();
+    } catch (e) {
+      existsAndFile = false;
       this.logDebug({
         className: "LocalStorageService",
         methodName: "exists",
-        message: "Checking succeed " + at,
-      });
-    } catch (e) {
-      exists = false;
-      this.logError({
-        className: "LocalStorageService",
-        methodName: "exists",
-        message: "Checking failed " + at,
-        err: e,
+        message: "Checking show file does not exist " + at,
         data: {
           at,
         }
       });
     }
 
-    return exists;
+    return existsAndFile;
   }
 
   /**

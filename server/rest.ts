@@ -461,7 +461,7 @@ export default function restServices(appData: IAppDataType) {
   }
 
   router.get("/buildnumber", (req, res) => {
-    res.setHeader("content-type", "application/json; charset=utf-8");
+    res.setHeader("content-type", "text/plain; charset=utf-8");
     res.end(appData.buildnumber.toString());
   });
 

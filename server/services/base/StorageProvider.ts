@@ -1,4 +1,4 @@
-import type { Readable } from "stream";
+import { Readable } from "stream";
 import { ServiceProvider, ServiceProviderType } from "..";
 
 import express from "express";
@@ -8,6 +8,7 @@ import { CLUSTER_ID, NODE_ENV } from "../../environment";
 
 import path from "path";
 import https from "https";
+import uuid from "uuid";
 
 /**
  * The storage provide determines how files are to be stored in the cluster,
@@ -21,6 +22,7 @@ import https from "https";
 export default class StorageProvider<T> extends ServiceProvider<T> {
   public storageJWTKey: string = null;
   public domain: string = null;
+  private localId: string = null;
 
   public static getType() {
     return ServiceProviderType.NONE;
@@ -30,6 +32,43 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
     this.storageJWTKey = await this.registry.createJWTSecretFor("STORAGE_KEY");
 
     this.domain = NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname;
+
+    // make a local id from the available functions
+    // in practise this local id will never be overwritten
+    // because it's available in all instances
+    const localIdExists = await this.existsOwn("uuid");
+    if (!localIdExists) {
+      // create a new uuid
+      const readable = new Readable();
+      const savePromise = this.save("uuid", readable);
+      this.localId = uuid.v4();
+      readable.push(this.localId);
+      readable.push(null);
+      await savePromise;
+    } else {
+      const rs = this.readOwn("uuid");
+      const promise = new Promise<void>((resolve, reject) => {
+        this.localId = "";
+        rs.on("data", (chunk: string) => {
+          this.localId += chunk;
+        });
+        rs.on("end", () => {
+          resolve();
+        });
+        rs.on("error", (err: Error) => {
+          reject(err);
+        });
+      });
+      await promise;
+    }
+  }
+
+  /**
+   * this is used to return a string that uniquely identifies the storage
+   * that we are using to ensure that it is the same storage
+   */
+  public async getOwnStorageUuid(): Promise<string> {
+    return this.localId;
   }
 
   /**
@@ -280,7 +319,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
 
   /**
    * It's executed to verify whether a given resource
-   * exists
+   * exists and is a file
    * 
    * @param at the resource to check for
    */
@@ -340,7 +379,12 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
    * @param sourceUrl 
    * @param targetPath 
    */
-  public async copyRemoteAt(at: string, clusterId: string, localTargetPath: string, options: { dump?: boolean } = {}): Promise<{ found: boolean }> {
+  public async copyRemoteAt(
+    at: string,
+    clusterId: string,
+    localTargetPath: string,
+    options: { dump?: boolean } = {},
+  ): Promise<{ found: boolean }> {
     if (!options.dump && clusterId === CLUSTER_ID) {
       return this.copyOwn(at, localTargetPath, options);
     }

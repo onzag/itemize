@@ -210,12 +210,13 @@ export async function dropExtraColumnInTable(
     try {
       const foreignKeys = await databaseConnection.queryRows(
         "SELECT conname FROM pg_constraint WHERE conrelid = $1::regclass AND confkey IS NOT NULL AND " +
-        "conkey @> (SELECT ARRAY(SELECT attnum FROM pg_attribute WHERE attrelid = $1::regclass AND attname = '$2'))",
+        "conkey @> (SELECT ARRAY(SELECT attnum FROM pg_attribute WHERE attrelid = $1::regclass AND attname = $2))",
         [
-          "public." + tableName,
+          "public." + JSON.stringify(tableName),
           currentColumnName,
         ]
       );
+
       for (const fkKey of foreignKeys) {
         await databaseConnection.query(
           `ALTER TABLE ${JSON.stringify(tableName)} DROP CONSTRAINT ${JSON.stringify(fkKey.conname)}`,
