@@ -259,7 +259,7 @@ export default async function loadDump(version: string, databaseConnection: Data
           if (dumpConfig.load.versionToClusterId && dumpConfig.load.versionToClusterId[row.version || ""]) {
             // we find the first one that has a cluster subdomain
             const newClusterValue = dumpConfig.load.versionToClusterId[row.version || ""].find((c) => {
-              return typeof config.clusterSubdomains[c] === "string";
+              return config.allClusters.includes(c);
             });
 
             // we set it if we get any
@@ -273,7 +273,7 @@ export default async function loadDump(version: string, databaseConnection: Data
           if (!wasSet && dumpConfig.load.clusterIdToClusterId && dumpConfig.load.clusterIdToClusterId[file.cluster]) {
             // we find one
             const newClusterValue = dumpConfig.load.clusterIdToClusterId[file.cluster].find((c) => {
-              return typeof config.clusterSubdomains[c] === "string";
+              return config.allClusters.includes(c);
             });
 
             // we set it if we did find one
@@ -284,14 +284,14 @@ export default async function loadDump(version: string, databaseConnection: Data
           }
 
           // and now for the primary if all fails
-          if (!wasSet && dumpConfig.load.primaryClusterId && typeof config.clusterSubdomains[dumpConfig.load.primaryClusterId] === "string") {
+          if (!wasSet && dumpConfig.load.primaryClusterId && config.allClusters.includes(dumpConfig.load.primaryClusterId)) {
             file.cluster = dumpConfig.load.primaryClusterId;
             wasSet = true;
           }
 
           // we still check just in case
-          if (typeof config.clusterSubdomains[file.cluster] !== "string") {
-            throw new Error("Could not resolve the cluster subdomain for cluster " + file.cluster +
+          if (!config.allClusters.includes(file.cluster)) {
+            throw new Error("Could not resolve the cluster for " + file.cluster +
               " in file at row " + row.id + " with file id " + file.id);
           }
 

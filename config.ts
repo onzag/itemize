@@ -129,14 +129,9 @@ export interface IConfigRawJSONDataType {
    */
   defaultCluster: string;
   /**
-   * the subdomain for a given cluster
-   * for example
-   * FI: fi and if your website is app.com
-   * the file will be searched at fi.app.com/uploads/...
+   * All the given clusters that are available
    */
-  clusterSubdomains: {
-    [clusterId: string]: string;
-  };
+  allClusters: Array<string>;
   /**
    * Special custom configuration
    */
@@ -285,13 +280,22 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   custom?: {
     [customKey: string]: any;
-  }
+  };
   /**
    * Shared custom information that is added to the standard config and sensitive config
    * but kept into the sensitive or standard file (eg. client side api keys)
    */
   shared?: {
     [customKey: string]: any;
+  };
+
+  clusters: {
+    [clusterId: string]: {
+      sshuser: string;
+      sshport?: number;
+      hostname: string;
+      services: string | Array<string>;
+    }
   }
 }
 
@@ -407,6 +411,32 @@ export const rawSensitiveConfigSchema = {
       type: "object",
       additionalProperties: {}
     },
+    clusters: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        properties: {
+          sshuser: {
+            type: "string",
+          },
+          sshport: {
+            type: "integer",
+          },
+          services: {
+            type: ["string", "array"],
+            enum: ["full", "cluster", "global"],
+            items: {
+              type: "string",
+            }
+          },
+        },
+        required: [
+          "sshuser",
+          "services",
+        ],
+      },
+      minItems: 1,
+    },
   },
   additionalProperties: false,
   required: [
@@ -420,6 +450,7 @@ export const rawSensitiveConfigSchema = {
     "logging",
     "devKey",
     "adminKey",
+    "clusters",
   ],
 };
 
@@ -667,11 +698,12 @@ export const rawConfigSchema = {
     defaultCluster: {
       type: "string",
     },
-    clusterSubdomains: {
-      type: "object",
-      additionalProperties: {
+    allClusters: {
+      type: "array",
+      items: {
         type: "string",
       },
+      minItems: 1,
     },
     custom: {
       type: "object",
@@ -702,7 +734,7 @@ export const rawConfigSchema = {
     "productionHostname",
     "mailDomain",
     "mailStorage",
-    "clusterSubdomains",
+    "allClusters",
     "defaultCluster",
   ],
 };

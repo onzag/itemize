@@ -18,7 +18,6 @@ import convert from "convert-units";
 import { countries, currencies } from "./imported-resources";
 import type { IAppDataType } from "./server";
 import prettyBytes from "@onzag/itemize-text-engine/util/pretty-bytes";
-import type { IConfigRawJSONDataType } from "./config";
 
 export const Moment = MomentDef;
 
@@ -531,9 +530,7 @@ export function parseDateTime(datetime: string) {
 export function fileURLAbsoluter(
   domain: string,
   defaultCluster: string,
-  clusterSubdomains: {
-    [key: string]: string,
-  },
+  allClusters: string[],
   file: IRQFile,
   itemDefinition: ItemDefinition,
   id: string,
@@ -562,20 +559,19 @@ export function fileURLAbsoluter(
 
   const clusterID = file.cluster || defaultCluster;
 
-  let subdomain: string = clusterSubdomains[clusterID];
-  if (typeof subdomain !== "string") {
-    console.warn("fileURLAbsoluter: there's no cluster subdomain for cluster " + file.cluster);
+  if (!this.config.allClusters.includes(clusterID)) {
+    console.warn("fileURLAbsoluter: there's no cluster for " + file.cluster);
     return null;
   }
 
   // the subdomain is not used because this works like a CDN
   // unless forceFullURLs is used otherwise urls are always relative and give
   // the clusterId where the file was stored
-  let prefix = `${subdomain && forceFullURLs ? "https://" + subdomain + "." + domain : ""}/uploads/${clusterID}/`;
+  let prefix = `/uploads/${clusterID}/`;
 
   // now here we have a local url but we are forcing full urls
   // eg /uploads/mysite.com/ when using local uploads
-  if (forceFullURLs && prefix.indexOf("/") === 0) {
+  if (forceFullURLs) {
     // we force it to have the domain
     prefix = "https://" + domain + prefix;
   }
@@ -615,9 +611,7 @@ export function fileURLAbsoluter(
 export function fileArrayURLAbsoluter(
   domain: string,
   defaultCluster: string,
-  containerHostnamePrefixes: {
-    [key: string]: string,
-  },
+  allClusters: string[],
   files: IRQFile[],
   itemDefinition: ItemDefinition,
   id: string,
@@ -631,7 +625,7 @@ export function fileArrayURLAbsoluter(
   }
   return files.map(
     (file) =>
-      fileURLAbsoluter(domain, defaultCluster, containerHostnamePrefixes, file, itemDefinition, id, version, include, property, cacheable)
+      fileURLAbsoluter(domain, defaultCluster, allClusters, file, itemDefinition, id, version, include, property, cacheable)
   );
 }
 

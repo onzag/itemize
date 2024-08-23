@@ -101,6 +101,13 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
         traceback.newTraceToBit("fallbackLanguage"),
       );
     }
+
+    if (!data.allClusters.includes(data.defaultCluster)) {
+      throw new CheckUpError(
+        "The default cluster should exist in the list of all clusters",
+        traceback.newTraceToBit("defaultCluster"),
+      );
+    }
   };
   const standardConfig = await extractOneConfig<IConfigRawJSONDataType>(
     checkConfig, "index", null, false, standardConfigCheckerCallback,
@@ -110,7 +117,25 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
     checkSensitiveConfig, "index", null, true,
   );
   await extractOneConfig(
-    checkSensitiveConfig, "index", "production", true,
+    checkSensitiveConfig, "index", "production", true, (data: ISensitiveConfigRawJSONDataType, traceback: Traceback) => {
+      for (const clusterId of standardConfig.allClusters) {
+        if (!sensitiveConfig.clusters[clusterId]) {
+          throw new CheckUpError(
+            "The cluster " + JSON.stringify(clusterId) + " which is defined in allClusters in standard config is missing information in sensitive config",
+            traceback.newTraceToBit("clusters"),
+          );
+        }
+      }
+
+      Object.keys(sensitiveConfig.clusters).forEach((clusterId) => {
+        if (!standardConfig.allClusters.includes(clusterId)) {
+          throw new CheckUpError(
+            "The cluster " + JSON.stringify(clusterId) + " is not included in the standard config of allClusters",
+            traceback.newTraceToBit("clusters").newTraceToBit(clusterId),
+          );
+        }
+      });
+    }
   );
 
   const redisConfig = await extractOneConfig<IRedisConfigRawJSONDataType>(

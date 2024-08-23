@@ -524,7 +524,7 @@ function resolveFile(
   return fileURLAbsoluter(
     domain,
     config.defaultCluster,
-    config.clusterSubdomains,
+    config.allClusters,
     file,
     idef,
     originalState.forId,

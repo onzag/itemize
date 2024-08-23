@@ -80,7 +80,7 @@ export default class PropertyViewFile
         value = fileURLAbsoluter(
           domain,
           this.props.config.defaultCluster,
-          this.props.config.clusterSubdomains,
+          this.props.config.allClusters,
           value,
           this.props.itemDefinition,
           this.props.forId,
@@ -112,7 +112,7 @@ export default class PropertyViewFile
       currentValue = fileURLAbsoluter(
         domain,
         this.props.config.defaultCluster,
-        this.props.config.clusterSubdomains,
+        this.props.config.allClusters,
         currentValue,
         this.props.itemDefinition,
         this.props.forId,

@@ -631,7 +631,7 @@ export async function reprocessFileArgument(
   const absolutedFile = fileURLAbsoluter(
     domain,
     options.config.defaultCluster,
-    options.config.clusterSubdomains,
+    options.config.allClusters,
     files,
     options.itemDefinition,
     options.forId,

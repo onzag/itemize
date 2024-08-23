@@ -173,8 +173,8 @@ export async function standardConfigSetup(
         defaultValue: "MAIN",
       },
       {
-        variableName: "clusterSubdomains",
-        type: "strobject",
+        variableName: "allClusters",
+        type: "strarray",
         message: "Now you need to specify the cluster subdomains as a comma separated list of values, each cluster has a name that is specified the name " +
         "of the default development cluster is \"MAIN\" which you may want to map to an empty subdomain to use locally, however in production " +
         "you want it to be equal to your cluster id",

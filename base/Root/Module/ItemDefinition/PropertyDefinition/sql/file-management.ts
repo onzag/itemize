@@ -394,7 +394,7 @@ function processOneFileAndItsSameIDReplacement(
  * @returns a void promise from when this is done
  */
 export async function deleteEveryPossibleFileFor(
-  clusterSubdomains: {[key: string]: string},
+  allClusters: string[],
   uploadsClient: StorageProvider<any>,
   itemDefinitionOrModule: ItemDefinition | Module,
   idVersionId: string,
@@ -403,7 +403,7 @@ export async function deleteEveryPossibleFileFor(
   const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
   const filesContainerPath = path.join(idefOrModLocationPath, idVersionId);
 
-  await Promise.all(Object.keys(clusterSubdomains).map(async (clusterId) => {
+  await Promise.all(allClusters.map(async (clusterId) => {
     await uploadsClient.removePathAt(
       filesContainerPath,
       clusterId,

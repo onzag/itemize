@@ -834,9 +834,8 @@ export default class CacheWorker {
   
     const clusterID = file.cluster || defaultCluster;
   
-    const subdomain: string = this.config.clusterSubdomains[clusterID];
-    if (typeof subdomain !== "string") {
-      console.warn("fileURLAbsoluter: there's no cluster subdomain for cluster " + file.cluster);
+    if (!this.config.allClusters.includes(clusterID)) {
+      console.warn("fileURLAbsoluter: there's no cluster for " + file.cluster);
       return null;
     }
   

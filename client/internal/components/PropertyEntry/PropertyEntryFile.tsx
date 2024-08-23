@@ -259,7 +259,7 @@ export default class PropertyEntryFile
         currentValue = fileURLAbsoluter(
           domain,
           this.props.config.defaultCluster,
-          this.props.config.clusterSubdomains,
+          this.props.config.allClusters,
           currentValue,
           this.props.itemDefinition,
           this.props.forId,

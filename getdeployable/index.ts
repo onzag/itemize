@@ -11,6 +11,8 @@ import colors from "colors/safe";
 import Waf from "./waf";
 import buildData from "../builder";
 import { execSync } from "child_process";
+import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
+import { readConfigFile } from "../setup";
 
 const fsAsync = fs.promises;
 
@@ -34,13 +36,10 @@ async function copyDir(src: string, dest: string) {
  * @param buildID the build id, usually the same as the instance group
  * @param services the services that we are allowing, comma separated; or full, standard, and slim
  */
-export default async function build(version: string, buildID: string, userat: string, services: string) {
+export default async function build(version: string) {
   if (version !== "development" && version !== "production") {
     throw new Error("Unknown deployment version: " + version + " should be development or production");
   }
-
-  // this is the message we add to our build folder
-  let message: string = "";
 
   // now let's check our deployments folder
   let deploymentsExist = true;
@@ -54,6 +53,41 @@ export default async function build(version: string, buildID: string, userat: st
   if (!deploymentsExist) {
     await fsAsync.mkdir("deployments");
   }
+
+  const standardConfig: IConfigRawJSONDataType = await readConfigFile("index.json");
+  const sensitiveConfig: ISensitiveConfigRawJSONDataType = await readConfigFile("index.json");
+
+  console.log("calling " + colors.green("build-data"));
+  await buildData();
+
+  console.log("calling " + colors.green("esbuild"));
+  execSync("NODE_ENV=" + version + " node esbuild.js");
+
+  console.log("calling " + colors.green("tsc"));
+  execSync("npm run install");
+
+  for (const clusterId of standardConfig.allClusters) {
+    const sensitiveConfigInfo = sensitiveConfig.clusters[clusterId];
+    await buildFor(
+      version,
+      clusterId,
+      sensitiveConfigInfo.services,
+      sensitiveConfigInfo.hostname,
+      sensitiveConfigInfo.sshuser,
+      sensitiveConfigInfo.sshport || 22,
+    );
+  }
+}
+
+async function buildFor(
+  version: string,
+  buildID: string,
+  services: string | Array<string>,
+  hostname: string,
+  sshuser: string,
+  sshport: number,
+) {
+
   // and we make all these directories
   await fsAsync.mkdir(path.join("deployments", buildID));
 
@@ -61,6 +95,9 @@ export default async function build(version: string, buildID: string, userat: st
   const dbConfigToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;
   const sensitiveConfigToUse = version === "development" ? "index.sensitive.json" : `index.${version}.sensitive.json`;
   const redisConfigToUse = version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`;
+
+  // this is the message we add to our build folder
+  let message: string = "";
 
   // now the actual services we are adding
   let actualServices: string[] = [];
@@ -77,8 +114,10 @@ export default async function build(version: string, buildID: string, userat: st
     actualServices = ["clustermgr", "extended"];
   } else if (services === "global") {
     actualServices = ["globalmgr"];
+  } else if (Array.isArray(services)) {
+    actualServices = services;
   } else {
-    actualServices = services.split(",");
+    console.log(colors.red("Unknown services value: " + JSON.stringify(services)));
     process.exit(1);
   }
 
@@ -163,15 +202,6 @@ export default async function build(version: string, buildID: string, userat: st
   console.log("emiting " + colors.green(path.join("deployments", buildID, "itemize.config.js")));
   await fsAsync.copyFile("itemize.config.js", path.join("deployments", buildID, "itemize.config.js"));
 
-  console.log("calling " + colors.green("build-data"));
-  await buildData();
-
-  console.log("calling " + colors.green("esbuild"));
-  execSync("NODE_ENV=" + version + " node esbuild.js");
-
-  console.log("calling " + colors.green("tsc"));
-  execSync("npm run install");
-
   console.log("emiting " + colors.green(path.join("deployments", buildID, "dist")));
   await copyDir("dist", path.join("deployments", buildID, "dist"));
 
@@ -199,25 +229,20 @@ export default async function build(version: string, buildID: string, userat: st
   message += "\n\nBefore starting the server you should run `bash install.sh`";
   message += "\n\nIn order to synchronize the server with the remote you should run `bash rsync.sh` or `bash rsync-only-dist.sh` in the client machine";
 
-  const userdata = userat.split("@");
-  const username = userdata[0].trim();
-  const servername = userdata[1].trim().split(":")[0];
-  const sshport = userdata[1].trim().split(":")[1] || 22;
-
   // write the ssh user
   console.log("emiting " + colors.green(path.join("deployments", buildID, ".ssh-user")));
-  await fsAsync.writeFile(path.join("deployments", buildID, ".ssh-user"), username + "@" + servername);
+  await fsAsync.writeFile(path.join("deployments", buildID, ".ssh-user"), sshuser + "@" + hostname + (sshport !== 22 ? " -p " + sshport : ""));
 
   // RSYNC SCRIPT GENERATION
-  const nodeCheck = "ssh " + username + "@" + servername + (sshport !== 22 ? (" -p " + sshport + " ") : " ") + "\"ps | grep node\"";
+  const nodeCheck = "ssh " + sshuser + "@" + hostname + (sshport !== 22 ? (" -p " + sshport + " ") : " ") + "\"ps | grep node\"";
   const nodeBreakdown = "if [ $? -eq 0 ]; then echo \"node is running, this script cant deploy over a currently running environment\"; exit 1; else echo \"node is not running, deploying\"; fi";
 
   const rsyncCommandStart = "rsync -rvz" +
     (sshport !== 22 ? (" -e 'ssh -p " + sshport + "' ") : " ") +
     "--progress ";
-  const rsyncCommandEnd = " " + username + "@" + servername + ":/home/" + username;
+  const rsyncCommandEnd = " " + sshuser + "@" + hostname + ":/home/" + sshuser;
 
-  const nodeModulesDelete = "ssh " + username + "@" + servername + (sshport !== 22 ? (" -p " + sshport + " ") : " ") + "\"rm -r /home/" + username + "/" + buildID +  "/node_modules\"";
+  const nodeModulesDelete = "ssh " + sshuser + "@" + hostname + (sshport !== 22 ? (" -p " + sshport + " ") : " ") + "\"rm -r /home/" + sshuser + "/" + buildID + "/node_modules\"";
 
   const rsyncCommandPWD = "#!/bin/bash\n\n#this script will rsync the contents of this cluster into the target, all of it\n\n" +
     nodeCheck + ";\n" + nodeBreakdown + ";\n" + rsyncCommandStart + "$PWD" + rsyncCommandEnd + ";\n" + nodeModulesDelete + ";";
@@ -257,11 +282,11 @@ export default async function build(version: string, buildID: string, userat: st
       contentOfFile
         .replace("$CLUSTER_ID", buildID)
         .replace("$NODE_ENV", version)
-        .replace("$WORKDIR", "/home/" + username + "/" + buildID)
-        .replace("$USER", username)
-        .replace("$APPEXEC", "node -r /home/" + username + "/" + buildID +
+        .replace("$WORKDIR", "/home/" + sshuser + "/" + buildID)
+        .replace("$USER", sshuser)
+        .replace("$APPEXEC", "node -r /home/" + sshuser + "/" + buildID +
           "/node_modules/@onzag/itemize/server-resolve.js /home/" +
-          username + "/" + buildID + "/dist/server/index.js")
+          sshuser + "/" + buildID + "/dist/server/index.js")
     );
   }
 

@@ -62,10 +62,9 @@ const actionRegistry: {
   },
   "get-deployable": {
     fn: getDeployable,
-    description: "Provides a deployable based on the config",
-    usage: "itemize get-deployable [development|production] [build-name] [username@server] (full|cluster|global|(comma-separated-services))",
-    needsArgs: 3,
-    arbitraryArgs: true,
+    description: "Provides a deployable for all clusters based on the config",
+    usage: "itemize get-deployable [development|production]",
+    needsArgs: 1,
   },
   "start-dev-environment": {
     fn: start,

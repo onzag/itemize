@@ -95,7 +95,7 @@ export default class PropertyViewFile
         vToUse = fileURLAbsoluter(
           domain,
           this.props.config.defaultCluster,
-          this.props.config.clusterSubdomains,
+          this.props.config.allClusters,
           v,
           this.props.itemDefinition,
           this.props.forId,

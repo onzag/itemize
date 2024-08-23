@@ -109,27 +109,25 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
       return this.listOwnFiles(at);
     }
 
-    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+    const hostname = this.appSensitiveConfig.clusters[clusterId]?.hostname;
 
-    if (!subdomain) {
+    if (!hostname) {
       throw new Error("Cluster " + clusterId + " does not exist");
     }
 
-    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
-
-    const url2 = new URL(url);
-    const token = await jwtSign({ pathname: url2.pathname }, this.storageJWTKey);
+    const pathToRequest = path.join("/uploads/" + clusterId, at);
+    const token = await jwtSign({ pathname: pathToRequest }, this.storageJWTKey);
 
     this.logDebug({
       className: "LocalStorageService",
       methodName: "removeRemoteFolder",
-      message: "Attempting to list files at " + url,
+      message: "Attempting to list files at " + pathToRequest + " at host: " + hostname,
     });
 
     const res = await httpRequest<string[]>({
       method: "GET",
-      host: url2.host,
-      path: url2.pathname,
+      host: hostname,
+      path: pathToRequest,
       isHttps: true,
       returnNonOk: true,
       headers: {
@@ -161,27 +159,26 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
       return this.save(at, readStream);
     }
 
-    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+    const hostname = this.appSensitiveConfig.clusters[clusterId]?.hostname;
 
-    if (!subdomain) {
+    if (!hostname) {
       throw new Error("Cluster " + clusterId + " does not exist");
     }
 
-    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
+    const pathToRequest = path.join("/uploads/" + clusterId, at);
 
-    const url2 = new URL(url);
-    const token = await jwtSign({ pathname: url2.pathname }, this.storageJWTKey);
+    const token = await jwtSign({ pathname: pathToRequest }, this.storageJWTKey);
 
     this.logDebug({
       className: "LocalStorageService",
       methodName: "saveRemote",
-      message: "Attempting to upload file at " + url,
+      message: "Attempting to upload file at " + pathToRequest + " at host: " + hostname,
     });
 
     const res = await httpRequest<string[]>({
       method: "POST",
-      host: url2.host,
-      path: url2.pathname,
+      host: hostname,
+      path: pathToRequest,
       isHttps: true,
       returnNonOk: true,
       headers: {
@@ -191,7 +188,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
     });
 
     if (res.response.statusCode !== 200) {
-      throw new Error("File failed to upload at " + url);
+      throw new Error("File failed to upload at " + pathToRequest + " at host: " + hostname);
     }
 
     return;
@@ -218,15 +215,15 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
       return this.readOwn(at);
     }
 
-    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+    const hostname = this.appSensitiveConfig.clusters[clusterId]?.hostname;
 
-    if (!subdomain) {
+    if (!hostname) {
       throw new Error("Cluster " + clusterId + " does not exist");
     }
 
-    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
+    const pathToRequest = path.join("/uploads/" + clusterId, at);
 
-    const stream = https.get(url);
+    const stream = https.get("https://" + hostname + pathToRequest);
     return stream as unknown as NodeJS.ReadableStream;
   }
 
@@ -259,27 +256,25 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
       return this.removeOwnPath(at);
     }
 
-    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+    const hostname = this.appSensitiveConfig.clusters[clusterId]?.hostname;
 
-    if (!subdomain) {
+    if (!hostname) {
       throw new Error("Cluster " + clusterId + " does not exist");
     }
 
-    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
-
-    const url2 = new URL(url);
-    const token = await jwtSign({ pathname: url2.pathname }, this.storageJWTKey);
+    const pathToRequest = path.join("/uploads/" + clusterId, at);
+    const token = await jwtSign({ pathname: pathToRequest }, this.storageJWTKey);
 
     this.logDebug({
       className: "LocalStorageService",
       methodName: "removeRemoteFolder",
-      message: "Attempting to remove remote file " + url,
+      message: "Attempting to remove remote file " + pathToRequest + " at host: " + hostname,
     });
 
     const res = await httpRequest({
       method: "DELETE",
-      host: url2.host,
-      path: url2.pathname,
+      host: hostname,
+      path: pathToRequest,
       headers: {
         token,
       },
@@ -290,14 +285,15 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
     if (res.response.statusCode === 200) {
       return;
     } else {
-      const err = new Error("Failed to remove file at " + url);
+      const err = new Error("Failed to remove file at " + pathToRequest + " at host: " + hostname);
       this.logError({
         className: "LocalStorageService",
         methodName: "removeRemoteFolder",
         message: err.message,
         err: err,
         data: {
-          url,
+          pathToRequest,
+          hostname,
         }
       });
       throw err;
@@ -328,26 +324,24 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
       return this.existsOwn(at);
     }
 
-    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+    const hostname = this.appSensitiveConfig.clusters[clusterId]?.hostname;
 
-    if (!subdomain) {
+    if (!hostname) {
       throw new Error("Cluster " + clusterId + " does not exist");
     }
 
-    const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, at);
-
-    const url2 = new URL(url);
+    const pathToRequest = path.join("/uploads/" + clusterId, at);
 
     this.logDebug({
       className: "LocalStorageService",
       methodName: "existsRemote",
-      message: "Attempting check existance of remote file " + url,
+      message: "Attempting check existance of remote file " + pathToRequest + " at host: " + hostname,
     });
 
     const res = await httpRequest({
       method: "HEAD",
-      host: url2.host,
-      path: url2.pathname,
+      host: hostname,
+      path: pathToRequest,
       isHttps: true,
       returnNonOk: true,
     });
@@ -398,31 +392,29 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
     }
 
     // grab the subdomain for that
-    const subdomain = this.appConfig.clusterSubdomains[clusterId];
+    const hostname = this.appSensitiveConfig.clusters[clusterId]?.hostname;
 
     // no subdomain no fun
-    if (!subdomain) {
+    if (!hostname) {
       throw new Error("Cluster " + clusterId + " does not exist");
     }
 
     // now we can loop over these files we are meant to download
     await Promise.all(fileList.map(async (fileToDownload) => {
       // grab the url
-      const url = "https://" + (subdomain ? subdomain + "." : "") + this.domain + path.join("/uploads/" + clusterId, fileToDownload);
-
-      const url2 = new URL(url);
+      const pathToRequest = path.join("/uploads/" + clusterId, fileToDownload);
   
       this.logDebug({
         className: "LocalStorageService",
         methodName: "copyRemoteAt",
-        message: "Attempting to copy file at " + url,
+        message: "Attempting to copy file at " + pathToRequest + " at host: " + hostname,
       });
   
       // do a http request for them
       const res = await httpRequest<string[]>({
         method: "GET",
-        host: url2.host,
-        path: url2.pathname,
+        host: hostname,
+        path: pathToRequest,
         isHttps: true,
         returnNonOk: true,
         processAsJSON: true,
@@ -451,7 +443,7 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
   public async dumpFolderFromAllSources(at: string, localBaseDirectory: string): Promise<void> {
     const filesToCopyNCluster: { [filePath: string]: string } = {};
 
-    await Promise.all(Object.keys(this.appConfig.clusterSubdomains).map(async (clusterId: string) => {
+    await Promise.all(this.appConfig.allClusters.map(async (clusterId: string) => {
       const filesAtThatCluster = await this.listFilesAt(at, clusterId);
       filesAtThatCluster.forEach((f) => {
         if (!filesToCopyNCluster[f] || clusterId === CLUSTER_ID) {

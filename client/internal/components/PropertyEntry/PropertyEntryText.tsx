@@ -65,7 +65,7 @@ export function fileResolver(
   const absolutedFile = fileURLAbsoluter(
     domain,
     config.defaultCluster,
-    config.clusterSubdomains,
+    config.allClusters,
     currentFile,
     itemDefinition,
     forId,
@@ -543,7 +543,7 @@ export default class PropertyEntryText
       return fileURLAbsoluter(
         domain,
         this.props.config.defaultCluster,
-        this.props.config.clusterSubdomains,
+        this.props.config.allClusters,
         value,
         this.props.itemDefinition,
         this.props.forId,

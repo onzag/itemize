@@ -407,7 +407,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     loggingService && await loggingService.initialize();
     loggingService && extendLoggerWith(loggingService);
 
-    const isSaneBeforeListen = await checkClusterSanityBeforeListen(config, buildnumber);
+    const isSaneBeforeListen = await checkClusterSanityBeforeListen(sensitiveConfig, config, buildnumber);
 
     if (!isSaneBeforeListen) {
       // enter death loop to prevent this server from causing further damage
@@ -1415,7 +1415,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
 
     await wait(2000);
 
-    const isSaneAfterListen = await checkClusterSanityAfterListen(config, appData.storage, buildnumber);
+    const isSaneAfterListen = await checkClusterSanityAfterListen(sensitiveConfig, config, appData.storage, buildnumber);
 
     if (!isSaneAfterListen) {
       // stops server from accepting new connections

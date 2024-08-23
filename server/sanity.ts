@@ -1,4 +1,4 @@
-import type { IConfigRawJSONDataType } from "../config";
+import type { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import { CLUSTER_ID, INSTANCE_MODE, NODE_ENV } from "./environment";
 import { logger } from "./logger";
 import { httpRequest } from "./request";
@@ -11,21 +11,47 @@ const wait = (time: number) => {
 };
 
 export async function checkClusterSanityBeforeListen(
+  sensitiveConfig: ISensitiveConfigRawJSONDataType,
   config: IConfigRawJSONDataType,
   buildnumber: string,
 ): Promise<boolean> {
   const baseDomain = NODE_ENV === "development" ? config.developmentHostname : config.productionHostname;
 
-  for (const clusterId of Object.keys(config.clusterSubdomains)) {
+  if (!config.allClusters.includes(config.defaultCluster)) {
+    logger.error({
+      message: "The configuration for the clusters is invalid as the default cluster is not contained in the list of all clusters",
+      methodName: "checkClusterSanity",
+      data: {
+        clusterId: CLUSTER_ID,
+        selfBuildNumber: buildnumber,
+      }
+    });
+    return false;
+  }
+
+  for (const clusterId of config.allClusters) {
+    if (!sensitiveConfig.clusters[clusterId]) {
+      logger.error({
+        message: "The configuration for the clusters is invalid as one of the clusters from allClusters is not contained in the sensitive config",
+        methodName: "checkClusterSanity",
+        data: {
+          clusterId: CLUSTER_ID,
+          otherClusterId: clusterId,
+          selfBuildNumber: buildnumber,
+        }
+      });
+      return false;
+    }
+
     if (clusterId === CLUSTER_ID) {
       continue;
     }
 
-    const otherClusterDomain = config.clusterSubdomains[clusterId] ? config.clusterSubdomains[clusterId] + "." + baseDomain : baseDomain;
+    const otherClusterHost = sensitiveConfig.clusters[clusterId].hostname;
 
     try {
       const buildNumberFromServer = await httpRequest({
-        host: otherClusterDomain,
+        host: otherClusterHost,
         isHttps: true,
         method: "GET",
         path: "/rest/buildnumber",
@@ -49,7 +75,7 @@ export async function checkClusterSanityBeforeListen(
       }
     } catch (err) {
       logger.info({
-        message: "Cluster at " + otherClusterDomain + " must be offline as it doesn't reply after 3 tries",
+        message: "Cluster at " + otherClusterHost + " must be offline as it doesn't reply after 3 tries",
         methodName: "checkClusterSanity",
         data: {
           clusterId: CLUSTER_ID,
@@ -78,13 +104,13 @@ export async function checkClusterSanityBeforeListen(
     });
   }
 
-  let clusterDomain: string = null;
+  let clusterHostname: string = null;
 
-  if (typeof config.clusterSubdomains[CLUSTER_ID] === "string") {
-    clusterDomain = config.clusterSubdomains[CLUSTER_ID] ? (config.clusterSubdomains[CLUSTER_ID] + "." + baseDomain) : baseDomain;
+  if (sensitiveConfig.clusters[CLUSTER_ID]?.hostname) {
+    clusterHostname = sensitiveConfig.clusters[CLUSTER_ID].hostname;
 
     logger.info({
-      message: "My assigned domain is " + clusterDomain,
+      message: "My assigned hostname is " + clusterHostname,
       methodName: "checkClusterSanity",
       data: {
         clusterId: CLUSTER_ID,
@@ -93,7 +119,7 @@ export async function checkClusterSanityBeforeListen(
       }
     });
 
-    if (clusterDomain === baseDomain && Object.keys(config.clusterSubdomains).length > 1) {
+    if (clusterHostname === baseDomain && config.allClusters.length > 1) {
       logger.error({
         message: "This is the same as the base domain however I am not the only valid cluster, therefore this setup is invalid",
         methodName: "checkClusterSanity",
@@ -122,6 +148,7 @@ export async function checkClusterSanityBeforeListen(
 }
 
 export async function checkClusterSanityAfterListen(
+  sensitiveConfig: ISensitiveConfigRawJSONDataType,
   config: IConfigRawJSONDataType,
   storageProvider: StorageProvider<any>,
   buildnumber: string,
@@ -133,12 +160,12 @@ export async function checkClusterSanityAfterListen(
   }
 
   const baseDomain = NODE_ENV === "development" ? config.developmentHostname : config.productionHostname;
-  const clusterDomain = config.clusterSubdomains[CLUSTER_ID] ? (config.clusterSubdomains[CLUSTER_ID] + "." + baseDomain) : baseDomain;
+  const clusterHostname = sensitiveConfig.clusters[CLUSTER_ID].hostname;
 
   while (true) {
     try {
       const uuidFromServer = await httpRequest({
-        host: clusterDomain,
+        host: clusterHostname,
         isHttps: true,
         method: "GET",
         path: "/uploads/" + CLUSTER_ID + "/uuid",
@@ -155,7 +182,7 @@ export async function checkClusterSanityAfterListen(
               clusterId: CLUSTER_ID,
               defaulCluster: config.defaultCluster,
               buildnumber,
-              clusterDomain,
+              clusterHostname,
               uuidFromServer: uuidFromServer.data,
               ownUuid: storageProvider.getOwnStorageUuid(),
             }
@@ -172,7 +199,7 @@ export async function checkClusterSanityAfterListen(
             clusterId: CLUSTER_ID,
             defaulCluster: config.defaultCluster,
             buildnumber,
-            clusterDomain,
+            clusterHostname,
             uuidFromServer: uuidFromServer.data,
             ownUuid: storageProvider.getOwnStorageUuid(),
           }
@@ -181,7 +208,7 @@ export async function checkClusterSanityAfterListen(
       }
     } catch (err) {
       logger.error({
-        message: "Cluster cannot communicaty with itself by the given domain at: " + clusterDomain + ", is the cluster healthy?..." +
+        message: "Cluster cannot communicaty with itself by the given domain at: " + clusterHostname + ", is the cluster healthy?..." +
           (NODE_ENV === "development" ? "" : " retrying in 2s"),
         methodName: "checkClusterSanity",
         err,
@@ -190,7 +217,7 @@ export async function checkClusterSanityAfterListen(
           clusterId: CLUSTER_ID,
           defaulCluster: config.defaultCluster,
           buildnumber,
-          clusterDomain,
+          clusterHostname,
         }
       });
       if (NODE_ENV === "development") {
@@ -201,7 +228,7 @@ export async function checkClusterSanityAfterListen(
             clusterId: CLUSTER_ID,
             defaulCluster: config.defaultCluster,
             buildnumber,
-            clusterDomain,
+            clusterHostname,
           }
         });
         break;

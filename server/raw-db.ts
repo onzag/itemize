@@ -1585,7 +1585,7 @@ export class ItemizeRawDB {
           // that will delete literally everything for the given id.version combo
           try {
             await deleteEveryPossibleFileFor(
-              this.config.clusterSubdomains,
+              this.config.allClusters,
               this.uploadsClient,
               itemDefinition,
               id + "." + (specifiedVersion || null),
@@ -1612,7 +1612,7 @@ export class ItemizeRawDB {
         if (someFilesInModule) {
           try {
             await deleteEveryPossibleFileFor(
-              this.config.clusterSubdomains,
+              this.config.allClusters,
               this.uploadsClient,
               itemDefinition.getParentModule(),
               id + "." + (specifiedVersion || null),

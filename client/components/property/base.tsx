@@ -339,7 +339,7 @@ export function EntryViewReadSet(
           const value = fileURLAbsoluter(
             domain,
             config.defaultCluster,
-            config.clusterSubdomains,
+            config.allClusters,
             props.useAppliedValue ? propertyState.stateAppliedValue as IRQFile : propertyState.value as IRQFile,
             itemContextualValue.idef,
             itemContextualValue.forId,
@@ -358,7 +358,7 @@ export function EntryViewReadSet(
           const value = fileArrayURLAbsoluter(
             domain,
             config.defaultCluster,
-            config.clusterSubdomains,
+            config.allClusters,
             props.useAppliedValue ? propertyState.stateAppliedValue as IRQFile[] : propertyState.value as IRQFile[],
             itemContextualValue.idef,
             itemContextualValue.forId,

@@ -62,6 +62,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "development",
       newArg.sensitiveConfigDevelopment,
       null,
+      newArg.standardConfig,
     );
   }
 
@@ -74,6 +75,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "production",
       newArg.sensitiveConfigProduction,
       newArg.sensitiveConfigDevelopment,
+      newArg.standardConfig,
     );
   }
 

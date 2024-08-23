@@ -3,7 +3,7 @@
  * @module
  */
 
-import { ISensitiveConfigRawJSONDataType } from "../../config";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../../config";
 import { configRequest } from "../read";
 
 /**
@@ -34,7 +34,30 @@ export async function sensitiveConfigSetup(
   version: string,
   currentConfig: ISensitiveConfigRawJSONDataType,
   referenceConfig: ISensitiveConfigRawJSONDataType,
+  config: IConfigRawJSONDataType,
 ): Promise<ISensitiveConfigRawJSONDataType> {
+  const domain = (version === "development" ? config.developmentHostname : config.productionHostname);
+  const isAlreadyASubdomain = domain.split(".").length >= 2;
+  const defaultValueForClusters = {
+    [config.defaultCluster]: {
+      sshuser: "ssh-user-here",
+      hostname: (config.allClusters.length >= 1 ? config.defaultCluster.toLowerCase() + (isAlreadyASubdomain ? "-" : ".") : "") + domain,
+      services: "full",
+    },
+  };
+
+  config.allClusters.forEach((clusterId) => {
+    if (clusterId === config.defaultCluster) {
+      return;
+    }
+
+    defaultValueForClusters[clusterId] = {
+      sshuser: "ssh-user-here",
+      hostname: (config.allClusters.length >= 1 ? clusterId.toLowerCase() + (isAlreadyASubdomain ? "-" : ".") : "") + domain,
+      services: "cluster",
+    };
+  })
+
   const newConfig = await configRequest(
     currentConfig || referenceConfig,
     "Sensitive configuration (" + version + ")",
@@ -202,81 +225,6 @@ export async function sensitiveConfigSetup(
         cantRerun: true,
       },
       {
-        variableName: "containers",
-        type: "multiconfig",
-        message: "Containers to use, the default provider is openstack",
-        defaultValue: null,
-        extractData: [
-          {
-            variableName: "type",
-            defaultValue: "openstack",
-            message: "The provider utilized",
-            nullifyFalseValues: true,
-          },
-          {
-            variableName: "config",
-            type: "config",
-            message: "the configuration utilized",
-            defaultValue: null,
-            extractData: [
-              {
-                variableName: "username",
-                message: "An username provided by an openstack cloud provider",
-                defaultValue: "",
-              },
-              {
-                variableName: "password",
-                message: "The user password provided by an openstack cloud provider",
-                defaultValue: "",
-                hidden: true,
-              },
-              {
-                variableName: "region",
-                message: "The region to connect from the openstack cloud provider",
-                defaultValue: "",
-                nullifyFalseValues: true,
-              },
-              {
-                variableName: "domainId",
-                message: "The domain id of the given openstack project",
-                defaultValue: "default",
-              },
-              {
-                variableName: "domainName",
-                message: "The domain name of the given openstack project",
-                defaultValue: "",
-              },
-              {
-                variableName: "containerName",
-                message: "The name of the container that contains the uploaded files",
-                defaultValue: "",
-              },
-              {
-                variableName: "authUrl",
-                message: "The auth url of the service provider that you are utilizing",
-                defaultValue: "",
-              },
-            ],
-          },
-        ],
-        preferUnfilled: true,
-        cantRerun: true,
-      },
-      {
-        variableName: "localContainer",
-        message: "You can define a local container, a local container is only truly usable in a single cluster, and it's not recommended for production builds",
-        defaultValue: "MAIN",
-        hidden: false,
-        nullifyFalseValues: true,
-      },
-      {
-        variableName: "defaultContainerID",
-        message: "of all the previous containers id which one is used by default for internal usage only when no country specified",
-        defaultValue: "MAIN",
-        hidden: false,
-        nullifyFalseValues: true,
-      },
-      {
         variableName: "devKey",
         message: "a development key that is used to obtain development javascript files in production settings when set as a cookie",
         defaultValue: genToken(16),
@@ -295,6 +243,30 @@ export async function sensitiveConfigSetup(
         preferUnfilled: true,
         cantRerun: true,
       },
+      {
+        variableName: "clusters",
+        type: "multiconfig",
+        defaultValue: defaultValueForClusters,
+        message: "The configuration for the clusters that have been created",
+        extractData: [
+          {
+            variableName: "sshuser",
+            type: "string",
+            message: "The user that connects to the cluster via ssh to deploy",
+          },
+          {
+            variableName: "hostname",
+            type: "string",
+            message: "The unique hostname that communicates only to this cluster",
+          },
+          {
+            variableName: "services",
+            type: "string&strarray",
+            message: "The services to be used here, you may use a comma separated list here for the value or a simple " +
+              "string, add a comma at the end to specify single array value",
+          },
+        ]
+      }
     ],
   );
 

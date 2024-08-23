@@ -57,7 +57,7 @@ export function request(options: read.Options): Promise<{
  * strarray is an array of string
  * strobject is an object with strings in it
  */
-type FieldRequestType = "strarray" | "string" | "integer" | "boolean" | "strobject";
+type FieldRequestType = "strarray" | "string" | "integer" | "boolean" | "strobject" | "string&strarray";
 
 /**
  * This function allows us to request one of the field types
@@ -141,7 +141,7 @@ export async function fieldRequest<T>(
       } catch (err) {
         currentValue = false as any;
       }
-    } else if (type === "strarray") {
+    } else if (type === "strarray" || type === "string&strarray") {
       // str array uses a comma separated list
       const actualDefaultValue = Array.isArray(defaultValue) ? defaultValue.join(", ") : (defaultValue || "").toString();
       // and we ask similarly to before
@@ -154,6 +154,11 @@ export async function fieldRequest<T>(
       });
       currentValue = retrievedValue.result.split(",").map(v => v.trim()).filter(v => !!v) as any;
       // so for str object one of the most complex
+
+      if (type === "string&strarray" && !retrievedValue.result.includes(",")) {
+        // turn into string
+        currentValue = currentValue[0];
+      }
     } else if (type === "strobject") {
       // first we need the keys we ask for an array of string, by comma separating these values
       const keys = await fieldRequest<string[]>(
@@ -333,12 +338,12 @@ export async function configRequest<T>(
       // now for multiconfig or the keys of config or multiconfig
     } else if (extractPoint.type === "multiconfig") {
       console.log("\t" + extractPoint.message);
-  
+
       if (extractPoint.preferUnfilled && await yesno("Would you rather leave the field untouched?")) {
         newConfig[extractPoint.variableName] =
-        typeof newConfig[extractPoint.variableName] !== "undefined" ?
-          newConfig[extractPoint.variableName] :
-          extractPoint.defaultValue;
+          typeof newConfig[extractPoint.variableName] !== "undefined" ?
+            newConfig[extractPoint.variableName] :
+            extractPoint.defaultValue;
       } else {
         // if we don't have a current value
         if (!newConfig[extractPoint.variableName]) {

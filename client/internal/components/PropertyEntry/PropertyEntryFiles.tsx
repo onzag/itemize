@@ -262,7 +262,7 @@ export default class PropertyEntryFile
           return fileURLAbsoluter(
             domain,
             this.props.config.defaultCluster,
-            this.props.config.clusterSubdomains,
+            this.props.config.allClusters,
             v,
             this.props.itemDefinition,
             this.props.forId,

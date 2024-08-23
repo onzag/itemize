@@ -97,8 +97,8 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     "/uploads/:clusterid",
     async (req, res, next) => {
       // first lets check the cluster is being asked for the file
-      const subdomainOfCluster = appData.config.clusterSubdomains[req.params.clusterid];
-      if (typeof subdomainOfCluster !== "string") {
+      const hasCluster = appData.config.allClusters.includes(req.params.clusterid);
+      if (!hasCluster) {
         res.status(404).end("Cluster does not exist");
         return;
       }

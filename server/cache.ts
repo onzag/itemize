@@ -2794,7 +2794,7 @@ export class Cache {
       if (someFilesInItemDef) {
         try {
           await deleteEveryPossibleFileFor(
-            this.config.clusterSubdomains,
+            this.config.allClusters,
             this.storageClient,
             itemDefinition,
             id + "." + (specifiedVersion || null),
@@ -2823,7 +2823,7 @@ export class Cache {
       if (someFilesInModule) {
         try {
           await deleteEveryPossibleFileFor(
-            this.config.clusterSubdomains,
+            this.config.allClusters,
             this.storageClient,
             itemDefinition.getParentModule(),
             id + "." + (specifiedVersion || null),
