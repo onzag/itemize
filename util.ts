@@ -571,7 +571,7 @@ export function fileURLAbsoluter(
   // the subdomain is not used because this works like a CDN
   // unless forceFullURLs is used otherwise urls are always relative and give
   // the clusterId where the file was stored
-  let prefix = `${subdomain && forceFullURLs ? "https://" + subdomain + "." + domain : ""}/rest/uploads/${clusterID}/`;
+  let prefix = `${subdomain && forceFullURLs ? "https://" + subdomain + "." + domain : ""}/uploads/${clusterID}/`;
 
   // now here we have a local url but we are forcing full urls
   // eg /uploads/mysite.com/ when using local uploads

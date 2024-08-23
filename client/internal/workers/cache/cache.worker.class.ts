@@ -843,7 +843,7 @@ export default class CacheWorker {
     // the subdomain is not used because this works like a CDN
     // unless forceFullURLs is used otherwise urls are always relative and give
     // the clusterId where the file was stored
-    const prefix = `/rest/uploads/${clusterID}/`;
+    const prefix = `/uploads/${clusterID}/`;
 
     return (
       prefix +

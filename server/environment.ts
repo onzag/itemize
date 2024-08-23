@@ -12,7 +12,7 @@ if (NODE_ENV !== "development" && NODE_ENV !== "production") {
   process.exit(1);
 }
 export const PORT: number = process.env.PORT ? (parseInt(process.env.PORT) || 8000) : 8000;
-export const CLUSTER_ID = process.env.CLUSTER_ID || "UNIDENTIFIED";
+export const CLUSTER_ID = process.env.CLUSTER_ID || "MAIN";
 
 if (CLUSTER_ID === "GLOBAL") {
   console.error("Invalid reserved CLUSTER_ID ", CLUSTER_ID);

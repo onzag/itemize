@@ -819,6 +819,9 @@ function displaceAndStoreI18NRootFieldsData(i18n: any, path: string[], storageI1
           storageInQuestion[p] = itemInQuestion;
         } else if (!storageInQuestion[p]) {
           storageInQuestion[p] = {};
+          storageInQuestion = storageInQuestion[p];
+        } else {
+          storageInQuestion = storageInQuestion[p];
         }
       });
     }

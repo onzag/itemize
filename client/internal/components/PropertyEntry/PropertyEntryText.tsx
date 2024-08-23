@@ -76,6 +76,10 @@ export function fileResolver(
     forceFullURLS,
   );
 
+  if (!absolutedFile) {
+    return null;
+  }
+
   const srcset = isImage ? imageSrcSetRetriever(absolutedFile, mediaProperty) : null;
 
   return {

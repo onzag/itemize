@@ -169,17 +169,17 @@ export async function standardConfigSetup(
       {
         variableName: "defaultCluster",
         message: "The id for the default cluster when a cluster identification is not found, used to deal with data corruption cases, for development " +
-        "you may want to use the UNIDENTIFIED value as that's the default cluster value",
-        defaultValue: "UNIDENTIFIED",
+        "you may want to use the MAIN value as that's the default cluster value",
+        defaultValue: "MAIN",
       },
       {
         variableName: "clusterSubdomains",
         type: "strobject",
         message: "Now you need to specify the cluster subdomains as a comma separated list of values, each cluster has a name that is specified the name " +
-        "of the default development cluster is \"UNIDENTIFIED\" which you may want to map to an empty subdomain to use locally, however in production " +
+        "of the default development cluster is \"MAIN\" which you may want to map to an empty subdomain to use locally, however in production " +
         "you want it to be equal to your cluster id",
         defaultValue: {
-          "UNIDENTIFIED": "",
+          "MAIN": "",
         },
       },
     ],
