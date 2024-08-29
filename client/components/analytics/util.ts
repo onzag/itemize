@@ -4,20 +4,7 @@ const browsers = ["firefox", "chrome", "edge", "ie", "safari", "opera", "other"]
 const oss = ["windows", "linux", "macos", "chromeos", "android", "ios", "other"] as const;
 const deviceTypes = ["desktop", "mobile", "tablet"] as const;
 
-export interface IBaseAnalyticsAdditionalData {
-  sex?: string;
-  age?: number;
-  name?: string;
-}
-
-export interface IBaseAnalyticsData extends IBaseAnalyticsAdditionalData {
-  country: string;
-  language: string;
-  currency: string;
-  role: string;
-}
-
-export interface IGenericAnalyticsData extends IBaseAnalyticsData {
+export interface IGenericAnalyticsData {
   /**
    * Internet browser used from the most common browsers
    */
@@ -40,31 +27,7 @@ export interface IGenericAnalyticsData extends IBaseAnalyticsData {
   deviceType: typeof deviceTypes[number];
 }
 
-export function baseAnalyticsDataValidator(data: IBaseAnalyticsData, userData: IServerSideTokenDataType) {
-  if (data.role !== userData.role) {
-    return false;
-  }
-
-  if (typeof data.country !== "string" || data.country.length !== 2) {
-    return false;
-  }
-
-  if (typeof data.currency !== "string" || data.currency.length !== 3) {
-    return false;
-  }
-
-  if (typeof data.language !== "string" || data.language.length !== 2) {
-    return false;
-  }
-
-  return true;
-}
-
 export function genericAnalyticsDataValidator(data: IGenericAnalyticsData, userData: IServerSideTokenDataType) {
-  if (!baseAnalyticsDataValidator(data, userData)) {
-    return false;
-  }
-
   if (
     typeof data.browser !== "string" ||
     !data.browser ||

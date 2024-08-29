@@ -251,7 +251,6 @@ export function convertRQValueToSQLValueForModule(
   data: IRQArgs,
   oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   language: string | ISQLTableRowValue,
   dictionary: string | ISQLTableRowValue,
   partialFields?: IRQRequestFields | IRQArgs | IRQValue,
@@ -277,7 +276,6 @@ export function convertRQValueToSQLValueForModule(
         data,
         oldData,
         uploadsClient,
-        domain,
         language,
         dictionary,
       );

@@ -40,6 +40,7 @@ import { Listener } from "./listener";
 import { IConfigRawJSONDataType } from "../config";
 import { INSTANCE_MODE, NODE_ENV } from "./environment";
 import StorageProvider from "./services/base/StorageProvider";
+import type { IRQValue } from "../rq-querier";
 
 type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -318,7 +319,9 @@ export class ItemizeRawDB {
    * @param value the vale you want to convert
    * @param serverData server data, required for doing things like currency conversion, you might use null otherwise but it should
    * be readily available in the global environment as well as local, you should never use raw db in local nevertheless
+   * @param language the language to use
    * @param dictionary the dictionary to use
+   * @param currentValue please provide if dealing with files as it will otherwise be unable ot figure out differences
    * @param partialFields by default it will populate the entire row information that is necessary to fill each one of the required
    * properties (not including the base) so with partial fields you can get partial values which are useful for updates, these
    * are the same as rq fields
@@ -329,7 +332,9 @@ export class ItemizeRawDB {
     item: ItemDefinition | string,
     value: any,
     appData: IAppDataType,
+    language: string,
     dictionary: string,
+    currentValue?: IRQValue,
     partialFields?: any,
   ): {
     modSQL: ISQLTableRowValue,
@@ -344,9 +349,9 @@ export class ItemizeRawDB {
       appData,
       mod,
       value,
-      null,
+      currentValue || null,
       this.uploadsClient,
-      NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname,
+      language,
       dictionary,
       partialFields,
     );
@@ -356,9 +361,9 @@ export class ItemizeRawDB {
       appData,
       itemDefinition,
       value,
-      null,
+      currentValue || null,
       this.uploadsClient,
-      NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname,
+      language,
       dictionary,
       partialFields,
     );

@@ -12,35 +12,21 @@ export function makeIdOutOf(str: string) {
   return "ANON" + uuidv5(str, NAMESPACE).replace(/-/g, "");
 }
 
-export enum TrackTimedStatus {
-  /**
-   * This track does not track time
-   */
-  NO = "NO",
-  /**
-   * This track tracks time but only using server side
-   * values
-   */
-  TRUSTED = "TRUSTED",
-  /**
-   * This track tracks client side provided time
-   */
-  UNTRUSTED = "UNTRUSTED",
-}
-
 
 export interface ITrackOptions {
   /**
    * Whether the track will have information
    * about tracking time slices or simple weights
-   * 
-   * if the value is TRUSTED then this means only the server
-   * side can define these timed tracks
+   */
+  timed: boolean;
+  /**
+   * if the value is teusted then this means only the server
+   * side can define these timed tracks or time of valuation
    * 
    * if the value is UNTRUSTED then this means the client side
-   * determines the values of the timed tracks
+   * determines the time of activation
    */
-  timed: "NO" | "TRUSTED" | "UNTRUSTED";
+  trusted: boolean;
   /**
    * Whether anonymous users can use this track to store
    * anonymous data
@@ -88,7 +74,15 @@ export interface ITrackOptions {
    * @param data 
    * @returns 
    */
-  dataValidator?: (data: any, userData: IServerSideTokenDataType) => boolean;
+  dataValidator?: (data: object, userData: IServerSideTokenDataType) => boolean;
+  /**
+   * If the validation yields true, use this function to extend
+   * what data is being stored in the analytics
+   * @param data 
+   * @param userData 
+   * @returns 
+   */
+  dataEditor?: (data: object, userData: IServerSideTokenDataType) => Promise<object>;
   /**
    * Use for validating context
    * 
@@ -145,6 +139,10 @@ export interface IAnalyticsPayload extends IAnalyticsTimetrackStartPayload {
  */
   weight?: number;
   /**
+   * time of when the payload is registered
+   */
+  time?: number;
+  /**
    * the time slice that is to be informed
    */
   timeslice?: {
@@ -162,7 +160,7 @@ export interface IAnalyticsPayload extends IAnalyticsTimetrackStartPayload {
 /**
  * @ignore
  */
-const validProperties = ["track", "context", "data", "timezone", "weight", "timeslice"];
+const validProperties = ["track", "context", "data", "timezone", "weight", "timeslice", "time"];
 
 export const ANALYTICS_HIT_REQUEST = "$analytics-hit-request";
 export const ANALYTICS_TIMETRACK_START_REQUEST = "$analytics-timetrack-start";
@@ -198,7 +196,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     this.elasticClient = elasticClient;
 
-    //this.onAnalyticsHit = this.onAnalyticsHit.bind(this);
+    this.onAnalyticsHit = this.onAnalyticsHit.bind(this);
   }
 
   private validateAnalyticPayload(
@@ -279,7 +277,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     if (type === "payload") {
       if (typeof (data as IAnalyticsPayload).timeslice !== "undefined" && (data as IAnalyticsPayload).timeslice !== null) {
-        if (track.timed !== "UNTRUSTED") {
+        if (track.timed && !track.trusted) {
           info.listener.emitError(info.socket, "Track is not an untrusted timed track yet a timeslice was provided", data);
           return false;
         }
@@ -305,6 +303,13 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
           )
         ) {
           info.listener.emitError(info.socket, "Invalid timeslice provided (end is not a number, too large, or less than start)", data);
+          return false;
+        }
+      }
+
+      if (typeof (data as IAnalyticsPayload).time !== "undefined" && (data as IAnalyticsPayload).time !== null) {
+        if (track.trusted) {
+          info.listener.emitError(info.socket, "Track is a trusted track, yet the time of the hit was specified", data);
           return false;
         }
       }
@@ -345,7 +350,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     return true;
   }
 
-  private onAnalyticsHit(
+  private async onAnalyticsHit(
     data: IAnalyticsPayload,
     info: ICustomListenerInfo,
   ) {
@@ -358,6 +363,11 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     const track = this.tracks[data.track];
 
+    let newData = data.data;
+    if (track.dataEditor) {
+      newData = await track.dataEditor(data.data, info.userData);
+    }
+
     this.hit(
       data.track,
       info.userData?.id || AnalyticsProvider.createUserIdFromIp(socketAddr),
@@ -366,8 +376,9 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
         context: data.context,
         upsert: track.clientWillUpsert,
         weight: typeof data.weight === "number" ? data.weight : 1,
-        data: data.data,
+        data: newData,
         timezone: data.timezone,
+        time: data.time ? new Date(data.time) : null,
         timeSlice: data.timeslice ? {
           trusted: false,
           start: new Date(data.timeslice.start),
@@ -421,6 +432,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
         info.userData?.id || AnalyticsProvider.createUserIdFromIp(socketAddr),
         {
           context: data.context || null,
+          userData: info.userData,
         },
       );
     } catch (err) {
@@ -446,6 +458,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
             contextsBeingTrackedInTrack.forEach((context) => {
               this.stopTrackingTrustedTime(track, userIdToUntrack, {
                 context,
+                userData: info.userData,
               });
             });
           });
@@ -479,6 +492,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     anonymous: boolean;
     data?: any;
     timezone: string;
+    time?: Date;
     timeSlice?: {
       trusted: boolean;
       start: Date;
@@ -522,7 +536,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       throw err;
     }
 
-    if (options.clientCanSpecifyWeight && options.timed !== "NO") {
+    if (options.clientCanSpecifyWeight && options.timed) {
       const err = new Error("Track is timed yet clientCanSpecifyWeight is true");
       this.logError({
         message: err.message,
@@ -552,7 +566,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       throw err;
     }
 
-    if (options.weightValidator && options.timed !== "NO") {
+    if (options.weightValidator && !options.timed) {
       const err = new Error("Track is timed yet weightValidator is set");
       this.logError({
         message: err.message,
@@ -567,7 +581,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       throw err;
     }
 
-    if (options.clientTrustedTrackingLimit && options.timed !== "TRUSTED") {
+    if (options.clientTrustedTrackingLimit && options.timed && !options.trusted) {
       const err = new Error("Track is not a trusted timed yet clientTrustedTrackingLimit is set");
       this.logError({
         message: err.message,
@@ -609,9 +623,9 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
   }) {
     const trackInfo = this.tracks[track];
 
-    if (!trackInfo || trackInfo.timed !== TrackTimedStatus.TRUSTED) {
+    if (!trackInfo || (trackInfo.timed && !trackInfo.trusted)) {
       const err = new Error(
-        trackInfo.timed !== TrackTimedStatus.TRUSTED ?
+        trackInfo ?
           ("The track at " + track + " is not a trusted track") :
           ("There's no track for " + track)
       );
@@ -702,6 +716,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
    */
   public async stopTrackingTrustedTime(track: string, userId: string, options: {
     context?: string;
+    userData: IServerSideTokenDataType;
   }) {
     // no track
     if (
@@ -740,12 +755,17 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     const trackInfo = this.tracks[track];
 
+    let newData = value.data;
+    if (trackInfo.dataEditor) {
+      newData = await trackInfo.dataEditor(value.data, options.userData);
+    }
+
     await this.hit(track, userId, {
       weight: stop.getTime() - value.start.getTime(),
       anonymous: !!value.anonymous,
       context: options.context,
       upsert: trackInfo.clientWillUpsert,
-      data: value.data,
+      data: newData,
       timezone: value.timezone,
       timeSlice: {
         start: value.start,

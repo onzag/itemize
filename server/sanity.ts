@@ -133,12 +133,13 @@ export async function checkClusterSanityBeforeListen(
     }
   } else {
     logger.info({
-      message: "I can't find a valid subdomain where I reside",
+      message: "I can't find a valid host where I reside",
       methodName: "checkClusterSanity",
       data: {
         clusterId: CLUSTER_ID,
         defaulCluster: config.defaultCluster,
         buildnumber,
+        clusters: sensitiveConfig.clusters,
       }
     });
     return false;
@@ -159,7 +160,6 @@ export async function checkClusterSanityAfterListen(
     return true;
   }
 
-  const baseDomain = NODE_ENV === "development" ? config.developmentHostname : config.productionHostname;
   const clusterHostname = sensitiveConfig.clusters[CLUSTER_ID].hostname;
 
   while (true) {

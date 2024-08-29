@@ -382,7 +382,6 @@ export function convertRQValueToSQLValueForItemDefinition(
   data: IRQArgs,
   oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   language: string | ISQLTableRowValue,
   dictionary: string | ISQLTableRowValue,
   partialFields?: IRQRequestFields | IRQArgs | IRQValue,
@@ -408,7 +407,6 @@ export function convertRQValueToSQLValueForItemDefinition(
         data,
         oldData,
         uploadsClient,
-        domain,
         language,
         dictionary,
       );
@@ -438,7 +436,6 @@ export function convertRQValueToSQLValueForItemDefinition(
         data,
         oldData,
         uploadsClient,
-        domain,
         language,
         dictionary,
         innerPartialFields,

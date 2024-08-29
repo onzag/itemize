@@ -10,7 +10,7 @@ import io, { Socket } from "socket.io-client";
 import Root from "../../../base/Root";
 import uuid from "uuid";
 import CacheWorkerInstance from "../workers/cache";
-import { PREFIX_GET, PREFIX_SEARCH } from "../../../constants";
+import { AWAITING_WEBSOCKET_EVENTS, ENDPOINT_ERRORS, PREFIX_GET, PREFIX_SEARCH } from "../../../constants";
 import {
   IRegisterRequest,
   IOwnedSearchRegisterRequest,
@@ -67,6 +67,7 @@ import {
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import type { IRQEndpointValue, IRQSearchRecord } from "../../../rq-querier";
+import { EndpointErrorType } from "../../../base/errors";
 
 const SLOW_POLLING_MIN_TIME = 60 * 1000;
 const SLOW_POLLING_TIME_BETWEEN_REQUESTS = 5 * 1000;
@@ -74,6 +75,27 @@ const SLOW_POLLING_TIME_BETWEEN_REQUESTS = 5 * 1000;
 async function wait(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
 }
+
+/**
+ * An instance version of the error
+ */
+export class TimeoutError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, TimeoutError.prototype);
+  }
+}
+
+
+/**
+ * value that comes from ack callbacks with custom events
+ */
+export interface IAckCallbackType {
+  error: EndpointErrorType;
+  data: any;
+};
 
 /**
  * This is what the remote listener expects of an argument taken
@@ -87,7 +109,12 @@ export interface IRemoteListenerRecordsCallbackArg {
   deletedRecords: IRQSearchRecord[];
 }
 
-interface AwaitingRequestType { event: IWSRQRequest, resolve: (v: IRQEndpointValue) => void, reject: (err: Error) => void };
+interface AwaitingRequestType {
+  event: IWSRQRequest;
+  resolve: (v: IRQEndpointValue) => void;
+  reject: (err: Error) => void;
+  requestedInThisConnection: boolean;
+};
 
 type RemoteListenerRecordsCallback = (arg: IRemoteListenerRecordsCallbackArg) => void;
 
@@ -363,6 +390,11 @@ export class RemoteListener {
   private awaitingRQRequests: AwaitingRequestType[] = [];
 
   /**
+   * Awaiting custom events
+   */
+  private awaitingCustomEvents: Array<{ event: string; payload: object; ackCallback: (data: any) => void; surviveRefresh: boolean }> = [];
+
+  /**
    * Instantiates a new remote listener
    * @param root the root we are using for it
    */
@@ -413,7 +445,14 @@ export class RemoteListener {
     this.socket.on(OWNED_PARENTED_SEARCH_RECORDS_EVENT, this.onOwnedParentedSearchRecordsEvent);
     this.socket.on(ERROR_EVENT, this.onError);
     this.socket.on(CURRENCY_FACTORS_UPDATED_EVENT, this.triggerCurrencyFactorsHandler);
-    this.socket.on(RQ_RESPONSE, this.onRQResponseReceived)
+    this.socket.on(RQ_RESPONSE, this.onRQResponseReceived);
+
+    try {
+      const storageValue = localStorage.getItem(AWAITING_WEBSOCKET_EVENTS);
+      if (storageValue) {
+        this.awaitingCustomEvents = JSON.parse(storageValue);
+      }
+    } catch (err) {}
   }
 
   /**
@@ -2082,8 +2121,22 @@ export class RemoteListener {
     this.connectionOnConnectOnceListeners = [];
 
     this.awaitingRQRequests.forEach((r) => {
-      this.queueAwaitingRequest(r);
+      if (!r.requestedInThisConnection) {
+        this.queueAwaitingRequest(r);
+      }
     });
+
+    this.awaitingCustomEvents = this.awaitingCustomEvents.filter((r) => {
+      return !this.sendCustomEvent(r.event, r.payload, r.ackCallback);
+    });
+    this.storeAwaitingCustomEvents();
+  }
+
+  private storeAwaitingCustomEvents() {
+    const survivors = this.awaitingCustomEvents.filter((v) => v.surviveRefresh);
+    if (survivors.length) {
+      localStorage.setItem(AWAITING_WEBSOCKET_EVENTS, JSON.stringify(survivors));
+    }
   }
 
   private async executeSlowPollingFeedbacks() {
@@ -2288,6 +2341,12 @@ export class RemoteListener {
     // Javascript is like that so I must make a copy of the array because JavaScript
     this.connectionListeners.slice().forEach((l) => l());
 
+    this.awaitingRQRequests.forEach((r) => {
+      // they have no more been requested because its been disconnected
+      // they will be requeed
+      r.requestedInThisConnection = false;
+    });
+
     // one second grace time before failing
     this.killAwaitingRqRequestsTimer = setTimeout(() => {
       this.awaitingRQRequests.forEach((r) => r.reject(new Error("Can't Connect")));
@@ -2309,6 +2368,7 @@ export class RemoteListener {
         event,
         resolve,
         reject,
+        requestedInThisConnection: this.socket.connected,
       };
       this.queueAwaitingRequest(awaitingRequest);
       this.awaitingRQRequests.push(awaitingRequest);
@@ -2321,6 +2381,10 @@ export class RemoteListener {
 
   private queueAwaitingRequest(request: AwaitingRequestType) {
     if (this.socket.connected) {
+      // modify the request to make it be requested
+      // in this connection
+      request.requestedInThisConnection = true;
+
       // and then emit it
       this.pushTestingInfo(
         "rqRequest",
@@ -2335,7 +2399,7 @@ export class RemoteListener {
 
   public onRQResponseReceived(response: IWSRQResponse) {
     const awaitingRespectiveRequestIndex = this.awaitingRQRequests.findIndex((v) => v.event.uuid === response.uuid);
-    
+
     // it has returned before?
     if (awaitingRespectiveRequestIndex === -1) {
       console.warn("The response for a given promise that is awaiting " + JSON.stringify(response) + " returned early for some reason");
@@ -2357,8 +2421,148 @@ export class RemoteListener {
     }
 
     const request = this.awaitingRQRequests[requestIndex];
-    request.reject(new Error("Timeout"));
+    request.reject(new TimeoutError("RQ request has timed out"));
 
     this.awaitingRQRequests.splice(requestIndex, 1);
+  }
+
+  private async sendCustomEvent(event: string, payload: object, ackCallback: (info: IAckCallbackType)  => void) {
+    if (this.socket.connected) {
+      // and then emit it
+      this.pushTestingInfo(
+        "customEvent",
+        payload,
+      );
+      try {
+        const data: IAckCallbackType = await this.socket.emitWithAck(
+          event,
+          payload,
+        );
+        if (ackCallback) {
+          ackCallback(data);
+        }
+        // here it succeeds regardless of error state
+        // and removes itself from the awaiting list
+        // false means remove
+        return false;
+      } catch (err) {
+        if (!this.socket.connected) {
+          console.warn("Event " + event + " failed to being acked by server as it disconnected while performing the request");
+          // do not remove, try again when connected
+          return true;
+        } else {
+          console.warn("Event " + event + " failed due to a remote error");
+          console.warn(err.stack);
+          // remove who knows what kind of weird error we got
+          if (ackCallback) {
+            ackCallback({
+              data: null,
+              error: {
+                code: ENDPOINT_ERRORS.UNSPECIFIED,
+                message: "Unknown network error " + err.message,
+              }
+            });
+          }
+          return false;
+        }
+      }
+    }
+
+    // do not remove we aren't even connected 
+    return true;
+  }
+
+  /**
+   * Triggers a custom event and returns an acked response
+   * from the server, by default the server will return ack, unless it is handled
+   * 
+   * If the server returns an error the error will come as a value, if the client
+   * however has an error such as it times out due to grace time then it will throw an
+   * TimeoutError which you may want to handle as CANT_CONNECT error code
+   * 
+   * Note that if you use surviveRefresh you will lose track of the promise
+   * so it's not recommended that you expect to read an ack from this, as these functions
+   * would be lost; they will execute whenever they can
+   * 
+   * @param event 
+   * @param payload 
+   * @param options 
+   * @returns 
+   */
+  public async triggerCustomEvent(
+    event: string,
+    payload: object,
+    options: {
+      graceTime?: number;
+      surviveRefresh?: boolean;
+    } = {},
+  ): Promise<IAckCallbackType> {
+    if (event[0] !== "$") {
+      console.warn("Invalid custom event " + event + " attempting to trigger with payload " + JSON.stringify(payload));
+      return;
+    }
+
+    return new Promise<IAckCallbackType>(async (resolve, reject) => {
+      let succeeded = false;
+      if (this.socket.connected) {
+        // the send custom events returns false if it succeeded because
+        // it is used for filtering, so false means remove it has been done
+        succeeded = !(await this.sendCustomEvent(event, payload, resolve));
+      }
+      if (!succeeded) {
+        if (typeof options.graceTime === "number" || options.graceTime === Infinity) {
+          const eventObject = {
+            event,
+            payload,
+            ackCallback: resolve,
+            surviveRefresh: !!options.surviveRefresh,
+          };
+  
+          this.awaitingCustomEvents.push(eventObject);
+          if (eventObject.surviveRefresh) {
+            // only relevant to store in local storage if
+            // we survive a refresh and it changes something for our survival list
+            this.storeAwaitingCustomEvents();
+          }
+  
+          if (options.graceTime !== Infinity) {
+            setTimeout(() => {
+              const indexFound = this.awaitingCustomEvents.findIndex((o) => o === eventObject);
+              if (indexFound !== -1) {
+                this.awaitingCustomEvents.splice(indexFound, 1);
+                // only relevant to store in local storage if
+                // we survive a refresh and it changes something for our survival list
+                if (eventObject.surviveRefresh) {
+                  this.storeAwaitingCustomEvents();
+                }
+                reject(new TimeoutError("Custom event has timeout"));
+              }
+            }, options.graceTime);
+          }
+        } else {
+          console.error("Custom event " + event + " with payload " + JSON.stringify(payload) + " failed to send");
+        }
+  
+        return;
+      }
+    })
+  }
+
+  public addCustomListener(event: string, listener: (payload: object) => void) {
+    if (event[0] !== "$") {
+      console.warn("Invalid custom event " + event + " attempted to being listened");
+      return;
+    }
+
+    this.socket.on(event, listener);
+  }
+
+  public removeCustomListener(event: string, listener: (payload: object) => void) {
+    if (event[0] !== "$") {
+      console.warn("Invalid custom event " + event + " attempted to being removed a listener");
+      return;
+    }
+
+    this.socket.removeListener(event, listener);
   }
 }

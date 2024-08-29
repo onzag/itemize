@@ -1193,7 +1193,6 @@ export class Cache {
       rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
       this.storageClient,
-      this.domain,
       // if this is a copy that is passing a SQL value and not specifying a language
       // then use what is found in the sql row and copy it
       options.language ? options.language : (isSQLType ? value as ISQLTableRowValue : null),
@@ -1206,7 +1205,6 @@ export class Cache {
       rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
       this.storageClient,
-      this.domain,
       options.language ? options.language : (isSQLType ? value as ISQLTableRowValue : null),
       options.dictionary ? options.dictionary : (isSQLType ? value as ISQLTableRowValue : null),
     );
@@ -2041,7 +2039,6 @@ export class Cache {
       update,
       currentValueAsRQ,
       this.storageClient,
-      this.domain,
       options.language,
       options.dictionary,
       partialUpdateFields,
@@ -2053,7 +2050,6 @@ export class Cache {
       update,
       currentValueAsRQ,
       this.storageClient,
-      this.domain,
       options.language,
       options.dictionary,
       partialUpdateFields,

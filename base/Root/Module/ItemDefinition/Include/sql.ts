@@ -227,7 +227,6 @@ export function convertRQValueToSQLValueForInclude(
   data: IRQArgs,
   oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   language: string | ISQLTableRowValue,
   dictionary: string | ISQLTableRowValue,
   partialFields?: any,
@@ -269,7 +268,6 @@ export function convertRQValueToSQLValueForInclude(
           data[include.getQualifiedIdentifier()] as IRQValue,
           (oldData && oldData[include.getQualifiedIdentifier()] as IRQValue) || null,
           uploadsClient,
-          domain,
           language,
           dictionary,
         );

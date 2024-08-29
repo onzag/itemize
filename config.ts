@@ -416,6 +416,9 @@ export const rawSensitiveConfigSchema = {
       additionalProperties: {
         type: "object",
         properties: {
+          hostname: {
+            type: "string",
+          },
           sshuser: {
             type: "string",
           },
@@ -433,7 +436,9 @@ export const rawSensitiveConfigSchema = {
         required: [
           "sshuser",
           "services",
+          "hostname",
         ],
+        additionalProperties: {},
       },
       minItems: 1,
     },

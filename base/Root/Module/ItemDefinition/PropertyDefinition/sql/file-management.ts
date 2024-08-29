@@ -40,7 +40,6 @@ export function processFileListFor(
   newValues: IRQFile[],
   oldValues: IRQFile[],
   uploadsClient: StorageProvider<any>,
-  domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -68,7 +67,6 @@ export function processFileListFor(
       newValue,
       relativeOldValue,
       uploadsClient,
-      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -80,7 +78,6 @@ export function processFileListFor(
       null,
       removedValue,
       uploadsClient,
-      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -122,7 +119,6 @@ export function processSingleFileFor(
   newValue: IRQFile,
   oldValue: IRQFile,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -135,7 +131,6 @@ export function processSingleFileFor(
       newValue,
       oldValue,
       uploadsClient,
-      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -148,7 +143,6 @@ export function processSingleFileFor(
       null,
       oldValue,
       uploadsClient,
-      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -158,7 +152,6 @@ export function processSingleFileFor(
       newValue,
       null,
       uploadsClient,
-      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -188,7 +181,6 @@ function processOneFileAndItsSameIDReplacement(
   newVersion: IRQFile,
   oldVersion: IRQFile,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -377,7 +369,6 @@ function processOneFileAndItsSameIDReplacement(
         filePath,
         curatedFileName,
         uploadsClient,
-        domain,
         valueWithStream,
         propertyDefinition,
       );
@@ -427,7 +418,6 @@ async function addFileFor(
   mainFilePath: string,
   curatedFileName: string,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   value: IRQFile,
   propertyDefinition: PropertyDefinition,
 ): Promise<void> {
@@ -459,7 +449,6 @@ async function addFileFor(
       curatedFileName,
       value.type,
       uploadsClient,
-      domain,
       propertyDefinition,
     );
   } else {
@@ -467,7 +456,6 @@ async function addFileFor(
     await sqlUploadPipeFile(
       uploadsClient,
       stream,
-      domain,
       path.join(mainFilePath, curatedFileName),
     );
   }
@@ -483,16 +471,13 @@ async function addFileFor(
 export async function sqlUploadPipeFile(
   uploadsClient: StorageProvider<any>,
   readStream: ReadStream | sharp.Sharp,
-  domain: string,
-  remote: string,
+  at: string,
 ): Promise<void> {
-  const finalLocation = domain + "/" + remote;
-
   CAN_LOG_DEBUG && logger.debug({
     functionName: "sqlUploadPipeFile",
     message: "Uploading",
-    data: { path: finalLocation },
+    data: { path: at },
   });
 
-  await uploadsClient.save(finalLocation, readStream);
+  await uploadsClient.save(at, readStream);
 }

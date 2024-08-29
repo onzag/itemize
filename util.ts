@@ -552,14 +552,14 @@ export function fileURLAbsoluter(
     return file;
   }
 
-  if (!file.cluster) {
-    console.warn("fileURLAbsoluter: file with id: " + file.id + " and url " + file.url +
-        " has no cluster, using default " + JSON.stringify(defaultCluster) + " as fallback");
+  if (!file.cluster && process.env.NODE_ENV === "development") {
+    console.log("fileURLAbsoluter: file with id: " + file.id + " and url " + file.url +
+      " has no cluster, using default " + JSON.stringify(defaultCluster) + " as fallback");
   }
 
   const clusterID = file.cluster || defaultCluster;
 
-  if (!this.config.allClusters.includes(clusterID)) {
+  if (!allClusters.includes(clusterID) && process.env.NODE_ENV === "development") {
     console.warn("fileURLAbsoluter: there's no cluster for " + file.cluster);
     return null;
   }

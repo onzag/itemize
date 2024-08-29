@@ -657,7 +657,6 @@ export function convertRQValueToSQLValueForProperty(
   data: IRQArgs,
   oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   language: string | ISQLTableRowValue,
   dictionary: string | ISQLTableRowValue,
 ): ISQLStreamComposedTableRowValue {
@@ -692,7 +691,6 @@ export function convertRQValueToSQLValueForProperty(
         newValue,
         oldValue,
         uploadsClient,
-        domain,
         itemDefinition || mod,
         include,
         propertyDefinition,
@@ -704,7 +702,6 @@ export function convertRQValueToSQLValueForProperty(
         newValue,
         oldValue,
         uploadsClient,
-        domain,
         itemDefinition || mod,
         include,
         propertyDefinition,

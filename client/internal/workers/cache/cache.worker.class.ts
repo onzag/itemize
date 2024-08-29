@@ -828,7 +828,7 @@ export default class CacheWorker {
     const defaultCluster = this.config.defaultCluster;
 
     if (!file.cluster) {
-      console.warn("fileURLAbsoluter: file with id: " + file.id + " and url " + file.url +
+      console.log("fileURLAbsoluter: file with id: " + file.id + " and url " + file.url +
           " has no cluster, using default " + JSON.stringify(defaultCluster) + " as fallback");
     }
   

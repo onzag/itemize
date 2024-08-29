@@ -117,7 +117,6 @@ export async function runImageConversions(
   fileName: string,
   fileMimeType: string,
   uploadsClient: StorageProvider<any>,
-  domain: string,
   propDef: PropertyDefinition,
 ): Promise<void> {
   // first we get the original file path, by joining the file path
@@ -137,7 +136,6 @@ export async function runImageConversions(
         await sqlUploadPipeFile(
           uploadsClient,
           imageStream,
-          domain,
           originalImageFilePath,
         );
         !hasBeenRejected && resolve();
@@ -226,7 +224,6 @@ export async function runImageConversions(
           await sqlUploadPipeFile(
             uploadsClient,
             outputPipeline,
-            domain,
             outputFileName,
           );
           !hasBeenCRejected && cResolve();
@@ -249,7 +246,6 @@ export async function runImageConversions(
           await sqlUploadPipeFile(
             uploadsClient,
             conversionPipelineCloned,
-            domain,
             originalImageFilePath,
           );
           !hasBeenCRejected && cResolve();

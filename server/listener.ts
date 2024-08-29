@@ -197,13 +197,20 @@ export interface ICustomListenerInfo {
 
 export type CustomListenerDisconnectHandler = (info: ICustomListenerInfo) => void;
 
+/**
+ * If a custom event returns a value this will be the value used
+ * for acking the client about receiving such custom event
+ * 
+ * If the promise crashes you may want to return an endpoint error type
+ * or otherwise it will be casted into internal server error
+ */
 export type CustomListenerEventHandler = (
   /**
    * data for the event
    */
   eventData: any,
   info: ICustomListenerInfo,
-) => void;
+) => Promise<void | object>;
 
 export class Listener {
   private io: IOServer;
@@ -413,8 +420,8 @@ export class Listener {
         this.handleRQRequest(socket, request);
       });
       Object.keys(this.customEvents).forEach((k) => {
-        socket.once(k, (data: any) => {
-          this.handleCustomEvent(k, socket, data);
+        socket.on(k, (data: any, callback: any) => {
+          this.handleCustomEvent(k, socket, data, callback);
         });
       });
       socket.on("disconnect", () => {
@@ -3684,7 +3691,7 @@ export class Listener {
       return;
     }
 
-    this.customDisconnectEvents.forEach((l) => l({userData: listenerData.user, socket, listener: this}));
+    this.customDisconnectEvents.forEach((l) => l({ userData: listenerData.user, socket, listener: this }));
 
     CAN_LOG_DEBUG && logger.debug(
       {
@@ -3765,10 +3772,20 @@ export class Listener {
     this.redisLocalPub.redisClient.publish(CLUSTER_MANAGER_RESET, JSON.stringify(redisEvent));
   }
 
-  private handleCustomEvent(
+  /**
+   * This function handles a custom event internally
+   * as it's received from the client provided that it's accepted
+   * @param event the event to be recieved
+   * @param socket the socket that sent it
+   * @param data the data that it sent
+   * @param callback the ack callback function, all custom events are acked
+   * @returns 
+   */
+  private async handleCustomEvent(
     event: string,
     socket: Socket,
     data: any,
+    callback: (rs: any) => void,
   ) {
     // get the listener
     const listener = this.customEvents[event];
@@ -3779,7 +3796,57 @@ export class Listener {
     // get the user data
     const userData = (this.listeners[socket.id]?.user || null);
     // call the listener
-    listener(data, {userData, socket, listener: this});
+    try {
+      const rs = await listener(data, { userData, socket, listener: this });
+      // all dandy
+      callback({
+        error: null,
+        data: rs || null,
+      });
+    } catch (err) {
+      // now an error
+      if (err instanceof EndpointError) {
+        // standard error let's respond
+        callback({
+          error: err.data,
+          data: null,
+        });
+      } else {
+        // deadly unexpected error
+        logger.error({
+          message: "Failed to handle custom event " + event,
+          className: "Listener",
+          methodName: "handleCustomEvent",
+          data: {
+            data,
+            event,
+          },
+          err: err,
+          serious: true,
+        });
+        // respond with internal server error
+        callback({
+          error: {
+            code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+            message: "Couldn't handle event while listening"
+          },
+          data: null,
+        });
+      }
+    }
+  }
+
+  public sendWithCustomEvent(
+    event: string,
+    socket: Socket,
+    data: any,
+  ) {
+    if (!customEventListenerRegex.test(event)) {
+      throw new Error("Invalid custom event id " + JSON.stringify(event));
+    }
+
+    socket.emit(event, data);
+    return;
   }
 
   /**
@@ -3806,7 +3873,7 @@ export class Listener {
 
     Object.keys(this.listeners).forEach((sId) => {
       const socket = this.listeners[sId].socket;
-      socket.once(event, this.handleCustomEvent.bind(this, event, socket))
+      socket.on(event, this.handleCustomEvent.bind(this, event, socket))
     });
   }
 
@@ -3872,21 +3939,21 @@ export class Listener {
     }
 
     try {
-          // our already processed arguments
-    const args = request.request.args;
-    // add the token if it uses it
-    if (typeof args.token === "undefined") {
-      args.token = token;
-    }
-    // we have no capacity to handle files
-    // not over websockets
-    // if files present this will burst into an error
-    processArgs(null, schemaRegion.args, args, "");
-    const fields = processFields(
-      schemaRegion.stdFields,
-      schemaRegion.ownFields,
-      request.request.f,
-    );
+      // our already processed arguments
+      const args = request.request.args;
+      // add the token if it uses it
+      if (typeof args.token === "undefined") {
+        args.token = token;
+      }
+      // we have no capacity to handle files
+      // not over websockets
+      // if files present this will burst into an error
+      processArgs(null, schemaRegion.args, args, "");
+      const fields = processFields(
+        schemaRegion.stdFields,
+        schemaRegion.ownFields,
+        request.request.f,
+      );
 
       // it must exist because it has been checked
       const value: IRQValue = await schemaRegion.resolve({

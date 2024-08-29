@@ -846,6 +846,7 @@ export async function rqQuery(query: RQQueryBuilder, options?: {
       reply =
         await options.remoteListener.makeRQRequest(baseOperation, rqOperations[baseOperation]);
     } catch (err) {
+      // likely a timeout error
       reply = {
         data: null,
         errors: [

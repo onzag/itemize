@@ -52,11 +52,23 @@ export class LocalStorageService extends StorageProvider<null> {
   }
 
   public readOwn(at: string): NodeJS.ReadableStream {
+    this.logDebug({
+      className: "LocalStorageService",
+      methodName: "readOwn",
+      message: "Attempting to read " + at,
+    });
+
     const rs = fs.createReadStream(path.join("uploads", at));
     return rs;
   }
 
   public async save(at: string, readStream: ReadStream, options: {dump?: boolean} = {}): Promise<void> {
+    this.logDebug({
+      className: "LocalStorageService",
+      methodName: "save",
+      message: "Attempting to save " + at,
+    });
+
     const targetAt = options.dump ? at : path.normalize(path.join("uploads", at));
     if (!options.dump && targetAt.startsWith("..")) {
       throw new Error("It's not allowed to go upstream of uploads")

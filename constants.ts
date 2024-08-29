@@ -356,6 +356,12 @@ export const MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_" + SEAR
 export const MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_" + UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION;
 
 /**
+ * Awaiting websocket events
+ * that also get destroyed with the destruction markers
+ */
+export const AWAITING_WEBSOCKET_EVENTS = "AWAITING_WEBSOCKET_EVENTS"
+
+/**
  * Store a last rich text change size global to use to save memory for lenght calculation
  */
 export const LAST_RICH_TEXT_CHANGE_LENGTH = "LAST_RICH_TEXT_CHANGE_LENGTH";
