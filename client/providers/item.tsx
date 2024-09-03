@@ -41,6 +41,9 @@ import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
 import type { ICacheMetadataMatchType, ICacheStateMetadata } from "../internal/workers/cache/cache.worker.class";
 import { blobToTransferrable } from "../../util";
+import Hit from "../components/analytics/Hit";
+import Timetrack from "../components/analytics/Timetrack";
+import { genericAnalyticsDataProvider } from "../components/analytics/util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -1820,6 +1823,65 @@ export interface IItemProviderProps {
    * disables using indexed as cache
    */
   doNotUseCache?: boolean;
+
+  /**
+   * Analytics properties used for the item
+   * 
+   * when used in the analytics the context will always be the
+   * signature of the item
+   * 
+   * if specified as a boolean true it will use a default configuration
+   * 
+   * {
+   *   enabled: true,
+   *   offlineTimeTrackId: "item",
+   * }
+   */
+  analytics?: IItemAnalyticsProps | boolean;
+}
+
+/**
+ * The analytics props to customize the analytics behaviour using the
+ * inner analytics mechanism with Timetrack and Hit
+ */
+export interface IItemAnalyticsProps {
+  /**
+   * whether it's enabled
+   */
+  enabled: boolean;
+  /**
+   * the track id for online usage that is tracked securely in the server side
+   */
+  onlineTimeTrackId?: string;
+  /**
+   * the track id for offline all time usage that is tracked in the client side
+   */
+  offlineTimeTrackId?: string;
+  /**
+   * used with hits, specifies the weight of the hit
+   * will not be used in timetrack as it doesn't support it since the weight of a timetrack
+   * is equivalent to the time spent
+   */
+  weight?: number;
+  /**
+   * The track id for an online hit
+   */
+  onlineHitTrackId?: string;
+  /**
+   * the track id for an offline client side tracked hit
+   */
+  offlineHitTrackId?: string;
+  /**
+   * The default data generator, it will use the item default data generator by default
+   * it's preferred that you don't override this function unless you want to override
+   * all default data
+   */
+  defaultDataGenerator?: () => object;
+  /**
+   * By default the data that gets attached to the object comes from the default data generator
+   * @returns 
+   */
+  extraDataGenerator?: (type: "online-time-track" | "offline-time-track" | "online-hit" | "offline-hit") => object;
 }
 
 /**
@@ -2356,6 +2418,7 @@ export class ActualItemProvider extends
     this.downloadState = this.downloadState.bind(this);
     this.downloadStateAt = this.downloadStateAt.bind(this);
     this.onConnectStatusChange = this.onConnectStatusChange.bind(this);
+    this.internalDataProviderForAnalytics = this.internalDataProviderForAnalytics.bind(this);
 
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
@@ -2861,7 +2924,8 @@ export class ActualItemProvider extends
       !equals(nextProps.setters, this.props.setters, { strict: true }) ||
       nextProps.location !== this.props.location ||
       !equals(nextProps.injectedParentContext, this.props.injectedParentContext, { strict: true }) ||
-      !equals(nextProps.highlights, this.props.highlights);
+      !equals(nextProps.highlights, this.props.highlights) ||
+      !equals(nextProps.analytics, this.props.analytics);
   }
   public async componentDidUpdate(
     prevProps: IActualItemProviderProps,
@@ -6191,6 +6255,13 @@ export class ActualItemProvider extends
       },
     });
   }
+  private internalDataProviderForAnalytics() {
+    const generalData = genericAnalyticsDataProvider() as any;
+    generalData.id = this.props.forId;
+    generalData.version = this.props.forVersion || null;
+    generalData.type = this.props.itemDefinitionQualifiedName;
+    return generalData;
+  }
   private installInternalSearchDestructionMarker(marker: [string, string, string, [string, string, string], [string, string]], unmark: boolean) {
     const index = this.internalSearchDestructionMarkers.findIndex((m) => equals(m, marker, { strict: true }));
     if (unmark) {
@@ -6200,7 +6271,7 @@ export class ActualItemProvider extends
         this.internalSearchDestructionMarkers.splice(index, 1);
       }
 
-    // not found
+      // not found
     } else if (index === -1) {
       // mark it
       this.internalSearchDestructionMarkers.push(marker);
@@ -6224,84 +6295,143 @@ export class ActualItemProvider extends
       );
     }
 
+    let analyticsNode: React.ReactNode = null;
+    if (
+      this.props.analytics &&
+      this.state.loaded &&
+      !this.state.notFound &&
+      this.props.forId
+    ) {
+      const realAnalytics: IItemAnalyticsProps = this.props.analytics === true ? {
+        enabled: true,
+        offlineTimeTrackId: "item",
+      } : this.props.analytics;
+
+      const context = this.props.itemDefinitionQualifiedName + "." + this.props.forId + "." + (this.props.forVersion || "");
+
+      analyticsNode = (
+        <>
+          {realAnalytics.offlineHitTrackId ? (
+            <Hit
+              trackId={realAnalytics.offlineTimeTrackId}
+              enabled={realAnalytics.enabled}
+              context={context}
+              dataGenerator={this.internalDataProviderForAnalytics}
+              weight={realAnalytics.weight}
+              trackOffline={true}
+            />
+          ) : null}
+          {realAnalytics.onlineHitTrackId ? (
+            <Hit
+              trackId={realAnalytics.onlineHitTrackId}
+              enabled={realAnalytics.enabled}
+              context={context}
+              weight={realAnalytics.weight}
+              dataGenerator={this.internalDataProviderForAnalytics}
+            />
+          ) : null}
+          {realAnalytics.offlineTimeTrackId ? (
+            <Timetrack
+              trackId={realAnalytics.offlineTimeTrackId}
+              enabled={realAnalytics.enabled}
+              context={context}
+              dataGenerator={this.internalDataProviderForAnalytics}
+              trackOffline={true}
+            />
+          ) : null}
+          {realAnalytics.onlineTimeTrackId ? (
+            <Timetrack
+              trackId={realAnalytics.onlineTimeTrackId}
+              enabled={realAnalytics.enabled}
+              context={context}
+              dataGenerator={this.internalDataProviderForAnalytics}
+            />
+          ) : null}
+        </>
+      );
+    }
+
     // nothing to render
     if (!this.props.children) {
-      return null;
+      return analyticsNode;
     }
 
     return (
-      <ItemContext.Provider
-        value={{
-          idef: this.props.itemDefinitionInstance,
-          state: this.state.itemState,
-          onPropertyChange: this.onPropertyChange,
-          onPropertyRestore: this.onPropertyRestore,
-          onIncludeSetExclusionState: this.onIncludeSetExclusionState,
-          onPropertyEnforce: this.onPropertyEnforce,
-          onPropertyClearEnforce: this.onPropertyClearEnforce,
-          notFound: this.state.notFound,
-          blocked: this.state.isBlocked,
-          blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
-          loadError: this.state.loadError,
-          loading: this.state.loading,
-          loaded: this.state.loaded,
-          holdsRemoteState: !!this.state.itemState.rqOriginalFlattenedValue,
-          submitError: this.state.submitError,
-          submitting: this.state.submitting,
-          submitted: this.state.submitted,
-          deleteError: this.state.deleteError,
-          deleting: this.state.deleting,
-          deleted: this.state.deleted,
-          searchError: this.state.searchError,
-          searching: this.state.searching,
-          searchRecords: this.state.searchRecords,
-          searchResults: this.state.searchResults,
-          searchLimit: this.state.searchLimit,
-          searchCount: this.state.searchCount,
-          searchOffset: this.state.searchOffset,
-          searchId: this.state.searchId,
-          searchWasRestored: this.state.searchWasRestored,
-          searchOwner: this.state.searchOwner,
-          searchLastModified: this.state.searchLastModified,
-          searchShouldCache: this.state.searchShouldCache,
-          searchFields: this.state.searchFields,
-          searchRequestedProperties: this.state.searchRequestedProperties,
-          searchRequestedIncludes: this.state.searchRequestedIncludes,
-          searchEngineEnabled: this.state.searchEngineEnabled,
-          searchEngineEnabledLang: this.state.searchEngineEnabledLang,
-          searchEngineUsedFullHighlights: this.state.searchEngineUsedFullHighlights,
-          searchEngineHighlightArgs: this.state.searchEngineHighlightArgs,
-          searchHighlights: this.state.searchHighlights,
-          searchMetadata: this.state.searchMetadata,
-          highlights: this.props.highlights,
-          pokedElements: this.state.pokedElements,
-          submit: this.submit,
-          reload: this.loadValue,
-          delete: this.delete,
-          clean: this.clean,
-          search: this.search,
-          forId: this.props.forId || null,
-          forVersion: this.props.forVersion || null,
-          dismissLoadError: this.dismissLoadError,
-          dismissSubmitError: this.dismissSubmitError,
-          dismissSubmitted: this.dismissSubmitted,
-          dismissDeleteError: this.dismissDeleteError,
-          dismissDeleted: this.dismissDeleted,
-          dismissSearchError: this.dismissSearchError,
-          dismissSearchResults: this.dismissSearchResults,
-          poke: this.poke,
-          unpoke: this.unpoke,
-          remoteListener: this.props.remoteListener,
-          injectSubmitBlockPromise: this.injectSubmitBlockPromise,
-          injectedParentContext: this.props.injectedParentContext,
-          downloadState: this.downloadState,
-          downloadStateAt: this.downloadStateAt,
-          loadStateFromFile: this.loadStateFromFile,
-          loadStateFromFileAt: this.loadStateFromFileAt,
-        }}
-      >
-        {this.props.children}
-      </ItemContext.Provider>
+      <>
+        {analyticsNode}
+        <ItemContext.Provider
+          value={{
+            idef: this.props.itemDefinitionInstance,
+            state: this.state.itemState,
+            onPropertyChange: this.onPropertyChange,
+            onPropertyRestore: this.onPropertyRestore,
+            onIncludeSetExclusionState: this.onIncludeSetExclusionState,
+            onPropertyEnforce: this.onPropertyEnforce,
+            onPropertyClearEnforce: this.onPropertyClearEnforce,
+            notFound: this.state.notFound,
+            blocked: this.state.isBlocked,
+            blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
+            loadError: this.state.loadError,
+            loading: this.state.loading,
+            loaded: this.state.loaded,
+            holdsRemoteState: !!this.state.itemState.rqOriginalFlattenedValue,
+            submitError: this.state.submitError,
+            submitting: this.state.submitting,
+            submitted: this.state.submitted,
+            deleteError: this.state.deleteError,
+            deleting: this.state.deleting,
+            deleted: this.state.deleted,
+            searchError: this.state.searchError,
+            searching: this.state.searching,
+            searchRecords: this.state.searchRecords,
+            searchResults: this.state.searchResults,
+            searchLimit: this.state.searchLimit,
+            searchCount: this.state.searchCount,
+            searchOffset: this.state.searchOffset,
+            searchId: this.state.searchId,
+            searchWasRestored: this.state.searchWasRestored,
+            searchOwner: this.state.searchOwner,
+            searchLastModified: this.state.searchLastModified,
+            searchShouldCache: this.state.searchShouldCache,
+            searchFields: this.state.searchFields,
+            searchRequestedProperties: this.state.searchRequestedProperties,
+            searchRequestedIncludes: this.state.searchRequestedIncludes,
+            searchEngineEnabled: this.state.searchEngineEnabled,
+            searchEngineEnabledLang: this.state.searchEngineEnabledLang,
+            searchEngineUsedFullHighlights: this.state.searchEngineUsedFullHighlights,
+            searchEngineHighlightArgs: this.state.searchEngineHighlightArgs,
+            searchHighlights: this.state.searchHighlights,
+            searchMetadata: this.state.searchMetadata,
+            highlights: this.props.highlights,
+            pokedElements: this.state.pokedElements,
+            submit: this.submit,
+            reload: this.loadValue,
+            delete: this.delete,
+            clean: this.clean,
+            search: this.search,
+            forId: this.props.forId || null,
+            forVersion: this.props.forVersion || null,
+            dismissLoadError: this.dismissLoadError,
+            dismissSubmitError: this.dismissSubmitError,
+            dismissSubmitted: this.dismissSubmitted,
+            dismissDeleteError: this.dismissDeleteError,
+            dismissDeleted: this.dismissDeleted,
+            dismissSearchError: this.dismissSearchError,
+            dismissSearchResults: this.dismissSearchResults,
+            poke: this.poke,
+            unpoke: this.unpoke,
+            remoteListener: this.props.remoteListener,
+            injectSubmitBlockPromise: this.injectSubmitBlockPromise,
+            injectedParentContext: this.props.injectedParentContext,
+            downloadState: this.downloadState,
+            downloadStateAt: this.downloadStateAt,
+            loadStateFromFile: this.loadStateFromFile,
+            loadStateFromFileAt: this.loadStateFromFileAt,
+          }}
+        >
+          {this.props.children}
+        </ItemContext.Provider>
+      </>
     );
   }
 }

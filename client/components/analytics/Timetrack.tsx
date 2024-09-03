@@ -1,16 +1,13 @@
-import type { IAnalyticsPayload } from "../../../server/services/base/AnalyticsProvider";
+import uuid from "uuid";
+import type { IAnalyticsPayload, IAnalyticsTimetrackEndPayload, IAnalyticsTimetrackStartPayload } from "../../../server/services/base/AnalyticsProvider";
 import { DataContext } from "../../internal/providers/appdata-provider";
-import { useContext, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
+import { getCurrentTimeZoneOffset } from "./util";
 
 /**
  * Options to trigger a timetrack
  */
 export interface ITimetrackOptions {
-  /**
-   * whether the hit is enabled, the hit will only trigger
-   * if it's marked as enabled
-   */
-  enabled: boolean;
   /**
    * the track id, changing the track id will generate a new hit
    */
@@ -31,77 +28,172 @@ export interface ITimetrackOptions {
   trackOffline?: boolean;
 }
 
+export interface ITimetrackProps extends ITimetrackOptions {
+  /**
+   * whether the hit is enabled, the hit will only trigger
+   * if it's marked as enabled
+   */
+  enabled: boolean;
+}
+
 /**
  * Represents the hit as a hook
  * @param options 
  * @returns 
  */
-export function useHit(options: ITimetrackOptions) {
+export function useTimetrack(): [(options: ITimetrackOptions) => void, () => void] {
   const dataCtx = useContext(DataContext);
 
   // first we declare this thing to see the previous options
   // that we used
-  const previousOptionsEffected = useRef<ITimetrackOptions>(null);
+  const previousOptionsTracked = useRef<ITimetrackOptions>(null);
+  const offlineTrackInterval = useRef<NodeJS.Timeout>(null);
+  const offlineTrackId = useRef<string>(null);
 
-  // now we are to use an effect every time our described options
-  // that trigger a hit have changed
-  useEffect(() => {
-    // and we will check that they are good for a new hit
-    if (
-      options.enabled &&
-      (
-        !previousOptionsEffected.current ||
-        (
-          previousOptionsEffected.current.enabled !== options.enabled ||
-          previousOptionsEffected.current.context !== options.context ||
-          previousOptionsEffected.current.trackId !== options.trackId
-        )
-      )
-    ) {
-      // and we get the data, timezone, and build the payload
+  // stops the track at the given last tracked options
+  const stopLastTrack = useCallback(() => {
+    if (previousOptionsTracked.current) {
+      // if we are not meant to track offline which means the server
+      // side is the one measuring time and making it trusted
+      if (!previousOptionsTracked.current.trackOffline) {
+        // get the track and the context
+        const payload: IAnalyticsTimetrackEndPayload = {
+          track: previousOptionsTracked.current.trackId,
+          context: previousOptionsTracked.current.context,
+        };
+        // trigger the event to tell it to stop the track
+        dataCtx.remoteListener.triggerCustomEvent(
+          "$analytics-timetrack-end",
+          payload,
+          {
+            graceTime: 10000,
+          }
+        );
+      } else {
+        // otherwise it's offline we stop the interval we were updating the event
+        // for
+        clearInterval(offlineTrackInterval.current);
+        // and now we just execute the thing
+        dataCtx.remoteListener.executeCustomEvent(offlineTrackId.current, {
+          graceTime: 10000,
+        });
+      }
+
+      previousOptionsTracked.current = null;
+    }
+  }, []);
+
+  const startTrack = useCallback((options: ITimetrackOptions) => {
+    stopLastTrack();
+
+    // if we are not tracking offline simple, we send our data
+    if (!options.trackOffline) {
+      // grab the stuff
       const data = (options.dataGenerator && options.dataGenerator()) || null;
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const payload: IAnalyticsPayload = {
+      const timezone = getCurrentTimeZoneOffset();
+      const payload: IAnalyticsTimetrackStartPayload = {
         timezone,
         track: options.trackId,
         context: options.context || null,
         data,
       };
-      // if it's tracking offline then we set the time ourselves
-      if (options.trackOffline) {
-        payload.time = (new Date()).getTime();
-      }
 
-      // and now we send it to the remote listener our analytics request
-      // using the custom event for our analytics provider
+      // send the payload
       dataCtx.remoteListener.triggerCustomEvent(
-        // our event is a analytics hit request
-        "$analytics-hit-request",
+        "$analytics-timetrack-start",
         payload,
         {
-          // the grace time is either Infinity or 3000 depending
-          // on if we are offline, if offline it will wait forever
-          // and then send that event
-          graceTime: options.trackOffline ? Infinity : 3000,
-          // survive refresh will make it keep tracking
-          // even if the user closes the browser as it will send the hit
-          // once the browser is reopened and a conneciton is adquired
-          surviveRefresh: options.trackOffline,
+          graceTime: 3000,
         }
       );
-    }
-    previousOptionsEffected.current = options;
-  }, [options.enabled, options.trackId, options.context]);
+    } else {
+      // otherwise we also started an offline track
+      // make a new id for that offline
+      const newId = uuid.v4();
+      // this is when we started tracking
+      const timetrackStartedAt = (new Date()).getTime();
 
-  return;
+      // and in each 10s interval we will update the event
+      // with new data, this will go to local storage
+      offlineTrackInterval.current = setInterval(() => {
+        // we will be updating all the time
+        const data = (options.dataGenerator && options.dataGenerator()) || null;
+        const timezone = getCurrentTimeZoneOffset();
+        const currentTime = (new Date()).getTime();
+        // make our payload with the timeslice
+        const payload: IAnalyticsPayload = {
+          timezone,
+          track: options.trackId,
+          context: options.context || null,
+          data,
+          time: currentTime,
+          timeslice: {
+            start: timetrackStartedAt,
+            end: currentTime,
+          },
+          weight: currentTime - timetrackStartedAt,
+        };
+        // and then queing or updating the custom event
+        dataCtx.remoteListener.queueCustomEvent(newId, "$analytics-hit-request", payload, {
+          // we make it that it survives refresh and make ready when storing
+          // so it's executed automagically once
+          // the browser is refreshed and we don't need to grab custom id events
+          surviveRefresh: true,
+          makeReadyWhenStoring: true,
+        });
+      }, 10000);
+      offlineTrackId.current = newId;
+    }
+
+    previousOptionsTracked.current = options;
+  }, []);
+
+  // now for an unmount effect
+  useEffect(() => {
+    return () => {
+      stopLastTrack();
+    }
+  }, []);
+
+  return [startTrack, stopLastTrack];
 }
 
 /**
- * Represents the hit as a component
+ * Represents the timetrack as a component
  * @param options 
  * @returns 
  */
-export default function Hit(props: IHitOptions) {
-  useHit(props);
+export default function Timetrack(props: ITimetrackProps) {
+  const [startTrack, stopLastTrack] = useTimetrack();
+  const previousOptionsEffected = useRef<ITimetrackProps>(null);
+
+    // now we are to use an effect every time our described options
+  // that trigger a hit have changed
+  useEffect(() => {
+    // so we will check just like when we do the hit
+    if (
+      props.enabled &&
+      (
+        !previousOptionsEffected.current ||
+        (
+          previousOptionsEffected.current.enabled !== props.enabled ||
+          previousOptionsEffected.current.context !== props.context ||
+          previousOptionsEffected.current.trackId !== props.trackId
+        )
+      )
+    ) {
+      startTrack(props);
+    }
+
+    // if we started one and we had one that we were tracking for
+    // already in this same settings, well, we stop that one
+    if (!props.enabled) {
+      stopLastTrack();
+    }
+
+    // now we set our previously effected
+    previousOptionsEffected.current = props;
+  }, [props.enabled, props.trackId, props.context]);
+
   return null;
 }

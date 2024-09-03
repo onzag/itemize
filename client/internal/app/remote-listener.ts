@@ -127,7 +127,7 @@ export class RemoteListener {
   /**
    * The socket io client
    */
-  private socket: Socket;
+  public socket: Socket;
   /**
    * The root we are using
    */
@@ -392,7 +392,15 @@ export class RemoteListener {
   /**
    * Awaiting custom events
    */
-  private awaitingCustomEvents: Array<{ event: string; payload: object; ackCallback: (data: any) => void; surviveRefresh: boolean }> = [];
+  private awaitingCustomEvents: Array<{
+    id?: string;
+    event: string;
+    payload: object;
+    ackCallback: (data: any) => void;
+    surviveRefresh: boolean;
+    notReady: boolean;
+    makeReadyWhenStoring?: boolean;
+  }> = [];
 
   /**
    * Instantiates a new remote listener
@@ -2127,6 +2135,9 @@ export class RemoteListener {
     });
 
     this.awaitingCustomEvents = this.awaitingCustomEvents.filter((r) => {
+      if (r.notReady) {
+        return true;
+      }
       return !this.sendCustomEvent(r.event, r.payload, r.ackCallback);
     });
     this.storeAwaitingCustomEvents();
@@ -2135,7 +2146,20 @@ export class RemoteListener {
   private storeAwaitingCustomEvents() {
     const survivors = this.awaitingCustomEvents.filter((v) => v.surviveRefresh);
     if (survivors.length) {
-      localStorage.setItem(AWAITING_WEBSOCKET_EVENTS, JSON.stringify(survivors));
+      localStorage.setItem(AWAITING_WEBSOCKET_EVENTS, JSON.stringify(survivors.map((v) => {
+        if (v.makeReadyWhenStoring && v.notReady) {
+          return (
+            {
+              ...v,
+              notReady: false,
+            }
+          );
+        }
+
+        return v;
+      })));
+    } else {
+      localStorage.removeItem(AWAITING_WEBSOCKET_EVENTS);
     }
   }
 
@@ -2472,6 +2496,97 @@ export class RemoteListener {
     return true;
   }
 
+  public getAllAwaitingQueuedCustomEvents() {
+    return this.awaitingCustomEvents.filter((v) => !!v.id);
+  }
+
+  /**
+   * queues a custom event but does not execute it over
+   * the network yet, the purpose of this function is to hold events
+   * until they are ready to be fired for that they need an id
+   * and they can be updated, as no two same id events can exist at the same time
+   * 
+   * The main purpose is that an event queued with survive refresh will be there
+   * on next refresh and the event ids can be retrieved with `getAllAwaitingQueuedCustomEvents`
+   * function in order to execute them, regardless on whether the browser has been reloaded
+   * in order to get a hold of the custom event
+   * 
+   * you can also use makeReadyWhenStoring to make it automatically execute when the browser
+   * experiences a reload without having to do a `executeCustomEvent` call
+   * 
+   * @param id 
+   * @param event 
+   * @param payload 
+   * @param options 
+   * @returns 
+   */
+  public async queueCustomEvent(
+    id: string,
+    event: string,
+    payload: object,
+    options: {
+      surviveRefresh?: boolean;
+      makeReadyWhenStoring?: boolean;
+    } = {}
+  ) {
+    if (!id) {
+      throw new Error("id was not specified while queuing custom event");
+    };
+    if (event[0] !== "$") {
+      throw new Error("Invalid custom event " + event + " attempting to trigger with payload " + JSON.stringify(payload));
+    }
+
+    const eventObject = {
+      id,
+      event,
+      payload,
+      ackCallback: null,
+      surviveRefresh: !!options.surviveRefresh,
+      notReady: true,
+      makeReadyWhenStoring: options.makeReadyWhenStoring,
+    };
+
+    const currentIndex = this.awaitingCustomEvents.findIndex((v) => v.id === id);
+    if (currentIndex !== -1) {
+      this.awaitingCustomEvents[currentIndex] = eventObject;
+    } else {
+      this.awaitingCustomEvents.push(eventObject);
+    }    
+  }
+
+  /**
+   * executes the provided custom event and removes it from
+   * the queue if it was in it
+   * 
+   * @param id 
+   */
+  public async executeCustomEvent(
+    id: string,
+    options: {
+      graceTime?: number;
+    } = {}
+  ): Promise<IAckCallbackType> {
+    const eventObjectIndex = this.awaitingCustomEvents.findIndex((e) => e.id === id);
+    if (eventObjectIndex === -1) {
+      throw new Error("Could not retrieve an event object for the id: " + id);
+    }
+
+    // get the event object that is not ready or queing
+    const eventObject = this.awaitingCustomEvents[eventObjectIndex];
+    this.awaitingCustomEvents.splice(eventObjectIndex, 1);
+
+    // patch the custom events
+    if (eventObject.surviveRefresh) {
+      this.storeAwaitingCustomEvents();
+    }
+
+    // trigger it normally
+    return this.triggerCustomEvent(eventObject.event, eventObject.payload, {
+      graceTime: options.graceTime,
+      surviveRefresh: eventObject.surviveRefresh,
+    });
+  }
+
   /**
    * Triggers a custom event and returns an acked response
    * from the server, by default the server will return ack, unless it is handled
@@ -2498,8 +2613,7 @@ export class RemoteListener {
     } = {},
   ): Promise<IAckCallbackType> {
     if (event[0] !== "$") {
-      console.warn("Invalid custom event " + event + " attempting to trigger with payload " + JSON.stringify(payload));
-      return;
+      throw new Error("Invalid custom event " + event + " attempting to trigger with payload " + JSON.stringify(payload));
     }
 
     return new Promise<IAckCallbackType>(async (resolve, reject) => {
@@ -2516,6 +2630,7 @@ export class RemoteListener {
             payload,
             ackCallback: resolve,
             surviveRefresh: !!options.surviveRefresh,
+            notReady: false,
           };
   
           this.awaitingCustomEvents.push(eventObject);

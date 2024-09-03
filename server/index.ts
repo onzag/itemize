@@ -909,7 +909,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
     }
 
     const analyticsService: AnalyticsProvider<any> = initConfig.analytics?.trackers ?
-      (new AnalyticsClass(null, registry, configsObj, elasticConnection) as any) :
+      (new AnalyticsClass(null, registry, configsObj, elasticAnalyticsConnection) as any) :
       null;
 
     // RETRIEVING INITIAL SERVER DATA

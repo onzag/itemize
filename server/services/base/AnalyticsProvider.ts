@@ -6,6 +6,8 @@ import { IAppDataType } from "../../";
 import { IServerSideTokenDataType } from "../../resolvers/basic";
 import { ICustomListenerInfo } from "../../listener";
 import uuidv5 from "uuid/v5";
+import { EndpointError } from "../../../base/errors";
+import { ENDPOINT_ERRORS } from "../../../constants";
 
 const NAMESPACE = "23ab4609-df49-5fdf-921b-4714adb284f3";
 export function makeIdOutOf(str: string) {
@@ -74,7 +76,7 @@ export interface ITrackOptions {
    * @param data 
    * @returns 
    */
-  dataValidator?: (data: object, userData: IServerSideTokenDataType) => boolean;
+  dataValidator?: (data: object, context: string, userData: IServerSideTokenDataType, appData: IAppDataType) => boolean;
   /**
    * If the validation yields true, use this function to extend
    * what data is being stored in the analytics
@@ -82,7 +84,7 @@ export interface ITrackOptions {
    * @param userData 
    * @returns 
    */
-  dataEditor?: (data: object, userData: IServerSideTokenDataType) => Promise<object>;
+  dataEditor?: (data: object, userData: IServerSideTokenDataType, appData: IAppDataType) => Promise<object>;
   /**
    * Use for validating context
    * 
@@ -91,21 +93,21 @@ export interface ITrackOptions {
    * @param context 
    * @returns 
    */
-  contextValidator?: (context: string) => boolean;
+  contextValidator?: (context: string, userData: IServerSideTokenDataType, appData: IAppDataType) => boolean;
   /**
    * if can specify weight use this to validate a valid weight
    * by default it will provide 1 if no weight specified
    * @param weight 
    * @returns 
    */
-  weightValidator?: (weight: number) => boolean;
+  weightValidator?: (weight: number, userData: IServerSideTokenDataType, appData: IAppDataType) => boolean;
 }
 
 /**
  * @ignore
  */
 const trackRegex = /^[a-zA-Z0-9_-]+$/;
-const timezoneRegex = /^(?:Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])$/;
+const timezoneRegex = /^([+-](?:2[0-3]|[01][0-9]):[0-5][0-9])$/;
 
 export interface IAnalyticsTimetrackEndPayload {
   /**
@@ -172,7 +174,7 @@ export const ANALYTICS_TIMETRACK_END_REQUEST = "$analytics-timetrack-end";
  */
 export default class AnalyticsProvider<T> extends ServiceProvider<T> {
   private tracks: { [id: string]: ITrackOptions } = {};
-  private elasticClient: Client;
+  public elasticClient: Client;
 
   private timedTracking: {
     [userId: string]: {
@@ -203,87 +205,132 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     type: "payload" | "timetrack-start" | "timetrack-end",
     data: IAnalyticsPayload | IAnalyticsTimetrackStartPayload | IAnalyticsTimetrackEndPayload,
     info: ICustomListenerInfo,
-  ): boolean {
+  ) {
     if (typeof data.track !== "string" || !this.tracks[data.track]?.exposed) {
       info.listener.emitError(info.socket, "Invalid track provided in analytics request", data);
-      return false;
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "Invalid track provided in analytics request",
+      });
     }
 
     const track = this.tracks[data.track];
 
-    if (type === "payload" || type === "timetrack-end") {
+    if (type === "payload" || type === "timetrack-start") {
       if (typeof (data as IAnalyticsPayload).data !== "undefined" && (data as IAnalyticsPayload).data !== null) {
         if (typeof (data as IAnalyticsPayload).data !== "object") {
           info.listener.emitError(info.socket, "Invalid data provided in analytics request", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "Invalid data provided in analytics request",
+          });
         }
 
         if (!track.dataValidator) {
           info.listener.emitError(info.socket, "The track in the request does not support data from clients", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "The track in the request does not support data from clients",
+          });
         }
 
-        if (!track.dataValidator((data as IAnalyticsPayload).data, info.userData)) {
+        if (!track.dataValidator((data as IAnalyticsPayload).data, data.context, info.userData, this.localAppData)) {
           info.listener.emitError(info.socket, "The track has rejected the data", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "The track has rejected the data",
+          });
         }
       }
 
       if (typeof (data as IAnalyticsPayload).timezone !== "string" || !timezoneRegex.test((data as IAnalyticsPayload).timezone)) {
         info.listener.emitError(info.socket, "Invalid timezone provided in analytics request", data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "Invalid timezone provided in analytics request",
+        });
       }
     } else {
       if (typeof (data as IAnalyticsPayload).data !== "undefined") {
         info.listener.emitError(info.socket, "Data was provided where it is not supported", data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "Data was provided where it is not supported",
+        });
       }
 
       if (typeof (data as IAnalyticsPayload).timezone !== "undefined") {
         info.listener.emitError(info.socket, "Timezone was provided where it is not supported", data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "Timezone was provided where it is not supported",
+        });
       }
     }
 
     if (typeof data.context !== "undefined" && data.context !== null && typeof data.context !== "string") {
       info.listener.emitError(info.socket, "Invalid context provided in analytics request", data);
-      return false;
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "Invalid context provided in analytics request",
+      });
     }
 
     if (typeof data.context !== "string" && track.clientMustSpecifyContext) {
       info.listener.emitError(info.socket, "The given track must provide a context", data);
-      return false;
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "The given track must provide a context",
+      });
     }
 
     if (typeof data.context === "string" && track.clientMustNotSpecifyContext) {
       info.listener.emitError(info.socket, "The given track must not provide a context", data);
-      return false;
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "The given track must not provide a context",
+      });
     }
 
     if (typeof data.context === "string" && data.context === "") {
       info.listener.emitError(info.socket, "The context cannot be empty string", data);
-      return false;
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "The context cannot be empty string",
+      });
     }
 
-    if (track.contextValidator && !track.contextValidator(data.context)) {
+    if (track.contextValidator && !track.contextValidator(data.context, info.userData, this.localAppData)) {
       info.listener.emitError(info.socket, "The context was rejected by the validator", data);
-      return false;
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "The context was rejected by the validator",
+      });
     }
 
     if ((!info.userData || !info.userData.id) && !track.allowAnonymous) {
       info.listener.emitError(info.socket, "The track does not allow for anonymous data", data);
-      return false;
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "The track does not allow for anonymous data",
+      });
     }
 
     if (type === "payload") {
       if (typeof (data as IAnalyticsPayload).timeslice !== "undefined" && (data as IAnalyticsPayload).timeslice !== null) {
         if (track.timed && !track.trusted) {
           info.listener.emitError(info.socket, "Track is not an untrusted timed track yet a timeslice was provided", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "Track is not an untrusted timed track yet a timeslice was provided",
+          });
         }
         if (typeof (data as IAnalyticsPayload).timeslice !== "object") {
           info.listener.emitError(info.socket, "Invalid timeslice provided", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "Invalid timeslice provided",
+          });
         }
         if (
           typeof (data as IAnalyticsPayload).timeslice.start !== "number" ||
@@ -293,7 +340,10 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
           )
         ) {
           info.listener.emitError(info.socket, "Invalid timeslice provided (start is not a number, too large, or less than 0)", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "Invalid timeslice provided (start is not a number, too large, or less than 0)",
+          });
         }
         if (
           typeof (data as IAnalyticsPayload).timeslice.end !== "number" ||
@@ -303,38 +353,56 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
           )
         ) {
           info.listener.emitError(info.socket, "Invalid timeslice provided (end is not a number, too large, or less than start)", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "Invalid timeslice provided (end is not a number, too large, or less than start)",
+          });
         }
       }
 
       if (typeof (data as IAnalyticsPayload).time !== "undefined" && (data as IAnalyticsPayload).time !== null) {
         if (track.trusted) {
           info.listener.emitError(info.socket, "Track is a trusted track, yet the time of the hit was specified", data);
-          return false;
+          throw new EndpointError({
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+            message: "Track is a trusted track, yet the time of the hit was specified",
+          });
         }
       }
     } else {
       if (typeof (data as IAnalyticsPayload).timeslice !== "undefined") {
         info.listener.emitError(info.socket, "Timeslice was provided where it is not supported", data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "Timeslice was provided where it is not supported",
+        });
       }
     }
 
     if (type === "payload") {
       if ((data as IAnalyticsPayload).weight && (data as IAnalyticsPayload).weight !== 1 && !track.clientCanSpecifyWeight) {
         info.listener.emitError(info.socket, "Weight is not allowed to be specified by the client", data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "Weight is not allowed to be specified by the client",
+        });
       }
 
       const assumedWeight = typeof (data as IAnalyticsPayload).weight === "number" ? (data as IAnalyticsPayload).weight : 1;
-      if (!track.weightValidator(assumedWeight)) {
+      if (!track.weightValidator(assumedWeight, info.userData, this.localAppData)) {
         info.listener.emitError(info.socket, "Weight validator rejected a weight of " + assumedWeight, data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "Weight validator rejected a weight of " + assumedWeight,
+        });
       }
     } else {
       if (typeof (data as IAnalyticsPayload).weight !== "undefined") {
         info.listener.emitError(info.socket, "Weight was provided where it is not supported", data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "Weight was provided where it is not supported",
+        });
       }
     }
 
@@ -343,20 +411,19 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     for (const key of allKeys) {
       if (!validProperties.includes(key)) {
         info.listener.emitError(info.socket, "unknown property " + JSON.stringify(key), data);
-        return false;
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "unknown property " + JSON.stringify(key),
+        });
       }
     }
-
-    return true;
   }
 
   private async onAnalyticsHit(
     data: IAnalyticsPayload,
     info: ICustomListenerInfo,
   ) {
-    if (!this.validateAnalyticPayload("payload", data, info)) {
-      return;
-    }
+    this.validateAnalyticPayload("payload", data, info);
 
     const socketAddr = info.socket.handshake.address;
     const anonymous = !info.userData?.id;
@@ -365,7 +432,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     let newData = data.data;
     if (track.dataEditor) {
-      newData = await track.dataEditor(data.data, info.userData);
+      newData = await track.dataEditor(data.data, info.userData, this.localAppData);
     }
 
     this.hit(
@@ -392,9 +459,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     data: IAnalyticsTimetrackStartPayload,
     info: ICustomListenerInfo,
   ) {
-    if (!this.validateAnalyticPayload("timetrack-start", data, info)) {
-      return;
-    }
+    this.validateAnalyticPayload("timetrack-start", data, info);
 
     const socketAddr = info.socket.handshake.address;
     const anonymous = !info.userData?.id;
@@ -420,9 +485,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     data: IAnalyticsTimetrackEndPayload,
     info: ICustomListenerInfo,
   ) {
-    if (!this.validateAnalyticPayload("timetrack-end", data, info)) {
-      return;
-    }
+    this.validateAnalyticPayload("timetrack-end", data, info);
 
     const socketAddr = info.socket.handshake.address;
 
@@ -624,11 +687,13 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     const trackInfo = this.tracks[track];
 
     if (!trackInfo || (trackInfo.timed && !trackInfo.trusted)) {
-      const err = new Error(
-        trackInfo ?
-          ("The track at " + track + " is not a trusted track") :
-          ("There's no track for " + track)
-      );
+      const err = new EndpointError({
+        message:
+          trackInfo ?
+            ("The track at " + track + " is not a trusted track") :
+            ("There's no track for " + track),
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      });
       if (!options.silent) {
         this.logError({
           message: err.message,
@@ -657,7 +722,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     if (currentTimedTracksForUserInTrack >= (trackInfo.clientTrustedTrackingLimit || 50)) {
       const message = "Exceeded the security limit of timed tracking requests for the given user at the track";
-      const err = new Error(message);
+      const err = new EndpointError({message, code: ENDPOINT_ERRORS.UNSPECIFIED});
       if (!options.silent) {
         this.logError({
           message,
@@ -682,7 +747,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       }
     } else {
       const message = "Attemtped to start tracking trusted time, but the timer has already started, this indicates a potential memory leak";
-      const err = new Error(message);
+      const err = new EndpointError({message, code: ENDPOINT_ERRORS.UNSPECIFIED});
       if (!options.silent) {
         this.logError({
           message,
@@ -757,7 +822,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     let newData = value.data;
     if (trackInfo.dataEditor) {
-      newData = await trackInfo.dataEditor(value.data, options.userData);
+      newData = await trackInfo.dataEditor(value.data, options.userData, this.localAppData);
     }
 
     await this.hit(track, userId, {
