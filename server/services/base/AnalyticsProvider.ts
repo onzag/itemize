@@ -318,7 +318,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
     if (type === "payload") {
       if (typeof (data as IAnalyticsPayload).timeslice !== "undefined" && (data as IAnalyticsPayload).timeslice !== null) {
-        if (track.timed && !track.trusted) {
+        if (track.timed && track.trusted) {
           info.listener.emitError(info.socket, "Track is not an untrusted timed track yet a timeslice was provided", data);
           throw new EndpointError({
             code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -380,7 +380,12 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     }
 
     if (type === "payload") {
-      if ((data as IAnalyticsPayload).weight && (data as IAnalyticsPayload).weight !== 1 && !track.clientCanSpecifyWeight) {
+      if (
+        (data as IAnalyticsPayload).weight &&
+        (data as IAnalyticsPayload).weight !== 1 &&
+        !(data as IAnalyticsPayload).timeslice &&
+        !track.clientCanSpecifyWeight
+      ) {
         info.listener.emitError(info.socket, "Weight is not allowed to be specified by the client", data);
         throw new EndpointError({
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -389,7 +394,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
       }
 
       const assumedWeight = typeof (data as IAnalyticsPayload).weight === "number" ? (data as IAnalyticsPayload).weight : 1;
-      if (!track.weightValidator(assumedWeight, info.userData, this.localAppData)) {
+      if (track.weightValidator && !track.weightValidator(assumedWeight, info.userData, this.localAppData)) {
         info.listener.emitError(info.socket, "Weight validator rejected a weight of " + assumedWeight, data);
         throw new EndpointError({
           code: ENDPOINT_ERRORS.UNSPECIFIED,

@@ -460,7 +460,7 @@ export class RemoteListener {
       if (storageValue) {
         this.awaitingCustomEvents = JSON.parse(storageValue);
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
   /**
@@ -2450,44 +2450,47 @@ export class RemoteListener {
     this.awaitingRQRequests.splice(requestIndex, 1);
   }
 
-  private async sendCustomEvent(event: string, payload: object, ackCallback: (info: IAckCallbackType)  => void) {
+  private async sendCustomEvent(event: string, payload: object, ackCallback: (info: IAckCallbackType) => void) {
     if (this.socket.connected) {
-      // and then emit it
-      this.pushTestingInfo(
-        "customEvent",
-        payload,
-      );
-      try {
-        const data: IAckCallbackType = await this.socket.emitWithAck(
-          event,
+      await this.onIdentificationDone();
+      if (this.socket.connected) {
+        // and then emit it
+        this.pushTestingInfo(
+          "customEvent",
           payload,
         );
-        if (ackCallback) {
-          ackCallback(data);
-        }
-        // here it succeeds regardless of error state
-        // and removes itself from the awaiting list
-        // false means remove
-        return false;
-      } catch (err) {
-        if (!this.socket.connected) {
-          console.warn("Event " + event + " failed to being acked by server as it disconnected while performing the request");
-          // do not remove, try again when connected
-          return true;
-        } else {
-          console.warn("Event " + event + " failed due to a remote error");
-          console.warn(err.stack);
-          // remove who knows what kind of weird error we got
+        try {
+          const data: IAckCallbackType = await this.socket.emitWithAck(
+            event,
+            payload,
+          );
           if (ackCallback) {
-            ackCallback({
-              data: null,
-              error: {
-                code: ENDPOINT_ERRORS.UNSPECIFIED,
-                message: "Unknown network error " + err.message,
-              }
-            });
+            ackCallback(data);
           }
+          // here it succeeds regardless of error state
+          // and removes itself from the awaiting list
+          // false means remove
           return false;
+        } catch (err) {
+          if (!this.socket.connected) {
+            console.warn("Event " + event + " failed to being acked by server as it disconnected while performing the request");
+            // do not remove, try again when connected
+            return true;
+          } else {
+            console.warn("Event " + event + " failed due to a remote error");
+            console.warn(err.stack);
+            // remove who knows what kind of weird error we got
+            if (ackCallback) {
+              ackCallback({
+                data: null,
+                error: {
+                  code: ENDPOINT_ERRORS.UNSPECIFIED,
+                  message: "Unknown network error " + err.message,
+                }
+              });
+            }
+            return false;
+          }
         }
       }
     }
@@ -2551,7 +2554,12 @@ export class RemoteListener {
       this.awaitingCustomEvents[currentIndex] = eventObject;
     } else {
       this.awaitingCustomEvents.push(eventObject);
-    }    
+    }
+
+    // patch the custom events
+    if (eventObject.surviveRefresh) {
+      this.storeAwaitingCustomEvents();
+    }
   }
 
   /**
@@ -2632,14 +2640,14 @@ export class RemoteListener {
             surviveRefresh: !!options.surviveRefresh,
             notReady: false,
           };
-  
+
           this.awaitingCustomEvents.push(eventObject);
           if (eventObject.surviveRefresh) {
             // only relevant to store in local storage if
             // we survive a refresh and it changes something for our survival list
             this.storeAwaitingCustomEvents();
           }
-  
+
           if (options.graceTime !== Infinity) {
             setTimeout(() => {
               const indexFound = this.awaitingCustomEvents.findIndex((o) => o === eventObject);
@@ -2657,7 +2665,7 @@ export class RemoteListener {
         } else {
           console.error("Custom event " + event + " with payload " + JSON.stringify(payload) + " failed to send");
         }
-  
+
         return;
       }
     })

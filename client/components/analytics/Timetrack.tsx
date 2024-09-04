@@ -3,6 +3,7 @@ import type { IAnalyticsPayload, IAnalyticsTimetrackEndPayload, IAnalyticsTimetr
 import { DataContext } from "../../internal/providers/appdata-provider";
 import { useCallback, useContext, useEffect, useRef } from "react";
 import { getCurrentTimeZoneOffset } from "./util";
+import { useUserDataRetriever } from "../user/UserDataRetriever";
 
 /**
  * Options to trigger a timetrack
@@ -34,6 +35,10 @@ export interface ITimetrackProps extends ITimetrackOptions {
    * if it's marked as enabled
    */
   enabled: boolean;
+  /**
+   * Allows to track anonymous users
+   */
+  trackAnonymous?: boolean;
 }
 
 /**
@@ -159,41 +164,83 @@ export function useTimetrack(): [(options: ITimetrackOptions) => void, () => voi
 }
 
 /**
+ * Prevent timetracks on the same track and same context to overlap
+ */
+const GLOBAL_TRACK_CONTEXT_POOL: {
+  [trackId: string]: {
+    [context: string]: number
+  }
+} = {};
+
+/**
  * Represents the timetrack as a component
+ * 
+ * this component has the special property of prevent overlapping tracks within the same context
+ * so they will not interfere with one another
+ * 
  * @param options 
  * @returns 
  */
 export default function Timetrack(props: ITimetrackProps) {
   const [startTrack, stopLastTrack] = useTimetrack();
+
+  const userData = useUserDataRetriever();
+
   const previousOptionsEffected = useRef<ITimetrackProps>(null);
+  const previousRealEnabledEffected = useRef<boolean>(null);
+
+  const realEnabled = props.enabled && (props.trackAnonymous ? true : !!userData.id);
 
     // now we are to use an effect every time our described options
   // that trigger a hit have changed
   useEffect(() => {
     // so we will check just like when we do the hit
     if (
-      props.enabled &&
+      realEnabled &&
       (
         !previousOptionsEffected.current ||
         (
-          previousOptionsEffected.current.enabled !== props.enabled ||
+          previousRealEnabledEffected.current !== realEnabled ||
           previousOptionsEffected.current.context !== props.context ||
           previousOptionsEffected.current.trackId !== props.trackId
         )
       )
     ) {
-      startTrack(props);
+      const rawCtx = props.context || "";
+      if (!GLOBAL_TRACK_CONTEXT_POOL[props.trackId]) {
+        GLOBAL_TRACK_CONTEXT_POOL[props.trackId] = {};
+      }
+      if (!GLOBAL_TRACK_CONTEXT_POOL[props.trackId][rawCtx]) {
+        GLOBAL_TRACK_CONTEXT_POOL[props.trackId][rawCtx] = 0;
+      }
+
+      if (!GLOBAL_TRACK_CONTEXT_POOL[props.trackId][rawCtx]) {
+        startTrack(props);
+      }
+      GLOBAL_TRACK_CONTEXT_POOL[props.trackId][rawCtx]++;
     }
 
     // if we started one and we had one that we were tracking for
     // already in this same settings, well, we stop that one
-    if (!props.enabled) {
-      stopLastTrack();
+    if (!realEnabled) {
+      const rawOldCtx = previousOptionsEffected.current.context || "";
+      if (
+        GLOBAL_TRACK_CONTEXT_POOL[previousOptionsEffected.current.trackId] &&
+        GLOBAL_TRACK_CONTEXT_POOL[previousOptionsEffected.current.trackId][rawOldCtx]
+      ) {
+        GLOBAL_TRACK_CONTEXT_POOL[previousOptionsEffected.current.trackId][rawOldCtx]--;
+        if (!GLOBAL_TRACK_CONTEXT_POOL[previousOptionsEffected.current.trackId][rawOldCtx]) {
+          stopLastTrack();
+        }
+      } else {
+        stopLastTrack();
+      }
     }
 
     // now we set our previously effected
     previousOptionsEffected.current = props;
-  }, [props.enabled, props.trackId, props.context]);
+    previousRealEnabledEffected.current = realEnabled;
+  }, [realEnabled, props.trackId, props.context]);
 
   return null;
 }

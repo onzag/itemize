@@ -30,6 +30,10 @@ export interface IPageTimetrackProps {
    */
   trackOfflineAtTrack?: string;
   /**
+   * Allows to track anonymous users
+   */
+  trackAnonymous?: boolean;
+  /**
    * By default the context will be the location.pathname + location.search
    * you may change if you want otherwise
    * 
@@ -58,6 +62,7 @@ export default function PageTimetrack(props: IPageTimetrackProps) {
         context={context}
         dataGenerator={dataGenerator}
         trackOffline={props.trackOffline}
+        trackAnonymous={props.trackAnonymous}
       />
       {props.trackOfflineAtTrack ? (
         <Timetrack
@@ -66,6 +71,7 @@ export default function PageTimetrack(props: IPageTimetrackProps) {
           context={context}
           dataGenerator={dataGenerator}
           trackOffline={true}
+          trackAnonymous={props.trackAnonymous}
         />
       ) : null}
     </>

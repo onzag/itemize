@@ -1872,6 +1872,10 @@ export interface IItemAnalyticsProps {
    */
   offlineHitTrackId?: string;
   /**
+   * Allows to track anonymous users
+   */
+  trackAnonymous?: boolean;
+  /**
    * The default data generator, it will use the item default data generator by default
    * it's preferred that you don't override this function unless you want to override
    * all default data
@@ -6319,6 +6323,7 @@ export class ActualItemProvider extends
               dataGenerator={this.internalDataProviderForAnalytics}
               weight={realAnalytics.weight}
               trackOffline={true}
+              trackAnonymous={realAnalytics.trackAnonymous}
             />
           ) : null}
           {realAnalytics.onlineHitTrackId ? (
@@ -6328,6 +6333,7 @@ export class ActualItemProvider extends
               context={context}
               weight={realAnalytics.weight}
               dataGenerator={this.internalDataProviderForAnalytics}
+              trackAnonymous={realAnalytics.trackAnonymous}
             />
           ) : null}
           {realAnalytics.offlineTimeTrackId ? (
@@ -6337,6 +6343,7 @@ export class ActualItemProvider extends
               context={context}
               dataGenerator={this.internalDataProviderForAnalytics}
               trackOffline={true}
+              trackAnonymous={realAnalytics.trackAnonymous}
             />
           ) : null}
           {realAnalytics.onlineTimeTrackId ? (
@@ -6345,6 +6352,7 @@ export class ActualItemProvider extends
               enabled={realAnalytics.enabled}
               context={context}
               dataGenerator={this.internalDataProviderForAnalytics}
+              trackAnonymous={realAnalytics.trackAnonymous}
             />
           ) : null}
         </>

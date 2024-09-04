@@ -2,6 +2,7 @@ import type { IAnalyticsPayload } from "../../../server/services/base/AnalyticsP
 import { DataContext } from "../../internal/providers/appdata-provider";
 import { useCallback, useContext, useEffect, useRef } from "react";
 import { getCurrentTimeZoneOffset } from "./util";
+import { useUserDataRetriever } from "../user/UserDataRetriever";
 
 /**
  * Options to trigger a hit
@@ -41,6 +42,10 @@ export interface IHitProps extends IHitOptions {
    * if it's marked as enabled
    */
   enabled: boolean;
+  /**
+   * Allows to track anonymous users
+   */
+  trackAnonymous?: boolean;
 }
 
 /**
@@ -97,20 +102,25 @@ export function useHit() {
 export default function Hit(props: IHitProps) {
   const sendHit = useHit();
 
-    // first we declare this thing to see the previous options
+  const userData = useUserDataRetriever();
+
+  // first we declare this thing to see the previous options
   // that we used
   const previousOptionsEffected = useRef<IHitProps>(null);
+  const previousRealEnabledEffected = useRef<boolean>(null);
 
-    // now we are to use an effect every time our described options
+  const realEnabled = props.enabled && (props.trackAnonymous ? true : !!userData.id);
+
+  // now we are to use an effect every time our described options
   // that trigger a hit have changed
   useEffect(() => {
     // and we will check that they are good for a new hit
     if (
-      props.enabled &&
+      realEnabled &&
       (
         !previousOptionsEffected.current ||
         (
-          previousOptionsEffected.current.enabled !== props.enabled ||
+          previousRealEnabledEffected.current !== realEnabled ||
           previousOptionsEffected.current.context !== props.context ||
           previousOptionsEffected.current.trackId !== props.trackId
         )
@@ -119,7 +129,8 @@ export default function Hit(props: IHitProps) {
       sendHit(props);
     }
     previousOptionsEffected.current = props;
-  }, [props.enabled, props.trackId, props.context]);
+    previousRealEnabledEffected.current = realEnabled;
+  }, [realEnabled, props.trackId, props.context]);
 
   return null;
 }
