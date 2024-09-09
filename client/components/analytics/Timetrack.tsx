@@ -136,7 +136,7 @@ export function useTimetrack(): [(options: ITimetrackOptions) => void, () => voi
             start: timetrackStartedAt,
             end: currentTime,
           },
-          weight: currentTime - timetrackStartedAt,
+          weight: Math.round((currentTime - timetrackStartedAt) / 1000),
         };
         // and then queing or updating the custom event
         dataCtx.remoteListener.queueCustomEvent(newId, "$analytics-hit-request", payload, {

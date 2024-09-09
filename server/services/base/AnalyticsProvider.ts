@@ -106,7 +106,7 @@ export interface ITrackOptions {
 /**
  * @ignore
  */
-const trackRegex = /^[a-zA-Z0-9_-]+$/;
+const trackRegex = /^[a-z0-9_-]+$/;
 const timezoneRegex = /^([+-](?:2[0-3]|[01][0-9]):[0-5][0-9])$/;
 
 export interface IAnalyticsTimetrackEndPayload {
@@ -168,6 +168,10 @@ export const ANALYTICS_HIT_REQUEST = "$analytics-hit-request";
 export const ANALYTICS_TIMETRACK_START_REQUEST = "$analytics-timetrack-start";
 export const ANALYTICS_TIMETRACK_END_REQUEST = "$analytics-timetrack-end";
 
+export interface IAnalyticsAnalysisResult {
+  [id: string]: number;
+}
+
 /**
  * The currency factors provider base class is an interface class that should
  * be extended in order ot provide the proper currency factors
@@ -191,6 +195,50 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
 
   public static getType() {
     return ServiceProviderType.GLOBAL;
+  }
+
+  /**
+   * Provides a list of all the context and their popularity ranking
+   * 
+   * @override
+   * @param filters 
+   * @returns 
+   */
+  public async getMostPopularContexts(trackId: string, filters: {
+    userId?: string;
+    anonymous?: boolean;
+    size?: number;
+    leastPopular?: boolean;
+  }): Promise<IAnalyticsAnalysisResult> {
+    return null;
+  }
+
+  /**
+   * Provides the specified context and its given added weight
+   * 
+   * @override
+   * @param filters 
+   * @returns 
+   */
+  public async getContextTotalWeight(trackId: string, context: string, filters: {
+    userId?: string;
+    anonymous?: boolean;
+  }): Promise<number> {
+    return null;
+  }
+
+  /**
+   * Provides the aggregate data for the given context with the provided information
+   * 
+   * @override
+   * @param filters 
+   * @returns 
+   */
+  public async getAggregateDataForContext(trackId: string, context: string, filters: {
+    userId?: string;
+    anonymous?: boolean;
+  }): Promise<number> {
+    return null;
   }
 
   constructor(c: T, registry: RegistryService, configs: any, elasticClient: Client) {
@@ -451,8 +499,8 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
         data: newData,
         timezone: data.timezone,
         time: data.time ? new Date(data.time) : null,
+        trusted: data.time || data.timeslice ? false : true,
         timeSlice: data.timeslice ? {
-          trusted: false,
           start: new Date(data.timeslice.start),
           end: new Date(data.timeslice.end),
         } : null,
@@ -561,8 +609,8 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     data?: any;
     timezone: string;
     time?: Date;
+    trusted: boolean;
     timeSlice?: {
-      trusted: boolean;
       start: Date;
       end: Date;
     }
@@ -590,7 +638,7 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
    */
   public async initializeTrack(track: string, options: ITrackOptions): Promise<void> {
     if (!trackRegex.test(track)) {
-      const err = new Error("Invalid track name " + JSON.stringify(track) + " must be A-Za-z0-9_-");
+      const err = new Error("Invalid track name " + JSON.stringify(track) + " must be a-z0-9_-");
       this.logError({
         message: err.message,
         className: "AnalyticsProvider",
@@ -831,16 +879,16 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
     }
 
     await this.hit(track, userId, {
-      weight: stop.getTime() - value.start.getTime(),
+      weight: Math.round((stop.getTime() - value.start.getTime()) / 1000),
       anonymous: !!value.anonymous,
       context: options.context,
       upsert: trackInfo.clientWillUpsert,
       data: newData,
       timezone: value.timezone,
+      trusted: true,
       timeSlice: {
         start: value.start,
         end: stop,
-        trusted: true,
       },
     });
   }

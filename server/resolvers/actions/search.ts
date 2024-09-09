@@ -464,6 +464,9 @@ export async function searchModule(
       });
     }
 
+    // TODO add specific boosting that can come from analytics
+    // in order to boost certain results when using search engine
+    // for that specific user
     const rHighReply = buildElasticQueryForModule(
       appData.cache.getServerData(),
       appData,

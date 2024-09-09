@@ -1,7 +1,11 @@
 import { initializeServer } from "@onzag/itemize/server";
 import { localeReplacer } from "@onzag/itemize/util";
-import { TrackTimedStatus } from "@onzag/itemize/server/services/base/AnalyticsProvider";
-import { genericAnalyticsDataValidator } from "@onzag/itemize/client/components/analytics/util";
+import {
+  genericAnalyticsDataValidator,
+  getGenericAnalyticsDataExtender,
+  getItemAnalyticsDataExtender,
+  itemAnalyticsDataValidator,
+} from "@onzag/itemize/client/components/analytics/util";
 
 // Check the client for info on these, we are replicating what is used in the client somewhat
 import React from "react";
@@ -69,55 +73,94 @@ initializeServer(
 				// tracks user pages and how much time users spend at a given page
 				// online only trusted timer
 				page: {
-					timed: TrackTimedStatus.TRUSTED,
-					allowAnonymous: true,
+					timed: true,
+					trusted: true,
 					clientMustSpecifyContext: true,
 					clientTrustedTrackingLimit: 2,
 					contextValidator: (context) => {
 						try {
 							new URL("https://test.com" + context);
+							return true;
 						} catch {
 							return false;
 						}
 					},
 					exposed: true,
 					dataValidator: genericAnalyticsDataValidator,
+					dataEditor: getGenericAnalyticsDataExtender(["username", "app_language", "app_country"]),
 					clientWillUpsert: false,
+					allowAnonymous: false,
 				},
 				// tracks user pages and how much time users spend at a given page
 				// including offline times
 				page_offline: {
-					timed: TrackTimedStatus.UNTRUSTED,
+					timed: true,
+					trusted: false,
 					allowAnonymous: false,
 					clientMustSpecifyContext: true,
 					contextValidator: (context) => {
 						try {
 							new URL("https://test.com" + context);
+							return true;
 						} catch {
 							return false;
 						}
 					},
 					exposed: true,
 					dataValidator: genericAnalyticsDataValidator,
+					dataEditor: getGenericAnalyticsDataExtender(["username", "app_language", "app_country"]),
 					clientWillUpsert: false,
 				},
 				// tracks user engagement with a given item
 				item: {
-					timed: TrackTimedStatus.UNTRUSTED,
+					timed: true,
+					trusted: false,
 					allowAnonymous: false,
-					dataValidator: genericAnalyticsDataValidator,
+					dataValidator: itemAnalyticsDataValidator,
+					dataEditor: getItemAnalyticsDataExtender(
+						["username", "app_language", "app_country"],
+						(row, data) => {
+							// set up all the data you want for custom interactions
+							// for the given type
+							if (row.type === "MOD_users__IDEF_user") {
+								// these are arbitrary, the data is arbitrary, analytics to your hearts content
+								data.interaction_type = "user_to_user";
+								data.target_user = row.id;
+								data.target_username = row.username;
+							} else {
+								data.interaction_type = "unknown";
+							}
+							return data;
+						}
+					),  
+					clientMustSpecifyContext: true,
+					contextValidator(context, userData, appData) {
+						const contextSplitted = context.split(".")[0];
+						return !!appData.root.registry[contextSplitted] && contextSplitted.startsWith("MOD_");
+					},
 					exposed: true,
-					clientWillUpsert: true,
+					clientWillUpsert: false,
 				},
 				// tracks user's opening the app
 				basic: {
-					timed: TrackTimedStatus.NO,
+					timed: false,
+					trusted: true,
 					allowAnonymous: true,
 					clientWillUpsert: false,
+					clientMustSpecifyContext: true,
+					contextValidator: (context) => {
+						try {
+							new URL("https://test.com" + context);
+							return true;
+						} catch {
+							return false;
+						}
+					},
 					dataValidator: genericAnalyticsDataValidator,
+					dataEditor: getGenericAnalyticsDataExtender(["username", "app_language", "app_country"]),
 					exposed: true,
-				}
+				},
 			}
 		}
-	},
+	}
 );
