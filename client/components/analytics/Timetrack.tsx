@@ -222,7 +222,7 @@ export default function Timetrack(props: ITimetrackProps) {
 
     // if we started one and we had one that we were tracking for
     // already in this same settings, well, we stop that one
-    if (!realEnabled) {
+    if (!realEnabled && previousOptionsEffected && previousOptionsEffected.current) {
       const rawOldCtx = previousOptionsEffected.current.context || "";
       if (
         GLOBAL_TRACK_CONTEXT_POOL[previousOptionsEffected.current.trackId] &&
