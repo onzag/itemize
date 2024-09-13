@@ -118,9 +118,7 @@ export function useTimetrack(): [(options: ITimetrackOptions) => void, () => voi
       // this is when we started tracking
       const timetrackStartedAt = (new Date()).getTime();
 
-      // and in each 10s interval we will update the event
-      // with new data, this will go to local storage
-      offlineTrackInterval.current = setInterval(() => {
+      const trackFn = () => {
         // we will be updating all the time
         const data = (options.dataGenerator && options.dataGenerator()) || null;
         const timezone = getCurrentTimeZoneOffset();
@@ -146,7 +144,12 @@ export function useTimetrack(): [(options: ITimetrackOptions) => void, () => voi
           surviveRefresh: true,
           makeReadyWhenStoring: true,
         });
-      }, 10000);
+      };
+
+      // and in each 10s interval we will update the event
+      // with new data, this will go to local storage
+      trackFn();
+      offlineTrackInterval.current = setInterval(trackFn, 10000);
       offlineTrackId.current = newId;
     }
 
