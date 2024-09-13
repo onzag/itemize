@@ -30,6 +30,7 @@ import { SearchLoaderWithPagination } from "@onzag/itemize/client/fast-prototypi
 import View from "@onzag/itemize/client/components/property/View";
 import AppLanguageRetriever from "@onzag/itemize/client/components/localization/AppLanguageRetriever";
 import Setter from "@onzag/itemize/client/components/property/Setter";
+import { useQSPaginator } from "@onzag/itemize/client/components/search/Pagination";
 
 /**
  * The article styles that are used
@@ -62,6 +63,10 @@ const style = {
 };
 
 function ArticleIndex() {
+	const paginator = useQSPaginator({
+		pageSize: 10,
+		windowSize: 500,
+	});
 	const [locale, setLocale] = useState<string>(null);
 	function setLocaleFiltered(newCode: string) {
 		setLocale(newCode);
@@ -84,8 +89,8 @@ function ArticleIndex() {
 						itemDefinition="article"
 						searchCounterpart={true}
 						automaticSearch={{
-							limit: 500,
-							offset: 0,
+							limit: paginator.limit,
+							offset: paginator.offset,
 							requestedProperties: [
 								"title",
 							],
@@ -105,7 +110,7 @@ function ArticleIndex() {
 					>
 						<SearchLoaderWithPagination
 							id="article-search-loader"
-							pageSize={10}
+							paginator={paginator}
 						>
 							{(arg, pagination) => {
 								return (

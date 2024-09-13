@@ -96,12 +96,17 @@ export interface ISearchLoaderArg {
    */
   searchRecords: IRQSearchRecordWithPopulateData[];
   /**
-   * The page count given the number of total pages, despite
+   * The page count given the number of total accessible pages, despite
    * this not being a pagination based mechanism, still
    * the search results are loaded in chunks or pages; note that
    * the page count is only has to do with the accessible count of matches
    */
   pageCount: number;
+  /**
+   * The page count given the number of total potential pages, despite
+   * this not being a pagination based mechanism
+   */
+  pageCountTotal: number;
   /**
    * The total count, the number of items that matched this search
    * in the server side
@@ -164,6 +169,11 @@ export interface ISearchLoaderProps {
    * The current page we are in
    * if pageSize is ALL the current page should be 0
    * otherwise this will cause an error
+   * 
+   * The page index starts at 0
+   * 
+   * Note that this is a very simplistic mechanism, and you should probably
+   * use a paginator object from Paginator.tsx and pass the page from there
    */
   currentPage: number;
   /**
@@ -1021,6 +1031,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     const pageCount = accessibleCount === 0 ? 0 : (typeof this.props.pageSize === "number" ? Math.ceil(accessibleCount / this.props.pageSize) : 1);
     // the total count is the search count or 0, the search count is a count(*) from the database
     const totalCount = this.props.searchCount || 0;
+    const pageCountTotal = totalCount === 0 ? 0 : (typeof this.props.pageSize === "number" ? Math.ceil(totalCount / this.props.pageSize) : 1);
 
     // now we return, for that we must make a new provider context with what
     // we are currently searching and our search fields that we are searching for
@@ -1083,6 +1094,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               } as IRQSearchRecordWithPopulateData;
             }),
             pageCount,
+            pageCountTotal,
             accessibleCount,
             totalCount,
             hasNextPage: this.props.currentPage < pageCount - 1,

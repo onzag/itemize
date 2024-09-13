@@ -1572,6 +1572,11 @@ export interface IItemProviderProps {
    */
   searchCounterpart?: boolean;
   /**
+   * Use this to prevent warnigns about two item providers sharing
+   * the same slot in search counterpart
+   */
+  searchCounterpartHasTwin?: boolean;
+  /**
    * some fields, eg. autocompleted ones and unique ones have rest
    * endpoints for them that will run checks, you might want to disable
    * these checks in two circumstances, 1. for efficiency if you don't need them
@@ -2367,6 +2372,7 @@ export class ActualItemProvider extends
   // the list of search block promises
   private activeSearchPromise: Promise<{ response: IActionResponseWithSearchResults, options: IActionSearchOptions }> = null;
   private activeSearchPromiseAwaiter: string = null;
+  private activeSearchOptions: IActionSearchOptions = null;
 
   // sometimes reload calls can come in batches due to triggering actions
   // it doesn't hurt to catch them all and create a timeout
@@ -2770,6 +2776,59 @@ export class ActualItemProvider extends
       const loc = getStoredStateLocation(this.props.loadStoredState, this.props.forId, this.props.forVersion);
       await this.loadStoredState(loc);
       // this.setupStoredStateListener(loc);
+    }
+
+    this.installDoubleSlotter();
+  }
+
+  /**
+   * internally used in development only to check for double slotting
+   * where two search items share a state and may be unnoticed
+   */
+  private installDoubleSlotter() {
+    if (process.env.NODE_ENV === "development" && !(window as any).DOUBLE_SLOTTING_FAILSAFE) {
+      (window as any).DOUBLE_SLOTTING_FAILSAFE = {};
+    }
+    if (process.env.NODE_ENV === "development" && this.props.itemDefinitionInstance.isInSearchMode()) {
+      const slotId = this.props.itemDefinitionQualifiedName + "." + (this.props.forId || "") + "." + (this.props.forVersion || "");
+      if (
+        (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] &&
+        (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length &&
+        !this.props.searchCounterpartHasTwin
+      ) {
+        console.warn(
+          "Found two instances of an item provider in search mode at the same slot at the same time, " +
+          "this is not an error, but they share a search state, on item: " + JSON.stringify(this.props.itemDefinitionQualifiedName) +
+          " at id: " + JSON.stringify(this.props.forId || null) +
+          " and version: " + JSON.stringify(this.props.forVersion || null));
+      }
+      (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] = (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] || [];
+      (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].push(this);
+    }
+  }
+
+  /**
+   * internally used in development only to check for double slotting
+   * where two search items share a state and may be unnoticed
+   */
+  private removeDoubleSlotter(props: IActualItemProviderProps = this.props) {
+    if (process.env.NODE_ENV === "development" && props.itemDefinitionInstance.isInSearchMode() && (window as any).DOUBLE_SLOTTING_FAILSAFE) {
+      const slotId = props.itemDefinitionQualifiedName + "." + (props.forId || "") + "." + (props.forVersion || "");
+      if ((window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] && (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length) {
+        const indexToRemove = (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].findIndex(i => i === this);
+        if (indexToRemove !== -1) {
+          (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].splice(indexToRemove, 1);
+        }
+        if ((window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length === 0) {
+          delete (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId];
+        }
+        if ((!(window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] || (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length === 1)) {
+          console.warn(
+            "The double slotting on item: " + JSON.stringify(this.props.itemDefinitionQualifiedName) +
+            " at id: " + JSON.stringify(this.props.forId || null) +
+            " and version: " + JSON.stringify(this.props.forVersion || null) + " has been removed");
+        }
+      }
     }
   }
 
@@ -3258,6 +3317,15 @@ export class ActualItemProvider extends
       if (this.props.storeStateOnChange) {
         clearTimeout(this.storeStateTimeout);
         this.storeStateTimeout = setTimeout(this.storeStateDelayed, 600);
+      }
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      const slotId = this.props.itemDefinitionQualifiedName + "." + (this.props.forId || "") + "." + (this.props.forVersion || "");
+      const prevSlotId = prevProps.itemDefinitionQualifiedName + "." + (prevProps.forId || "") + "." + (prevProps.forVersion || "");
+      if (slotId !== prevSlotId) {
+        this.removeDoubleSlotter(prevProps);
+        this.installDoubleSlotter();
       }
     }
   }
@@ -4268,6 +4336,8 @@ export class ActualItemProvider extends
         mountItem.unmountTime = (new Date()).toISOString();
       }
     }
+
+    this.removeDoubleSlotter();
   }
   public onIncludeSetExclusionState(include: Include, state: IncludeExclusionState) {
     // just sets the exclusion state
@@ -5444,6 +5514,13 @@ export class ActualItemProvider extends
           }
         }
       } else {
+        console.warn(
+          "Can't search while searching to trigger at " + this.props.itemDefinitionQualifiedName + " newly provided options:",
+          originalOptions,
+          "active options:",
+          this.activeSearchOptions,
+          "id-version: " + JSON.stringify(this.props.forId || null) + "." + JSON.stringify(this.props.forVersion || null),
+        );
         throw new Error("Can't search while searching, please consider your calls");
       }
     }
@@ -5821,6 +5898,7 @@ export class ActualItemProvider extends
       activeSearchPromiseResolve = resolve;
       activeSearchPromiseReject = reject;
     });
+    this.activeSearchOptions = options;
 
     const {
       results,
@@ -6099,6 +6177,7 @@ export class ActualItemProvider extends
     };
     this.props.onSearch && this.props.onSearch(result);
     this.activeSearchPromise = null;
+    this.activeSearchOptions = null;
     activeSearchPromiseResolve({ response: result, options });
     return result;
   }

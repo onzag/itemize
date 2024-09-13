@@ -54,6 +54,7 @@ import { PropertyDefinitionSupportedStringType } from "../../../../base/Root/Mod
 import type { EndpointErrorType } from "../../../../base/errors";
 import { localizedRedirectTo } from "../../../components/navigation";
 import TitleSetter from "../../../components/util/TitleSetter";
+import { useQSPaginator } from "../../../components/search/Pagination";
 
 const style = {
   flex: {
@@ -1845,10 +1846,10 @@ function FakeNoResultsComponent(props: INoResultsComponentProps) {
 }
 
 export function EmailClient(props: IEmailClientProps) {
-  const [limitoffset, setLimitOffset] = useState([20, 0]);
-  const onOutOfBounds = useCallback((newLimit: number, newOffset: number) => {
-    setLimitOffset([newLimit, newOffset]);
-  }, []);
+  const paginator = useQSPaginator({
+    pageSize: 20,
+    windowSize: 20,
+  });
 
   const SwitcherComponent = typeof props.SwitcherComponent === "undefined" ? DefaultSwitcherComponent : props.SwitcherComponent;
   const ListComponent = typeof props.ListComponent === "undefined" ? List : props.ListComponent;
@@ -1890,8 +1891,8 @@ export function EmailClient(props: IEmailClientProps) {
                 settersCriteria[props.location]
             }
             automaticSearch={{
-              limit: limitoffset[0],
-              offset: limitoffset[1],
+              limit: paginator.limit,
+              offset: paginator.offset,
               requestedProperties: [
                 "source",
                 "read",
@@ -1927,11 +1928,10 @@ export function EmailClient(props: IEmailClientProps) {
               <SearchLoaderWithPagination
                 {...props.searchLoaderProps}
                 id="messages-search"
-                pageSize={10}
+                paginator={paginator}
                 static="TOTAL"
                 cleanOnDismount={true}
                 total={true}
-                onTotalOutOfBounds={onOutOfBounds}
               >
                 {(arg, pagination, noResults) => (
                   <InternalWrapperComponent>

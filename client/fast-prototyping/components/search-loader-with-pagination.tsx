@@ -4,12 +4,12 @@
  * @module
  */
 
-import { PagedSearchLoader, IPagedSearchLoaderArg } from "../../components/search/PagedSearchLoader";
-import { TotalPagedSearchLoader } from "../../components/search/TotalPagedSearchLoader";
 import React, { useCallback } from "react";
 import Pagination from '@mui/material/Pagination';
 import { PaginationItem } from "@mui/material";
 import { AltBadgeReactioner } from "./alt-badge-reactioner";
+import SearchLoader, { ISearchLoaderArg } from "../../components/search/SearchLoader";
+import { IPaginatorInternalObject } from "../../components/search/Pagination";
 
 
 /**
@@ -17,17 +17,9 @@ import { AltBadgeReactioner } from "./alt-badge-reactioner";
  */
 export interface ISearchLoaderWithPaginationProps {
   /**
-   * Whether to use a local state
-   */
-  localState?: boolean;
-  /**
    * An unique id to track this loader
    */
   id: string;
-  /**
-   * The page size utilized in the search loader
-   */
-  pageSize: number;
   /**
    * Whether to clean on dismount for the search results that have been loaded
    */
@@ -36,6 +28,10 @@ export interface ISearchLoaderWithPaginationProps {
    * whether to use the total paged search loader
    */
   total?: boolean;
+  /**
+   * A paginator object to handle pagination
+   */
+  paginator: IPaginatorInternalObject;
   /**
    * Whether to disable the external checks for the item definition
    * results provider props
@@ -54,13 +50,9 @@ export interface ISearchLoaderWithPaginationProps {
    */
   static?: "TOTAL" | "NO_LISTENING";
   /**
-   * When the total has gone out of bounds
-   */
-  onTotalOutOfBounds?: (newLimit: number, newOffset: number) => void;
-  /**
    * The children that recieves the arguments
    */
-  children: (arg: IPagedSearchLoaderArg, pagination: React.ReactNode, noResults: boolean) => React.ReactNode;
+  children: (arg: ISearchLoaderArg, pagination: React.ReactNode, noResults: boolean) => React.ReactNode;
 
   paginationVariant?: "text" | "outlined";
 
@@ -106,11 +98,6 @@ function defaultRenderItem(x: any) {
  * @param props the search loader props
  */
 export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationProps) {
-  if (props.total && !props.onTotalOutOfBounds) {
-    throw new Error("The search loader uses total but has no callback for when it is out of bounds in onTotalOutOfBounds is missing");
-  }
-  const ElementToUse = props.total ? TotalPagedSearchLoader : PagedSearchLoader;
-
   const renderItemFn = useCallback((x: any) => {
     if (!props.accessible) {
       return defaultRenderItem(x);
@@ -147,36 +134,39 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
   ]);
 
   return (
-    <ElementToUse
-      pageSize={props.pageSize}
+    <SearchLoader
+      // in the search loader pages are zero indexed
+      currentPage={props.paginator.page - 1}
+      pageSize={props.paginator.pageSize}
       cleanOnDismount={props.cleanOnDismount}
-      localState={props.localState}
-      onOutOfBounds={props.onTotalOutOfBounds}
       static={props.static}
       enableExternalChecks={props.enableExternalChecks}
-      queryStringPageLocation={props.queryStringPageLocation}
       startInSearchingState={props.startInSearchingState}
     >
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {
-          arg.goToPage(value - 1);
+          props.paginator.goToPage(value + 1);
         }
+
+        const pageCount = props.total ? arg.pageCountTotal : arg.pageCount;
+        const currentPage = props.total ? props.paginator.pageTotal : props.paginator.page;
+
         const pagination = (
-          arg.pageCount === 0 ?
+          pageCount === 0 ?
             null :
             <Pagination
-              count={arg.pageCount}
+              count={pageCount}
               color="primary"
-              page={arg.currentPage + 1}
+              page={currentPage}
               onChange={handlePageChange}
               variant={props.paginationVariant}
               renderItem={renderItemFn}/>
         );
 
         return (
-          props.children(arg, pagination, !!(arg.searchId && arg.pageCount === 0))
+          props.children(arg, pagination, !!(arg.searchId && pageCount === 0))
         );
       }}
-    </ElementToUse>
+    </SearchLoader>
   )
 }
