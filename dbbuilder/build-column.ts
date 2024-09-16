@@ -21,9 +21,11 @@ export function convertValueToExpression(
     return escapeString(v);
   } else if (typeof v === "number") {
     return v.toString();
-  } else {
+  } else if (v) {
     return escapeString(JSON.stringify(v)) + "::jsonb";
   }
+
+  return null;
 }
 
 /**
