@@ -53,7 +53,7 @@ export async function buildIndexes(
   for (const tableInfo of allTablesInDb) {
     const tableName = tableInfo.table_name as string;
 
-    if (!tableName.startsWith("MOD_") || !newDatabaseSchema[tableName]) {
+    if (!newDatabaseSchema[tableName]) {
       continue;
     }
 

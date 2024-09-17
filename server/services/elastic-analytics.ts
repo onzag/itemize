@@ -1,7 +1,9 @@
-import type { UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
+import type { SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { ServiceProviderType } from ".";
 import AnalyticsProvider, { ITrackOptions } from "./base/AnalyticsProvider";
-export class ElasticAnalyticsService extends AnalyticsProvider<null> {
+import { ElasticQueryBuilder } from "../elastic";
+
+export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQueryBuilder, SearchResponse> {
   public static getType() {
     return ServiceProviderType.LOCAL;
   }

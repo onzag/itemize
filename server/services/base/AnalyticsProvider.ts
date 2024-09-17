@@ -1,7 +1,6 @@
 import { Client } from "@elastic/elasticsearch";
 import { ServiceProvider, ServiceProviderType } from "..";
 import { RegistryService } from "../registry";
-import { Router } from "express";
 import { IAppDataType } from "../../";
 import { IServerSideTokenDataType } from "../../resolvers/basic";
 import { ICustomListenerInfo } from "../../listener";
@@ -12,6 +11,19 @@ import { ENDPOINT_ERRORS } from "../../../constants";
 const NAMESPACE = "23ab4609-df49-5fdf-921b-4714adb284f3";
 export function makeIdOutOf(str: string) {
   return "ANON" + uuidv5(str, NAMESPACE).replace(/-/g, "");
+}
+
+export interface IBasicDataLimiter {[key: string]: string | boolean | number};
+
+export interface IExposeAnalyticsOptions<T, V> {
+  trackId: string;
+  endpoint: string;
+  authUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => boolean | Promise<boolean>;
+  limitToContext?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => string | string[] | Promise<string | string[]>;
+  limitToUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => string | string[] | Promise<string | string[]>;
+  limitToData?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => IBasicDataLimiter | Promise<IBasicDataLimiter>;
+  // customizeQuery?: (user: IServerSideTokenDataType, builder: T, req: Express.Request) => void | Promise<void>;
+  timeslices?: number;
 }
 
 
@@ -176,7 +188,7 @@ export interface IAnalyticsAnalysisResult {
  * The currency factors provider base class is an interface class that should
  * be extended in order ot provide the proper currency factors
  */
-export default class AnalyticsProvider<T> extends ServiceProvider<T> {
+export default class AnalyticsProvider<T, BuilderType, ResponseType> extends ServiceProvider<T> {
   private tracks: { [id: string]: ITrackOptions } = {};
   public elasticClient: Client;
 
@@ -891,5 +903,9 @@ export default class AnalyticsProvider<T> extends ServiceProvider<T> {
         end: stop,
       },
     });
+  }
+
+  public async exposeAnalyticsEndpoint(options: IExposeAnalyticsOptions<BuilderType, ResponseType>) {
+
   }
 }
