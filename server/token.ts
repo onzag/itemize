@@ -10,7 +10,7 @@
 import jwt from "jsonwebtoken";
 import express from "express";
 import type { IServerSideTokenDataType } from "./resolvers/basic";
-import { ENDPOINT_ERRORS, JWT_KEY } from "../constants";
+import { ENDPOINT_ERRORS, GUEST_METAROLE, JWT_KEY } from "../constants";
 import type { EndpointErrorType } from "../base/errors";
 import type { IAppDataType } from "../server";
 
@@ -118,7 +118,10 @@ export async function jwtVerifyRequest(
         code: ENDPOINT_ERRORS.MUST_BE_LOGGED_IN,
         message: "User did not provide a token",
       },
-      info: null,
+      info: {
+        id: null,
+        role: GUEST_METAROLE,
+      },
     };
   }
   

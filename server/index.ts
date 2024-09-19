@@ -224,7 +224,7 @@ export interface IAppDataType {
   loggingService: LoggingProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
-  analyticsService: AnalyticsProvider<any>;
+  analyticsService: AnalyticsProvider<any, any, any>;
   ussdService: USSDProvider<any>;
   registry: RegistryService;
   customServices: {
@@ -908,7 +908,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       throw new Error("Analytics provider class is not a local type");
     }
 
-    const analyticsService: AnalyticsProvider<any> = initConfig.analytics?.trackers ?
+    const analyticsService: AnalyticsProvider<any, any, any> = initConfig.analytics?.trackers ?
       (new AnalyticsClass(null, registry, configsObj, elasticAnalyticsConnection) as any) :
       null;
 

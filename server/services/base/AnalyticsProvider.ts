@@ -6,24 +6,95 @@ import { IServerSideTokenDataType } from "../../resolvers/basic";
 import { ICustomListenerInfo } from "../../listener";
 import uuidv5 from "uuid/v5";
 import { EndpointError } from "../../../base/errors";
-import { ENDPOINT_ERRORS } from "../../../constants";
+import { ENDPOINT_ERRORS, GUEST_METAROLE } from "../../../constants";
+import path from "path";
+import { jwtVerifyRequest } from "../../token";
 
 const NAMESPACE = "23ab4609-df49-5fdf-921b-4714adb284f3";
 export function makeIdOutOf(str: string) {
   return "ANON" + uuidv5(str, NAMESPACE).replace(/-/g, "");
 }
 
-export interface IBasicDataLimiter {[key: string]: string | boolean | number};
+export interface IBasicDataLimiter { [key: string]: string | boolean | number };
 
-export interface IExposeAnalyticsOptions<T, V> {
-  trackId: string;
+export interface IDataAggregator {
+  [dataKey: string]: {
+    /**
+     * The method to use
+     * keyword-terms uses the keyword of a field in order to create a list on how many times this was found
+     * terms is the same as keyword-terms but it will not use the keyword field, usually a matter of performance, keyword is better, terms works for boolean
+     * stats used for numeric values
+     * extended_stats used for numeric values as well and has more stats
+     */
+    method: "keyword-terms" | "terms" | "stats" | "extended_stats";
+  }
+}
+
+export interface IExposeAnalyticsOptionsNoTrack {
+  /**
+   * Endpoint, will exist at /rest/analytics/${trackid}/${endpoint}
+   */
   endpoint: string;
+  /**
+   * Authorize or not the given user
+   * 
+   * the user authorization should come in the form fo the token
+   * in the headers as token
+   * 
+   * @param user 
+   * @param appData 
+   * @param req 
+   * @returns 
+   */
   authUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => boolean | Promise<boolean>;
+  /**
+   * Prevent guests from querying this
+   */
+  authUserNoGuests?: boolean;
+  /**
+   * Set limiters for the conext that the user gets information from
+   * @param user 
+   * @param appData 
+   * @param req 
+   * @returns 
+   */
   limitToContext?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => string | string[] | Promise<string | string[]>;
+  /**
+   * Set limiters for the users that are retrieved information from
+   * @param user 
+   * @param appData 
+   * @param req 
+   * @returns 
+   */
   limitToUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => string | string[] | Promise<string | string[]>;
+  /**
+   * Set limiters for the kind of data that can be accessed, it generates a filter query in the aggregation
+   * @param user 
+   * @param appData 
+   * @param req 
+   * @returns 
+   */
   limitToData?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => IBasicDataLimiter | Promise<IBasicDataLimiter>;
   // customizeQuery?: (user: IServerSideTokenDataType, builder: T, req: Express.Request) => void | Promise<void>;
+  /**
+   * Set to use timeslices specify the range between the slices in order to get statistics
+   * based on these slices
+   * 
+   * setting timeslices will also add a "from" and "to" querystring to the endpoint
+   */
   timeslices?: number;
+  /**
+   * You need to specify a data agregator even if an empty object {} this means you send no data
+   * you should specify it to know that you are not providing data otherwise
+   */
+  dataAggregator: IDataAggregator;
+}
+
+export interface IExposeAnalyticsOptions extends IExposeAnalyticsOptionsNoTrack {
+  /**
+   * The track id which is to be exposed
+   */
+  trackId: string;
 }
 
 
@@ -113,6 +184,11 @@ export interface ITrackOptions {
    * @returns 
    */
   weightValidator?: (weight: number, userData: IServerSideTokenDataType, appData: IAppDataType) => boolean;
+
+  /**
+   * Endpoints to be exposed for the given track
+   */
+  exposeStatistics?: IExposeAnalyticsOptionsNoTrack[];
 }
 
 /**
@@ -203,6 +279,10 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
         }
       }
     }
+  } = {};
+
+  private exposedEndpoints: {
+    [endpointPath: string]: IExposeAnalyticsOptions;
   } = {};
 
   public static getType() {
@@ -726,6 +806,15 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
 
     await this.createTrackIfNotExist(track, options);
     this.tracks[track] = options;
+
+    if (options.exposeStatistics) {
+      options.exposeStatistics.forEach((e) => {
+        this.exposeAnalyticsEndpoint({
+          trackId: track,
+          ...e,
+        });
+      });
+    }
   }
 
   /**
@@ -787,7 +876,7 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
 
     if (currentTimedTracksForUserInTrack >= (trackInfo.clientTrustedTrackingLimit || 50)) {
       const message = "Exceeded the security limit of timed tracking requests for the given user at the track";
-      const err = new EndpointError({message, code: ENDPOINT_ERRORS.UNSPECIFIED});
+      const err = new EndpointError({ message, code: ENDPOINT_ERRORS.UNSPECIFIED });
       if (!options.silent) {
         this.logError({
           message,
@@ -812,7 +901,7 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
       }
     } else {
       const message = "Attemtped to start tracking trusted time, but the timer has already started, this indicates a potential memory leak";
-      const err = new EndpointError({message, code: ENDPOINT_ERRORS.UNSPECIFIED});
+      const err = new EndpointError({ message, code: ENDPOINT_ERRORS.UNSPECIFIED });
       if (!options.silent) {
         this.logError({
           message,
@@ -905,7 +994,63 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     });
   }
 
-  public async exposeAnalyticsEndpoint(options: IExposeAnalyticsOptions<BuilderType, ResponseType>) {
+  public getRouter(appData: IAppDataType) {
+    const router = this.expressRouter();
+    router.use("/analytics/:track", async (req, res, next) => {
+      let pathOfTrack = path.normalize(req.path.replace(`/uploads/${req.params.track}`, ""));
+      if (!pathOfTrack.startsWith("/")) {
+        pathOfTrack = "/" + pathOfTrack;
+      }
 
+      const endpointAtPath = this.exposedEndpoints[pathOfTrack];
+
+      if (!endpointAtPath) {
+        next();
+        return;
+      }
+
+      const userData = await jwtVerifyRequest(appData, req);
+
+      // not a guest and not verified, which means invalid credentials
+      if ((!userData.verified && userData.info.role !== GUEST_METAROLE) || !userData.info) {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        res.status(400);
+        res.end(JSON.stringify(userData.err));
+        return;
+      }
+
+      if (endpointAtPath.authUserNoGuests && userData.info.role === GUEST_METAROLE) {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        res.status(400);
+        res.end(JSON.stringify(userData.err));
+        return;
+      }
+
+      if (endpointAtPath.authUser) {
+        const checked = await endpointAtPath.authUser(userData.info, appData, req);
+
+        if (!checked) {
+          res.setHeader("content-type", "application/json; charset=utf-8");
+          res.status(400);
+          res.end(JSON.stringify({
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+            message: "This resource is not accessible by the given user",
+          }));
+          return;
+        }
+      }
+    });
+    return router;
+  }
+
+  public async exposeAnalyticsEndpoint(options: IExposeAnalyticsOptions) {
+    let realEndpoint = options.endpoint;
+    if (!realEndpoint.startsWith("/")) {
+      realEndpoint = "/" + realEndpoint;
+    }
+    if (this.exposedEndpoints[realEndpoint]) {
+      throw new Error("Could not register endpoint for " + realEndpoint + " twice as it's already registered");
+    }
+    this.exposedEndpoints[realEndpoint] = options;
   }
 }

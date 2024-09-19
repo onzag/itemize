@@ -1,10 +1,42 @@
 /**
- * Utility to execute commands in sh, even in sudo mode
+ * Utility to execute commands in console
  * @module
  */
 
 import { spawn } from "child_process";
-import sudo from "sudo-prompt";
+
+/**
+ * Split args in a lazy manner for the exec async
+ * so that's more or less bash compatible
+ * 
+ * @param code 
+ * @returns 
+ */
+function splitArgs(code: string): string[] {
+  const codeArray = code.split(/\s+/g).filter((v) => v);
+  const finalValue: string[] = [];
+  let accum: string = "";
+  let inJSONStr = false;
+  codeArray.forEach((v) => {
+    accum += " " + v;
+    if (v.startsWith('"')) {
+      inJSONStr = true;
+    }
+    
+    if (v.endsWith('"') && inJSONStr) {
+      inJSONStr = false;
+      accum = JSON.parse(accum.trim());
+    }
+    
+    if (!inJSONStr) {
+      accum = accum.trim();
+      finalValue.push(accum);
+      accum = "";
+    }
+  });
+
+  return finalValue;
+}
 
 /**
  * Simply does an exec
@@ -16,7 +48,7 @@ export function execAsync(code: string): Promise<void> {
   // this is the promise
   return new Promise((resolve, reject) => {
     // we need to rid of spaces
-    const codeArray = code.split(/\s+/g);
+    const codeArray = splitArgs(code);
     // the program is the first arg
     const program = codeArray.shift();
     // and now we run spawn with each arg
@@ -41,42 +73,5 @@ export function execAsync(code: string): Promise<void> {
     spawnable.on("error", (err) => {
       reject(err);
     });
-  });
-}
-
-/**
- * Does the same as execAsync but with sudo provileges
- * @param code the code to execute
- * @param name the name we are giving this application
- * @param icns
- * @returns a void promise
- */
-export function execSudo(code: string, name: string, icns?: string): Promise<void> {
-  console.log(code);
-  return new Promise((resolve, reject) => {
-    sudo.exec(
-      code,
-      {
-        name,
-        icns,
-      },
-      (
-        error,
-        stdout,
-        stderr,
-      ) => {
-        if (stdout) {
-          console.log(stdout);
-        }
-        if (stderr) {
-          console.log(stderr)
-        }
-        if (error) {
-          reject(error)
-        } else {
-          resolve();
-        }
-      }
-    );
   });
 }

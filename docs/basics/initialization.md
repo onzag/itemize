@@ -14,6 +14,37 @@ At the time of this writing due to many limitations with incompatible updates it
 
 Itemize currently only works under a linux system, it was tested under WSL with it not being capable to complete a npm install; while theorethically it should work the same way under WSL in practise the setup proves inconviently complex as many things fail.
 
+## Settings requirements
+
+### Docker
+
+Please ensure that for using a development enviroment docker is running without sudo, for that you may run the following command, for example, in ubuntu
+
+`sudo usermod -aG docker $USER`
+
+Provided that your current user has root privileges.
+
+### Virtual memory
+
+Some errors may arise if the virtual memory is not enough, ensure to increase it, on linux this is done via the following command (AS ROOT)
+
+Become root.
+
+`sudo su`
+
+Increase the virtual memory
+
+`echo "vm.max_map_count=262144" >> /etc/sysctl.conf && echo "vm.max_map_count=262144" >> /etc/sysctl.d/99-sysctl.conf`
+
+Exit root
+
+`exit`
+
+Reload
+
+`sudo sysctl -w vm.max_map_count=262144 && sudo sysctl -p && sudo sysctl --system`
+
+
 ## Fast initialization
 
 1. Make a directory
@@ -368,25 +399,25 @@ If you are using elasticsearch and have configured it you can access the logs as
 In order to start kibana in this development environment you will need to first create an enrollment token, first find the countainer that ends with the `_devedb` suffix and is running elasticsearch.
 
 ```sh
-sudo docker ps
+docker ps
 ```
 
 Find the container that ends with `_devedb` it should have your application name before it, you will need that identifier.
 
 ```sh
-sudo docker exec -it my_application_name_devedb /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+docker exec -it my_application_name_devedb /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
 ```
 
 You will be output a token, copy it, you will need it; now you shall get kibana running, you will need to do the same regarding the network name that you will use and connect it to your development environment
 
 ```sh
-sudo docker network ls
+docker network ls
 ```
 
 Find the one that contains your application name within it, eg. `my_application_name_network` that is the one that the dev environment is using, now you can launch kibana with that
 
 ```sh
-sudo docker run --net my_application_name_network --name kibana -p 5601:5601 docker.elastic.co/kibana/kibana:8.2.0
+docker run --net my_application_name_network --name kibana -p 5601:5601 docker.elastic.co/kibana/kibana:8.2.0
 ```
 
 It will prompt you in your browser and request you for the token, once you paste the token you will then proceed to login, your username should be `elastic` and the password is whatever you put in the `db.sensitive.json` for elastic password.
@@ -394,8 +425,8 @@ It will prompt you in your browser and request you for the token, once you paste
 And that's all you should be within kibana with those steps, remember once you are done to stop this container before running `stop-dev-environment`.
 
 ```sh
-sudo docker stop kibana
-sudo docker rm kibana
+docker stop kibana
+docker rm kibana
 ```
 
 ### Start the silly server

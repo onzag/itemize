@@ -69,8 +69,9 @@ const actionRegistry: {
   "start-dev-environment": {
     fn: start,
     description: "Starts the development environment, as configured",
-    usage: "itemize start-dev-environment [development|production]",
+    usage: "itemize start-dev-environment [development|production] (with-kibana)",
     needsArgs: 1,
+    arbitraryArgs: true,
   },
   "stop-dev-environment": {
     fn: stop,

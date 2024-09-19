@@ -11,8 +11,9 @@ import { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, IConfigRawJSONDa
 import { ensureConfigDirectory } from "../setup";
 import { readConfigFile } from "../setup";
 import colors from "colors";
-import { execSudo } from "../setup/exec";
+import { execAsync } from "../setup/exec";
 import equals from "deep-equal";
+import { httpRequest } from "../server/request";
 
 const ELASTIC_VERSION = process.env.ELASTIC_VERSION || "8.2.0";
 const REDIS_VERSION = process.env.REDIS_VERSION || "";
@@ -24,6 +25,35 @@ const suffixer = {
   elasticAnalytics: "_analytics",
 };
 
+const ports = {
+  elastic: 5601,
+  elasticLogs: 5602,
+  elasticAnalytics: 5603,
+};
+
+const pwd = process.cwd();
+
+function wait(n: number) {
+  return new Promise((r) => {
+    setTimeout(r, n*1000);
+  });
+}
+
+async function waitForElastic(port: string) {
+  await wait(10);
+  await httpRequest({
+    isHttps: true,
+    host: "localhost",
+    port,
+    method: "GET",
+    path: "/_cluster/health?wait_for_status=yellow&timeout=60s",
+    maxAttempts: 3,
+    maxAttemptsRetryTime: 5000,
+    returnNonOk: true,
+  });
+  await wait(10);
+}
+
 /**
  * this function is triggered by the main.ts file and passes its argument
  * its configuration is there, check the main.ts file for modification on how
@@ -31,9 +61,11 @@ const suffixer = {
  * 
  * @param version the version param
  */
-export async function start(version: string) {
+export async function start(version: string, kibana?: "with-kibana") {
   // first we ensure the config directory exists
   await ensureConfigDirectory();
+
+  const useKibana = !!kibana;
 
   // now we need our standard generic config
   const standardConfig: IConfigRawJSONDataType = await readConfigFile("index.json");
@@ -73,19 +105,17 @@ export async function start(version: string) {
   try {
     // and we execute this command with the configuration
     // it will execute for localhost of course
-    console.log(colors.yellow("Please allow Itemize to create a network"));
-    await execSudo(
+    console.log(colors.yellow("Itemize is creating a network"));
+    await execAsync(
       `docker network create ${dockerprefixer}_network`,
-      "Itemize Docker Network Creator",
     );
   } catch (err) {
     // if something fails show a message
     console.log(colors.red(err.message));
     console.log(colors.yellow("Something went wrong please allow for cleanup..."));
     try {
-      await execSudo(
+      await execAsync(
         `docker network rm ${dockerprefixer}_network`,
-        "Itemize Docker Network Creator",
       );
     } catch {
     }
@@ -103,28 +133,26 @@ export async function start(version: string) {
     console.log(colors.red("As so it cannot be executed"));
   } else {
     // otherwise yes we can do itt
-    console.log(colors.yellow("Please allow Itemize to create a docker container for the database"));
+    console.log(colors.yellow("Itemize is creating a docker container for the database"));
     console.log(colors.yellow("The execution might take a while, please wait..."));
 
     // and for such we need to first know where we are, we need an absolute path for all this
     try {
       // and we execute this command with the configuration
       // it will execute for localhost of course
-      await execSudo(
+      await execAsync(
         `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfig.password} ` +
         `-e POSTGRES_USER=${dbConfig.user} -e POSTGRES_DB=${dbConfig.database} ` +
-        `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
+        `-v ${path.join(pwd, "devenv", "pgdata")}:/var/lib/postgresql/data ` +
         `-p ${dbConfig.port}:5432 -d postgis/postgis:${POSTGIS_VERSION}`,
-        "Itemize Docker Contained PGSQL Postgis Enabled Database",
       );
     } catch (err) {
       // if something fails show a message
       console.log(colors.red(err.message));
       console.log(colors.yellow("Something went wrong please allow for cleanup..."));
       try {
-        await execSudo(
+        await execAsync(
           `docker rm ${dockerprefixer}_devdb`,
-          "Itemize Docker Contained PGSQL Postgis Enabled Database",
         );
       } catch {
       }
@@ -152,34 +180,67 @@ export async function start(version: string) {
           const username = dbConfig[eVersion].auth && dbConfig[eVersion].auth.username;
           const password = dbConfig[eVersion].auth && dbConfig[eVersion].auth.password;
           if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:" && username === "elastic") {
-            console.log(colors.yellow("Please allow Itemize to create a docker container for " + eVersion));
+            console.log(colors.yellow("Itemize is creating a docker container for " + eVersion));
             console.log(colors.yellow("The execution might take a while, please wait..."));
 
             try {
-              // and we execute this command with the configuration
-              // it will execute for localhost of course
-              await execSudo(
-                "sysctl -w vm.max_map_count=262144",
-                "Itemize Sysctl setup for elasticsearch",
-              );
-              await execSudo(
+              await execAsync(
                 `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devedb${suffixer[eVersion]} -e ELASTIC_PASSWORD=${password} ` +
                 `-e "ES_JAVA_OPTS=-Xms4g -Xmx4g" ` +
                 `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}`,
-                "Itemize Docker Contained Elasticsearch Database",
               );
             } catch (err) {
               // if something fails show a message
               console.log(colors.red(err.message));
               console.log(colors.yellow("Something went wrong please allow for cleanup..."));
               try {
-                await execSudo(
+                await execAsync(
                   `docker rm ${dockerprefixer}_devedb${suffixer[eVersion]}`,
-                  "Itemize Docker Contained Elasticsearch Database",
                 );
               } catch {
               }
               throw err;
+            }
+
+            if (useKibana) {
+              // otherwise we are good to go
+              console.log(colors.yellow("Itemize is creating a docker container for kibana " + eVersion));
+
+              console.log(colors.yellow("Waiting until elasticsearch is ready..."));
+              await waitForElastic(port);
+              console.log(colors.green("Done"));
+
+              console.log(colors.yellow("The execution might take a while, please wait..."));
+          
+              try {
+                await execAsync(
+                  `docker exec -t ${dockerprefixer}_devedb${suffixer[eVersion]} /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana`,
+                );
+              } catch (err) {
+                console.log(colors.red(err.message));
+                console.log(colors.yellow("Something went wrong when creating the enrollment token..."));
+                throw err;
+              }
+          
+              try {
+                await execAsync(
+                  `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devkibana${suffixer[eVersion]} ` +
+                  `-p ${ports[eVersion]}:5601 -d docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}`,
+                );
+              } catch (err) {
+                console.log(colors.red(err.message));
+                console.log(colors.yellow("Something went wrong when creating kibana, please allow for cleanup..."));
+                await execAsync(
+                  `docker rm ${dockerprefixer}_devkibana`,
+                );
+                throw err;
+              }
+
+              try {
+                await execAsync(
+                  `docker logs ${dockerprefixer}_devkibana${suffixer[eVersion]}`,
+                );
+              } catch (err) {}
             }
           } else if (hostname !== "localhost" && hostname !== "127.0.0.1") {
             console.log(colors.red("Development environment " + eVersion + " database host is connecting to ") + hostname);
@@ -239,22 +300,20 @@ export async function start(version: string) {
     console.log(colors.red("As so it cannot be executed"));
   } else {
     // otherwise we are good to go
-    console.log(colors.yellow("Please allow Itemize to create a docker container for redis"));
+    console.log(colors.yellow("Itemize is creating a docker container for redis"));
     console.log(colors.yellow("The execution might take a while, please wait..."));
 
     // and we attempt to execute
     try {
-      await execSudo(
+      await execAsync(
         `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devredis ` +
         `-p ${redisConfig.global.port}:6379 -d redis${REDIS_VERSION ? ":" + REDIS_VERSION : ""}`,
-        "Itemize Docker Contained REDIS Database",
       );
     } catch (err) {
       console.log(colors.red(err.message));
       console.log(colors.yellow("Something went wrong please allow for cleanup..."));
-      await execSudo(
+      await execAsync(
         `docker rm ${dockerprefixer}_devredis`,
-        "Itemize Docker Contained REDIS Database",
       );
       throw err;
     }
@@ -284,16 +343,14 @@ export async function stop(version: string) {
     dbConfig.host === "127.0.0.1"
   ) {
     try {
-      console.log(colors.yellow("Please allow Itemize to stop the PGSQL docker container"));
-      await execSudo(
+      console.log(colors.yellow("Itemize is stopping the PGSQL docker container"));
+      await execAsync(
         `docker stop ${dockerprefixer}_devdb`,
-        "Itemize Docker Contained PGSQL Database",
       );
 
       console.log(colors.yellow("Now we attempt to remove the PGSQL docker container"));
-      await execSudo(
+      await execAsync(
         `docker rm ${dockerprefixer}_devdb`,
-        "Itemize Docker Contained PGSQL Database",
       );
     } catch (err) {
     }
@@ -320,16 +377,27 @@ export async function stop(version: string) {
 
           if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:") {
             try {
+              console.log(colors.yellow("Itemize is stopping a potential kibana container"));
+              await execAsync(
+                `docker stop ${dockerprefixer}_devkibana${suffixer[eVersion]}`,
+              );
+        
+              console.log(colors.yellow("Now we attempt to stop the potential kibana docker container"));
+              await execAsync(
+                `docker rm ${dockerprefixer}_devkibana${suffixer[eVersion]}`,
+              );
+            } catch (err) {
+            }
+            
+            try {
               console.log(colors.yellow("Please allow Itemize to stop the Elastic docker container"));
-              await execSudo(
+              await execAsync(
                 `docker stop ${dockerprefixer}_devedb${suffixer[eVersion]}`,
-                "Itemize Docker Contained Elasticsearch Database",
               );
 
               console.log(colors.yellow("Now we attempt to remove the Elastic docker container"));
-              await execSudo(
+              await execAsync(
                 `docker rm ${dockerprefixer}_devedb${suffixer[eVersion]}`,
-                "Itemize Docker Contained Elasticsearch Database",
               );
             } catch (err) {
             }
@@ -349,26 +417,23 @@ export async function stop(version: string) {
     !redisConfig.global.path
   ) {
     try {
-      console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));
-      await execSudo(
+      console.log(colors.yellow("Itemize is stopping the REDIS docker container"));
+      await execAsync(
         `docker stop ${dockerprefixer}_devredis`,
-        "Itemize Docker Contained REDIS Database",
       );
 
       console.log(colors.yellow("Now we attempt to remove the REDIS docker container"));
-      await execSudo(
+      await execAsync(
         `docker rm ${dockerprefixer}_devredis`,
-        "Itemize Docker Contained REDIS Database",
       );
     } catch (err) {
     }
   }
 
   try {
-    console.log(colors.yellow("Please allow Itemize to remove the development network"));
-    await execSudo(
+    console.log(colors.yellow("Itemize is removing the development network"));
+    await execAsync(
       `docker network rm ${dockerprefixer}_network`,
-      "Itemize Docker Network",
     );
   } catch (err) {
   }

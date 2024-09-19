@@ -20,6 +20,6 @@ export default {
   "build-data": "itemize build-data",
   "build-database": "itemize build-database",
   "get-deployable": "itemize get-deployable",
-  "start-dev-environment": "itemize start-dev-environment",
-  "stop-dev-environment": "itemize stop-dev-environment",
+  "start-dev-environment": "NODE_TLS_REJECT_UNAUTHORIZED=0 itemize start-dev-environment",
+  "stop-dev-environment": "NODE_TLS_REJECT_UNAUTHORIZED=0 itemize stop-dev-environment",
 }

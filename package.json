@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.331",
+  "version": "0.0.332",
   "description": "Itemize",
   "bin": {
     "itemize": "index.js"
@@ -71,7 +71,6 @@
     "stripe": "^8.160.0",
     "stylis": "^4.1.3",
     "stylis-plugin-rtl": "^2.1.1",
-    "sudo-prompt": "^9.2.1",
     "svgo": "^3.1.0",
     "tarn": "^3.0.1",
     "typescript": "^5.3.3",
