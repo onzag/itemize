@@ -1,6 +1,6 @@
-import type { SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
+import type { QueryDslQueryContainer, SearchRequest, SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { ServiceProviderType } from ".";
-import AnalyticsProvider, { ITrackOptions } from "./base/AnalyticsProvider";
+import AnalyticsProvider, { IResolveAggregationArg, ITrackOptions } from "./base/AnalyticsProvider";
 import { ElasticQueryBuilder } from "../elastic";
 
 export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQueryBuilder, SearchResponse> {
@@ -111,4 +111,144 @@ export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQuer
     }
   }
 
+  public async resolveAggregation(arg: IResolveAggregationArg): Promise<any> {
+    const elasticQuery: SearchRequest = {
+      index: "track_" + arg.trackId,
+      query: {
+        bool: {
+          filter: [],
+        },
+      },
+      size: 0,
+      aggs: {
+        weight: {
+          stats: {
+            field: "weight"
+          }
+        },
+        context: {
+          terms: {
+            field: "context",
+          }
+        },
+      }
+    };
+
+    if (arg.contextToLimit) {
+      if (typeof arg.contextToLimit === "string")
+        (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+          term: {
+            context: arg.contextToLimit,
+          }
+        })
+    } else {
+      (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+        terms: {
+          context: arg.contextToLimit,
+        }
+      })
+    }
+
+    if (arg.userToLimit) {
+      if (typeof arg.userToLimit === "string")
+        (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+          term: {
+            userid: arg.userToLimit,
+          }
+        })
+    } else {
+      (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+        terms: {
+          userid: arg.userToLimit,
+        }
+      });
+    }
+
+    if (arg.dataToLimit && Object.keys(arg.dataToLimit).length) {
+      const dataKeys = Object.keys(arg.dataToLimit);
+
+      dataKeys.forEach((k) => {
+        const limitValue = arg.dataToLimit[k];
+
+        if (Array.isArray(limitValue)) {
+          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+            terms: {
+              ["data." + k + ".keyword"]: limitValue,
+            }
+          });
+        } else if (typeof limitValue === "object") {
+          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+            range: {
+              ["data." + k]: limitValue,
+            }
+          });
+        } else if (typeof limitValue === "string") {
+          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+            term: {
+              ["data." + k + ".keyword"]: limitValue,
+            }
+          });
+        } else if (typeof limitValue === "boolean" || typeof limitValue === "number") {
+          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+            term: {
+              ["data." + k]: limitValue,
+            }
+          });
+        }
+      });
+    }
+
+    if (arg.dataAggregator) {
+      const aggKeys = Object.keys(arg.dataAggregator);
+      if (aggKeys && aggKeys.length) {
+        aggKeys.forEach((k) => {
+          const aggValue = arg.dataAggregator[k];
+          if (aggValue.method === "extended-stats") {
+            elasticQuery.aggs["data." + k] = {
+              extended_stats: {
+                field: "data." + k,
+              }
+            }
+          } else if (aggValue.method === "stats") {
+            elasticQuery.aggs["data." + k] = {
+              stats: {
+                field: "data." + k,
+              }
+            }
+          } else if (aggValue.method === "keyword-terms" || aggValue.method === "terms") {
+            elasticQuery.aggs["data." + k] = {
+              terms: {
+                field: "data." + k + (aggValue.method === "keyword-terms" ? ".keyword" : ""),
+              }
+            }
+          }
+        });
+      }
+    }
+
+    if (arg.timeslices) {
+      // make a shallow copy
+      const currentAggs = Object.assign({}, elasticQuery.aggs);
+
+      elasticQuery.aggs.histogram = {
+        date_histogram: {
+          field: "date",
+          ...arg.timeslices,
+          min_doc_count: 1,
+        },
+
+        aggs: currentAggs,
+      }
+
+      if (arg.timeslicesFrom || arg.timeslicesTo) {
+        elasticQuery.aggs.histogram.date_histogram.hard_bounds = {
+          min: arg.timeslicesFrom || null,
+          max: arg.timeslicesTo || "now",
+        }
+      }
+    }
+
+    const rs = await this.elasticClient.search(elasticQuery);
+    return rs;
+  }
 }

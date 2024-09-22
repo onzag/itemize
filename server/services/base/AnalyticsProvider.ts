@@ -16,8 +16,13 @@ export function makeIdOutOf(str: string) {
   return "ANON" + uuidv5(str, NAMESPACE).replace(/-/g, "");
 }
 
-interface INumericRangeDataLimiter {gte?: number; ge?: number, lte?: number; le?: number};
+interface INumericRangeDataLimiter { gte?: number; ge?: number, lte?: number; le?: number };
 export interface IBasicDataLimiter { [key: string]: string | boolean | number | Array<string> | INumericRangeDataLimiter };
+
+interface ITimeslicesDefinition {
+  fixed_interval?: string;
+  calendar_interval?: AggregationsCalendarInterval;
+};
 
 export interface IDataAggregator {
   [dataKey: string]: {
@@ -26,10 +31,25 @@ export interface IDataAggregator {
      * keyword-terms uses the keyword of a field in order to create a list on how many times this was found
      * terms is the same as keyword-terms but it will not use the keyword field, usually a matter of performance, keyword is better, terms works for boolean
      * stats used for numeric values
-     * extended_stats used for numeric values as well and has more stats
+     * extended-stats used for numeric values as well and has more stats
+     * 
+     * These are the options for when elastic-analytics the default provider is used
+     * if you use a different provider check for their options
      */
-    method: "keyword-terms" | "terms" | "stats" | "extended-stats";
+    method: string;
   }
+}
+
+export interface IResolveAggregationArg {
+  trackId: string;
+  req: Express.Request;
+  contextToLimit?: string | string[];
+  userToLimit?: string | string[];
+  dataToLimit?: IBasicDataLimiter;
+  dataAggregator: IDataAggregator;
+  timeslices?: ITimeslicesDefinition;
+  timeslicesFrom?: string;
+  timeslicesTo?: string;
 }
 
 export interface IExposeAnalyticsOptionsNoTrack {
@@ -88,10 +108,7 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-datehistogram-aggregation.html
    * and check fixed_interval or calendar_interval values
    */
-  timeslices?: {
-    fixed_interval?: string;
-    calendar_interval?: AggregationsCalendarInterval;
-  };
+  timeslices?: ITimeslicesDefinition;
   /**
    * You need to specify a data agregator even if an empty object {} this means you send no data
    * you should specify it to know that you are not providing data otherwise
@@ -732,6 +749,16 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
   }
 
   /**
+   * Resolve an aggregation and return a json object
+   * that wil be provided to the client
+   * 
+   * @param arg 
+   */
+  public async resolveAggregation(arg: IResolveAggregationArg): Promise<any> {
+
+  }
+
+  /**
    * should create a track and keep track of it
    * 
    * @param track 
@@ -1049,131 +1076,11 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
         }
       }
 
-      const trackInfo = this.tracks[endpointAtPath.trackId];
+      const contextToLimit = endpointAtPath.limitToContext ? await endpointAtPath.limitToContext(userData.info, appData, req) : null;
+      const userToLimit = endpointAtPath.limitToUser ? await endpointAtPath.limitToUser(userData.info, appData, req) : null;
+      const dataToLimit = endpointAtPath.limitToData ? await endpointAtPath.limitToData(userData.info, appData, req) : null;
 
-      let elasticQuery: SearchRequest = {
-        query: {
-          bool: {
-            filter: [],
-          },
-        },
-        size: 0,
-        aggs: {
-          weight: {
-            stats: {
-              field: "weight"
-            }
-          },
-          context: {
-            terms: {
-              field: "context",
-            }
-          },
-        }
-      };
-
-      if (endpointAtPath.limitToContext) {
-        const contextToLimit = await endpointAtPath.limitToContext(userData.info, appData, req);
-        if (contextToLimit) {
-          if (typeof contextToLimit === "string")
-            (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-              term: {
-                context: contextToLimit,
-              }
-            })
-        } else {
-          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-            terms: {
-              context: contextToLimit,
-            }
-          })
-        }
-      }
-
-      if (endpointAtPath.limitToUser) {
-        const userToLimit = await endpointAtPath.limitToUser(userData.info, appData, req);
-        if (userToLimit) {
-          if (typeof userToLimit === "string")
-            (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-              term: {
-                userid: userToLimit,
-              }
-            })
-        } else {
-          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-            terms: {
-              userid: userToLimit,
-            }
-          });
-        }
-      }
-
-      if (endpointAtPath.limitToData) {
-        const dataToLimit = await endpointAtPath.limitToData(userData.info, appData, req);
-        if (dataToLimit && Object.keys(dataToLimit).length) {
-          const dataKeys = Object.keys(dataToLimit);
-
-          dataKeys.forEach((k) => {
-            const limitValue = dataToLimit[k];
-
-            if (Array.isArray(limitValue)) {
-              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-                terms: {
-                  ["data." + k + ".keyword"]: limitValue,
-                }
-              });
-            } else if (typeof limitValue === "object") {
-              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-                range: {
-                  ["data." + k]: limitValue,
-                }
-              });
-            } else if (typeof limitValue === "string") {
-              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-                term: {
-                  ["data." + k + ".keyword"]: limitValue,
-                }
-              });
-            } else if (typeof limitValue === "boolean" || typeof limitValue === "number") {
-              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-                term: {
-                  ["data." + k]: limitValue,
-                }
-              });
-            }
-          });
-        }
-      }
-
-      if (endpointAtPath.dataAggregator) {
-        const aggKeys = Object.keys(endpointAtPath.dataAggregator);
-        if (aggKeys && aggKeys.length) {
-          aggKeys.forEach((k) => {
-            const aggValue = endpointAtPath.dataAggregator[k];
-            if (aggValue.method === "extended-stats") {
-              elasticQuery.aggs["data." + k] = {
-                extended_stats: {
-                  field: "data." + k,
-                }
-              }
-            } else if (aggValue.method === "stats") {
-              elasticQuery.aggs["data." + k] = {
-                stats: {
-                  field: "data." + k,
-                }
-              }
-            } else if (aggValue.method === "keyword-terms" || aggValue.method === "terms") {
-              elasticQuery.aggs["data." + k] = {
-                terms: {
-                  field: "data." + k + (aggValue.method === "keyword-terms" ? ".keyword" : ""),
-                }
-              }
-            }
-          });
-        }
-      }
-
-      if (endpointAtPath.timeslices) {
+      try {
         const from = req.query.from as string;
         const to = req.query.to as string;
 
@@ -1187,24 +1094,31 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
           actualTo = to;
         }
 
-        // make a shallow copy
-        const currentAggs = Object.assign({}, elasticQuery.aggs);
-
-        elasticQuery.aggs.histogram = {
-          date_histogram: {
-            field: "date",
-            ...endpointAtPath.timeslices,
-            min_doc_count: 1,
-          },
-
-          aggs: currentAggs,
-        }
-
-        if (actualFrom || actualTo) {
-          elasticQuery.aggs.histogram.date_histogram.hard_bounds = {
-            min: actualFrom || null,
-            max: actualTo || "now",
-          }
+        const result = await this.resolveAggregation({
+          trackId: req.params.track,
+          req,
+          contextToLimit,
+          userToLimit,
+          dataToLimit,
+          dataAggregator: endpointAtPath.dataAggregator,
+          timeslices: endpointAtPath.timeslices,
+          timeslicesFrom: actualFrom,
+          timeslicesTo: actualTo,
+        });
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        res.status(200);
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        if (err instanceof EndpointError) {
+          res.status(400);
+          res.end(JSON.stringify(err.data));
+        } else {
+          res.status(500);
+          res.end(JSON.stringify({
+            code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+            message: "Internal server error",
+          }));
         }
       }
     });
