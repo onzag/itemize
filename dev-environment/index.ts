@@ -35,22 +35,27 @@ const pwd = process.cwd();
 
 function wait(n: number) {
   return new Promise((r) => {
-    setTimeout(r, n*1000);
+    setTimeout(r, n * 1000);
   });
 }
 
 async function waitForElastic(port: string) {
   await wait(10);
-  await httpRequest({
-    isHttps: true,
-    host: "localhost",
-    port,
-    method: "GET",
-    path: "/_cluster/health?wait_for_status=yellow&timeout=60s",
-    maxAttempts: 3,
-    maxAttemptsRetryTime: 5000,
-    returnNonOk: true,
-  });
+  while (true) {
+    try {
+      await httpRequest({
+        isHttps: true,
+        host: "localhost",
+        port,
+        method: "GET",
+        path: "/_cluster/health?wait_for_status=yellow&timeout=60s",
+        maxAttempts: 3,
+        maxAttemptsRetryTime: 5000,
+        returnNonOk: true,
+      });
+      break;
+    } catch (err) { }
+  }
   await wait(10);
 }
 
@@ -211,7 +216,7 @@ export async function start(version: string, kibana?: "with-kibana") {
               console.log(colors.green("Done"));
 
               console.log(colors.yellow("The execution might take a while, please wait..."));
-          
+
               try {
                 await execAsync(
                   `docker exec -t ${dockerprefixer}_devedb${suffixer[eVersion]} /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana`,
@@ -221,7 +226,7 @@ export async function start(version: string, kibana?: "with-kibana") {
                 console.log(colors.yellow("Something went wrong when creating the enrollment token..."));
                 throw err;
               }
-          
+
               try {
                 await execAsync(
                   `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devkibana${suffixer[eVersion]} ` +
@@ -237,10 +242,11 @@ export async function start(version: string, kibana?: "with-kibana") {
               }
 
               try {
+                await wait(5000);
                 await execAsync(
                   `docker logs ${dockerprefixer}_devkibana${suffixer[eVersion]}`,
                 );
-              } catch (err) {}
+              } catch (err) { }
             }
           } else if (hostname !== "localhost" && hostname !== "127.0.0.1") {
             console.log(colors.red("Development environment " + eVersion + " database host is connecting to ") + hostname);
@@ -381,14 +387,14 @@ export async function stop(version: string) {
               await execAsync(
                 `docker stop ${dockerprefixer}_devkibana${suffixer[eVersion]}`,
               );
-        
+
               console.log(colors.yellow("Now we attempt to stop the potential kibana docker container"));
               await execAsync(
                 `docker rm ${dockerprefixer}_devkibana${suffixer[eVersion]}`,
               );
             } catch (err) {
             }
-            
+
             try {
               console.log(colors.yellow("Please allow Itemize to stop the Elastic docker container"));
               await execAsync(

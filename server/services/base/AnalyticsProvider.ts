@@ -9,13 +9,15 @@ import { EndpointError } from "../../../base/errors";
 import { ENDPOINT_ERRORS, GUEST_METAROLE } from "../../../constants";
 import path from "path";
 import { jwtVerifyRequest } from "../../token";
+import { AggregationsCalendarInterval, QueryDslQueryContainer, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 
 const NAMESPACE = "23ab4609-df49-5fdf-921b-4714adb284f3";
 export function makeIdOutOf(str: string) {
   return "ANON" + uuidv5(str, NAMESPACE).replace(/-/g, "");
 }
 
-export interface IBasicDataLimiter { [key: string]: string | boolean | number };
+interface INumericRangeDataLimiter {gte?: number; ge?: number, lte?: number; le?: number};
+export interface IBasicDataLimiter { [key: string]: string | boolean | number | Array<string> | INumericRangeDataLimiter };
 
 export interface IDataAggregator {
   [dataKey: string]: {
@@ -26,7 +28,7 @@ export interface IDataAggregator {
      * stats used for numeric values
      * extended_stats used for numeric values as well and has more stats
      */
-    method: "keyword-terms" | "terms" | "stats" | "extended_stats";
+    method: "keyword-terms" | "terms" | "stats" | "extended-stats";
   }
 }
 
@@ -81,8 +83,15 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * based on these slices
    * 
    * setting timeslices will also add a "from" and "to" querystring to the endpoint
+   * 
+   * the timeslices should be written in the elasticsearch format for its fixed_interval check the documentation for
+   * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-datehistogram-aggregation.html
+   * and check fixed_interval or calendar_interval values
    */
-  timeslices?: number;
+  timeslices?: {
+    fixed_interval?: string;
+    calendar_interval?: AggregationsCalendarInterval;
+  };
   /**
    * You need to specify a data agregator even if an empty object {} this means you send no data
    * you should specify it to know that you are not providing data otherwise
@@ -1037,6 +1046,165 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
             message: "This resource is not accessible by the given user",
           }));
           return;
+        }
+      }
+
+      const trackInfo = this.tracks[endpointAtPath.trackId];
+
+      let elasticQuery: SearchRequest = {
+        query: {
+          bool: {
+            filter: [],
+          },
+        },
+        size: 0,
+        aggs: {
+          weight: {
+            stats: {
+              field: "weight"
+            }
+          },
+          context: {
+            terms: {
+              field: "context",
+            }
+          },
+        }
+      };
+
+      if (endpointAtPath.limitToContext) {
+        const contextToLimit = await endpointAtPath.limitToContext(userData.info, appData, req);
+        if (contextToLimit) {
+          if (typeof contextToLimit === "string")
+            (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+              term: {
+                context: contextToLimit,
+              }
+            })
+        } else {
+          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+            terms: {
+              context: contextToLimit,
+            }
+          })
+        }
+      }
+
+      if (endpointAtPath.limitToUser) {
+        const userToLimit = await endpointAtPath.limitToUser(userData.info, appData, req);
+        if (userToLimit) {
+          if (typeof userToLimit === "string")
+            (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+              term: {
+                userid: userToLimit,
+              }
+            })
+        } else {
+          (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+            terms: {
+              userid: userToLimit,
+            }
+          });
+        }
+      }
+
+      if (endpointAtPath.limitToData) {
+        const dataToLimit = await endpointAtPath.limitToData(userData.info, appData, req);
+        if (dataToLimit && Object.keys(dataToLimit).length) {
+          const dataKeys = Object.keys(dataToLimit);
+
+          dataKeys.forEach((k) => {
+            const limitValue = dataToLimit[k];
+
+            if (Array.isArray(limitValue)) {
+              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+                terms: {
+                  ["data." + k + ".keyword"]: limitValue,
+                }
+              });
+            } else if (typeof limitValue === "object") {
+              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+                range: {
+                  ["data." + k]: limitValue,
+                }
+              });
+            } else if (typeof limitValue === "string") {
+              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+                term: {
+                  ["data." + k + ".keyword"]: limitValue,
+                }
+              });
+            } else if (typeof limitValue === "boolean" || typeof limitValue === "number") {
+              (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+                term: {
+                  ["data." + k]: limitValue,
+                }
+              });
+            }
+          });
+        }
+      }
+
+      if (endpointAtPath.dataAggregator) {
+        const aggKeys = Object.keys(endpointAtPath.dataAggregator);
+        if (aggKeys && aggKeys.length) {
+          aggKeys.forEach((k) => {
+            const aggValue = endpointAtPath.dataAggregator[k];
+            if (aggValue.method === "extended-stats") {
+              elasticQuery.aggs["data." + k] = {
+                extended_stats: {
+                  field: "data." + k,
+                }
+              }
+            } else if (aggValue.method === "stats") {
+              elasticQuery.aggs["data." + k] = {
+                stats: {
+                  field: "data." + k,
+                }
+              }
+            } else if (aggValue.method === "keyword-terms" || aggValue.method === "terms") {
+              elasticQuery.aggs["data." + k] = {
+                terms: {
+                  field: "data." + k + (aggValue.method === "keyword-terms" ? ".keyword" : ""),
+                }
+              }
+            }
+          });
+        }
+      }
+
+      if (endpointAtPath.timeslices) {
+        const from = req.query.from as string;
+        const to = req.query.to as string;
+
+        let actualFrom: string = null;
+        if (from && typeof from === "string") {
+          actualFrom = from;
+        }
+
+        let actualTo: string = null;
+        if (to && typeof to === "string") {
+          actualTo = to;
+        }
+
+        // make a shallow copy
+        const currentAggs = Object.assign({}, elasticQuery.aggs);
+
+        elasticQuery.aggs.histogram = {
+          date_histogram: {
+            field: "date",
+            ...endpointAtPath.timeslices,
+            min_doc_count: 1,
+          },
+
+          aggs: currentAggs,
+        }
+
+        if (actualFrom || actualTo) {
+          elasticQuery.aggs.histogram.date_histogram.hard_bounds = {
+            min: actualFrom || null,
+            max: actualTo || "now",
+          }
         }
       }
     });
