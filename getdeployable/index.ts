@@ -55,7 +55,8 @@ export default async function build(version: string) {
   }
 
   const standardConfig: IConfigRawJSONDataType = await readConfigFile("index.json");
-  const sensitiveConfig: ISensitiveConfigRawJSONDataType = await readConfigFile("index.json");
+  const sensitiveConfig: ISensitiveConfigRawJSONDataType = await readConfigFile(version === "development" ?
+    "index.sensitive.json" : "index.production.sensitive.json");
 
   console.log("calling " + colors.green("build-data"));
   await buildData();

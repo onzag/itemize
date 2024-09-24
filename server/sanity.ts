@@ -172,8 +172,10 @@ export async function checkClusterSanityAfterListen(
         returnNonOk: true,
       });
 
+      const ownUuid = await storageProvider.getOwnStorageUuid();
+
       if (uuidFromServer.response.statusCode === 200) {
-        if (uuidFromServer.data !== storageProvider.getOwnStorageUuid()) {
+        if (uuidFromServer.data !== ownUuid) {
           logger.error({
             message: "Cluster response of the storage id is mismatching, this is not the same cluster environment as they are not using the same storage",
             methodName: "checkClusterSanity",
@@ -184,7 +186,7 @@ export async function checkClusterSanityAfterListen(
               buildnumber,
               clusterHostname,
               uuidFromServer: uuidFromServer.data,
-              ownUuid: storageProvider.getOwnStorageUuid(),
+              ownUuid: ownUuid,
             }
           });
           return false;
@@ -201,7 +203,7 @@ export async function checkClusterSanityAfterListen(
             buildnumber,
             clusterHostname,
             uuidFromServer: uuidFromServer.data,
-            ownUuid: storageProvider.getOwnStorageUuid(),
+            ownUuid,
           }
         });
         await wait(2000);

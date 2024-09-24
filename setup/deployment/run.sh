@@ -177,7 +177,15 @@ else
             echo "Initializing service: $servicenamenoext";
 
             if [ -e "${SYSTEMD_FOLDER}/${servicenamenoext}.service" ]; then
-                echo "Service for $servicenamenoext already exists, reenabling and restarting";
+                # check that the config files used are the same ones
+                if cmp --silent -- "$SYSTEMD_FOLDER/${servicenamenoext}.service" "./systemd-processed/${servicenamenoext}.service" ; then
+                    echo "Service description is equal, no changes required";
+                else
+                    echo "Service description has changed, updating with new version";
+                    cp "./systemd-processed/${servicenamenoext}.service" "$SYSTEMD_FOLDER/${servicenamenoext}.service";
+                fi
+                
+                echo "Service for $servicenamenoext being enabled and restarted";
                 systemctl enable "$servicename";
                 systemctl restart "$servicename";
             else
