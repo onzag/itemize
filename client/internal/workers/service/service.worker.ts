@@ -35,15 +35,40 @@ const urlsToCache = [
 ];
 let CACHE_NAME = "ITEMIZEV" + buildnumber;
 
+async function deleteAllOldCaches(): Promise<boolean[]> {
+  const names = await caches.keys();
+  return await Promise.all(names.map((name) => {
+    if (name.startsWith("ITEMIZEV") && name !== CACHE_NAME) {
+      return caches.delete(name).catch((err) => {
+        console.error(`Failed to delete old cache ${name}`);
+        if (err.message) {
+          console.error(err.message);
+        }
+        return false;
+      });
+    }
+  }));
+}
+
+async function addAllToCache(): Promise<void> {
+  const cache = await caches.open(CACHE_NAME);
+  await Promise.all(urlsToCache.map(fileUrl => {
+    cache.add(fileUrl).catch(err => {
+      console.error(`Failed to load ${fileUrl} into the cache`);
+      if (err.message) {
+        console.error(err.message);
+      }
+    });
+  }));
+}
+
 self.addEventListener("install", (event: any) => {
   console.log("SERVICE WORKER INSTALLING");
+
   (self as any).skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(urlsToCache);
-      }),
-  );
+
+  event.waitUntil(addAllToCache());
+  event.waitUntil(deleteAllOldCaches());
 });
 
 self.addEventListener("fetch", (event: any) => {
@@ -161,7 +186,7 @@ self.addEventListener("fetch", (event: any) => {
           // we clone the response stream
           const clonedResponse = netWorkResponse.clone();
           // let's parse the result
-          const serverProvidedBuildNumber = (await clonedResponse.text()).trim();
+          const serverProvidedBuildNumber = await clonedResponse.text();
           // if build numbers do not match
           if (
             // the server build number does not match the app
@@ -176,17 +201,32 @@ self.addEventListener("fetch", (event: any) => {
             // is if there was no network in which case we don't really have a 200 status
             // as our fetch will simply crash
           ) {
+            const REAL_CACHE_NAME = "ITEMIZEV" + serverProvidedBuildNumber;
             console.log(
-              "Service worker wiping itself due to buildnumber mismatch",
+              "Service worker wiping caches due to buildnumber mismatch",
               serverProvidedBuildNumber,
               currentAppBuildNumber,
               currentSwBuildNumber,
             );
-            await caches.delete(CACHE_NAME);
+            if (REAL_CACHE_NAME !== CACHE_NAME) {
+              console.log("Wiping", CACHE_NAME);
+              await caches.delete(CACHE_NAME);
+            }
+            const currentAppCache = "ITEMIZEV" + currentAppBuildNumber;
+            if (currentAppCache !== CACHE_NAME) {
+              console.log("Wiping", currentAppCache);
+              await caches.delete(currentAppCache);
+            }
 
             // We will update the cache name in case anything else is added to it
             // and the user keeps using this and not updating the application as requested
-            CACHE_NAME = "ITEMIZEV" + serverProvidedBuildNumber;
+            CACHE_NAME = REAL_CACHE_NAME;
+            // For good measure we want to kill old caches
+            // I keep having issues with the caches not being removed
+            // adding a lot of redundancy, this should have happened during the install
+            // event but who knows if the old one is still writting to the cache and revives it
+            deleteAllOldCaches();
+
 
             // this is due to an error in the past, now that a request to the page uses the network
             // first strategy it will always receive an updated buildnumber and when the client requests

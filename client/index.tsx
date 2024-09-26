@@ -26,6 +26,7 @@ import Module from "../base/Root/Module";
 import { IGlobalTestingType, setupTesting } from "./internal/testing";
 import type { ISSRServerModeInfo } from "../server/ssr";
 import { destroyDestructionMarkers, destroySearchDestructionMarkers } from "./internal/app/destruction-markers";
+import { onControllerChangeCall } from "./internal/workers/service";
 
 /**
  * when cookies expire
@@ -497,9 +498,10 @@ export async function initializeItemizeApp(
 
       document.body.appendChild(rotatingElement);
 
-      window.navigator.serviceWorker.oncontrollerchange = ((self: any, ev: any) => {
+      // this should make it reload once the controller changes
+      onControllerChangeCall(() => {
         (location as any).reload(true);
-      }) as any;
+      });
 
       // just in case
       setTimeout(() => {
