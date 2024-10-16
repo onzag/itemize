@@ -3,6 +3,78 @@ import { ServiceProviderType } from ".";
 import AnalyticsProvider, { IResolveAggregationArg, ITrackOptions } from "./base/AnalyticsProvider";
 import { ElasticQueryBuilder } from "../elastic";
 
+export interface IElasticAnalyticsTermStats {
+  leftout_count: number;
+  members: {
+    [key: string]: IElasticAnalyticsNumericStat;
+  };
+}
+
+export interface IElasticAnalyticsNumericStat {
+  count: number;
+  min: number;
+  max: number;
+  avg: number;
+  sum: number;
+  subcategories?: {
+    [by: string]: {
+      [key: string]: IElasticAnalyticsNumericStat;
+    };
+  }
+}
+
+export interface IElasticAnalyticsExtendedNumericStat extends IElasticAnalyticsNumericStat {
+  sum_of_squares: number;
+  variance: number;
+  variance_population: number;
+  variance_sampling: number;
+  std_deviation: number;
+  std_deviation_population: number;
+  std_deviation_sampling: number;
+  std_deviation_bounds: {
+    upper: number;
+    lower: number;
+    upper_population: number;
+    lower_population: number;
+    upper_sampling: number;
+    lower_sampling: number;
+  }
+}
+
+export interface IElasticAnalyticsResponseBase {
+  count: number;
+  stats: {
+    context: IElasticAnalyticsTermStats,
+    users?: IElasticAnalyticsTermStats,
+    weight: IElasticAnalyticsNumericStat,
+  };
+  dataStats: {
+    [key: string]: IElasticAnalyticsTermStats | IElasticAnalyticsNumericStat | IElasticAnalyticsExtendedNumericStat;
+  };
+}
+
+export interface IElasticAnalyticsResponseHistogram extends IElasticAnalyticsResponseBase {
+  date: string;
+  unixdate: number;
+}
+
+export interface IElasticAnalyticsResponse extends IElasticAnalyticsResponseBase {
+  histogram: Array<IElasticAnalyticsResponseHistogram>;
+}
+
+function unwrapTermsStats(stat: any): IElasticAnalyticsTermStats {
+  const final: IElasticAnalyticsTermStats = {
+    leftout_count: stat.sum_other_doc_count,
+    members: {},
+  };
+
+  stat.buckets.forEach((bucket) => {
+    final.members[bucket.key] = bucket.weight;
+  });
+
+  return final;
+}
+
 export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQueryBuilder, SearchResponse> {
   public static getType() {
     return ServiceProviderType.LOCAL;
@@ -123,45 +195,73 @@ export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQuer
       aggs: {
         weight: {
           stats: {
-            field: "weight"
+            field: "weight",
           }
         },
         context: {
           terms: {
             field: "context",
-          }
+            size: arg.contextMaxSize || 300,
+          },
+          aggs: {
+            weight: {
+              stats: {
+                field: "weight",
+              },
+            },
+          },
         },
       }
     };
 
+    if (arg.aggregateUsers) {
+      elasticQuery.aggs.users = {
+        terms: {
+          field: "userid",
+          size: arg.aggregateUsersMaxSize || 300,
+        },
+        aggs: {
+          weight: {
+            stats: {
+              field: "weight",
+            },
+          },
+        },
+      };
+      // TODO automatically add categories by the data aggregator
+      elasticQuery.aggs.context.aggs.users = elasticQuery.aggs.users;
+    }
+
     if (arg.contextToLimit) {
-      if (typeof arg.contextToLimit === "string")
+      if (typeof arg.contextToLimit === "string") {
         (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
           term: {
             context: arg.contextToLimit,
           }
         })
-    } else {
-      (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-        terms: {
-          context: arg.contextToLimit,
-        }
-      })
+      } else {
+        (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+          terms: {
+            context: arg.contextToLimit,
+          }
+        })
+      }
     }
 
     if (arg.userToLimit) {
-      if (typeof arg.userToLimit === "string")
+      if (typeof arg.userToLimit === "string") {
         (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
           term: {
             userid: arg.userToLimit,
           }
         })
-    } else {
-      (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
-        terms: {
-          userid: arg.userToLimit,
-        }
-      });
+      } else {
+        (elasticQuery.query.bool.filter as QueryDslQueryContainer[]).push({
+          terms: {
+            userid: arg.userToLimit,
+          }
+        });
+      }
     }
 
     if (arg.dataToLimit && Object.keys(arg.dataToLimit).length) {
@@ -198,6 +298,7 @@ export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQuer
       });
     }
 
+    // TODO add subcategories query
     if (arg.dataAggregator) {
       const aggKeys = Object.keys(arg.dataAggregator);
       if (aggKeys && aggKeys.length) {
@@ -219,7 +320,15 @@ export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQuer
             elasticQuery.aggs["data." + k] = {
               terms: {
                 field: "data." + k + (aggValue.method === "keyword-terms" ? ".keyword" : ""),
-              }
+                size: aggValue.size || 300,
+              },
+              aggs: {
+                weight: {
+                  stats: {
+                    field: "weight",
+                  },
+                },
+              },
             }
           }
         });
@@ -248,7 +357,80 @@ export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQuer
       }
     }
 
+    if (process.env.NODE_ENV === "development") {
+      console.log(JSON.stringify(elasticQuery, null, 2));
+    }
+
     const rs = await this.elasticClient.search(elasticQuery);
-    return rs;
+
+    const response: IElasticAnalyticsResponse = {
+      count: (rs.hits.total as any).value,
+      histogram: null,
+      stats: {
+        context: unwrapTermsStats(rs.aggregations.context),
+        weight: rs.aggregations.weight as any,
+      },
+      dataStats: {
+        
+      },
+    };
+
+    if (arg.aggregateUsers) {
+      response.stats.users = unwrapTermsStats(rs.aggregations.users);
+    }
+
+    // TODO extract subcategories
+    if (arg.dataAggregator) {
+      const aggKeys = Object.keys(arg.dataAggregator);
+      if (aggKeys && aggKeys.length) {
+        aggKeys.forEach((k) => {
+          const aggValue = arg.dataAggregator[k];
+          if (aggValue.method === "extended-stats" || aggValue.method === "stats") {
+            response.dataStats[k] = rs.aggregations["data." + k] as any;
+          } else if (aggValue.method === "keyword-terms" || aggValue.method === "terms") {
+            response.dataStats[k] = unwrapTermsStats(rs.aggregations["data." + k] as any);
+          }
+        });
+      }
+    }
+
+    if (arg.timeslices) {
+      response.histogram = (rs.aggregations.histogram as any).buckets.map((b) => {
+        const rsPoint: IElasticAnalyticsResponseHistogram = {
+          date: b.key_as_string,
+          unixdate: b.key,
+          count: b.doc_count,
+          stats: {
+            context: unwrapTermsStats(b.context),
+            weight: b.weight as any,
+          },
+          dataStats: {
+        
+          },
+        };
+
+        if (arg.aggregateUsers) {
+          rsPoint.stats.users = unwrapTermsStats(b.users);
+        }
+
+        if (arg.dataAggregator) {
+          const aggKeys = Object.keys(arg.dataAggregator);
+          if (aggKeys && aggKeys.length) {
+            aggKeys.forEach((k) => {
+              const aggValue = arg.dataAggregator[k];
+              if (aggValue.method === "extended-stats" || aggValue.method === "stats") {
+                rsPoint.dataStats[k] = b["data." + k] as any;
+              } else if (aggValue.method === "keyword-terms" || aggValue.method === "terms") {
+                rsPoint.dataStats[k] = unwrapTermsStats(b["data." + k] as any);
+              }
+            });
+          }
+        }
+
+        return rsPoint;
+      });
+    }
+
+    return response;
   }
 }

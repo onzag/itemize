@@ -6,10 +6,10 @@ import { IServerSideTokenDataType } from "../../resolvers/basic";
 import { ICustomListenerInfo } from "../../listener";
 import uuidv5 from "uuid/v5";
 import { EndpointError } from "../../../base/errors";
-import { ENDPOINT_ERRORS, GUEST_METAROLE } from "../../../constants";
+import { ADMIN_ROLE, ENDPOINT_ERRORS, GUEST_METAROLE } from "../../../constants";
 import path from "path";
 import { jwtVerifyRequest } from "../../token";
-import { AggregationsCalendarInterval, QueryDslQueryContainer, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
+import { AggregationsCalendarInterval } from "@elastic/elasticsearch/lib/api/types";
 
 const NAMESPACE = "23ab4609-df49-5fdf-921b-4714adb284f3";
 export function makeIdOutOf(str: string) {
@@ -37,6 +37,16 @@ export interface IDataAggregator {
      * if you use a different provider check for their options
      */
     method: string;
+    /**
+     * Perform a subcategorization operation
+     * TODO
+     */
+    subcategorizeBy?: IDataAggregator[];
+    /**
+     * a limiter for methods that have a size limitation, such a terms
+     * the default size is 300
+     */
+    size?: number;
   }
 }
 
@@ -50,11 +60,14 @@ export interface IResolveAggregationArg {
   timeslices?: ITimeslicesDefinition;
   timeslicesFrom?: string;
   timeslicesTo?: string;
+  aggregateUsers?: boolean;
+  aggregateUsersMaxSize?: number;
+  contextMaxSize?: number;
 }
 
 export interface IExposeAnalyticsOptionsNoTrack {
   /**
-   * Endpoint, will exist at /rest/analytics/${trackid}/${endpoint}
+   * Endpoint, will exist at /rest/service/stats/${endpoint}
    */
   endpoint: string;
   /**
@@ -114,6 +127,20 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * you should specify it to know that you are not providing data otherwise
    */
   dataAggregator: IDataAggregator;
+  /**
+   * Aggregate users and how commonly they appear
+   */
+  aggregateUsers?: boolean;
+  /**
+   * A non-zero number to account when building the buckets for
+   * the context information, if not provided it will default to 300
+   */
+  maxContextsToAccountAtOnce?: number;
+  /**
+   * Requires aggregateUsers to be set and represents the bucket
+   * size limit for the user information, if not provided it will default to 300
+   */
+  maxUsersToAccountAtOnce?: number;
 }
 
 export interface IExposeAnalyticsOptions extends IExposeAnalyticsOptionsNoTrack {
@@ -214,7 +241,7 @@ export interface ITrackOptions {
   /**
    * Endpoints to be exposed for the given track
    */
-  exposeStatistics?: IExposeAnalyticsOptionsNoTrack[];
+  clientRetrievableEndpoint?: IExposeAnalyticsOptionsNoTrack[];
 }
 
 /**
@@ -307,7 +334,7 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     }
   } = {};
 
-  private exposedEndpoints: {
+  private clientRetrievableEndpoints: {
     [endpointPath: string]: IExposeAnalyticsOptions;
   } = {};
 
@@ -843,9 +870,9 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     await this.createTrackIfNotExist(track, options);
     this.tracks[track] = options;
 
-    if (options.exposeStatistics) {
-      options.exposeStatistics.forEach((e) => {
-        this.exposeAnalyticsEndpoint({
+    if (options.clientRetrievableEndpoint) {
+      options.clientRetrievableEndpoint.forEach((e) => {
+        this.addClientRetrievableEndpoint({
           trackId: track,
           ...e,
         });
@@ -1032,13 +1059,36 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
 
   public getRouter(appData: IAppDataType) {
     const router = this.expressRouter();
-    router.use("/analytics/:track", async (req, res, next) => {
-      let pathOfTrack = path.normalize(req.path.replace(`/uploads/${req.params.track}`, ""));
+    router.get("/stats-info", async (req, res, next) => {
+      const userData = await jwtVerifyRequest(appData, req);
+
+      // not a guest and not verified, which means invalid credentials
+      if (!userData.verified || userData.info.role !== ADMIN_ROLE) {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        res.status(403);
+        res.end(JSON.stringify(userData.err));
+        return;
+      }
+
+      res.setHeader("content-type", "application/json; charset=utf-8");
+      res.status(200);
+      res.end(JSON.stringify({
+        endpoints: Object.keys(this.clientRetrievableEndpoints).map((e) => {
+          const clientRetrievableEndpoint = this.clientRetrievableEndpoints[e];
+          return {
+            trackId: clientRetrievableEndpoint.trackId,
+            path: "/rest/service/stats" + (!clientRetrievableEndpoint.endpoint.startsWith("/") ? "/" : "") + clientRetrievableEndpoint.endpoint,
+          };
+        }),
+      }));
+    });
+    router.use("/stats", async (req, res, next) => {
+      let pathOfTrack = path.normalize(req.path.replace("/rest/service/stats", ""));
       if (!pathOfTrack.startsWith("/")) {
         pathOfTrack = "/" + pathOfTrack;
       }
 
-      const endpointAtPath = this.exposedEndpoints[pathOfTrack];
+      const endpointAtPath = this.clientRetrievableEndpoints[pathOfTrack];
 
       if (!endpointAtPath) {
         next();
@@ -1095,7 +1145,7 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
         }
 
         const result = await this.resolveAggregation({
-          trackId: req.params.track,
+          trackId: endpointAtPath.trackId,
           req,
           contextToLimit,
           userToLimit,
@@ -1104,6 +1154,9 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
           timeslices: endpointAtPath.timeslices,
           timeslicesFrom: actualFrom,
           timeslicesTo: actualTo,
+          aggregateUsers: endpointAtPath.aggregateUsers,
+          contextMaxSize: endpointAtPath.maxContextsToAccountAtOnce,
+          aggregateUsersMaxSize: endpointAtPath.maxUsersToAccountAtOnce,
         });
         res.setHeader("content-type", "application/json; charset=utf-8");
         res.status(200);
@@ -1114,6 +1167,16 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
           res.status(400);
           res.end(JSON.stringify(err.data));
         } else {
+          this.logError({
+            message: "Internal server error while handling response",
+            className: "AnalyticsProvider",
+            data: {
+              pathOfTrack,
+            },
+            endpoint: req.path,
+            err,
+            serious: true,
+          });
           res.status(500);
           res.end(JSON.stringify({
             code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
@@ -1125,14 +1188,14 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     return router;
   }
 
-  public async exposeAnalyticsEndpoint(options: IExposeAnalyticsOptions) {
+  public async addClientRetrievableEndpoint(options: IExposeAnalyticsOptions) {
     let realEndpoint = options.endpoint;
     if (!realEndpoint.startsWith("/")) {
       realEndpoint = "/" + realEndpoint;
     }
-    if (this.exposedEndpoints[realEndpoint]) {
+    if (this.clientRetrievableEndpoints[realEndpoint]) {
       throw new Error("Could not register endpoint for " + realEndpoint + " twice as it's already registered");
     }
-    this.exposedEndpoints[realEndpoint] = options;
+    this.clientRetrievableEndpoints[realEndpoint] = options;
   }
 }

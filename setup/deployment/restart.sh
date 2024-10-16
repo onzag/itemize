@@ -12,6 +12,15 @@ if [ "$EUID" -ne 0 ]
   exit 1;
 fi
 
+# install contents check
+if [[ -d "./node_modules" ]]; then
+    echo "node_modules exist";
+else
+    echo "you must run 'bash install.sh' as the user before proceeding";
+    echo "DEAD";
+    exit 1;
+fi
+
 # now let's loop over our services
 for service_name in $(ls /etc/systemd/system | grep itmzsrv-); do
     echo "enabling $service_name";

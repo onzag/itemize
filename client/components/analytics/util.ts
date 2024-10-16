@@ -114,6 +114,13 @@ export function genericAnalyticsDataProvider() {
  * The generic analytics data validator is to be used in the server side to validate the
  * genericAnalyticsDataProvider when used in a hit or timetrack
  * 
+ * it ensures that the client provides
+ * browser
+ * browserRawId
+ * os
+ * osRawId
+ * deviceType
+ * 
  * @param data 
  * @param context 
  * @param userData 

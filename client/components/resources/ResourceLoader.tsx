@@ -199,6 +199,17 @@ class ActualResourceLoader
 
     const shouldRequestNewAlways = (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME;
 
+    // we run this request in order to cache, even when it's not really used
+    const headers: any = {
+      "sw-cacheable": typeof this.props.swCacheable ? JSON.stringify(this.props.swCacheable) : "true",
+      "sw-network-first": typeof this.props.swNetworkFirst ? JSON.stringify(this.props.swNetworkFirst) : "false",
+      "sw-recheck": typeof this.props.swRecheck ? JSON.stringify(this.props.swRecheck) : "false",
+    };
+
+    if (this.props.includeToken) {
+      headers.token = this.props.token;
+    }
+
     // and this executes regardless we have an html content or not, so we are going to check
     // our ssr context again here, and who knows, the user might be going back or doing
     // something that we can take advantage of our ssr context once again
@@ -224,19 +235,9 @@ class ActualResourceLoader
         // the reason for this is that we want to tickle the service
         // worker to cache this file for the given buildnumber
         const loadURL = actualSrc;
-
-        // we run this request in order to cache, even when it's not really used
-        const headers: any = {
-          "sw-cacheable": typeof this.props.swCacheable ? JSON.stringify(this.props.swCacheable) : "true",
-          "sw-network-first": typeof this.props.swNetworkFirst ? JSON.stringify(this.props.swNetworkFirst) : "false",
-          "sw-recheck": typeof this.props.swRecheck ? JSON.stringify(this.props.swRecheck) : "false",
-        };
-
-        if (this.props.includeToken) {
-          headers.token = this.props.token;
-        }
         fetch(loadURL, {
           headers,
+          credentials: "omit",
         });
       }
       // return
@@ -290,11 +291,8 @@ class ActualResourceLoader
       // and here we run fetch
       const fetchResponse =
         await fetch(loadURL, {
-          headers: {
-            "sw-cacheable": typeof this.props.swCacheable ? JSON.stringify(this.props.swCacheable) : "true",
-            "sw-network-first": typeof this.props.swNetworkFirst ? JSON.stringify(this.props.swNetworkFirst) : "false",
-            "sw-recheck": typeof this.props.swRecheck ? JSON.stringify(this.props.swRecheck) : "false",
-          },
+          headers,
+          credentials: "omit",
         });
 
       // if we have bad status
