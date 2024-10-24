@@ -1,3 +1,11 @@
+/**
+ * This file specifies a base for creating the internal analytics
+ * provider that is used to manage analytics and other
+ * statistical information
+ * 
+ * @module
+ */
+
 import { Client } from "@elastic/elasticsearch";
 import { ServiceProvider, ServiceProviderType } from "..";
 import { RegistryService } from "../registry";
@@ -16,14 +24,69 @@ export function makeIdOutOf(str: string) {
   return "ANON" + uuidv5(str, NAMESPACE).replace(/-/g, "");
 }
 
+/**
+ * Used to limit a numberic value in the data of the analytics information to keep it within a range
+ */
 interface INumericRangeDataLimiter { gte?: number; ge?: number, lte?: number; le?: number };
+
+/**
+ * The data limiter represents functionality to limit the data that can be retrieved to a given
+ * analytics point
+ */
 export interface IBasicDataLimiter { [key: string]: string | boolean | number | Array<string> | INumericRangeDataLimiter };
 
+/**
+ * The timeslices definition determines how a timeline is to be built
+ * in order to retrieve the timeline information
+ */
 interface ITimeslicesDefinition {
+  /**
+   * Fixed interval based on elastic fixed interval definition
+   */
   fixed_interval?: string;
+  /**
+   * calendar interval based on elastic calendar_interval definition
+   */
   calendar_interval?: AggregationsCalendarInterval;
 };
 
+const maxSizeIdToNumber = {
+  minute: 60000,
+  hour: 3600000,
+  // wiggle room
+  day: 3600000*25,
+  week: 3600000*24*8,
+  month: 3600000*24*7*32,
+  year: 3600000*24*7*366,
+}
+
+export interface ISingleTimesliceDescription {
+  /**
+   * How many slices can be retrieved at once on the histogram
+   * this number is the number of milliseconds
+   * that is allowed to be retrieved and it enforces
+   * using from to ensure that these millisecond amounts are respected
+   * otherwise it will throw an error that the timeslices are too large
+   */
+  maxsize?: number | "minute" | "hour" | "day" | "week" | "month" | "year";
+  /**
+   * The definition of how this scale is to be sliced
+   */
+  slices: ITimeslicesDefinition;
+};
+
+/**
+ * The timeslices description provides the slices definition
+ * while also adding information about limits
+ */
+interface ITimeslicesDescription {
+  [key: string]: ISingleTimesliceDescription;
+}
+
+/**
+ * The data aggregator represents the way to aggregate the data in order to build
+ * statistical models
+ */
 export interface IDataAggregator {
   [dataKey: string]: {
     /**
@@ -38,10 +101,10 @@ export interface IDataAggregator {
      */
     method: string;
     /**
-     * Perform a subcategorization operation
-     * TODO
+     * Perform a subcategorization operation, for example you may want to subcategorize by the intersection between
+     * language and country if those are available as data, the subcategorization depends on the data that is available
      */
-    subcategorizeBy?: IDataAggregator[];
+    subcategorizeBy?: IDataAggregator;
     /**
      * a limiter for methods that have a size limitation, such a terms
      * the default size is 300
@@ -50,21 +113,97 @@ export interface IDataAggregator {
   }
 }
 
+/**
+ * The resolve aggregation is passed to the analytics
+ * provider resolver that is used by the service provider
+ * the properties are similar to the ones given by the app
+ * server developer
+ * 
+ * It can also be used in the server side to resolve information
+ */
 export interface IResolveAggregationArg {
+  /**
+   * The track id in question
+   * based on what the client is querying
+   * server specfied
+   */
   trackId: string;
-  req: Express.Request;
+  /**
+   * The request that was used in the http query
+   * server specfied
+   */
+  req?: Express.Request;
+  /**
+   * The context to limit specfied by the developer
+   * 
+   * If you make contextToLimit be a string or a single item in the array
+   * it is recommended to have disableContextAggregation as true
+   * as it will be irrelevant
+   * 
+   * developer specified
+   */
   contextToLimit?: string | string[];
+  /**
+   * Disable retrieving the context in the aggregation results
+   * developer specified
+   */
+  disableContextAggregation?: boolean;
+  /**
+   * Limit to a specific user(s)
+   * 
+   * If you have userToLimit as string or single item in the array
+   * it's not recommended to have aggregateUsers as true
+   * 
+   * developer specified
+   */
   userToLimit?: string | string[];
+  /**
+   * Limit by data properties
+   * developer specified
+   */
   dataToLimit?: IBasicDataLimiter;
+  /**
+   * The data aggregator that the developer specified
+   * developer specified
+   */
   dataAggregator: IDataAggregator;
-  timeslices?: ITimeslicesDefinition;
+  /**
+   * The timeslice mechanism if it's to use one
+   * this is a elasticsearch style definition
+   * developer specified
+   */
+  timeslices?: ISingleTimesliceDescription;
+  /**
+   * The timelice to grab should start at this date
+   * client specified
+   */
   timeslicesFrom?: string;
+  /**
+   * The timelice to grab should end at this date
+   * client specified
+   */
   timeslicesTo?: string;
+  /**
+   * Aggregate the users in all the potential aggregations
+   * developer specified
+   */
   aggregateUsers?: boolean;
+  /**
+   * How many users to aggregate
+   * developer specified
+   */
   aggregateUsersMaxSize?: number;
+  /**
+   * How many contexts to aggregate
+   * developer specified
+   */
   contextMaxSize?: number;
 }
 
+/**
+ * Options to expose an analytics endpoint to a client
+ * that will provide analytics for a given track
+ */
 export interface IExposeAnalyticsOptionsNoTrack {
   /**
    * Endpoint, will exist at /rest/service/stats/${endpoint}
@@ -121,7 +260,7 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-datehistogram-aggregation.html
    * and check fixed_interval or calendar_interval values
    */
-  timeslices?: ITimeslicesDefinition;
+  timeslices?: ITimeslicesDescription;
   /**
    * You need to specify a data agregator even if an empty object {} this means you send no data
    * you should specify it to know that you are not providing data otherwise
@@ -143,6 +282,10 @@ export interface IExposeAnalyticsOptionsNoTrack {
   maxUsersToAccountAtOnce?: number;
 }
 
+/**
+ * Options to expose an analytics endpoint to a client
+ * that will provide analytics for a given track, includes track id
+ */
 export interface IExposeAnalyticsOptions extends IExposeAnalyticsOptionsNoTrack {
   /**
    * The track id which is to be exposed
@@ -150,7 +293,9 @@ export interface IExposeAnalyticsOptions extends IExposeAnalyticsOptionsNoTrack 
   trackId: string;
 }
 
-
+/**
+ * Options used to create a track for trackig purposes
+ */
 export interface ITrackOptions {
   /**
    * Whether the track will have information
@@ -186,23 +331,33 @@ export interface ITrackOptions {
   exposed: boolean;
   /**
    * All values must have a context specified to them
+   * only useful if exposed is true
    */
   clientMustSpecifyContext?: boolean;
   /**
    * All values must have a context specified to them
+   * only useful if exposed is true
    */
   clientMustNotSpecifyContext?: boolean;
   /**
    * Whether the user can specify the weight
    * 
    * does not hold in timed requests
+   * 
+   * only useful if exposed is true
+   * only useful if timed is false
    */
   clientCanSpecifyWeight?: boolean;
   /**
    * the tracking limit for trusted timed tracking
-   * for this track, defaults to 50
+   * for this track, defaults to 50, aka how many
+   * requests can be tracked at the same time
    * 
    * does not hold in untimed requests
+   * 
+   * only useful if exposed is true
+   * only useful if timed is true
+   * only useful if trusted is true
    */
   clientTrustedTrackingLimit?: number;
   /**
@@ -240,6 +395,10 @@ export interface ITrackOptions {
 
   /**
    * Endpoints to be exposed for the given track
+   * 
+   * This has nothing to do with the capacity of a client to start/stop tracking events
+   * but rather the capacity of a client to retrieve information about tracking
+   * events in order to build chart statistics in the client side
    */
   clientRetrievableEndpoint?: IExposeAnalyticsOptionsNoTrack[];
 }
@@ -248,8 +407,14 @@ export interface ITrackOptions {
  * @ignore
  */
 const trackRegex = /^[a-z0-9_-]+$/;
+/**
+ * @ignore
+ */
 const timezoneRegex = /^([+-](?:2[0-3]|[01][0-9]):[0-5][0-9])$/;
 
+/**
+ * Options to stop a timetrack event
+ */
 export interface IAnalyticsTimetrackEndPayload {
   /**
    * The track that is to be used
@@ -263,6 +428,9 @@ export interface IAnalyticsTimetrackEndPayload {
   context?: string;
 }
 
+/**
+ * Options to start a timetrack event
+ */
 export interface IAnalyticsTimetrackStartPayload extends IAnalyticsTimetrackEndPayload {
   /**
    * data related to the track
@@ -274,7 +442,9 @@ export interface IAnalyticsTimetrackStartPayload extends IAnalyticsTimetrackEndP
   timezone: string;
 }
 
-// analytics events
+/**
+ * Payload to specify an analytics event
+ */
 export interface IAnalyticsPayload extends IAnalyticsTimetrackStartPayload {
   /**
  * weight of the hit, if not provided it counts
@@ -305,8 +475,20 @@ export interface IAnalyticsPayload extends IAnalyticsTimetrackStartPayload {
  */
 const validProperties = ["track", "context", "data", "timezone", "weight", "timeslice", "time"];
 
+/**
+ * This is the id of the event that comes for an analytics hit
+ * they are used for both timetrack (untrusted) and standard hits
+ */
 export const ANALYTICS_HIT_REQUEST = "$analytics-hit-request";
+/**
+ * This is the id of the event that comes for an analytics timetrack start
+ * trusted event
+ */
 export const ANALYTICS_TIMETRACK_START_REQUEST = "$analytics-timetrack-start";
+/**
+ * This is the id of the event that comes for an analytics timetrack end
+ * trusted event
+ */
 export const ANALYTICS_TIMETRACK_END_REQUEST = "$analytics-timetrack-end";
 
 export interface IAnalyticsAnalysisResult {
@@ -321,6 +503,9 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
   private tracks: { [id: string]: ITrackOptions } = {};
   public elasticClient: Client;
 
+  /**
+   * The users that we are currently tracking
+   */
   private timedTracking: {
     [userId: string]: {
       [trackId: string]: {
@@ -334,56 +519,20 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     }
   } = {};
 
+  /**
+   * Stores the endpoints that are used for exposing to the client
+   * side in the rest
+   */
   private clientRetrievableEndpoints: {
     [endpointPath: string]: IExposeAnalyticsOptions;
   } = {};
 
+  /**
+   * Local type I guess, it doesn't matter much when it's a default service
+   * @returns the type
+   */
   public static getType() {
-    return ServiceProviderType.GLOBAL;
-  }
-
-  /**
-   * Provides a list of all the context and their popularity ranking
-   * 
-   * @override
-   * @param filters 
-   * @returns 
-   */
-  public async getMostPopularContexts(trackId: string, filters: {
-    userId?: string;
-    anonymous?: boolean;
-    size?: number;
-    leastPopular?: boolean;
-  }): Promise<IAnalyticsAnalysisResult> {
-    return null;
-  }
-
-  /**
-   * Provides the specified context and its given added weight
-   * 
-   * @override
-   * @param filters 
-   * @returns 
-   */
-  public async getContextTotalWeight(trackId: string, context: string, filters: {
-    userId?: string;
-    anonymous?: boolean;
-  }): Promise<number> {
-    return null;
-  }
-
-  /**
-   * Provides the aggregate data for the given context with the provided information
-   * 
-   * @override
-   * @param filters 
-   * @returns 
-   */
-  public async getAggregateDataForContext(trackId: string, context: string, filters: {
-    userId?: string;
-    anonymous?: boolean;
-  }): Promise<number> {
-    return null;
+    return ServiceProviderType.LOCAL;
   }
 
   constructor(c: T, registry: RegistryService, configs: any, elasticClient: Client) {
@@ -394,11 +543,19 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     this.onAnalyticsHit = this.onAnalyticsHit.bind(this);
   }
 
+  /**
+   * For a given analytic payload coming from websocket it is validated
+   * 
+   * @param type 
+   * @param data 
+   * @param info 
+   */
   private validateAnalyticPayload(
     type: "payload" | "timetrack-start" | "timetrack-end",
     data: IAnalyticsPayload | IAnalyticsTimetrackStartPayload | IAnalyticsTimetrackEndPayload,
     info: ICustomListenerInfo,
   ) {
+    // if the track isn't a string that's wrong
     if (typeof data.track !== "string" || !this.tracks[data.track]?.exposed) {
       info.listener.emitError(info.socket, "Invalid track provided in analytics request", data);
       throw new EndpointError({
@@ -407,8 +564,10 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
       });
     }
 
+    // get the track info now
     const track = this.tracks[data.track];
 
+    // check by the type
     if (type === "payload" || type === "timetrack-start") {
       if (typeof (data as IAnalyticsPayload).data !== "undefined" && (data as IAnalyticsPayload).data !== null) {
         if (typeof (data as IAnalyticsPayload).data !== "object") {
@@ -617,42 +776,74 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     }
   }
 
+  /**
+   * This funciton triggers when an user does an analytics hit request and sends some data
+   * it's attached to the websocket
+   * 
+   * @param data 
+   * @param info 
+   */
   private async onAnalyticsHit(
     data: IAnalyticsPayload,
     info: ICustomListenerInfo,
   ) {
+    // first we validate the payload
     this.validateAnalyticPayload("payload", data, info);
 
+    // now we grab the scoket adddress
     const socketAddr = info.socket.handshake.address;
     const anonymous = !info.userData?.id;
 
+    // and the track
     const track = this.tracks[data.track];
 
+    // let's get the data ad edit the data if we have a function for it
     let newData = data.data;
     if (track.dataEditor) {
       newData = await track.dataEditor(data.data, info.userData, this.localAppData);
     }
 
-    this.hit(
-      data.track,
-      info.userData?.id || AnalyticsProvider.createUserIdFromIp(socketAddr),
-      {
-        anonymous,
-        context: data.context,
-        upsert: track.clientWillUpsert,
-        weight: typeof data.weight === "number" ? data.weight : 1,
-        data: newData,
-        timezone: data.timezone,
-        time: data.time ? new Date(data.time) : null,
-        trusted: data.time || data.timeslice ? false : true,
-        timeSlice: data.timeslice ? {
-          start: new Date(data.timeslice.start),
-          end: new Date(data.timeslice.end),
-        } : null,
+    // and now we can do a hit
+    // note how we do detach in order to free the websocket
+    // which is waiting for an ack reply
+    // let it be acked
+    (async () => {
+      try {
+        await this.hit(
+          data.track,
+          info.userData?.id || AnalyticsProvider.createUserIdFromIp(socketAddr),
+          {
+            anonymous,
+            context: data.context,
+            upsert: track.clientWillUpsert,
+            weight: typeof data.weight === "number" ? data.weight : 1,
+            data: newData,
+            timezone: data.timezone,
+            time: data.time ? new Date(data.time) : null,
+            trusted: data.time || data.timeslice ? false : true,
+            timeSlice: data.timeslice ? {
+              start: new Date(data.timeslice.start),
+              end: new Date(data.timeslice.end),
+            } : null,
+          }
+        );
+      } catch (err) {
+        this.logError({
+          message: "Failed to perform a hit in a detached analytics hit query",
+          className: "AnalyticsProvider",
+          data: data,
+          methodName: "onAnalyticsHit",
+          err,
+        });
       }
-    )
+    })();
   }
 
+  /**
+   * Internal function that triggers when the timetrack is requested to start by a client
+   * @param data the payload given in the websocket
+   * @param info the websocket information
+   */
   private onAnalyticsTimeTrackStart(
     data: IAnalyticsTimetrackStartPayload,
     info: ICustomListenerInfo,
@@ -679,6 +870,11 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     }
   }
 
+  /**
+   * Internal function that triggers when the timetrack is requested to end by a client
+   * @param data the payload given by the websocket
+   * @param info the websocket information
+   */
   private onAnalyticsTimeTrackEnd(
     data: IAnalyticsTimetrackEndPayload,
     info: ICustomListenerInfo,
@@ -701,15 +897,24 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     }
   }
 
+  /**
+   * Standard initialize function
+   */
   public initialize(): void {
+    // first we register these custom events to the listener
     this.localAppData.listener.registerCustomEventListener(ANALYTICS_HIT_REQUEST, this.onAnalyticsHit.bind(this));
     this.localAppData.listener.registerCustomEventListener(ANALYTICS_TIMETRACK_START_REQUEST, this.onAnalyticsTimeTrackStart.bind(this));
     this.localAppData.listener.registerCustomEventListener(ANALYTICS_TIMETRACK_END_REQUEST, this.onAnalyticsTimeTrackEnd.bind(this));
+
+    // and now we can add a custom disconnect listener
     this.localAppData.listener.addCustomDisconnectEventListener((info) => {
       const socketAddr = info.socket.handshake.address;
       const userId = info.userData?.id;
       const anonId = AnalyticsProvider.createUserIdFromIp(socketAddr);
 
+      // when this happens we want to find all tracks we have created
+      // for this user and untrack their trusted time
+      // since they are now disconnected
       for (const userIdToUntrack of [userId, anonId]) {
         if (userIdToUntrack && this.timedTracking[userIdToUntrack]) {
           const tracksInUser = Object.keys(this.timedTracking[userIdToUntrack]);
@@ -728,10 +933,21 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     });
   }
 
+  /**
+   * Provides a track information given an id
+   * @param id 
+   * @returns 
+   */
   public getTrackFor(id: string) {
     return this.tracks[id] || null;
   }
 
+  /**
+   * Given an user ip address it will create a custom user id
+   * for that anonymous user
+   * @param ipAddr 
+   * @returns 
+   */
   public static createUserIdFromIp(ipAddr: string): string {
     return makeIdOutOf(ipAddr);
   }
@@ -778,6 +994,8 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
   /**
    * Resolve an aggregation and return a json object
    * that wil be provided to the client
+   * 
+   * Can also be used in the server side to resolve for a given criteria
    * 
    * @param arg 
    */
@@ -1057,8 +1275,16 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     });
   }
 
+  /**
+   * Provides the router for the analytics provider
+   * @param appData 
+   * @returns 
+   */
   public getRouter(appData: IAppDataType) {
     const router = this.expressRouter();
+
+    // the stats info will provide the information
+    // for all potential endpoints
     router.get("/stats-info", async (req, res, next) => {
       const userData = await jwtVerifyRequest(appData, req);
 
@@ -1082,6 +1308,9 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
         }),
       }));
     });
+
+    // this endpoint will envertheless provide the given information for the given
+    // statistic required
     router.use("/stats", async (req, res, next) => {
       let pathOfTrack = path.normalize(req.path.replace("/rest/service/stats", ""));
       if (!pathOfTrack.startsWith("/")) {
@@ -1144,6 +1373,53 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
           actualTo = to;
         }
 
+        const timesliceQueried = req.query.timeslice as string;
+        let timeslice: ISingleTimesliceDescription = null;
+
+        if (timesliceQueried) {
+          timeslice = endpointAtPath.timeslices[timesliceQueried];
+
+          if (!timeslice) {
+            res.setHeader("content-type", "application/json; charset=utf-8");
+            res.status(400);
+            res.end(JSON.stringify({
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+              message: "There is no timeslice with id " + timesliceQueried,
+            }));
+            return;
+          }
+        }
+
+
+        if (timeslice && typeof timeslice.maxsize !== "undefined") {
+          if (!actualFrom) {
+            res.setHeader("content-type", "application/json; charset=utf-8");
+            res.status(400);
+            res.end(JSON.stringify({
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+              message: "With timeslices enabled with a maxsize the query for from should be defined and passed",
+            }));
+            return;
+          }
+
+          const actualMaxSize = typeof timeslice.maxsize === "string" ? maxSizeIdToNumber[timeslice.maxsize] : timeslice.maxsize;
+
+          // calculate the difference
+          const diff = (actualTo ? new Date(actualTo) : new Date()).getTime() - (new Date(actualFrom)).getTime();
+          // if the difference is greater than our limit
+          if (diff >= actualMaxSize) {
+            res.setHeader("content-type", "application/json; charset=utf-8");
+            res.status(400);
+            res.end(JSON.stringify({
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+              message: "The date range from " + actualFrom + " to " + (actualTo || "now") + " is too large for the max size of " +
+                actualMaxSize + "ms as the difference is calculated at " + diff + "ms",
+            }));
+            return;
+          }
+        }
+
+        // now we can resolve this aggregation
         const result = await this.resolveAggregation({
           trackId: endpointAtPath.trackId,
           req,
@@ -1151,7 +1427,7 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
           userToLimit,
           dataToLimit,
           dataAggregator: endpointAtPath.dataAggregator,
-          timeslices: endpointAtPath.timeslices,
+          timeslices: timeslice,
           timeslicesFrom: actualFrom,
           timeslicesTo: actualTo,
           aggregateUsers: endpointAtPath.aggregateUsers,
@@ -1188,6 +1464,10 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
     return router;
   }
 
+  /**
+   * Adds an endpoint that a client can access based on expose configurations
+   * @param options 
+   */
   public async addClientRetrievableEndpoint(options: IExposeAnalyticsOptions) {
     let realEndpoint = options.endpoint;
     if (!realEndpoint.startsWith("/")) {

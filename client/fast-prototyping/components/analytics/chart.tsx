@@ -2,7 +2,17 @@ import { loadLib } from "../../../../util";
 import type { IElasticAnalyticsNumericStat, IElasticAnalyticsResponse, IElasticAnalyticsTermStats } from "../../../../server/services/elastic-analytics";
 import ResourceLoader from "../../../components/resources/ResourceLoader";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Box from "@mui/material/Box";
 
+/**
+ * Raw logic function for making a pie chart
+ * @param d3 
+ * @param chartSvgElement 
+ * @param setColorMap 
+ * @param setSelected 
+ * @param data 
+ * @returns 
+ */
 export function pieChart(
   d3: any,
   chartSvgElement: SVGSVGElement,
@@ -20,9 +30,14 @@ export function pieChart(
     amountDisplayModifier?: (statViz: string, refViz: string, n: number) => string;
   }
 ) {
-  const svg = d3.select(chartSvgElement).append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+  // remove and clear old chart, we don't do animations
+  d3.select(chartSvgElement).select("*").remove();
 
+  // grab the svg and start on it
+  const svg = d3.select(chartSvgElement).append("g")
+    .attr("transform", "translate(" + data.width / 2 + "," + data.height / 2 + ")");
+
+  // we build these members that will have the ratios
   const membersWithVal = {};
   let errored = false;
   Object.keys(data.data.members).forEach((memKey) => {
@@ -47,8 +62,10 @@ export function pieChart(
     return;
   }
 
-  var radius = Math.min(width, height) / 2 - margin;
+  // calculate the radius of the pie
+  const radius = Math.min(data.width, data.height) / 2 - data.margin;
 
+  // make a color map
   const color = d3.scaleOrdinal()
     .domain(Object.keys(membersWithVal))
     .range(d3.schemeSet2);
@@ -57,6 +74,7 @@ export function pieChart(
   // it has to be set this way
   setColorMap({ color: color });
 
+  // make the pie
   const pie = d3.pie()
     .value((d: any) => d[1]);
 
@@ -82,6 +100,14 @@ export function pieChart(
     });
 }
 
+/**
+ * Raw logic function to making a bar chart
+ * @param d3 
+ * @param chartSvgElement 
+ * @param setColorMap 
+ * @param setSelected 
+ * @param data 
+ */
 export function barChart(
   d3: any,
   chartSvgElement: SVGSVGElement,
@@ -99,8 +125,10 @@ export function barChart(
     amountDisplayModifier?: (statViz: string, refViz: string, n: number) => string;
   }
 ) {
-  const barMarginX = margin * 2;
-  const barMarginY = margin * 3;
+  d3.select(chartSvgElement).select("*").remove();
+
+  const barMarginX = data.margin * 2;
+  const barMarginY = data.margin * 3;
   const svg = d3.select(chartSvgElement).append("g")
     .attr("transform",
       "translate(" + barMarginX + "," + barMarginY + ")");
@@ -129,12 +157,12 @@ export function barChart(
   setColorMap({ color: color });
 
   const x = d3.scaleBand()
-    .range([0, width - (barMarginX * 2)])
+    .range([0, data.width - (barMarginX * 2)])
     .domain(dataMemberLabels)
     .padding(0.2);
 
   svg.append("g")
-    .attr("transform", "translate(0," + (height - (barMarginY * 2)) + ")")
+    .attr("transform", "translate(0," + (data.height - (barMarginY * 2)) + ")")
     .call(d3.axisBottom(x).tickFormat((n) => {
       if (data.termDisplayModifier) {
         return data.termDisplayModifier(data.statViz, n);
@@ -147,7 +175,7 @@ export function barChart(
 
   const y = d3.scaleLinear()
     .domain([min.value > 0 ? 0 : min.value, max.value])
-    .range([height - (barMarginY * 2), 0]);
+    .range([data.height - (barMarginY * 2), 0]);
   svg.append("g")
     .call(d3.axisLeft(y).tickFormat((n) => {
       if (data.amountDisplayModifier) {
@@ -168,7 +196,7 @@ export function barChart(
     })
     .attr("width", x.bandwidth())
     .attr("height", (d) => {
-      return height - (barMarginY * 2) - y(d.value);
+      return data.height - (barMarginY * 2) - y(d.value);
     })
     .attr("fill", (d) => {
       return color(d.label);
@@ -184,6 +212,10 @@ export interface IBaseAnalyticsProps {
    * Represents the statistical value to be used for comparison, eg. context, language, etc...
    */
   statViz?: string;
+  /**
+   * If a stat viz is not specified a initial can be specified
+   */
+  initialStatViz?: string;
   /**
    * Represents the reference used for comparison, eg. max, min, avg
    */
@@ -231,30 +263,156 @@ export interface IBaseAnalyticsProps {
    * @returns 
    */
   legendAmountDisplayModifier?: (statViz: string, refViz: string, percent: number, value: number, stat: IElasticAnalyticsNumericStat) => string;
+
+  /**
+   * The subcategory i18n specifies how to render each subcategory for language reasons
+   * in the selector
+   * 
+   * @param subcat 
+   * @returns a string or a react node with the language string
+   */
   subcategoryI18n?: (subcat: string) => string | React.ReactNode;
+
+  /**
+   * The ref viz i18n specifies how to render each reference visualization for language reasons
+   * eg. max, min, avg
+   * 
+   * @param refViz 
+   * @returns a string or a react node with the language string
+   */
   refVizI18n?: (refViz: string) => string | React.ReactNode;
+
+  /**
+   * the stat viz i18n specifies how to render each stat visualization for language reasons
+   * 
+   * @param statViz 
+   * @returns a string or a react node with the language string
+   */
   statVizI18n?: (statViz: string) => string | React.ReactNode;
 }
 
 export type RawD3LogicFn = typeof pieChart;
 
+/**
+ * Base props for the chart
+ */
 export interface IChartBaseProps extends IBaseAnalyticsProps {
+  /**
+   * type of the chart
+   * - bar a bar chart
+   * - pie a pie chart
+   * 
+   * or a raw logic function that you have to define
+   * yourself how to render and execute using d3
+   */
   type: "bar" | "pie" | RawD3LogicFn;
+  /**
+   * Similar to type but used in subcategories instead
+   * specifying how to render each subcategory
+   * and in timeliens how to render each time point breakdown
+   */
+  subcattype?: "bar" | "pie" | RawD3LogicFn;
+  /**
+   * width of the svg object
+   */
+  width?: number;
+  /**
+   * height of the svg object
+   */
+  height?: number;
+  /**
+   * margin of the svg object
+   */
+  margin?: number;
 }
 
+/**
+ * Final property of the chart
+ */
 interface IFinalChartProps extends IChartBaseProps {
+  /**
+   * includes the data
+   */
   data: IElasticAnalyticsResponse;
 }
 
+/**
+ * Props for defining an analytics chart
+ */
 export interface IAnalyticsChartProps extends IChartBaseProps {
+  /**
+   * src url where the data is to be pulled, and it should be a exposed
+   * analytics endpoint that the client can retrieve information from
+   */
   src: string;
+  /**
+   * A component to show while the chart is loading
+   */
   loadingComponent?: React.ReactNode;
+  /**
+   * A component to show if the data fails to load
+   */
   failedComponent?: React.ReactNode;
 }
 
+/**
+ * Internal: Given subcategory information it will convert such
+ * to a response object style so it can be consumed by another chartbase
+ * 
+ * @param parentNumericStat the parent numeric stat where these substats where taken from
+ * this could be the breakdown of all values of eg. chrome users, and they are also broken down by language (subcategories)
+ * @returns 
+ */
+export function subcategoriesToResponse(
+  parentNumericStat: IElasticAnalyticsNumericStat,
+): IElasticAnalyticsResponse {
+  // we build a response object
+  const rs: IElasticAnalyticsResponse = {
+    count: parentNumericStat.count,
+    dataStats: {
+
+    },
+    stats: {
+      weight: {
+        avg: parentNumericStat.avg,
+        count: parentNumericStat.count,
+        max: parentNumericStat.avg,
+        min: parentNumericStat.min,
+        sum: parentNumericStat.sum,
+      },
+    },
+    histogram: null,
+  };
+
+  // now we loop in the subcategories and add them to the stat or data stats
+  // depending on where they come from
+  Object.keys(parentNumericStat.subcategories).forEach((keyName) => {
+    if (keyName.startsWith("data.")) {
+      rs.dataStats[keyName.replace("data.", "")] = (parentNumericStat.subcategories[keyName] as IElasticAnalyticsTermStats);
+    } else {
+      rs.stats[keyName] = (parentNumericStat.subcategories[keyName] as IElasticAnalyticsTermStats);
+    }
+  });
+
+  // return that
+  return rs;
+}
+
+/**
+ * The analytics chart component takes an endpoint that provides
+ * analytics information and generates a chart from it
+ * 
+ * this chart will show general all time data, for displaying a timeline in analytics
+ * information that support timeslices, see "timeline" component for analytics
+ * 
+ * @param props the props to build the chart
+ * @returns 
+ */
 export function AnalyticsChart(props: IAnalyticsChartProps) {
+  // to track to load d3
   const [d3loaded, setd3Loaded] = useState(false);
 
+  // load using loadlib as effect
   useEffect(() => {
     (async () => {
       await loadLib("D3CDN", "https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js", () => {
@@ -264,6 +422,7 @@ export function AnalyticsChart(props: IAnalyticsChartProps) {
     })();
   }, []);
 
+  // and now we can use our resource loader
   return (
     <ResourceLoader
       path="/rest/service/stats"
@@ -293,27 +452,49 @@ export function AnalyticsChart(props: IAnalyticsChartProps) {
   )
 }
 
-const width = 600;
-const height = 600;
-const margin = 40;
-function ChartBase(props: IFinalChartProps) {
+const dwidth = 600;
+const dheight = 600;
+const dmargin = 40;
+/**
+ * The chart base component build the chart but also needs the data instead
+ * of the url and other information
+ * 
+ * @param props 
+ * @returns 
+ */
+export function ChartBase(props: IFinalChartProps) {
   const chartRef = useRef<SVGSVGElement>();
   const [colorFn, setColorFn] = useState(null as any);
   const [selected, setSelected] = useState(null as string);
   const [currentRefViz, setCurrentRefViz] = useState("sum" as string);
-  const [currentStatViz, setCurrentStatViz] = useState("context" as string);
+  const [currentStatViz, setCurrentStatViz] = useState(props.initialStatViz ? props.initialStatViz : (props.data.stats.context ? "context" : "weight"));
+
+  // if the initial stat viz is changed or the data is changed we go back to the default
+  useEffect(() => {
+    // basically if there is a initial stat viz we go with that
+    // otherwise we go for context or weight, whatever is available
+    setCurrentStatViz(props.initialStatViz ? props.initialStatViz : (props.data.stats.context ? "context" : "weight"));
+  }, [props.initialStatViz, props.data]);
 
   const updateCurrentStatViz = useCallback((k: string) => {
     setSelected(null);
     setCurrentStatViz(k);
   }, []);
 
+  // make the ref viz according to the prop or the state
   const refViz = props.refViz || currentRefViz;
   const statViz = props.statViz || currentStatViz;
 
-
+  // grab the data we are uding via a memo
   const data = useMemo(() => {
+    if (!statViz) {
+      return null;
+    }
     let data = (props.data.dataStats[statViz] || props.data.stats[statViz]) as IElasticAnalyticsTermStats;
+
+    if (!data) {
+      return null;
+    }
 
     if (data && !data.members) {
       const dataAsNumeric = data as any as IElasticAnalyticsNumericStat;
@@ -331,12 +512,16 @@ function ChartBase(props: IFinalChartProps) {
   let availableStatViz: string[] = [];
 
   if (props.data && !props.statViz) {
-    if (props.data.stats) {
-      availableStatViz = ["context", "weight"];
+    if (props.data.stats.context) {
+      availableStatViz.push("context");
+    }
 
-      if (props.data.stats.users) {
-        availableStatViz.push("users");
-      }
+    if (props.data.stats.weight) {
+      availableStatViz.push("weight");
+    }
+
+    if (props.data.stats.users) {
+      availableStatViz.push("users");
     }
 
     if (props.data.dataStats) {
@@ -350,13 +535,11 @@ function ChartBase(props: IFinalChartProps) {
     if (data) {
       const d3 = (window as any).d3;
 
-      d3.select(chartRef.current).select("*").remove();
-
       if (props.type === "pie") {
         pieChart(d3, chartRef.current, setColorFn, setSelected, {
-          width,
-          height,
-          margin,
+          width: typeof props.width === "number" ? props.width : dwidth,
+          height: typeof props.height === "number" ? props.height : dheight,
+          margin: typeof props.margin === "number" ? props.margin : dmargin,
           data,
           refViz: refViz,
           statViz: statViz,
@@ -366,9 +549,9 @@ function ChartBase(props: IFinalChartProps) {
         });
       } else if (props.type === "bar") {
         barChart(d3, chartRef.current, setColorFn, setSelected, {
-          width,
-          height,
-          margin,
+          width: typeof props.width === "number" ? props.width : dwidth,
+          height: typeof props.height === "number" ? props.height : dheight,
+          margin: typeof props.margin === "number" ? props.margin : dmargin,
           data,
           refViz: refViz,
           statViz: statViz,
@@ -378,9 +561,9 @@ function ChartBase(props: IFinalChartProps) {
         });
       } else {
         props.type(d3, chartRef.current, setColorFn, setSelected, {
-          width,
-          height,
-          margin,
+          width: typeof props.width === "number" ? props.width : dwidth,
+          height: typeof props.height === "number" ? props.height : dheight,
+          margin: typeof props.margin === "number" ? props.margin : dmargin,
           data,
           refViz: refViz,
           statViz: statViz,
@@ -390,7 +573,18 @@ function ChartBase(props: IFinalChartProps) {
         });
       }
     }
-  }, [data, refViz, props.refVizModifier, props.termDisplayModifier, props.amountDisplayModifier, props.type, statViz]);
+  }, [
+    data,
+    refViz,
+    props.refVizModifier,
+    props.termDisplayModifier,
+    props.amountDisplayModifier,
+    props.type,
+    statViz,
+    props.width,
+    props.height,
+    props.margin,
+  ]);
 
   const membersSorted = useMemo(() => {
     if (!colorFn) {
@@ -419,89 +613,105 @@ function ChartBase(props: IFinalChartProps) {
 
   const selectedInfo = membersSorted.find((v) => v.key === selected);
 
+  const [selectedSubCatToResponse, firstSubcat] = useMemo(() => {
+    if (!selectedInfo || !selectedInfo.info || !selectedInfo.info.subcategories) {
+      return [null, null];
+    }
+    const response = subcategoriesToResponse(selectedInfo.info);
+    const firstSubcat = Object.keys(response.dataStats)[0];
+    return [response, firstSubcat || null];
+  }, [selectedInfo]);
+
   return (
     <>
-      {availableStatViz && availableStatViz.length ? <div style={{ fontSize: "10px", display: "flex", rowGap: "2px", columnGap: "4px" }}>
+      {availableStatViz && availableStatViz.length ? <Box
+        className="current-stat-viz-selector"
+        sx={{ fontSize: "10px", display: "flex", rowGap: "2px", columnGap: "4px" }}
+      >
         {availableStatViz.map((k) => {
           return (
-            <span
-              style={{ color: k === statViz ? "red" : "black", fontWeight: k === refViz ? 800 : 500, cursor: "pointer" }}
+            <Box
+              component="span"
+              sx={{ color: k === statViz ? "red" : "black", fontWeight: k === refViz ? 800 : 500, cursor: "pointer" }}
               onClick={updateCurrentStatViz.bind(null, k)}
               key={k}
+              className="current-stat-viz"
             >
               {k}
-            </span>
+            </Box>
           );
         })}
-      </div> : null}
-      {props.refViz || !membersSorted[0] ? null : <div style={{ fontSize: "10px", display: "flex", rowGap: "2px", columnGap: "4px" }}>
+      </Box> : null}
+      {props.refViz || !membersSorted[0] ? null : <Box
+        className="current-ref-viz-selector"
+        sx={{ fontSize: "10px", display: "flex", rowGap: "2px", columnGap: "4px" }}
+      >
         {Object.keys(membersSorted[0].info).map((k) => {
           if (k === "subcategories") {
             return null;
           }
           return (
-            <span
-              style={{ color: k === refViz ? "red" : "black", fontWeight: k === refViz ? 800 : 500, cursor: "pointer" }}
+            <Box
+              component="span"
+              className="current-ref-viz"
+              sx={{ color: k === refViz ? "red" : "black", fontWeight: k === refViz ? 800 : 500, cursor: "pointer" }}
               onClick={setCurrentRefViz.bind(null, k)}
               key={k}
             >
               {k}
-            </span>
+            </Box>
           );
         })}
-      </div>}
-      <svg
-        width={width}
-        height={height}
+      </Box>}
+      <Box
+        component="svg"
+        className="svg-chart"
+        width={typeof props.width === "number" ? props.width : dwidth}
+        height={typeof props.height === "number" ? props.height : dheight}
         ref={chartRef}
-        viewBox={([0, 0, width, height]).join(" ")}
-        style={{ border: "solid 2px" }}
-      ></svg>
-      <div>
-        {membersSorted.map((v) => {
-          return (<div
-            key={v.key} style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", columnGap: "10px", cursor: "pointer" }}
+        viewBox={([0, 0, typeof props.width === "number" ? props.width : dwidth, typeof props.height === "number" ? props.height : dheight]).join(" ")}
+        sx={{ border: "solid 2px" }}
+      ></Box>
+      <div className="legend-container">
+      {membersSorted.map((v) => {
+          return (<Box
+            key={v.key} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", columnGap: "10px", cursor: "pointer" }}
+            className="legend-element"
             onClick={setSelected.bind(null, v.key)}
           >
-            <div style={{ width: "20px", height: "20px", display: "inline-block", backgroundColor: v.color }}></div>
+            <Box sx={{ width: "20px", height: "20px", display: "inline-block", backgroundColor: v.color }} className="legend-color"></Box>
             <b>{v.name}</b> - {props.legendAmountDisplayModifier || props.amountDisplayModifier ?
               (props.legendAmountDisplayModifier ? props.legendAmountDisplayModifier(statViz, refViz, v.percent, v.value, v.info) :
                 props.amountDisplayModifier(statViz, refViz, v.value)) : (v.percent + "%")}
-          </div>);
+          </Box>);
         })}
       </div>
       {selectedInfo ? (
-        <div style={{ margin: "1rem", padding: "1rem" }}>
-          <div><b>{selectedInfo.name}</b></div>
-          <div>
+        <Box sx={{ margin: "1rem", padding: "1rem" }} className="selected-stat-container">
+          <div className="selected-stat-name"><b>{selectedInfo.name}</b></div>
+          <div className="selected-stat-subcategory-container">
             {Object.keys(selectedInfo.info).map((k) => (
               k === "subcategories" ? null :
-                <div key={k}>
+                <div key={k} className="selected-stat-subcategory">
                   {k}: {props.amountDisplayModifier && k !== "count" ? props.amountDisplayModifier(statViz, refViz, selectedInfo.info[k]) : selectedInfo.info[k]}
                 </div>
             ))}
           </div>
-          {selectedInfo.info.subcategories ? (
-            Object.keys(selectedInfo.info.subcategories).map((v) => {
-              <div>
-                <div>{props.subcategoryI18n ? props.subcategoryI18n(v) : v}</div>
-                <ChartBase
-                  data={{
-                    count: selectedInfo.info.count,
-                    dataStats: selectedInfo.info.subcategories[v],
-                    histogram: null,
-                    stats: null,
-                  }}
-                  type="pie"
-                  amountDisplayModifier={props.amountDisplayModifier}
-                  legendAmountDisplayModifier={props.legendAmountDisplayModifier}
-                  statVizI18n={props.statVizI18n}
-                  refVizI18n={props.refVizI18n}
-                />
-              </div>
-            })
+          {selectedSubCatToResponse ? (
+            <div className="selected-stat-chart-subcontainer">
+              <ChartBase
+                data={selectedSubCatToResponse}
+                type={props.subcattype || "pie"}
+                initialStatViz={firstSubcat}
+                subcattype={props.subcattype}
+                amountDisplayModifier={props.amountDisplayModifier}
+                legendAmountDisplayModifier={props.legendAmountDisplayModifier}
+                statVizI18n={props.statVizI18n}
+                refVizI18n={props.refVizI18n}
+              />
+            </div>
           ) : null}
-        </div>
+        </Box>
       ) : null}
     </>
   );
