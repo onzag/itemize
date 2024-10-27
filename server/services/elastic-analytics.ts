@@ -260,15 +260,8 @@ export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQuer
    * @param userId 
    * @param options 
    */
-  public async hit(track: string, userId: string, options: { weight: number; context: string; upsert: boolean; anonymous: boolean; data?: any; trusted: boolean; timezone: string; time?: Date; timeSlice?: { start: Date; end: Date; }; }): Promise<void> {
+  public async hit(track: string, userId: string, options: { weight: number; context: string; anonymous: boolean; data?: any; trusted: boolean; timezone: string; time?: Date; timeSlice?: { start: Date; end: Date; }; }): Promise<void> {
     const trackInfo = this.getTrackFor(track);
-
-    if (trackInfo.clientWillUpsert !== options.upsert) {
-      // it is not supported because when we upsert we know that there is only one per user per context
-      // of a given type, but otherwise there can be more this allows for an efficiency increase
-      // where we can have upserts straight from elasticsearch, instead of manually making them
-      throw new Error("The track specifies that the client is supposed to upsert but the option provided specifies upsert as false, this is not supported");
-    }
 
     const indexName = "track_" + track;
     const document = {

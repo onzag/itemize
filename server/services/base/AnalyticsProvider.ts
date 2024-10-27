@@ -18,6 +18,7 @@ import { ADMIN_ROLE, ENDPOINT_ERRORS, GUEST_METAROLE } from "../../../constants"
 import path from "path";
 import { jwtVerifyRequest } from "../../token";
 import { AggregationsCalendarInterval } from "@elastic/elasticsearch/lib/api/types";
+import type { Request } from "express";
 
 const NAMESPACE = "23ab4609-df49-5fdf-921b-4714adb284f3";
 export function makeIdOutOf(str: string) {
@@ -220,7 +221,7 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * @param req 
    * @returns 
    */
-  authUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => boolean | Promise<boolean>;
+  authUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Request) => boolean | Promise<boolean>;
   /**
    * Prevent guests from querying this
    */
@@ -232,7 +233,7 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * @param req 
    * @returns 
    */
-  limitToContext?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => string | string[] | Promise<string | string[]>;
+  limitToContext?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Request) => string | string[] | Promise<string | string[]>;
   /**
    * Set limiters for the users that are retrieved information from
    * @param user 
@@ -240,7 +241,7 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * @param req 
    * @returns 
    */
-  limitToUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => string | string[] | Promise<string | string[]>;
+  limitToUser?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Request) => string | string[] | Promise<string | string[]>;
   /**
    * Set limiters for the kind of data that can be accessed, it generates a filter query in the aggregation
    * @param user 
@@ -248,7 +249,7 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * @param req 
    * @returns 
    */
-  limitToData?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Express.Request) => IBasicDataLimiter | Promise<IBasicDataLimiter>;
+  limitToData?: (user: IServerSideTokenDataType, appData: IAppDataType, req: Request) => IBasicDataLimiter | Promise<IBasicDataLimiter>;
   // customizeQuery?: (user: IServerSideTokenDataType, builder: T, req: Express.Request) => void | Promise<void>;
   /**
    * Set to use timeslices specify the range between the slices in order to get statistics
@@ -314,12 +315,12 @@ export interface ITrackOptions {
    * Whether anonymous users can use this track to store
    * anonymous data
    */
-  allowAnonymous: boolean;
+  allowAnonymous?: boolean;
   /**
    * Whether this track will store one hit per user or many
    * hits per user with different accumulating weights
    */
-  clientWillUpsert: boolean;
+  clientWillUpsert?: boolean;
   /**
    * whether this track is exposed, normally you want this to be true
    * unless the track is being used exclusively with server side analytics
@@ -815,7 +816,6 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
           {
             anonymous,
             context: data.context,
-            upsert: track.clientWillUpsert,
             weight: typeof data.weight === "number" ? data.weight : 1,
             data: newData,
             timezone: data.timezone,
@@ -957,7 +957,6 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
    * 
    * @param track represent which element is being used to track
    * @param options.weight the weight that is used to track with, expect a positive integer
-   * @param options.upsert it will add a new value or update an existing one
    * @param options.context a secondary reference within the track, this is used for example with urls
    * 
    * @override
@@ -965,7 +964,6 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
   public async hit(track: string, userId: string, options: {
     weight: number;
     context: string;
-    upsert: boolean;
     anonymous: boolean;
     data?: any;
     timezone: string;
@@ -1264,7 +1262,6 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
       weight: Math.round((stop.getTime() - value.start.getTime()) / 1000),
       anonymous: !!value.anonymous,
       context: options.context,
-      upsert: trackInfo.clientWillUpsert,
       data: newData,
       timezone: value.timezone,
       trusted: true,

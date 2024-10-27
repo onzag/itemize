@@ -106,7 +106,7 @@ export function AnalyticsTimeline(props: ITimelineProps) {
 
   const qs = useMemo(() => {
     let qs: string = "";
-    qs += (props.src.includes("?") ? "&" : "?") + "timeslice=" + encodeURIComponent(fromAsDate);
+    qs += (props.src.includes("?") ? "&" : "?") + "timeslice=" + encodeURIComponent(props.timeslice);
     if (fromAsDate) {
       qs += "&from=" + encodeURIComponent(fromAsDate);
     }
@@ -148,6 +148,7 @@ export function AnalyticsTimeline(props: ITimelineProps) {
 export interface ITimelineBaseHistogramPoint {
   data: IElasticAnalyticsTermStats;
   date: string;
+  count: number;
 }
 
 export interface ITmelineBrokenDownHistogramPoint {
@@ -253,7 +254,7 @@ export function timelineChart(
         .y((d: { value: number, date: string }) => { return y(d.value) })
       );
     // Add the points
-    svg
+    const circles = svg
       .append("g")
       .selectAll("dot")
       .data(histogramResult[memberKey])
@@ -264,9 +265,11 @@ export function timelineChart(
       .attr("r", 5)
       .attr("fill", color(memberKey))
       .attr("opacity", 0.7)
-      .on("click", (d, i) => {
-        setSelectedHistogramPoint(d.original);
-      });
+      .attr("style", "cursor:pointer");
+
+    circles.on("click", (event, d) => {
+      setSelectedHistogramPoint(d.original);
+    });
   });
 }
 
@@ -321,6 +324,7 @@ function TimelineBase(props: IFinaltimelineProps) {
       return {
         data,
         date: a.date,
+        count: a.count,
       };
     });
 
@@ -439,6 +443,22 @@ function TimelineBase(props: IFinaltimelineProps) {
     return [response, firstSubcat || null];
   }, [selectedInfo]);
 
+  const selectedHistogramAsResponse = useMemo(() => {
+    if (!selectedHistogramPoint) {
+      return null;
+    }
+    const response: IElasticAnalyticsResponse = {
+      count: selectedHistogramPoint.count,
+      stats: {
+        weight: null,
+        context: selectedHistogramPoint.data,
+      },
+      dataStats: {},
+      histogram: null,
+    }
+    return response;
+  }, [selectedHistogramPoint]);
+
   return (
     <>
       {availableStatViz && availableStatViz.length ? <Box
@@ -530,9 +550,20 @@ function TimelineBase(props: IFinaltimelineProps) {
           ) : null}
         </Box>
       ) : null}
-      {selectedHistogramPoint ? (
+      {selectedHistogramAsResponse ? (
         <Box sx={{ margin: "1rem", padding: "1rem" }} className="selected-histogram-stat-container">
-
+          <div className="selected-histogram-point-chart-subcontainer">
+            <ChartBase
+              data={selectedHistogramAsResponse}
+              type={props.subcattype || "pie"}
+              statViz="context"
+              subcattype={props.subcattype}
+              amountDisplayModifier={props.amountDisplayModifier}
+              legendAmountDisplayModifier={props.legendAmountDisplayModifier}
+              statVizI18n={props.statVizI18n}
+              refVizI18n={props.refVizI18n}
+            />
+          </div>
         </Box>
       ) : null}
     </>
