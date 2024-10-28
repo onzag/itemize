@@ -439,6 +439,12 @@ export function AnalyticsChart(props: IAnalyticsChartProps) {
             legendAmountDisplayModifier={props.legendAmountDisplayModifier} type={props.type}
             refVizI18n={props.refVizI18n}
             statVizI18n={props.statVizI18n}
+            subcattype={props.subcattype}
+            subcategoryI18n={props.subcategoryI18n}
+            height={props.height}
+            initialStatViz={props.initialStatViz}
+            margin={props.margin}
+            width={props.width}
           />);
         }
 
