@@ -109,7 +109,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   deleteRoleAccess?: string[];
   searchRoleAccess?: string[];
   readRoleAccess?: string[];
-  parentingRoleAccess?: {[key: string]: string[]};
+  parentingRoleAccess?: { [key: string]: string[] };
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
   parentMaxChildCountSameType?: number;
   parentMaxChildCountAnyType?: number;
@@ -154,13 +154,11 @@ export default async function build() {
     }
 
     // we run all the build steps
-    const [rawRoot] = await Promise.all([
-      buildData(rawDataConfig),
-      buildHTML(rawDataConfig),
-      buildBuildNumber(rawDataConfig),
-      buildResources(rawDataConfig),
-      copyMomentFiles(rawDataConfig),
-    ]);
+    const rawRoot = await buildData(rawDataConfig);
+    await buildHTML(rawDataConfig);
+    await buildBuildNumber(rawDataConfig);
+    await buildResources(rawDataConfig);
+    await copyMomentFiles(rawDataConfig);
 
     await buildManifest(rawDataConfig, rawRoot);
   } catch (err) {
@@ -279,18 +277,18 @@ async function buildData(rawDataConfig: IBuilderBasicConfigType): Promise<IRootR
     JSON.stringify(mainResultBuild),
   );
 
-  // and now let's output clean builds for every language that is supported
-  await Promise.all(rawDataConfig.standard.supportedLanguages.map(async (sl, index) => {
-    // so we get a resulting build for the given language
+  for (let index = 0; index < rawDataConfig.standard.supportedLanguages.length; index++) {
+    const sl = rawDataConfig.standard.supportedLanguages[index];
+    // Get the resulting build for the given language
     const resultingBuild = resultBuilds[index];
-    // and let's emit such file
+    // Define the file path and emit the file
     const fileName = path.join("dist", "data", `build.${sl}.json`);
-    console.log("emiting " + colors.green(fileName));
+    console.log("emitting " + colors.green(fileName));
     await fsAsync.writeFile(
       fileName,
       JSON.stringify(resultingBuild),
     );
-  }));
+  }
 
   await rootTypesBuilder(resultJSON);
 
@@ -525,20 +523,21 @@ async function buildModule(
       });
     }
 
-    propExtensions =
-      await Promise.all<IPropertyDefinitionRawJSONDataType>(
-        internalFileData.data.map((pd, index) => {
-          const specificPropertyTraceback =
-            propExtTraceback.newTraceToBit(index);
-          return getI18nPropertyData(
-            rawDataConfig,
-            actualLocation,
-            pd,
-            searchableProperties,
-            specificPropertyTraceback,
-          );
-        }),
+    propExtensions = [];
+    for (let index = 0; index < internalFileData.data.length; index++) {
+      const pd = internalFileData.data[index];
+      const specificPropertyTraceback = propExtTraceback.newTraceToBit(index);
+
+      const result = await getI18nPropertyData(
+        rawDataConfig,
+        actualLocation,
+        pd,
+        searchableProperties,
+        specificPropertyTraceback,
       );
+
+      propExtensions.push(result);
+    }
   }
 
   if (typeof actualEvaledFileData.searchable !== "undefined") {
@@ -624,14 +623,14 @@ async function buildItemDefinition(
   );
 
   // lets get the file definitions that are imported that exist
-  await Promise.all(
-    (actualEvaledFileData.imports || []).map((imp, index) => {
-      return getActualFileLocation(
-        [lastModuleDirectory, imp],
-        traceback.newTraceToBit("imports").newTraceToBit(index),
-      );
-    }),
-  );
+  for (let index = 0; index < (actualEvaledFileData.imports || []).length; index++) {
+    const imp = actualEvaledFileData.imports[index];
+
+    await getActualFileLocation(
+      [lastModuleDirectory, imp],
+      traceback.newTraceToBit("imports").newTraceToBit(index),
+    );
+  }
 
   // lets get the file definitions that are imported
   // as an array for use by the browser
@@ -810,18 +809,23 @@ async function buildItemDefinition(
 
   if (finalValue.properties) {
     const propertiesTraceback = traceback.newTraceToBit("properties");
-    finalValue.properties = await Promise.all<IPropertyDefinitionRawJSONDataType>
-      (finalValue.properties.map((pd, index) => {
-        const specificPropertyTraceback =
-          propertiesTraceback.newTraceToBit(index);
-        return getI18nPropertyData(
-          rawDataConfig,
-          actualLocation,
-          pd,
-          typeof finalValue.searchable === "undefined" ? true : finalValue.searchable,
-          specificPropertyTraceback,
-        );
-      }));
+    const finalValuePropsNew = [];
+    for (let index = 0; index < finalValue.properties.length; index++) {
+      const pd = finalValue.properties[index];
+      const specificPropertyTraceback = propertiesTraceback.newTraceToBit(index);
+
+      const result = await getI18nPropertyData(
+        rawDataConfig,
+        actualLocation,
+        pd,
+        typeof finalValue.searchable === "undefined" ? true : finalValue.searchable,
+        specificPropertyTraceback,
+      );
+
+      finalValuePropsNew.push(result);
+    }
+
+    finalValue.properties = finalValuePropsNew;
   }
 
   if (finalValue.includes) {
@@ -858,21 +862,19 @@ async function buildItemDefinition(
     };
 
     const tracebackIncludes = traceback.newTraceToBit("includes");
-    await Promise.all(
-      finalValue.includes.map((include, index) => {
-        return fnCheckExists(include, tracebackIncludes.newTraceToBit(index));
-      }),
-    );
+    for (let index = 0; index < finalValue.includes.length; index++) {
+      const include = finalValue.includes[index];
+      await fnCheckExists(include, tracebackIncludes.newTraceToBit(index));
+    }
 
-    finalValue.includes = await Promise.all<IIncludeRawJSONDataType>
-      (finalValue.includes.map((include, index) => {
-        return getI18nIncludeData(
-          rawDataConfig,
-          actualLocation,
-          include,
-          tracebackIncludes.newTraceToBit(index),
-        );
-      }));
+    for (let index = 0; index < finalValue.includes.length; index++) {
+      finalValue.includes[index] = await getI18nIncludeData(
+        rawDataConfig,
+        actualLocation,
+        finalValue.includes[index],
+        tracebackIncludes.newTraceToBit(index),
+      );
+    }
   }
 
   return finalValue;
@@ -884,7 +886,7 @@ async function buildItemDefinition(
  * @returns 
  */
 function buildProperty(p: IPropertyDefinitionRawJSONDataType) {
-  const p2 = {...p};
+  const p2 = { ...p };
   delete (p2 as any).description;
 
   return p2;
@@ -1451,6 +1453,7 @@ async function getI18nPropertyData(
           break;
         }
       }
+      
       // if we don't find it and it's not required not a big deal
       if (!result && !expectedProperty.required) {
         return;
