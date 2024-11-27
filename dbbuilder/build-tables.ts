@@ -405,12 +405,12 @@ export async function updateTable(
       ]
     );
 
-    const columnInfo = {
+    const columnInfo = rawColumnInfo ? {
       column_name: rawColumnInfo.column_name,
       data_type: rawColumnInfo.data_type,
       is_nullable: rawColumnInfo.is_nullable === "YES",
       column_default: rawColumnInfo.column_default,
-    };
+    } : null;
 
     // if there was no such column
     if (!columnInfo) {

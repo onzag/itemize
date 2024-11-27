@@ -6,6 +6,7 @@
 
 import fs from "fs";
 const fsAsync = fs.promises;
+import colors from "colors";
 
 const propertiesValidValueRegex = /^[a-zA-Z0-9-_&]+$/;
 
@@ -14,6 +15,8 @@ const propertiesValidValueRegex = /^[a-zA-Z0-9-_&]+$/;
  * @param pathToFile 
  */
 export async function propertiesReader(pathToFile: string) {
+  const inheritMap: {[key: string]: string} = {};
+
   // first read the content
   const content = await fsAsync.readFile(pathToFile, "utf-8");
 
@@ -25,6 +28,7 @@ export async function propertiesReader(pathToFile: string) {
 
   // the main key that is supposed to be the language
   let currentMainKey: string = null;
+  let currentMainKeyInheritsFrom: string = null;
 
   // now we loop over the lines
   for (let line of splittedLines) {
@@ -47,6 +51,19 @@ export async function propertiesReader(pathToFile: string) {
 
       // set the main key
       currentMainKey = trimmed.substring(1, trimmed.length - 1).trim();
+
+      if (currentMainKey.includes("|")) {
+        const splitted = currentMainKey.split("|");
+
+        if (splitted.length > 2) {
+          throw new Error("Could not parse " + pathToFile + " as the header at key for " + currentMainKey + " contains multiple inherits");
+        }
+
+        currentMainKey = splitted[0].trim();
+        currentMainKeyInheritsFrom = splitted[1].trim();
+        inheritMap[currentMainKey] = currentMainKeyInheritsFrom;
+      }
+
       continue;
     }
 
@@ -159,5 +176,40 @@ export async function propertiesReader(pathToFile: string) {
     });
   }
 
+  Object.keys(inheritMap).forEach((inheritMainKey) => {
+    const inheritsFromKey = inheritMap[inheritMainKey];
+
+    if (!rs[inheritMainKey] && rs[inheritsFromKey]) {
+      rs[inheritMainKey] = {};
+    };
+
+    applyMergeProperties(rs[inheritMainKey], rs[inheritsFromKey], inheritMainKey, inheritsFromKey);
+  });
+
   return rs;
+}
+
+function applyMergeProperties(applyTo: any, applyFrom: any, keyTo: string, keyFrom: string) {
+  if (!applyFrom) {
+    return;
+  }
+
+  Object.keys(applyFrom).forEach((applyFromKey) => {
+    // variations are not allowed to be filled
+    if (applyFromKey.includes("&")) {
+      return;
+    }
+    const newKeyFrom = keyFrom + "." + applyFromKey;
+    const newKeyTo = keyTo + "." + applyFromKey;
+    if (typeof applyFrom[applyFromKey] === "object") {
+      if (!applyTo[applyFromKey]) {
+        applyTo[applyFromKey] = {};
+      }
+
+      applyMergeProperties(applyTo[applyFromKey], applyFrom[applyFromKey], newKeyTo, newKeyFrom);
+    } else if (typeof applyTo[applyFromKey] === "undefined") {
+      console.warn(colors.yellow("Key at " + newKeyTo + " was filled with information from " + newKeyFrom));
+      applyTo[applyFromKey] = applyFrom[applyFromKey];
+    }
+  });
 }

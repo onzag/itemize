@@ -2896,7 +2896,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
   private getLangHeaderBase(lang: string, id: string) {
     const v = this.storageIdef.getI18nDataFor(lang);
-    return v && v.custom && v.custom[id];
+    return v && v.custom && v.custom[id] && v.custom[id].toString();
   }
 
   public getLangHeader(lang: string, id: string, def: string) {

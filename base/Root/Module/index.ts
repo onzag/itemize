@@ -28,6 +28,10 @@ import Root, { ICustomRoleManager, Ii18NType, ISearchLimitersType } from "..";
 import { EndpointError } from "../../errors";
 import { IRQRequestFields, IRQValue } from "../../../rq-querier";
 
+export interface II18nCountableObject {
+  [key: string]: string;
+}
+
 /**
  * Specific locale information contained within modules and item
  * definitions, as this is how the i18n properties parsed from the
@@ -58,7 +62,7 @@ export interface IRawJsonI18NSpecificLocaleDataType {
    * Custom translation fields
    */
   custom?: {
-    [key: string]: string;
+    [key: string]: string | II18nCountableObject;
   };
   /**
    * Policies, which only really exists on item definitions

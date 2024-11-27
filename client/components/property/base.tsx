@@ -270,6 +270,19 @@ export function EntryViewReadSet(
   // now we need the actual id, because search variants
   // cause another id
   let actualId = props.id;
+
+  if (actualId === null) {
+    if (type === "read") {
+      if (use) {
+        return [null, null];
+      }
+
+      return props.children(null, null, null);
+    } else {
+      return null;
+    }
+  }
+
   if (props.searchVariant) {
     // for that we just get the prefix and add it
     actualId =

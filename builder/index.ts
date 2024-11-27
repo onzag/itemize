@@ -485,6 +485,7 @@ async function buildModule(
     propExtRaw = await fsAsync.readFile(propExtLocation, "utf8");
     try {
       internalFileData = jsonMap.parse(propExtRaw);
+      internalFileData.data = evalRawJSON(rawDataConfig, internalFileData.data);
     } catch (err) {
       throw new CheckUpError(err.message, propExtTraceback);
     }
@@ -1024,7 +1025,12 @@ async function getI18nData(
     if (properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY]) {
       i18nData[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY] = {};
       Object.keys(properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY]).forEach((customPropertyInCustomKey) => {
-        if (typeof properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY][customPropertyInCustomKey] !== "string") {
+        const isCountableObjectKey = typeof properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY][customPropertyInCustomKey] === "object" &&
+          typeof properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY][customPropertyInCustomKey].n === "string";
+        if (
+          typeof properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY][customPropertyInCustomKey] !== "string" &&
+          !isCountableObjectKey
+        ) {
           throw new CheckUpError(
             "Custom key '" + customPropertyInCustomKey + "' in locale " + locale + " is not a string",
             localeFileTraceback,

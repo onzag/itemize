@@ -1451,13 +1451,13 @@ export function userRestServices(appData: IAppDataType) {
         "/rest/user/validate?token=" + encodeURIComponent(validateToken) + "&id=" + encodeURIComponent(decoded.id);
 
       if (isMail) {
-        const templateIdToUse = i18nData.custom.validate_account_email_fragment_id;
+        const templateIdToUse = i18nData.custom.validate_account_email_fragment_id.toString();
 
-        const subject = capitalize(i18nData.custom.validate_account);
+        const subject = capitalize(i18nData.custom.validate_account.toString());
 
         await appData.mailService.sendTemplateEmail({
-          fromUsername: i18nData.custom.validate_account_user,
-          fromEmailHandle: i18nData.custom.validate_account_email_user,
+          fromUsername: i18nData.custom.validate_account_user.toString(),
+          fromEmailHandle: i18nData.custom.validate_account_email_user.toString(),
           id: templateIdToUse,
           version: languageToUse,
           itemDefinition: fragmentIdef,
@@ -1475,7 +1475,7 @@ export function userRestServices(appData: IAppDataType) {
           emailProperty: "email",
         });
       } else {
-        const templateIdToUse = i18nData.custom.validate_account_phone_fragment_id;
+        const templateIdToUse = i18nData.custom.validate_account_phone_fragment_id.toString();
 
         await appData.phoneService.sendTemplateSMS({
           id: templateIdToUse,
@@ -1735,7 +1735,7 @@ export function userRestServices(appData: IAppDataType) {
         throw err;
       }
 
-      const templateIdToUse = email ? i18nData.custom.forgot_password_fragment_id : i18nData.custom.forgot_password_phone_fragment_id;
+      const templateIdToUse = (email ? i18nData.custom.forgot_password_fragment_id : i18nData.custom.forgot_password_phone_fragment_id).toString();
 
       const fragmentIdef = appData.root.getModuleFor(["cms"]).getItemDefinitionFor(["fragment"]);
       const extractedProperties: any = {};
@@ -1753,11 +1753,11 @@ export function userRestServices(appData: IAppDataType) {
         encodeURIComponent(userId);
 
       if (email) {
-        const subject = capitalize(i18nData.custom.forgot_password_title);
+        const subject = capitalize(i18nData.custom.forgot_password_title.toString());
 
         await appData.mailService.sendTemplateEmail({
-          fromUsername: i18nData.custom.forgot_password_user,
-          fromEmailHandle: i18nData.custom.forgot_password_email_user,
+          fromUsername: i18nData.custom.forgot_password_user.toString(),
+          fromEmailHandle: i18nData.custom.forgot_password_email_user.toString(),
           id: templateIdToUse,
           version: languageToUse,
           itemDefinition: fragmentIdef,
