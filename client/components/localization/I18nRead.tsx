@@ -321,7 +321,11 @@ function i18nReadInternal(
     }
 
     if (typeof i18nValue !== "string") {
-      errMessage += "; resolves to an object instead of a string";
+      if (i18nValue === null) {
+        errMessage += "; did not resolve";
+      } else {
+        errMessage += "; resolves to an object instead of a string";
+      }
     }
     // throw the error
     if (typeof window !== "undefined") {

@@ -101,6 +101,7 @@ export async function getItemDefinition(
             type: sqlValue.parent_type,
             version: sqlValue.parent_version,
           } : null,
+          parentNull: !(sqlValue && sqlValue.parent_id),
           customId: null,
           environmentParent: null,
         });
@@ -499,6 +500,7 @@ export async function getItemDefinitionList(
           type: value.parent_type,
           version: value.parent_version,
         } : null,
+        parentNull: !(value.parent_id),
         customId: null,
         environmentParent: null,
       });
@@ -822,6 +824,7 @@ export async function getModuleList(
           type: value.parent_type,
           version: value.parent_version,
         } : null,
+        parentNull: !(value.parent_id),
         customId: null,
         environmentParent: null,
       });

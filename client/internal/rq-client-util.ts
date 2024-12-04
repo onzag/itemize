@@ -1513,6 +1513,7 @@ interface ISearchQueryArg {
     id: string,
     version: string,
   };
+  parentNull?: boolean;
   types?: string[];
   enableNulls: boolean;
   traditional: boolean;
@@ -1651,6 +1652,10 @@ export function getSearchArgsFor(
     searchArgs.parent_type = arg.parentedBy.itemDefinition.getQualifiedPathName();
     searchArgs.parent_id = arg.parentedBy.id || null;
     searchArgs.parent_version = arg.parentedBy.version || null;
+  }
+
+  if (arg.parentNull) {
+    searchArgs.parent_null = true;
   }
 
   searchArgs.order_by = convertOrderByRule(arg.orderBy);

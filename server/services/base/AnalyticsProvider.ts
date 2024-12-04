@@ -199,6 +199,13 @@ export interface IResolveAggregationArg {
    * developer specified
    */
   contextMaxSize?: number;
+  /**
+   * Custom args related to the specific analytics provided
+   * that is used that only works with it
+   */
+  args?: {
+    [key: string]: any;
+  }
 }
 
 /**
@@ -281,6 +288,13 @@ export interface IExposeAnalyticsOptionsNoTrack {
    * size limit for the user information, if not provided it will default to 300
    */
   maxUsersToAccountAtOnce?: number;
+  /**
+   * Custom args related to the specific analytics provided
+   * that is used that only works with it
+   */
+  args?: {
+    [key: string]: any;
+  }
 }
 
 /**
@@ -1427,6 +1441,7 @@ export default class AnalyticsProvider<T, BuilderType, ResponseType> extends Ser
           timeslices: timeslice,
           timeslicesFrom: actualFrom,
           timeslicesTo: actualTo,
+          args: endpointAtPath.args,
           aggregateUsers: endpointAtPath.aggregateUsers,
           contextMaxSize: endpointAtPath.maxContextsToAccountAtOnce,
           aggregateUsersMaxSize: endpointAtPath.maxUsersToAccountAtOnce,

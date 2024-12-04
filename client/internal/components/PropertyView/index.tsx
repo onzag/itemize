@@ -140,7 +140,14 @@ export interface IPropertyViewMainHandlerProps<ValueType extends PropertyDefinit
   handleAs?: {
     type: string;
     subtype?: string;
-  }
+  };
+  /**
+   * Normally values are displayed in the timezone of the client
+   * rather than in the values that they are specified originally
+   * in the original timezone, use this to ensure that the value is
+   * displayed in the original timezone
+   */
+  retainTimeZone?: boolean;
 }
 
 /**

@@ -127,6 +127,7 @@ export async function addItemDefinition(
         type: resolverArgs.args.parent_type,
         version: resolverArgs.args.parent_version || null,
       } : null,
+      parentNull: !isParenting,
       customId,
       environmentParent: null,
     });

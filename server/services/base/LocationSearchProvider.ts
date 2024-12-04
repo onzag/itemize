@@ -15,6 +15,12 @@ import { ServiceProvider, ServiceProviderType } from "..";
  */
 const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
 
+export interface ITimezoneInformation {
+  name: string;
+  utcOffset: string;
+  utcOffsetMs: number;
+}
+
 /**
  * The location search provider is a base interface type class
  * that specifies how to create a service for location search
@@ -100,6 +106,20 @@ export default class LocationSearchProvider<T> extends ServiceProvider<T> {
     lang: string,
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
+    return null;
+  }
+
+  /**
+   * Provided latitude and longuitude provides the timezone
+   * @param lat 
+   * @param lng 
+   * @override
+   * @returns 
+   */
+  public async performTimezoneRequest(
+    lat: string | number,
+    lng: string | number,
+  ): Promise<ITimezoneInformation> {
     return null;
   }
 }

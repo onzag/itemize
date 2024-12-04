@@ -1,7 +1,7 @@
 import https from "https";
 import { ServiceProviderType } from ".";
 import { IPropertyDefinitionSupportedLocationType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
-import LocationSearchProvider from "./base/LocationSearchProvider";
+import LocationSearchProvider, { ITimezoneInformation } from "./base/LocationSearchProvider";
 
 // the interface that roughly represents a result from the
 // here we go API, check the API at
@@ -37,6 +37,22 @@ interface IHereResult {
   // search props
   ontologyId?: string;
   houseNumberType?: string;
+}
+
+function utcOffsetToMilliseconds(utcOffset) {
+  // Validate the format of the input (e.g., "+1:00" or "-01:30")
+  const match = /^([+-]?)(\d{1,2}):(\d{2})$/.exec(utcOffset);
+  if (!match) {
+      throw new Error("Invalid UTC offset format. Use [+/-]HH:MM.");
+  }
+
+  const sign = match[1] === "-" ? -1 : 1; // Determine if the offset is negative
+  const hours = parseInt(match[2], 10);  // Extract hours
+  const minutes = parseInt(match[3], 10); // Extract minutes
+
+  // Convert the offset to milliseconds
+  const offsetInMilliseconds = sign * (((hours * 60) + minutes) * 60 * 1000);
+  return offsetInMilliseconds;
 }
 
 export interface IHereMapsConfig {
@@ -375,6 +391,96 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
           }
         );
         resolve([]);
+      });
+    });
+  }
+  
+  public performTimezoneRequest(lat: string | number, lng: string | number): Promise<ITimezoneInformation> {
+    const hostname = "discover.search.hereapi.com";
+    const path = "/v1/revgeocode";
+    const qs = `?at=${lat},${lng}&apiKey=${this.config.apiKey}&show=tz`;
+    const pathwithqs = path + qs;
+
+    return new Promise<ITimezoneInformation>((resolve, reject) => {
+      https.get(
+        {
+          hostname,
+          path: pathwithqs,
+          headers: {
+            "Accept-Language": `en-US;q=0.9, en;q=0.9, es-419;q=0.8, es;q=0.7`,
+          },
+        },
+        (resp) => {
+          // let's get the response from the stream
+          let data = "";
+          resp.on("data", (chunk) => {
+            data += chunk;
+          });
+          resp.on("error", (err) => {
+            this.logError(
+              {
+                className: "HereMapsService",
+                methodName: "performTimezoneRequest",
+                message: "Here response cancelled",
+                serious: true,
+                err,
+                data: {
+                  data,
+                  lat,
+                  lng,
+                },
+              }
+            );
+            resolve(null);
+          });
+          resp.on("end", () => {
+            // now that we got the answer, let's use our guess
+            try {
+              const parsedData = JSON.parse(data);
+
+              console.log(parsedData);
+
+              if (!parsedData.items[0] || !parsedData.items[0].timeZone) {
+                resolve(null);
+              }
+
+              const tzObject: ITimezoneInformation = parsedData.items[0].timeZone;
+              tzObject.utcOffsetMs = utcOffsetToMilliseconds(tzObject.utcOffset);
+              resolve(tzObject);
+            } catch (err) {
+              this.logError(
+                {
+                  className: "HereMapsService",
+                  methodName: "performTimezoneRequest",
+                  message: "Here replied with invalid data or with error message",
+                  serious: true,
+                  err,
+                  data: {
+                    data,
+                    lat,
+                    lng,
+                  },
+                }
+              );
+              resolve(null);
+            }
+          });
+        }
+      ).on("error", (err) => {
+        this.logError(
+          {
+            className: "HereMapsService",
+            methodName: "performTimezoneRequest",
+            message: "Https request to here API failed",
+            serious: true,
+            err,
+            data: {
+              lat,
+              lng,
+            },
+          }
+        );
+        resolve(null);
       });
     });
   }

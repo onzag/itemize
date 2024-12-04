@@ -1379,6 +1379,10 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES_RQ: (orderByRule: RQArg) => {[id: s
     array: true,
     description: "Blacklists the given parent types (note that this is a filter and does not replace parent_id parent_type and parent_version)",
   },
+  parent_null: {
+    type: "boolean",
+    description: "Will only allow results that have no parent"
+  },
   search: {
     type: "string",
     description: "A search string, searches within the prop extensions and the prop extensions only",

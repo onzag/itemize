@@ -59,6 +59,26 @@ export interface ICustomRoleGranterArg {
     version: string;
   };
   /**
+   * Whether the parent is expected to be not there
+   * 
+   * This variable will be set to true if what we are dealing with
+   * is guraranteed not to have a parent, while the parent variable
+   * refers on a known parent we will be dealing with but in ambiguous requests
+   * a parent may not be set yet the client may be requesting to read items
+   * that come with a parent
+   * 
+   * for example in a Search where a parent is specified, parentNull would be false
+   * but if this parent is not specified it will still be false because you will still
+   * have items that could potentially have a parent
+   * 
+   * However if the client specifically specifies they don't want results with a parent
+   * then parentNull can be guaranteed to be true
+   * 
+   * On single item read cases where the value is already known the parentNull is exactly the same
+   * as having or not a parent, because it is already known this to be the case
+   */
+  parentNull: boolean;
+  /**
    * When creating, if a custom id is given this field will contain it
    */
   customId: string;

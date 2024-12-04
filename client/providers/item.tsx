@@ -810,7 +810,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
      * The version for the given id that is wanted
      */
     version?: string,
-  };
+  } | "NO_PARENT";
 
   /**
    * Use this to enable SSR search
@@ -2727,7 +2727,8 @@ export class ActualItemProvider extends
           try {
             this.initialAutomaticNextSearch = true;
             await this.search(this.props.automaticSearch);
-          } catch {
+          } catch (err) {
+            console.error(err);
             // setup listeners just in case
             // for a failed search
             listenersSetup();
@@ -2822,7 +2823,7 @@ export class ActualItemProvider extends
         if ((window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length === 0) {
           delete (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId];
         }
-        if ((!(window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] || (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length === 1)) {
+        if ((window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] && (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length === 1) {
           console.warn(
             "The double slotting on item: " + JSON.stringify(this.props.itemDefinitionQualifiedName) +
             " at id: " + JSON.stringify(this.props.forId || null) +
@@ -5633,9 +5634,10 @@ export class ActualItemProvider extends
 
     // and the cache policy by parenting
     let searchParent: [string, string, string] = null;
-    if ((options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent") && (!options.parentedBy || !options.parentedBy.id)) {
-      throw new Error("A by owner cache policy requires parentedBy option to be set with a specific id");
-    } else if (options.parentedBy && options.parentedBy.id) {
+    if ((options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent") &&
+      (options.parentedBy === "NO_PARENT" || !options.parentedBy || !options.parentedBy.id)) {
+      throw new Error("A by owner-and-parent cache policy requires parentedBy option to be set with a specific id");
+    } else if (options.parentedBy && options.parentedBy !== "NO_PARENT" && options.parentedBy.id) {
       // because the parenting rule goes by a path, eg.... module/module  and then idef/idef
       // we need to loop and find it by the path in order to find both
       const itemDefinitionInQuestion = this.props.itemDefinitionInstance.getParentModule()
@@ -5871,7 +5873,8 @@ export class ActualItemProvider extends
     const requestedSearchFields = searchFieldsAndArgs.requestFields;
 
     let parentedBy = null;
-    if (options.parentedBy) {
+    let parentNull = false;
+    if (options.parentedBy && options.parentedBy !== "NO_PARENT") {
       const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
       const parentIdef = root.registry[options.parentedBy.item] as ItemDefinition;
       parentedBy = {
@@ -5879,6 +5882,8 @@ export class ActualItemProvider extends
         id: options.parentedBy.id || null,
         version: options.parentedBy.version || null,
       };
+    } else if (options.parentedBy === "NO_PARENT") {
+      parentNull = true;
     }
 
     const stateOfSearch = this.props.itemDefinitionInstance.getStateNoExternalChecking(
@@ -5939,6 +5944,7 @@ export class ActualItemProvider extends
       offset: options.offset,
       enableNulls: options.enableNulls,
       parentedBy,
+      parentNull,
       waitAndMerge: options.waitAndMerge,
       progresser: options.progresser,
       cacheStoreMetadata: options.cacheMetadata,

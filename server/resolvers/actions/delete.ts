@@ -105,6 +105,7 @@ export async function deleteItemDefinition(
             type: sqlValue.parent_type,
             version: sqlValue.parent_version,
           } : null,
+          parentNull: !(sqlValue && sqlValue.parent_id),
           customId: null,
           environmentParent: null,
           id: resolverArgs.args.id,

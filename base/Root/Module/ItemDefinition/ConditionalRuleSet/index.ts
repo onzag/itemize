@@ -281,6 +281,11 @@ export default class ConditionalRuleSet {
       // if there is an attribute, then we use that attribute
       if (rawDataAsProperty.attribute && actualPropertyValue !== null) {
         actualPropertyValue = actualPropertyValue[rawDataAsProperty.attribute];
+
+        if (typeof actualPropertyValue === "undefined" && process.env.NODE_ENV === "development") {
+          console.warn("The conditional rule could not find the value attribute for property \"" + rawDataAsProperty.property +
+            "\" was unable to do and as a result it is currently undefined, the atrribute required is: " + JSON.stringify(rawDataAsProperty.attribute));
+        }
       }
 
       // now let's check what we are comparing against

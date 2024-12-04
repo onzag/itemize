@@ -92,6 +92,24 @@ export async function searchModule(
     });
   }
 
+  if (
+    resolverArgs.args.parent_null &&
+    (
+      resolverArgs.args.parent_id ||
+      resolverArgs.args.parent_type ||
+      resolverArgs.args.parent_version ||
+      resolverArgs.args.parent_ids_filter_ ||
+      resolverArgs.args.parent_ids_filter_out ||
+      resolverArgs.args.parent_type_filter ||
+      resolverArgs.args.parent_type_filter_out
+    )
+  ) {
+    throw new EndpointError({
+      message: "Conflict using parent_null while also using another parent filter that expects a parent",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
   const since = retrieveSince(resolverArgs.args);
   const until = retrieveUntil(resolverArgs.args);
   if (!opts.noLimitOffset) {
@@ -122,6 +140,7 @@ export async function searchModule(
       type: resolverArgs.args.parent_type,
       version: resolverArgs.args.parent_version || null,
     } : null,
+    parentNull: !!resolverArgs.args.parent_null,
     customId: null,
     environmentParent: null,
   });
@@ -759,7 +778,7 @@ export async function searchModule(
       count = baseResult.length + offset;
     } else {
       const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
-      count = countResult ? countResult.count : null;
+      count = countResult ? parseInt(countResult.count) : null;
     }
   }
 
@@ -1079,6 +1098,24 @@ export async function searchItemDefinition(
     });
   }
 
+  if (
+    resolverArgs.args.parent_null &&
+    (
+      resolverArgs.args.parent_id ||
+      resolverArgs.args.parent_type ||
+      resolverArgs.args.parent_version ||
+      resolverArgs.args.parent_ids_filter_ ||
+      resolverArgs.args.parent_ids_filter_out ||
+      resolverArgs.args.parent_type_filter ||
+      resolverArgs.args.parent_type_filter_out
+    )
+  ) {
+    throw new EndpointError({
+      message: "Conflict using parent_null while also using another parent filter that expects a parent",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
   let pooledRoot: Root;
   try {
     pooledRoot = await appData.rootPool.acquire().promise;
@@ -1138,6 +1175,7 @@ export async function searchItemDefinition(
         type: resolverArgs.args.parent_type,
         version: resolverArgs.args.parent_version || null,
       } : null,
+      parentNull: !!resolverArgs.args.parent_null,
       customId: null,
       environmentParent: null,
     });
@@ -1466,6 +1504,14 @@ export async function searchItemDefinition(
         });
       }
 
+      if (resolverArgs.args.parent_null) {
+        elasticQuery.mustTerm({
+          parent_id: "?NULL",
+        }, {
+          groupId: "PARENT",
+        });
+      }
+
       if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
         elasticQuery.mustTerm({
           parent_id: resolverArgs.args.parent_id,
@@ -1608,6 +1654,15 @@ export async function searchItemDefinition(
           `"parent_id" != ANY(ARRAY[${resolverArgs.args.parent_ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
           resolverArgs.args.parent_ids_filter_out,
         );
+      }
+
+      if (resolverArgs.args.parent_null) {
+        // these are non nullable and the index work better
+        // this way
+        queryModel.whereBuilder
+          .andWhereColumn("parent_id", "")
+          .andWhereColumn("parent_version", "")
+          .andWhereColumn("parent_type", "");
       }
 
       if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
@@ -1778,7 +1833,7 @@ export async function searchItemDefinition(
         count = baseResult.length + offset;
       } else {
         const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
-        count = countResult ? countResult.count : null;
+        count = countResult ? parseInt(countResult.count) : null;
       }
     }
 

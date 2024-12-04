@@ -89,10 +89,14 @@ export default class PropertyViewDateTime extends React.Component<IPropertyViewH
     let momentValue: Moment.Moment = null;
     const valueToUse: string = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as string;
     if (valueToUse && valueToUse !== "Invalid Date") {
-      if (this.state.isReady) {
+      if (this.state.isReady && !this.props.retainTimeZone) {
         // when we are ready we can be sure we are in client side
         // and we can use the same timezone as the browser/machine
         momentValue = Moment(valueToUse, dbFormat);
+      } else if (this.props.retainTimeZone) {
+        // this will not affect the server because we retain the original timezone
+        // and therefore both server and client will agree
+        momentValue = Moment.parseZone(valueToUse, dbFormat);
       } else {
         // otherwise force UTC
         momentValue = Moment.utc(valueToUse, dbFormat);

@@ -28,6 +28,22 @@ export interface IElasticAnalyticsTermStats {
 }
 
 /**
+ * Specific args to the elastic analytics
+ */
+export interface IElasticAnalyticsArgs {
+  /**
+   * Type of bound to use to build the histogram
+   * defaults to hard
+   */
+  bounds?: "hard" | "extended";
+  /**
+   * whether to remove empty results
+   * defaults to false
+   */
+  histogramMinDocCount?: boolean;
+}
+
+/**
  * A numeric stat is based on the weight of a given
  * entry
  */
@@ -530,8 +546,12 @@ export class ElasticAnalyticsService extends AnalyticsProvider<null, ElasticQuer
         aggs: currentAggs,
       }
 
+      if (arg.args && typeof arg.args.histogramMinDocCount === "number") {
+        elasticQuery.aggs.histogram.date_histogram.min_doc_count = arg.args.histogramMinDocCount;
+      }
+
       if (arg.timeslicesFrom || arg.timeslicesTo) {
-        elasticQuery.aggs.histogram.date_histogram.hard_bounds = {
+        elasticQuery.aggs.histogram.date_histogram[arg.args.bounds === "extended" ? "extended_bounds" : "hard_bounds"] = {
           min: arg.timeslicesFrom || null,
           max: arg.timeslicesTo || "now",
         }

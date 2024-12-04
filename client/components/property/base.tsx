@@ -229,7 +229,14 @@ export interface IPropertyViewProps<RendererPropsType> extends IPropertyBaseWith
   handleAs?: {
     type: string;
     subtype?: string;
-  }
+  };
+  /**
+   * Normally values are displayed in the timezone of the client
+   * rather than in the values that they are specified originally
+   * in the original timezone, use this to ensure that the value is
+   * displayed in the original timezone
+   */
+  retainTimeZone?: boolean;
 }
 
 /**
@@ -433,7 +440,7 @@ export function EntryViewReadSet(
       console.warn(
         "Possibly unwanted behaviour, you used a Reader on property " +
         property.getId() +
-        " but it has not been loaded on this context"
+        " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
       );
     }
 
@@ -478,6 +485,7 @@ export function EntryViewReadSet(
           displayHidden={props.displayHidden}
           highlights={itemContextualValue.highlights && itemContextualValue.highlights[property.getId()]}
           handleAs={props.handleAs}
+          retainTimeZone={props.retainTimeZone}
         />
       );
     }
@@ -512,7 +520,7 @@ export function EntryViewReadSet(
       console.warn(
         "Possibly unwanted behaviour, you used a View on property " +
         property.getId() +
-        " but it has not been loaded on this context"
+        " but it has not been loaded on this context, if you wish to ignore this use suppressWarnings={true}"
       );
     }
 
@@ -529,7 +537,7 @@ export function EntryViewReadSet(
         console.warn(
           "Possibly unwanted behaviour, you used a Entry on property " +
           property.getId() +
-          " but it has not been loaded on this context"
+          " but it has not been loaded on this context, if you wisth to ignore this use suppressWarnings={true}"
         );
       }
 
@@ -545,7 +553,7 @@ export function EntryViewReadSet(
       console.warn(
         "Possibly unwanted behaviour, you used a Entry on property " +
         property.getId() +
-        " but it is currently hidden, if you want it to display it anyway use displayHidden={true}"
+        " but it is currently hidden, if you want it to display it anyway use displayHidden={true} or suppressWarnings={true}"
       );
     }
 

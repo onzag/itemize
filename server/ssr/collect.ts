@@ -427,7 +427,7 @@ export class Collector {
       const requestedSearchFields = searchFieldsAndArgs.requestFields;
 
       let parentedBy = null;
-      if (args.parentedBy) {
+      if (args.parentedBy && args.parentedBy !== "NO_PARENT") {
         const root = idef.getParentModule().getParentRoot();
         const parentIdef = root.registry[args.parentedBy.item] as ItemDefinition;
         parentedBy = {
@@ -461,6 +461,7 @@ export class Collector {
         limit: args.limit,
         offset: args.offset,
         enableNulls: args.enableNulls,
+        parentNull: args.parentedBy === "NO_PARENT",
         parentedBy,
       });
 
@@ -507,7 +508,7 @@ export class Collector {
       })) as IRQSearchRecord[];
 
       let searchParent: [string, string, string] = null;
-      if (args.parentedBy && args.parentedBy.id) {
+      if (args.parentedBy && args.parentedBy !== "NO_PARENT" && args.parentedBy.id) {
         const itemDefinitionInQuestion = idef.getParentModule()
           .getParentRoot().registry[args.parentedBy.item] as ItemDefinition;
 
@@ -712,6 +713,7 @@ export class Collector {
           idef,
           rowValue,
         ) : null,
+        parentNull: !(rowValue && rowValue.parent_id),
         customId: null,
         environmentParent: null,
       }

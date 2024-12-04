@@ -784,6 +784,7 @@ export class Listener {
           type: value.parent_type,
           version: value.parent_version || null,
         } : null,
+        parentNull: !(value && value.parent_id),
         customId: null,
         environmentParent: null,
       }
@@ -923,6 +924,7 @@ export class Listener {
           requestArgs: {},
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -1105,6 +1107,7 @@ export class Listener {
           },
           owner: UNSPECIFIED_OWNER,
           parent: null,
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -1245,6 +1248,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -1388,6 +1392,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -1569,6 +1574,7 @@ export class Listener {
           requestArgs: {},
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -1891,6 +1897,7 @@ export class Listener {
           },
           owner: UNSPECIFIED_OWNER,
           parent: null,
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -2219,6 +2226,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -2550,6 +2558,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          parentNull: false,
           customId: null,
           environmentParent: null,
         }
@@ -2897,6 +2906,7 @@ export class Listener {
           type: value.parent_type,
           version: value.parent_version || null,
         } : null,
+        parentNull: false,
         customId: null,
         environmentParent: null,
       }

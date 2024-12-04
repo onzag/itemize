@@ -283,7 +283,7 @@ export function processFields(
       if (!schemaField) {
         throw new EndpointError({
           code: ENDPOINT_ERRORS.UNSPECIFIED,
-          message: prefixErrr + "[" + index + "][0] main key does not represent a field found in the schema",
+          message: prefixErrr + "[" + index + "][0] main key " + JSON.stringify(mainKey) + " does not represent a field found in the schema",
         });
       }
       // non-std
@@ -306,7 +306,7 @@ export function processFields(
       if (!schemaField) {
         throw new EndpointError({
           code: ENDPOINT_ERRORS.UNSPECIFIED,
-          message: prefixErrr + "[" + index + "] key does not represent a field found in the schema",
+          message: prefixErrr + "[" + index + "] key " + JSON.stringify(field) + " does not represent a field found in the schema",
         });
       }
       fieldsResult[field] = {};

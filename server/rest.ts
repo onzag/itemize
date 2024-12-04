@@ -392,6 +392,41 @@ export default function restServices(appData: IAppDataType) {
     res.end(JSON.stringify(finalResults));
   });
 
+  router.get("/util/location-tz", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    if (
+      !appData.locationSearchService
+    ) {
+      res.status(400);
+      res.end(JSON.stringify({
+        message: "A location fetcher hasn't been set",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
+      return;
+    }
+
+    if (
+      !req.query.lat || isNaN(req.query.lat as any) ||
+      !req.query.lng || isNaN(req.query.lng as any)
+    ) {
+      res.status(400);
+      res.end(JSON.stringify({
+        message: "Invalid request, needs parameters, lat, lng",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
+      return;
+    }
+
+    const finalResult = await appData.locationSearchService.performTimezoneRequest(
+      req.query.lat as string,
+      req.query.lng as string,
+    );
+
+    res.status(200);
+    res.end(JSON.stringify(finalResult));
+  });
+
   // add the static resources
   const reprocessedCache = {};
   REPROCESSED_RESOURCES.forEach((rr) => {
