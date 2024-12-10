@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
-import ItemDefinition, { IItemSearchStateHighlightArgsType, IItemSearchStateType, IItemStateType } from "../../base/Root/Module/ItemDefinition";
-import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { IElasticHighlightRecordInfo, IElasticHighlightSingleRecordInfo, PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
-import { TokenContext, ITokenContextType } from "../internal/providers/token-provider";
+import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
+import ItemDefinition, { IItemSearchStateHighlightArgsType, IItemSearchStateType, IItemStateType } from "../../../base/Root/Module/ItemDefinition";
+import PropertyDefinition, { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IElasticHighlightRecordInfo, IElasticHighlightSingleRecordInfo, PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import Include, { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
+import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import {
   PREFIX_GET,
   UNSPECIFIED_OWNER,
@@ -19,31 +19,31 @@ import {
   UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION,
   MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION,
   UNMOUNT_DESTRUCTION_MARKERS_LOCATION,
-} from "../../constants";
-import { IRQSearchRecord, IRQValue, IRQRequestFields, ProgresserFn } from "../../rq-querier";
-import { requestFieldsAreContained } from "../../rq-util";
-import { EndpointErrorType } from "../../base/errors";
+} from "../../../constants";
+import { IRQSearchRecord, IRQValue, IRQRequestFields, ProgresserFn } from "../../../rq-querier";
+import { requestFieldsAreContained } from "../../../rq-util";
+import { EndpointErrorType } from "../../../base/errors";
 import equals from "deep-equal";
-import { ModuleContext } from "./module";
-import CacheWorkerInstance from "../internal/workers/cache";
-import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/app/remote-listener";
+import { ModuleContext } from "../module";
+import CacheWorkerInstance from "../../internal/workers/cache";
+import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../../internal/app/remote-listener";
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
   IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode, SearchCacheMetadataMismatchActionFn, getPropertyListDefault
-} from "../internal/rq-client-util";
-import { IPropertyCoreProps, IPropertySetterProps } from "../components/property/base";
-import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { ConfigContext } from "../internal/providers/config-provider";
-import { IConfigRawJSONDataType } from "../../config";
-import { setHistoryQSState, setHistoryState } from "../components/navigation";
-import LocationRetriever from "../components/navigation/LocationRetriever";
+} from "../../internal/rq-client-util";
+import { IPropertyCoreProps, IPropertySetterProps } from "../../components/property/base";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
+import { ConfigContext } from "../../internal/providers/config-provider";
+import { IConfigRawJSONDataType } from "../../../config";
+import { setHistoryQSState, setHistoryState } from "../../components/navigation";
+import LocationRetriever from "../../components/navigation/LocationRetriever";
 import { Location } from "history";
-import type { ICacheMetadataMatchType, ICacheStateMetadata } from "../internal/workers/cache/cache.worker.class";
-import { blobToTransferrable } from "../../util";
-import Hit from "../components/analytics/Hit";
-import Timetrack from "../components/analytics/Timetrack";
-import { genericAnalyticsDataProvider } from "../components/analytics/util";
+import type { ICacheMetadataMatchType, ICacheStateMetadata } from "../../internal/workers/cache/cache.worker.class";
+import { blobToTransferrable } from "../../../util";
+import Hit from "../../components/analytics/Hit";
+import Timetrack from "../../components/analytics/Timetrack";
+import { genericAnalyticsDataProvider } from "../../components/analytics/util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 

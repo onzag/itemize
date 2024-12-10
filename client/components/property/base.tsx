@@ -262,7 +262,7 @@ export function EntryViewReadSet(
   const includeContextualValue = useContext(IncludeContext);
 
   let props = originalProps as IPropertyEntryViewReadSetProps<any, any>;
-  if (typeof originalProps === "string") {
+  if (typeof originalProps === "string" || originalProps === null) {
     props = {
       id: originalProps,
     } as any;

@@ -287,7 +287,7 @@ export interface IPropertyDefinitionInvalidRuleDataType {
 /**
  * This is the state you receive from a property once you request it
  */
-export interface IPropertyDefinitionState<T extends PropertyDefinitionSupportedType> {
+export interface IPropertyDefinitionState<T> {
   /**
    * whether this value was user set
    */
