@@ -97,7 +97,7 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
   };
 }
 
-function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSupportedType>, itemDefinition: ItemDefinition) {
+export function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSupportedType>, itemDefinition: ItemDefinition) {
   let actualId: string = setter.id;
   if (setter.searchVariant) {
     actualId = PropertyDefinitionSearchInterfacesPrefixes[setter.searchVariant.toUpperCase().replace("-", "_")] + setter.id;
@@ -108,7 +108,7 @@ function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSup
   return itemDefinition.getPropertyDefinitionFor(actualId, true);
 }
 
-function resolveCoreProp(value: string | IPropertyCoreProps) {
+export function resolveCoreProp(value: string | IPropertyCoreProps) {
   if (typeof value === "string") {
     return value;
   } else if (value.searchVariant) {
@@ -118,7 +118,7 @@ function resolveCoreProp(value: string | IPropertyCoreProps) {
   return value.id;
 }
 
-function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOptions) {
+export function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOptions) {
   let searchANoFn = searchA;
   let searchBNoFn = searchB;
   if (
@@ -2244,6 +2244,8 @@ export class ActualItemProvider extends
     let memoryLoadedAndValid = false;
     // by default we don't know
     let isNotFound = false;
+    let isBlocked = false;
+    let isBlockedButDataIsAccessible = false;
     if (memoryLoaded) {
       const appliedRQValue = props.itemDefinitionInstance.getRQAppliedValue(
         props.forId || null, props.forVersion || null,
@@ -2265,6 +2267,8 @@ export class ActualItemProvider extends
         requestFieldsAreContained(requestFields, appliedRQValue.requestFields)
       );
       isNotFound = memoryLoadedAndValid && appliedRQValue.rawValue === null;
+      isBlocked = !isNotFound && !!appliedRQValue.rawValue.blocked_at;
+      isBlockedButDataIsAccessible = isBlocked && !!appliedRQValue.rawValue.DATA;
     }
 
     let searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION" = "NO";
@@ -2318,8 +2322,8 @@ export class ActualItemProvider extends
       // all the optimization flags
       itemState: ActualItemProvider.getItemStateStatic(props),
       // and we pass all this state
-      isBlocked: false,
-      isBlockedButDataIsAccessible: false,
+      isBlocked,
+      isBlockedButDataIsAccessible,
       notFound: isNotFound,
       loadError: null,
       // loading will be true if we are setting up with an id

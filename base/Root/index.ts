@@ -78,8 +78,12 @@ export interface ICustomRoleManager {
 }
 
 type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string, requestFields: IRQRequestFields) => Promise<void>;
+type RequestManagerNeedsFn = (itemDefinition: ItemDefinition, id: string, version: string, requestFields: IRQRequestFields) => boolean;
 type RequestManagerSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => Promise<void>;
+type RequestManagerNeedsSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => boolean;
 type RequestManagerResourceFn = (finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>) => Promise<string>;
+type RequestManagerNeedsResourceFn = (finalPath: string) => boolean;
+
 
 /**
  * This is the raw processed form of the root
@@ -234,6 +238,7 @@ export default class Root {
    * @internal
    */
   private requestManager: RequestManagerFn = null;
+  private requestManagerNeeds: RequestManagerNeedsFn = null;
 
   /**
    * This is used for SSR and lives in the root
@@ -242,6 +247,7 @@ export default class Root {
    * @internal
    */
   private requestManagerSearch: RequestManagerSearchFn = null;
+  private requestManagerNeedsSearch: RequestManagerNeedsSearchFn = null;
 
   /**
    * This is used for SSR and lives in the root
@@ -250,6 +256,7 @@ export default class Root {
    * @internal
    */
   private requestManagerResource: RequestManagerResourceFn = null;
+  private requestManagerNeedsResource: RequestManagerNeedsResourceFn = null;
 
   /**
    * Used by the server side to set server flags to flag
@@ -323,8 +330,9 @@ export default class Root {
    * @param manager the manager in question
    * @internal
    */
-   public setRequestManagerSearch(manager: RequestManagerSearchFn) {
+   public setRequestManagerSearch(manager: RequestManagerSearchFn, managerNeeds: RequestManagerNeedsSearchFn) {
     this.requestManagerSearch = manager;
+    this.requestManagerNeedsSearch = managerNeeds;
   }
 
   /**
@@ -334,8 +342,17 @@ export default class Root {
    * @param manager the manager in question
    * @internal
    */
-  public setRequestManager(manager: RequestManagerFn) {
+  public setRequestManager(manager: RequestManagerFn, managerNeeds: RequestManagerNeedsFn) {
     this.requestManager = manager;
+    this.requestManagerNeeds = managerNeeds;
+  }
+
+  /**
+   * Specifies whether a request manager has been specified
+   * in practise only true in the server side
+   */
+  public hasRequestManager() {
+    return !!this.requestManager;
   }
 
   /**
@@ -344,8 +361,9 @@ export default class Root {
    * @param manager the manager in question
    * @internal
    */
-   public setRequestManagerResource(manager: RequestManagerResourceFn) {
+   public setRequestManagerResource(manager: RequestManagerResourceFn, managerNeeds: RequestManagerNeedsResourceFn) {
     this.requestManagerResource = manager;
+    this.requestManagerNeedsResource = managerNeeds;
   }
 
   /**
@@ -361,6 +379,19 @@ export default class Root {
   }
 
   /**
+   * Specifies whether it needs to call the request manager search
+   * @internal
+   * @param itemDefinition 
+   * @param id 
+   * @param version 
+   * @param args 
+   * @returns 
+   */
+  public needsRequestManagerSearch(itemDefinition: ItemDefinition, id: string, version: string, args: any) {
+    return this.requestManagerNeedsSearch(itemDefinition, id, version, args);
+  }
+
+  /**
    * Calls the request manager to request it for a given value
    * to be stored and be applied the state inside our
    * root
@@ -373,6 +404,10 @@ export default class Root {
     await this.requestManager(itemDefinition, id, version, requestFields);
   }
 
+  public needsRequestManager(itemDefinition: ItemDefinition, id: string, version: string, requestFields: IRQRequestFields) {
+    return this.requestManagerNeeds(itemDefinition, id, version, requestFields);
+  }
+
   /**
    * Calls the request manager to request for a given resource
    * @param finalPath
@@ -381,6 +416,10 @@ export default class Root {
    */
    public async callRequestManagerResource(finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>): Promise<string> {
     return await this.requestManagerResource(finalPath, customResolver);
+  }
+
+  public needsRequestManagerResource(finalPath: string) {
+    return this.requestManagerNeedsResource(finalPath);
   }
 
   /**

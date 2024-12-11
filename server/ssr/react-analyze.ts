@@ -231,7 +231,7 @@ export async function walkReactTree(
       ) {
         try {
           instance.componentWillUnmount()
-        } catch (_err) {}
+        } catch (_err) { }
       }
 
       instance._isMounted = false;
@@ -241,7 +241,26 @@ export async function walkReactTree(
 
       currentContextMap = contextMap;
       ReactCurrentDispatcher.current = Dispatcher;
-      const childComponent = element.type(element.props);
+
+      let errCount: number = 0;
+      let childComponent: any = null;
+      while (true) {
+        try {
+          childComponent = element.type(element.props);
+          break;
+        } catch (err) {
+          if (err.resolveServerSideState) {
+            await err.resolveServerSideState();
+            errCount++;
+
+            if (errCount >= 100) {
+              throw new Error("Max error size exceeded from walking react tree at 100 errors");
+            }
+          } else {
+            throw err;
+          }
+        }
+      }
 
       currentContextMap = null;
       ReactCurrentDispatcher.current = originalDispatcher;

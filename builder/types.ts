@@ -14,10 +14,6 @@ import path from "path";
 import colors from "colors/safe";
 const fsAsync = fs.promises;
 
-function typeGenerator(ide) {
-
-}
-
 function rqToTypescriptDefinition(
   flat: boolean,
   itemOrMod: ItemDefinition | Module,
@@ -204,6 +200,14 @@ function modTypeNameGetterSQL(mod: Module) {
   return modTypeNameGetterBase(mod) + "SQLType";
 }
 
+function modTypeNameGetterUseBase(mod: Module) {
+  return "use" + modTypeNameGetterBase(mod) + "ItemProvider";
+}
+
+function modTypeNameGetterUseSearch(mod: Module) {
+  return "use" + modTypeNameGetterBase(mod) + "SearchItemProvider";
+}
+
 function itemTypeNameGetterRqSS(item: ItemDefinition) {
   return itemTypeNameGetterBase(item) + "FlatRqType";
 }
@@ -218,6 +222,14 @@ function itemTypeNameGetterSQL(item: ItemDefinition) {
 
 function itemTypeNameGetterOnlySQL(item: ItemDefinition) {
   return itemTypeNameGetterBaseOnly(item) + "SQLType";
+}
+
+function itemTypeNameGetterUseBase(item: ItemDefinition) {
+  return "use" + itemTypeNameGetterBase(item) + "ItemProvider";
+}
+
+function itemTypeNameGetterUseSearch(item: ItemDefinition) {
+  return "use" + itemTypeNameGetterBase(item) + "SearchItemProvider";
 }
 
 function itemTypeBuilder(item: ItemDefinition, mod: Module) {
@@ -276,6 +288,46 @@ function itemTypeBuilder(item: ItemDefinition, mod: Module) {
   });
 
   return rsRqSS + rsRqCS + rsSQL + rsSQLFull + itemData;
+}
+
+function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
+  const typeNameRqSS = itemTypeNameGetterRqSS(idef);
+  const typeNameRqCS = itemTypeNameGetterRqCS(idef);
+  const typeNameSQL = itemTypeNameGetterSQL(idef);
+  
+  const hookDefault = "export function " + itemTypeNameGetterUseBase(idef) + "(options: ISchemaItemProviderOptions) {}\n";
+  const hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ISchemaItemProviderOptions) {}\n";
+  
+  let itemData = "";
+
+  idef.getChildDefinitions().forEach((c) => {
+    itemData += itemSchemaJsBuilder(c, mod);
+  });
+
+  return hookDefault + hookSearch + itemData;
+}
+
+function moduleSchemaJsBuilder(mod: Module): string {
+  const typeNameRqSS = modTypeNameGetterRqSS(mod);
+  const typeNameRqCS = modTypeNameGetterRqCS(mod);
+  const typeNameSQL = modTypeNameGetterSQL(mod);
+  
+  const hookDefault = "export function " + modTypeNameGetterUseBase(mod) + "(options: ISchemaItemProviderOptions) {}\n";
+  const hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ISchemaItemProviderOptions) {}\n";
+  
+  let itemData = "";
+
+  mod.getAllChildItemDefinitions().forEach((c) => {
+    itemData += itemSchemaJsBuilder(c, mod);
+  });
+
+  let childModData = "";
+
+  mod.getAllModules().forEach((m) => {
+    childModData += moduleSchemaJsBuilder(m);
+  });
+
+  return hookDefault + hookSearch + itemData + childModData;
 }
 
 function moduleTypeBuilder(mod: Module): string {
@@ -347,6 +399,19 @@ export async function rootTypesBuilder(data: IRootRawJSONDataType) {
   console.log("emiting " + colors.green(outputFile));
 
   await fsAsync.writeFile(outputFile, fileData);
+
+  await ensureSrcFolder();
+
+  let schemaData = "import { useItemProvider, IItemProviderOptions } from @onzag/itemize/client/providers/item/hook\n\n";
+  schemaData += "interface ISchemaItemProviderOptions extends Omit<IItemProviderOptions, 'itemDefinition' | 'module' | 'searchCounterpart'>\n\n";
+  processedRoot.getAllModules().forEach((m) => {
+    schemaData += moduleSchemaJsBuilder(m);
+  });
+
+  const outputFile2 = path.join("src", "schema.ts");
+  console.log("emiting " + colors.green(outputFile2));
+
+  await fsAsync.writeFile(outputFile2, schemaData);
 }
 
 
@@ -358,6 +423,21 @@ async function ensureTypes() {
       // If it doesn't exist, create it
       if (error.code === 'ENOENT') {
           await fsAsync.mkdir("types");
+      } else {
+          // Other error occurred, handle it appropriately
+          throw error;
+      }
+  }
+}
+
+async function ensureSrcFolder() {
+  try {
+      // Check if the directory exists
+      await fsAsync.stat("src");
+  } catch (error) {
+      // If it doesn't exist, create it
+      if (error.code === 'ENOENT') {
+          await fsAsync.mkdir("src");
       } else {
           // Other error occurred, handle it appropriately
           throw error;

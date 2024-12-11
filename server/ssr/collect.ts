@@ -154,6 +154,9 @@ export class Collector {
     this.collect = this.collect.bind(this);
     this.collectSearch = this.collectSearch.bind(this);
     this.collectResource = this.collectResource.bind(this);
+    this.needsCollect = this.needsCollect.bind(this);
+    this.needsCollectSearch = this.needsCollectSearch.bind(this);
+    this.needsCollectResource = this.needsCollectResource.bind(this);
   }
 
   /**
@@ -229,6 +232,14 @@ export class Collector {
    */
   public hasForbiddenResources() {
     return this.results.some((r) => r === null);
+  }
+
+  public needsCollectResource(finalPath: string) {
+    const mergedID = "__RESOURCE__" + finalPath;
+    if (this.collectionStatuses[mergedID]) {
+      return false;
+    }
+    return true;
   }
 
   public async collectResource(finalPath: string, customResolver: (appData: IAppDataType, finalPath: string) => Promise<IResourceCollectionResult>): Promise<string> {
@@ -350,6 +361,20 @@ export class Collector {
     }
 
     return result.data;
+  }
+
+  public needsCollectSearch(idef: ItemDefinition, id: string, version: string, args: IActionSearchOptions) {
+    if (!args.ssrEnabled || (args.cachePolicy && args.cachePolicy !== "none") || !args.traditional) {
+      return false;
+    }
+
+    const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
+
+    if (this.collectionStatuses[mergedID]) {
+      return false;
+    }
+
+    return true;
   }
 
   public async collectSearch(idef: ItemDefinition, id: string, version: string, args: IActionSearchOptions): Promise<void> {
@@ -602,6 +627,14 @@ export class Collector {
     // completed
     this.collectionStatuses[mergedID] = true;
     this.collectionRequestsCbs[mergedID].forEach((r) => r());
+  }
+
+  public needsCollect(idef: ItemDefinition, id: string, version: string, requestFields: IRQRequestFields) {
+    const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
+    if (this.collectionStatuses[mergedID]) {
+      return false;
+    }
+    return true;
   }
 
   /**
