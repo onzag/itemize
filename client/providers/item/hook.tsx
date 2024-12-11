@@ -1,11 +1,11 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { IActionResponseWithValue, IItemProviderProps, ILoadCompletedPayload, IPokeElementsType, SearchItemValueContext, getPropertyForSetter, resolveCoreProp } from ".";
+import { IActionResponseWithValue, IItemProviderProps, ILoadCompletedPayload, IPokeElementsType, LOAD_TIME, SSR_GRACE_TIME, SearchItemValueContext, getPropertyForSetter, resolveCoreProp } from ".";
 import { useRootRetriever } from "../../components/root/RootRetriever";
 import type Module from "../../../base/Root/Module";
 import ItemDefinition, { IItemSearchStateType } from "../../../base/Root/Module/ItemDefinition";
 import { IPropertyBaseProps, IPropertyCoreProps } from "../../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { PREFIX_GET, RESERVED_BASE_PROPERTIES_RQ } from "../../../constants";
+import { DESTRUCTION_MARKERS_LOCATION, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, RESERVED_BASE_PROPERTIES_RQ, SEARCH_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import {
@@ -43,7 +43,7 @@ export class SSRError extends Error {
   }
 }
 
-interface IActualItemProviderState extends IItemSearchStateType {
+export interface IHookItemProviderState extends IItemSearchStateType {
   searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION";
   // itemState: IItemStateType;
   isBlocked: boolean;
@@ -62,7 +62,7 @@ interface IActualItemProviderState extends IItemSearchStateType {
 }
 
 export interface IItemProviderHookElement {
-  state: IActualItemProviderState;
+  state: IHookItemProviderState;
   getStateForProperty<T>(pId: string | IPropertyBasePropsWInclude): IPropertyDefinitionState<T>;
   getValueForProperty<T>(pId: string | IPropertyBasePropsWInclude): T;
 }
@@ -74,6 +74,10 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
   const searchContext = useContext(SearchItemValueContext);
   const dataContext = useContext(DataContext);
+
+  // hack to update the options in real time in the ref object
+  const activeOptions = useRef(options);
+  activeOptions.current = options;
 
   const idef: ItemDefinition = useMemo(() => {
     let idef: ItemDefinition = null;
@@ -98,7 +102,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   // =============================================================================
 
   // COPY OF setupInitialState
-  const [stateInfo, setStateInfoOriginal] = useState<IActualItemProviderState>(() => {
+  const [stateInfo, setStateInfoOriginal] = useState<IHookItemProviderState>(() => {
     // the value might already be available in memory, this is either because it was loaded
     // by another instance or because of SSR during the initial render
     const memoryLoaded = !!(options.forId && idef.hasAppliedValueTo(
@@ -216,12 +220,25 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     };
   });
 
+  const stateInfoCb = useRef<() => void>(null);
+
+  useEffect(() => {
+    if (stateInfoCb.current) {
+      stateInfoCb.current();
+      stateInfoCb.current = null;
+    }
+  }, [stateInfo]);
+
   // used as an alternative to set state
-  const setStateInfo = useCallback((value: Partial<IActualItemProviderState>) => {
+  const setStateInfo = useCallback((value: Partial<IHookItemProviderState>, cb?: () => void) => {
     setStateInfoOriginal({
       ...stateInfo,
       ...value,
     });
+
+    if (cb) {
+      stateInfoCb.current = cb;
+    }
   }, [stateInfo]);
 
   // NOW THAT WE KNOW THE INITIAL STATE WE CAN CHECK THE REQUEST MANAGER
@@ -304,156 +321,15 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
   // COPY FROM blockCleanup
   const blockIdClean = useRef<string>(null);
-  const blockCleanup = useCallback((options: IItemProviderOptions) => {
-    if (options.forId) {
-      if (!blockIdClean.current) {
-        blockIdClean.current = uuid.v4();
-      }
-      idef.addBlockCleanFor(options.forId || null, options.forVersion || null, blockIdClean.current);
-    }
-  }, [idef]);
-  const releaseCleanupBlock = useCallback((options: IItemProviderOptions) => {
-    if (options.forId) {
-      if (!blockIdClean.current) {
-        blockIdClean.current = uuid.v4();
-      }
-      idef.removeBlockCleanFor(options.forId || null, options.forVersion || null, blockIdClean.current);
-    }
-  }, [idef]);
 
   // COPY FROM install setters and remove setters
   const isCMounted = useRef(false);
-  useEffect(() => {
-    isCMounted.current = true;
-  }, []);
-  const onPropertyEnforceOrClearFinal = useCallback((
-    givenForId: string,
-    givenForVersion: string,
-    internal?: boolean,
-  ) => {
-    idef.triggerListeners(
-      "change",
-      givenForId || null,
-      givenForVersion || null,
-    );
-    if (
-      !internal &&
-      options.automaticSearch &&
-      !options.automaticSearch.clientDisabled &&
-      !options.automaticSearchIsOnlyInitial &&
-      isCMounted.current
-    ) {
-      // TODO
-      // search(options.automaticSearch);
-    }
-  }, [options.automaticSearch, idef, ]);//search]);
-  const onPropertyEnforce = useCallback((
-    property: PropertyDefinition | string | IPropertyCoreProps,
-    value: PropertyDefinitionSupportedType,
-    givenForId: string,
-    givenForVersion: string,
-    internal?: boolean,
-    // doNotCleanSearchState?: boolean,
-  ) => {
-    const actualProperty = property instanceof PropertyDefinition ?
-      property : idef.getPropertyDefinitionFor(resolveCoreProp(property), true);
-
-    // this function is basically run by the setter
-    // since they might be out of sync that's why the id is passed
-    // the setter enforces values
-    actualProperty.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
-    // !doNotCleanSearchState && this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
-    onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
-  }, [idef, onPropertyEnforceOrClearFinal]);
-  const onPropertyClearEnforce = useCallback((
-    property: PropertyDefinition | string | IPropertyCoreProps,
-    givenForId: string,
-    givenForVersion: string,
-    internal?: boolean,
-  ) => {
-    const actualProperty = property instanceof PropertyDefinition ?
-      property : idef.getPropertyDefinitionFor(resolveCoreProp(property), true);
-    // same but removes the enforcement
-    actualProperty.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
-    // this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
-    onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
-  }, [idef, onPropertyEnforceOrClearFinal])
-  const installSetters = useCallback((options: IItemProviderOptions) => {
-    if (options.setters) {
-      options.setters.forEach((setter) => {
-        const property = getPropertyForSetter(setter, idef);
-        onPropertyEnforce(property, setter.value, options.forId || null, options.forVersion || null, true);
-      });
-    }
-  }, [idef, onPropertyEnforce]);
-  const removeSetters = useCallback((options: IItemProviderOptions) => {
-    if (options.setters) {
-      options.setters.forEach((setter) => {
-        const property = getPropertyForSetter(setter, idef);
-        onPropertyClearEnforce(property, options.forId || null, options.forVersion || null, true);
-      });
-    }
-  }, [idef, onPropertyClearEnforce]);
+  const mountCbFns = useRef([]);
+  const changedSearchListenerLastCollectedSearchId = useRef(null as { id: string });
+  const initialAutomaticNextSearch = useRef(false);
 
   // COPY FROM prefills
-  const installPrefills = useCallback((options: IItemProviderOptions) => {
-    if (options.prefills) {
-      options.prefills.forEach((prefill) => {
-        const property = getPropertyForSetter(prefill, idef);
-        property.setCurrentValue(
-          options.forId || null,
-          options.forVersion || null,
-          prefill.value,
-          null,
-        );
-      });
-    }
-
-    // syncing from the query string in a cheap way
-    if (options.queryStringSync && options.queryStringSync.length) {
-      // grabbing the property to sync in there
-      const propertiesToSync = (
-        idef.isInSearchMode() ?
-          getPropertyListForSearchMode(
-            options.queryStringSync || [],
-            idef.getStandardCounterpart()
-          ) : getPropertyListDefault(options.queryStringSync)
-      )
-
-      // using the search params to parse the information there
-      const searchParamsParsed = new URLSearchParams(location.search);
-
-      // and now we can sync if we find a value
-      propertiesToSync.forEach((p) => {
-        // check for it
-        const valueInQueryString = searchParamsParsed.get(p);
-        // we got something
-        if (valueInQueryString) {
-          // try to synchornize it
-          try {
-            const valueParsed = JSON.parse(valueInQueryString);
-            const property = idef.getPropertyDefinitionFor(p, true);
-            property.setCurrentValue(
-              options.forId || null,
-              options.forVersion || null,
-              valueParsed,
-              null,
-            );
-          } catch {
-          }
-        }
-      });
-    }
-
-    if (options.prefills || (options.queryStringSync && options.queryStringSync.length)) {
-      // !doNotCleanSearchState && props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
-      idef.triggerListeners(
-        "change",
-        options.forId || null,
-        options.forVersion || null,
-      );
-    }
-  }, [idef, location.search]);
+  
 
   // COPY FROM constructor
   const isConstruct = useRef(true);
@@ -465,9 +341,8 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     installPrefills(options);
 
     if (typeof document !== "undefined") {
-      // TODO
-      // setupListeners();
-      blockCleanup(options);
+      setupListeners();
+      blockCleanup(blockIdClean, idef, options);
     }
   }
 
@@ -478,11 +353,8 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   const lastLoadValuePromise = useRef<Promise<void>>(null);
   const lastLoadValuePromiseResolve = useRef<() => void>(null);
   const isUnmounted = useRef(false);
-  useEffect(() => {
-    return () => {
-      isUnmounted.current = true;
-    }
-  }, []);
+
+  
   const loadValueCompleted: (value: ILoadCompletedPayload) => IActionResponseWithValue = useCallback((value: ILoadCompletedPayload) => {
     // basically if it's unmounted, or what we were updating for does not match
     // what we are supposed to be updating for, this basically means load value got called once
@@ -758,24 +630,184 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     loadValueCompleted,
   ]);
 
-  // // TODO
-  // useEffect(() => {
-  //   idef.addListener("change", options.forId, options.forVersion, onPropertyValuesChangedForceUpdate);
-  //   idef.addListener("load", options.forId, options.forVersion, forceUpdate);
-  //   if (idef.isInSearchMode()) {
-  //     idef.addListener("search-change", options.forId, options.forVersion, forceUpdate);
-  //   }
-  //   idef.addListener("reload", options.forId, options.forVersion, forceUpdate);
+  const onConnectStatusChange = useCallback(() => {
+    const isConnected = !dataContext.remoteListener.isOffline();
+    if (isConnected) {
+      if (
+        stateInfo.loadError &&
+        stateInfo.loadError.code === ENDPOINT_ERRORS.CANT_CONNECT &&
+        !options.doNotAutomaticReloadIfCantConnect
+      ) {
+        loadValue();
+      }
+      if (
+        stateInfo.searchError &&
+        stateInfo.searchError.code === ENDPOINT_ERRORS.CANT_CONNECT &&
+        !options.doNotAutomaticReloadSearchIfCantConnect
+      ) {
+        search(stateInfo.searchOriginalOptions);
+      }
+    }
+  }, [
+    dataContext.remoteListener,
+    loadValue,
+    search,
+    stateInfo.searchError,
+    stateInfo.loadError,
+    options.doNotAutomaticReloadIfCantConnect,
+    stateInfo.searchOriginalOptions,
+  ]);
 
-  //   return () => {
-  //     idef.removeListener("change", options.forId, options.forVersion, onPropertyValuesChangedForceUpdate);
-  //     idef.removeListener("load", options.forId, options.forVersion, forceUpdate);
-  //     if (idef.isInSearchMode()) {
-  //       idef.removeListener("search-change", options.forId, options.forVersion, forceUpdate);
-  //     }
-  //     idef.removeListener("reload", options.forId, options.forVersion, forceUpdate);
-  //   }
-  // }, [idef, options.forId, options.forVersion]);
+  const markSearchForDestruction = useCallback(async (
+    type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
+    qualifiedName: string,
+    owner: string,
+    parent: [string, string, string],
+    property: [string, string],
+    unmount: boolean,
+    unmark: boolean,
+  ) => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    if (CacheWorkerInstance.instance) {
+      await CacheWorkerInstance.instance.waitForInitializationBlock();
+    }
+
+    const locationMemcached =
+      unmount ? MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION;
+    const locationReal =
+      unmount ? UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : SEARCH_DESTRUCTION_MARKERS_LOCATION;
+
+    (window as any)[locationMemcached] =
+      (window as any)[locationMemcached] ||
+      JSON.parse(localStorage.getItem(locationReal) || "{}");
+    let changed = false;
+
+    if (unmark) {
+      if (!(window as any)[locationMemcached][qualifiedName]) {
+        // already not there
+      } else {
+        const foundValueIndex = (window as any)[locationMemcached][qualifiedName]
+          .findIndex((m: [string, string, [string, string, string], [string, string]]) =>
+            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }));
+        if (foundValueIndex !== -1) {
+          changed = true;
+          (window as any)[locationMemcached][qualifiedName].splice(foundValueIndex, 1);
+        }
+      }
+    } else {
+      if (!(window as any)[locationMemcached][qualifiedName]) {
+        (window as any)[locationMemcached][qualifiedName] = [
+          [type, owner, parent, property],
+        ];
+        changed = true;
+      } else {
+        if (
+          !(window as any)[locationMemcached][qualifiedName]
+            .find((m: [string, string, [string, string, string], [string, string]]) =>
+              m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }))
+        ) {
+          changed = true;
+          (window as any)[locationMemcached][qualifiedName].push([type, owner, parent, property]);
+        }
+      }
+    }
+
+    if (changed) {
+      localStorage.setItem(locationReal, JSON.stringify((window as any)[locationMemcached]));
+    }
+  }, []);
+
+  // LIFECYCLE
+
+  useEffect(() => {
+    // COPY from componentDidMount
+    isCMounted.current = true;
+    mountCbFns.current.forEach((c) => c());
+    dataContext.remoteListener.addConnectStatusListener(this.onConnectStatusChange);
+
+    // now we retrieve the externally checked value
+    if (idef.containsAnExternallyCheckedProperty() && options.enableExternalChecks) {
+      this.setStateToCurrentValueWithExternalChecking(null);
+    }
+
+    const listenersSetup = () => {
+      const currentSearch = this.state;
+
+      // when we have a search that was done during SSR and was not stored
+      // somewherue in our stuff, we don't want to request feedback
+      // when we jst loaded the app because then it makes no sense
+      // as the information should be up to date
+      const shouldRequestFeedback = currentSearch.searchId === "SSR_SEARCH" && !options.automaticSearchNoGraceTime ? (
+        (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
+      ) : true;
+
+      searchListenersSetup(
+        currentSearch,
+        shouldRequestFeedback,
+      );
+    };
+
+    let searchWasRedone = false;
+    if (options.automaticSearch && !options.automaticSearch.clientDisabled) {
+      // the search listener might have triggered during the mount callback,
+      // which means this function won't see the new state and won't trigger
+      // automatic search so we use this variable to check it
+      const searchIdToCheckAgainst = changedSearchListenerLastCollectedSearchId.current ?
+        changedSearchListenerLastCollectedSearchId.current.id : stateInfo.searchId;
+
+      if (
+        // no search id at all, not in the state, not on the changed listener, nowhere
+        (!searchIdToCheckAgainst) ||
+        // search is forced and we didn't load from location
+        (options.automaticSearchForce && this.state.searchWasRestored !== "FROM_LOCATION") ||
+        // cache policies searches that have been resolved by SSR need to be redone
+        // this is only relevant during mount of course
+        // the reason is that the cache may have changes or not be inline with whatever
+        // was calculated from the server side
+        // that's the issue with ssrEnabled searches that are also cache
+        (searchIdToCheckAgainst === "SSR_SEARCH" && options.automaticSearch.cachePolicy !== "none") ||
+        (searchIdToCheckAgainst === "SSR_SEARCH" && options.automaticSearch.ssrRequestedProperties)
+      ) {
+        // this variable that is passed into the search is used to set the initial
+        // state in case it needs to be saved in the history
+        searchWasRedone = true;
+        (async () => {
+          try {
+            initialAutomaticNextSearch.current = true;
+            await this.search(options.automaticSearch);
+          } catch (err) {
+            console.error(err);
+            // setup listeners just in case
+            // for a failed search
+            listenersSetup();
+          }
+        })();
+      }
+    }
+
+    return () => {
+      isUnmounted.current = true;
+      releaseCleanupBlock();
+      unSetupListeners();
+      removeSetters();
+      runDismountOn();
+      this.props.remoteListener.removeConnectStatusListener(this.onConnectStatusChange);
+
+      if (window.TESTING && process.env.NODE_ENV === "development") {
+        const mountItem = window.TESTING.mountedItems.find(m => m.instanceUUID === this.internalUUID);
+        if (mountItem) {
+          mountItem.unmountTime = (new Date()).toISOString();
+        }
+      }
+
+      this.removeDoubleSlotter();
+    }
+  }, []);
+
+  // CUSTOMS FOR THIS ALONE
 
   const getValueFor = useCallback((idOrBase: string | IPropertyBasePropsWInclude) => {
     if (idOrBase === null || typeof idOrBase === "undefined") {

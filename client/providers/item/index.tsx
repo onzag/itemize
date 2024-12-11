@@ -44,21 +44,11 @@ import { blobToTransferrable } from "../../../util";
 import Hit from "../../components/analytics/Hit";
 import Timetrack from "../../components/analytics/Timetrack";
 import { genericAnalyticsDataProvider } from "../../components/analytics/util";
+import { IStoredStateLocation, blockCleanup, dismissDeleteError, dismissDeleted, dismissLoadError, dismissSearchError, dismissSearchResults, dismissSubmitError, dismissSubmitted, getItemState, installPrefills, installSetters, isSearchUnequal, markForDestruction, markSearchForDestruction, onConnectStatusChange, onMount, releaseCleanupBlock, removeSetters, resolveCoreProp, search, setupInitialState } from "./util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-const SSR_GRACE_TIME = 10000;
-const LOAD_TIME = (new Date()).getTime();
 
-interface IStoredStateLocation { id: string; version: string };
-
-function getStoredStateLocation(v: boolean | string | IStoredStateLocation, currentId: string, currentVersion: string): IStoredStateLocation {
-  return typeof v === "string" ?
-    { id: v, version: null } : (
-      typeof v === "boolean" ? { id: currentId || null, version: currentVersion || null } :
-        v
-    )
-}
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -66,103 +56,6 @@ function getStoredStateLocation(v: boolean | string | IStoredStateLocation, curr
 // TODO cache policy search destruction markers
 // destruct a whole search and its children on logout
 
-function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType {
-  return {
-    searchCount: state.searchCount,
-    searchError: state.searchError,
-    searchFields: state.searchFields,
-    searchId: state.searchId,
-    searchLastModified: state.searchLastModified,
-    searchLimit: state.searchLimit,
-    searchOffset: state.searchOffset,
-    searchOwner: state.searchOwner,
-    searchParent: state.searchParent,
-    searchRecords: state.searchRecords,
-    searchCacheUsesProperty: state.searchCacheUsesProperty,
-    searchRequestedIncludes: state.searchRequestedIncludes,
-    searchRequestedProperties: state.searchRequestedProperties,
-    searchResults: state.searchResults,
-    searchShouldCache: state.searchShouldCache,
-    searching: state.searching,
-    searchEngineEnabled: state.searchEngineEnabled,
-    searchEngineEnabledLang: state.searchEngineEnabledLang,
-    searchEngineUsedFullHighlights: state.searchEngineUsedFullHighlights,
-    searchEngineHighlightArgs: state.searchEngineHighlightArgs,
-    searchHighlights: state.searchHighlights,
-    searchMetadata: state.searchMetadata,
-    searchCachePolicy: state.searchCachePolicy,
-    searchListenPolicy: state.searchListenPolicy,
-    searchOriginalOptions: state.searchOriginalOptions,
-    searchListenSlowPolling: state.searchListenSlowPolling,
-  };
-}
-
-export function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSupportedType>, itemDefinition: ItemDefinition) {
-  let actualId: string = setter.id;
-  if (setter.searchVariant) {
-    actualId = PropertyDefinitionSearchInterfacesPrefixes[setter.searchVariant.toUpperCase().replace("-", "_")] + setter.id;
-  }
-  if (setter.policyName && setter.policyType) {
-    return itemDefinition.getPropertyDefinitionForPolicy(setter.policyType, setter.policyName, actualId);
-  }
-  return itemDefinition.getPropertyDefinitionFor(actualId, true);
-}
-
-export function resolveCoreProp(value: string | IPropertyCoreProps) {
-  if (typeof value === "string") {
-    return value;
-  } else if (value.searchVariant) {
-    return PropertyDefinitionSearchInterfacesPrefixes[value.searchVariant.toUpperCase().replace("-", "_")] + value.id;
-  }
-
-  return value.id;
-}
-
-export function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOptions) {
-  let searchANoFn = searchA;
-  let searchBNoFn = searchB;
-  if (
-    searchA &&
-    searchA.cacheMetadataMismatchAction
-  ) {
-    if (typeof searchA.cacheMetadataMismatchAction === "function") {
-      searchANoFn = { ...searchA, cacheMetadataMismatchAction: null as any };
-    } else {
-      searchANoFn = {
-        ...searchA,
-        cacheMetadataMismatchAction: {
-          ...searchA.cacheMetadataMismatchAction,
-          recordsRefetchCondition: {
-            ...searchA.cacheMetadataMismatchAction.recordsRefetchCondition,
-            custom: null as any,
-          }
-        }
-      }
-    }
-  }
-
-  if (
-    searchB &&
-    searchB.cacheMetadataMismatchAction
-  ) {
-    if (typeof searchB.cacheMetadataMismatchAction === "function") {
-      searchBNoFn = { ...searchB, cacheMetadataMismatchAction: null as any };
-    } else {
-      searchBNoFn = {
-        ...searchB,
-        cacheMetadataMismatchAction: {
-          ...searchB.cacheMetadataMismatchAction,
-          recordsRefetchCondition: {
-            ...searchB.cacheMetadataMismatchAction.recordsRefetchCondition,
-            custom: null as any,
-          }
-        }
-      }
-    }
-  }
-
-  return !equals(searchANoFn, searchBNoFn, { strict: true });
-}
 
 /**
  * A response given by some handlers like
@@ -177,10 +70,6 @@ export interface IActionResponseWithValue extends IBasicActionResponse {
   cached: boolean;
   id: string;
   version: string;
-}
-
-export interface ILoadCompletedPayload extends IActionResponseWithValue {
-  cached: boolean;
 }
 
 /**
@@ -1897,7 +1786,7 @@ export interface IItemAnalyticsProps {
  * This represents the actual provider that does the job, it takes on some extra properties
  * taken from the contexts that this is expected to run under
  */
-interface IActualItemProviderProps extends IItemProviderProps {
+export interface IActualItemProviderProps extends IItemProviderProps {
   /**
    * The token data is retrieved from the token provider and is used for
    * running the requests
@@ -1946,7 +1835,7 @@ interface IActualItemProviderProps extends IItemProviderProps {
 
 // This is the state of such, it's basically a copy of the
 // context, so refer to that, the context is avobe
-interface IActualItemProviderState extends IItemSearchStateType {
+export interface IActualItemProviderState extends IItemSearchStateType {
   searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION";
   itemState: IItemStateType;
   isBlocked: boolean;
@@ -2056,21 +1945,6 @@ export class ActualItemProvider extends
   private consumableQsState: any = null;
   private consumeQsStateTimeout: NodeJS.Timeout = null;
 
-  private static getItemStateStatic(props: IActualItemProviderProps) {
-    return props.itemDefinitionInstance.getStateNoExternalChecking(
-      props.forId || null,
-      props.forVersion || null,
-      props.enableExternalChecks,
-      props.itemDefinitionInstance.isInSearchMode() ?
-        getPropertyListForSearchMode(
-          props.properties || [],
-          props.itemDefinitionInstance.getStandardCounterpart()
-        ) : getPropertyListDefault(props.properties),
-      props.includes || {},
-      !props.includePolicies,
-    );
-  }
-
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
   // the state between the item and the expected state will
@@ -2163,7 +2037,7 @@ export class ActualItemProvider extends
       }
 
       return {
-        itemState: ActualItemProvider.getItemStateStatic(props),
+        itemState: getItemState(props.itemDefinitionInstance, props),
         ...searchState,
         searchWasRestored: searchWasRestored as any,
       };
@@ -2181,7 +2055,7 @@ export class ActualItemProvider extends
       const id = props.forId || null;
       const version = props.forVersion || null;
       await root.callRequestManagerSearch(props.itemDefinitionInstance, id, version, props.automaticSearch);
-      return ActualItemProvider.setupInitialState(props);
+      return setupInitialState(props.itemDefinitionInstance, props, true);
     } else if (
       state.loaded ||
       props.forId === null ||
@@ -2232,126 +2106,7 @@ export class ActualItemProvider extends
       version,
       requestFields,
     );
-    return ActualItemProvider.setupInitialState(props);
-  }
-
-  public static setupInitialState(props: IActualItemProviderProps): IActualItemProviderState {
-    // the value might already be available in memory, this is either because it was loaded
-    // by another instance or because of SSR during the initial render
-    const memoryLoaded = !!(props.forId && props.itemDefinitionInstance.hasAppliedValueTo(
-      props.forId || null, props.forVersion || null,
-    ));
-    let memoryLoadedAndValid = false;
-    // by default we don't know
-    let isNotFound = false;
-    let isBlocked = false;
-    let isBlockedButDataIsAccessible = false;
-    if (memoryLoaded) {
-      const appliedRQValue = props.itemDefinitionInstance.getRQAppliedValue(
-        props.forId || null, props.forVersion || null,
-      );
-      // this is the same as for loadValue we are tyring to predict
-      const { requestFields } = getFieldsAndArgs({
-        includeArgs: false,
-        includeFields: true,
-        uniteFieldsWithAppliedValue: true,
-        includes: props.includes || {},
-        properties: getPropertyListDefault(props.properties),
-        itemDefinitionInstance: props.itemDefinitionInstance,
-        forId: props.forId || null,
-        forVersion: props.forVersion || null,
-      });
-      // this will work even for null values, and null requestFields
-      memoryLoadedAndValid = (
-        appliedRQValue &&
-        requestFieldsAreContained(requestFields, appliedRQValue.requestFields)
-      );
-      isNotFound = memoryLoadedAndValid && appliedRQValue.rawValue === null;
-      isBlocked = !isNotFound && !!appliedRQValue.rawValue.blocked_at;
-      isBlockedButDataIsAccessible = isBlocked && !!appliedRQValue.rawValue.DATA;
-    }
-
-    let searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION" = "NO";
-    let searchState: IItemSearchStateType = {
-      searchError: null,
-      searching: false,
-      searchResults: null,
-      searchRecords: null,
-      searchLimit: null,
-      searchOffset: null,
-      searchCount: null,
-      searchId: null,
-      searchOwner: null,
-      searchLastModified: null,
-      searchParent: null,
-      searchCacheUsesProperty: null,
-      searchShouldCache: false,
-      searchFields: null,
-      searchRequestedIncludes: {},
-      searchRequestedProperties: [],
-      searchEngineEnabled: false,
-      searchEngineEnabledLang: null,
-      searchEngineUsedFullHighlights: null,
-      searchEngineHighlightArgs: null,
-      searchHighlights: {},
-      searchMetadata: null,
-      searchCachePolicy: "none",
-      searchListenPolicy: "none",
-      searchOriginalOptions: null,
-      searchListenSlowPolling: false,
-    };
-    const searchStateComplex = props.itemDefinitionInstance.getSearchState(
-      props.forId || null, props.forVersion || null,
-    );
-    if (searchStateComplex) {
-      searchState = searchStateComplex.searchState;
-
-      const state = searchStateComplex.state;
-      props.itemDefinitionInstance.applyState(
-        props.forId || null,
-        props.forVersion || null,
-        state,
-      );
-
-      searchWasRestored = "FROM_STATE";
-    }
-
-    // so the initial setup
-    return {
-      // same we get the initial state, without checking it externally and passing
-      // all the optimization flags
-      itemState: ActualItemProvider.getItemStateStatic(props),
-      // and we pass all this state
-      isBlocked,
-      isBlockedButDataIsAccessible,
-      notFound: isNotFound,
-      loadError: null,
-      // loading will be true if we are setting up with an id
-      // as after mount it will attempt to load such id, in order
-      // to avoid pointless refresh we set it up as true from
-      // the beggining
-      loading: memoryLoadedAndValid ? false : (props.avoidLoading ? false : !!props.forId),
-      // loaded will be whether is loaded or not only if there is an id
-      // otherwise it's technically loaded
-      loaded: props.forId ? memoryLoadedAndValid : true,
-
-      submitError: null,
-      submitting: false,
-      submitted: false,
-
-      deleteError: null,
-      deleting: false,
-      deleted: false,
-
-      ...searchState,
-      searchWasRestored,
-
-      pokedElements: {
-        properties: [],
-        includes: {},
-        policies: [],
-      },
-    };
+    return setupInitialState(props.itemDefinitionInstance, props, true);
   }
 
   // These are used for external checking, when available
@@ -2433,6 +2188,7 @@ export class ActualItemProvider extends
     this.downloadStateAt = this.downloadStateAt.bind(this);
     this.onConnectStatusChange = this.onConnectStatusChange.bind(this);
     this.internalDataProviderForAnalytics = this.internalDataProviderForAnalytics.bind(this);
+    this.basicFnsRetriever = this.basicFnsRetriever.bind(this);
 
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
@@ -2446,78 +2202,35 @@ export class ActualItemProvider extends
     }
 
     // we get the initial state
-    this.state = ActualItemProvider.setupInitialState(props);
+    this.state = setupInitialState(props.itemDefinitionInstance, props, true);
   }
   public blockCleanup(props: IActualItemProviderProps = this.props) {
-    if (props.forId) {
-      if (!this.blockIdClean) {
-        this.blockIdClean = uuid.v4();
+    const $this = this;
+    return blockCleanup({
+      get current() {
+        return $this.blockIdClean;
+      },
+      set current(v: string) {
+        $this.blockIdClean = v;
       }
-      this.props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
-    }
+    }, props.itemDefinitionInstance, props);
   }
   public releaseCleanupBlock(props: IActualItemProviderProps = this.props) {
-    if (props.forId) {
-      if (!this.blockIdClean) {
-        this.blockIdClean = uuid.v4();
+    const $this = this;
+    return releaseCleanupBlock({
+      get current() {
+        return $this.blockIdClean;
+      },
+      set current(v: string) {
+        $this.blockIdClean = v;
       }
-      this.props.itemDefinitionInstance.removeBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
-    }
+    }, props.itemDefinitionInstance, props);
   }
   public injectSubmitBlockPromise(p: Promise<any>) {
     this.submitBlockPromises.push(p);
   }
   public async markForDestruction(unmount: boolean, unmark: boolean, props: IActualItemProviderProps = this.props) {
-    if (typeof document === "undefined") {
-      return;
-    }
-    if (props.forId) {
-      if (CacheWorkerInstance.instance) {
-        await CacheWorkerInstance.instance.waitForInitializationBlock();
-      }
-
-      const qualifiedName = props.itemDefinitionInstance.getQualifiedPathName();
-      const forId = props.forId;
-      const forVersion = props.forVersion || null;
-
-      const locationMemcached = unmount ? MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_DESTRUCTION_MARKERS_LOCATION;
-      const locationReal = unmount ? UNMOUNT_DESTRUCTION_MARKERS_LOCATION : DESTRUCTION_MARKERS_LOCATION;
-
-      // the destruction marker simply follows the criteria [id, version] identified by its qualifiedName
-      (window as any)[locationMemcached] =
-        (window as any)[locationMemcached] ||
-        JSON.parse(localStorage.getItem(locationReal) || "{}");
-      let changed = false;
-
-      if (unmark) {
-        if (!(window as any)[locationMemcached][qualifiedName]) {
-          // already unmarked
-        } else {
-          const indexFound = (window as any)[locationMemcached][qualifiedName]
-            .findIndex((m: [string, string]) => m[0] === forId && m[1] === forVersion);
-          // found at index
-          if (indexFound !== -1) {
-            changed = true;
-            (window as any)[locationMemcached][qualifiedName].splice(indexFound, 1);
-          }
-        }
-      } else {
-        if (!(window as any)[locationMemcached][qualifiedName]) {
-          (window as any)[locationMemcached][qualifiedName] = [[forId, forVersion]];
-          changed = true;
-        } else {
-          if (!(window as any)[locationMemcached][qualifiedName]
-            .find((m: [string, string]) => m[0] === forId && m[1] === forVersion)) {
-            changed = true;
-            (window as any)[locationMemcached][qualifiedName].push([forId, forVersion]);
-          }
-        }
-      }
-
-      if (changed) {
-        localStorage.setItem(locationReal, JSON.stringify((window as any)[locationMemcached]));
-      }
-    }
+    return await markForDestruction(props.itemDefinitionInstance, unmount, unmark, props);
   }
   public async markSearchForDestruction(
     type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
@@ -2528,355 +2241,81 @@ export class ActualItemProvider extends
     unmount: boolean,
     unmark: boolean,
   ) {
-    if (typeof document === "undefined") {
-      return;
-    }
-
-    if (CacheWorkerInstance.instance) {
-      await CacheWorkerInstance.instance.waitForInitializationBlock();
-    }
-
-    const locationMemcached =
-      unmount ? MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION;
-    const locationReal =
-      unmount ? UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : SEARCH_DESTRUCTION_MARKERS_LOCATION;
-
-    (window as any)[locationMemcached] =
-      (window as any)[locationMemcached] ||
-      JSON.parse(localStorage.getItem(locationReal) || "{}");
-    let changed = false;
-
-    if (unmark) {
-      if (!(window as any)[locationMemcached][qualifiedName]) {
-        // already not there
-      } else {
-        const foundValueIndex = (window as any)[locationMemcached][qualifiedName]
-          .findIndex((m: [string, string, [string, string, string], [string, string]]) =>
-            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }));
-        if (foundValueIndex !== -1) {
-          changed = true;
-          (window as any)[locationMemcached][qualifiedName].splice(foundValueIndex, 1);
-        }
-      }
-    } else {
-      if (!(window as any)[locationMemcached][qualifiedName]) {
-        (window as any)[locationMemcached][qualifiedName] = [
-          [type, owner, parent, property],
-        ];
-        changed = true;
-      } else {
-        if (
-          !(window as any)[locationMemcached][qualifiedName]
-            .find((m: [string, string, [string, string, string], [string, string]]) =>
-              m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }))
-        ) {
-          changed = true;
-          (window as any)[locationMemcached][qualifiedName].push([type, owner, parent, property]);
-        }
-      }
-    }
-
-    if (changed) {
-      localStorage.setItem(locationReal, JSON.stringify((window as any)[locationMemcached]));
-    }
+    return await markSearchForDestruction(type, qualifiedName, owner, parent, property, unmount, unmark);
   }
   public installSetters(props: IActualItemProviderProps = this.props) {
-    if (props.setters) {
-      props.setters.forEach((setter) => {
-        const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-        this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true);
-      });
-    }
+    return installSetters(props.itemDefinitionInstance, props, this.isCMounted, this.search);
   }
   public removeSetters(props: IActualItemProviderProps = this.props) {
-    if (props.setters) {
-      props.setters.forEach((setter) => {
-        const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-        this.onPropertyClearEnforce(property, props.forId || null, props.forVersion || null, true);
-      });
-    }
+    return removeSetters(props.itemDefinitionInstance, props, this.isCMounted, this.search);
   }
   public installPrefills(props: IActualItemProviderProps = this.props) {
-    if (props.prefills) {
-      props.prefills.forEach((prefill) => {
-        const property = getPropertyForSetter(prefill, props.itemDefinitionInstance);
-        property.setCurrentValue(
-          props.forId || null,
-          props.forVersion || null,
-          prefill.value,
-          null,
-        );
-      });
-    }
-
-    // syncing from the query string in a cheap way
-    if (props.queryStringSync && props.queryStringSync.length) {
-      // grabbing the property to sync in there
-      const propertiesToSync = (
-        props.itemDefinitionInstance.isInSearchMode() ?
-          getPropertyListForSearchMode(
-            props.queryStringSync || [],
-            props.itemDefinitionInstance.getStandardCounterpart()
-          ) : getPropertyListDefault(props.queryStringSync)
-      )
-
-      // using the search params to parse the information there
-      const searchParamsParsed = new URLSearchParams(props.location.search);
-
-      // and now we can sync if we find a value
-      propertiesToSync.forEach((p) => {
-        // check for it
-        const valueInQueryString = searchParamsParsed.get(p);
-        // we got something
-        if (valueInQueryString) {
-          // try to synchornize it
-          try {
-            const valueParsed = JSON.parse(valueInQueryString);
-            const property = props.itemDefinitionInstance.getPropertyDefinitionFor(p, true);
-            property.setCurrentValue(
-              props.forId || null,
-              props.forVersion || null,
-              valueParsed,
-              null,
-            );
-          } catch {
-          }
-        }
-      });
-    }
-
-    if (props.prefills || (props.queryStringSync && props.queryStringSync.length)) {
-      // !doNotCleanSearchState && props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
-      props.itemDefinitionInstance.triggerListeners(
-        "change",
-        props.forId || null,
-        props.forVersion || null,
-      );
-    }
+    return installPrefills(props.itemDefinitionInstance, props, props.location);
   }
 
   public onConnectStatusChange() {
-    const isConnected = !this.props.remoteListener.isOffline();
-    if (isConnected) {
-      if (
-        this.state.loadError &&
-        this.state.loadError.code === ENDPOINT_ERRORS.CANT_CONNECT &&
-        !this.props.doNotAutomaticReloadIfCantConnect
-      ) {
-        this.loadValue();
-      }
-      if (
-        this.state.searchError &&
-        this.state.searchError.code === ENDPOINT_ERRORS.CANT_CONNECT &&
-        !this.props.doNotAutomaticReloadSearchIfCantConnect
-      ) {
-        this.search(this.state.searchOriginalOptions);
-      }
-    }
+    return onConnectStatusChange(
+      this.props,
+      this.props.remoteListener,
+      this.state,
+      this.search,
+      this.loadValue,
+    );
+  }
+
+  public basicFnsRetriever(): IBasicFns {
+    return {
+      clean: this.clean,
+      delete: this.delete,
+      poke: this.poke,
+      reload: this.loadValue,
+      search: this.search,
+      submit: this.submit,
+      unpoke: this.unpoke,
+    };
   }
 
   // so now we have mounted, what do we do at the start
   public async componentDidMount() {
-    this.isCMounted = true;
-    this.mountCbFns.forEach((c) => c());
-    this.props.remoteListener.addConnectStatusListener(this.onConnectStatusChange);
-
-    // now we retrieve the externally checked value
-    if (this.props.containsExternallyCheckedProperty && this.props.enableExternalChecks) {
-      this.setStateToCurrentValueWithExternalChecking(null);
-    }
-
-    const listenersSetup = () => {
-      const currentSearch = this.state;
-
-      // when we have a search that was done during SSR and was not stored
-      // somewherue in our stuff, we don't want to request feedback
-      // when we jst loaded the app because then it makes no sense
-      // as the information should be up to date
-      const shouldRequestFeedback = currentSearch.searchId === "SSR_SEARCH" && !this.props.automaticSearchNoGraceTime ? (
-        (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
-      ) : true;
-
-      this.searchListenersSetup(
-        currentSearch,
-        shouldRequestFeedback,
-      );
-    };
-
-    let searchWasRedone = false;
-    if (this.props.automaticSearch && !this.props.automaticSearch.clientDisabled) {
-      // the search listener might have triggered during the mount callback,
-      // which means this function won't see the new state and won't trigger
-      // automatic search so we use this variable to check it
-      const searchIdToCheckAgainst = this.changedSearchListenerLastCollectedSearchId ?
-        this.changedSearchListenerLastCollectedSearchId.id : this.state.searchId;
-
-      if (
-        // no search id at all, not in the state, not on the changed listener, nowhere
-        (!searchIdToCheckAgainst) ||
-        // search is forced and we didn't load from location
-        (this.props.automaticSearchForce && this.state.searchWasRestored !== "FROM_LOCATION") ||
-        // cache policies searches that have been resolved by SSR need to be redone
-        // this is only relevant during mount of course
-        // the reason is that the cache may have changes or not be inline with whatever
-        // was calculated from the server side
-        // that's the issue with ssrEnabled searches that are also cache
-        (searchIdToCheckAgainst === "SSR_SEARCH" && this.props.automaticSearch.cachePolicy !== "none") ||
-        (searchIdToCheckAgainst === "SSR_SEARCH" && this.props.automaticSearch.ssrRequestedProperties)
-      ) {
-        // this variable that is passed into the search is used to set the initial
-        // state in case it needs to be saved in the history
-        searchWasRedone = true;
-        (async () => {
-          try {
-            this.initialAutomaticNextSearch = true;
-            await this.search(this.props.automaticSearch);
-          } catch (err) {
-            console.error(err);
-            // setup listeners just in case
-            // for a failed search
-            listenersSetup();
-          }
-        })();
-      }
-    }
-
-    if (!searchWasRedone) {
-      listenersSetup();
-    }
-
-    if (this.props.onSearchStateLoaded || this.props.onSearchStateChange) {
-      const searchState = getSearchStateOf(this.state);
-      if (searchState.searchId) {
-        this.props.onSearchStateLoaded && this.props.onSearchStateLoaded(searchState);
-        this.props.onSearchStateChange && this.props.onSearchStateChange(searchState);
-      }
-    }
-
-    if (typeof this.props.markForDestructionOnLogout !== "undefined" && this.props.markForDestructionOnLogout !== null) {
-      if (this.props.markForDestructionOnLogout) {
-        this.markForDestruction(false, false);
-      } else {
-        this.markForDestruction(false, true);
-      }
-    }
-
-    if (typeof this.props.markForDestructionOnUnmount !== "undefined" && this.props.markForDestructionOnUnmount !== null) {
-      if (this.props.markForDestructionOnUnmount) {
-        this.markForDestruction(true, false);
-      } else {
-        this.markForDestruction(true, true);
-      }
-    }
-
-    if (window.TESTING && process.env.NODE_ENV === "development") {
-      this.mountOrUpdateIdefForTesting();
-    }
-
-    // and we attempt to load the current value
-    if (!this.props.avoidLoading) {
-      await this.loadValue();
-    }
-    if (this.props.loadStoredState) {
-      const loc = getStoredStateLocation(this.props.loadStoredState, this.props.forId, this.props.forVersion);
-      await this.loadStoredState(loc);
-      // this.setupStoredStateListener(loc);
-    }
-
-    this.installDoubleSlotter();
-  }
-
-  /**
-   * internally used in development only to check for double slotting
-   * where two search items share a state and may be unnoticed
-   */
-  private installDoubleSlotter() {
-    if (process.env.NODE_ENV === "development" && !(window as any).DOUBLE_SLOTTING_FAILSAFE) {
-      (window as any).DOUBLE_SLOTTING_FAILSAFE = {};
-    }
-    if (process.env.NODE_ENV === "development" && this.props.itemDefinitionInstance.isInSearchMode()) {
-      const slotId = this.props.itemDefinitionQualifiedName + "." + (this.props.forId || "") + "." + (this.props.forVersion || "");
-      if (
-        (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] &&
-        (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length &&
-        !this.props.searchCounterpartHasTwin
-      ) {
-        console.warn(
-          "Found two instances of an item provider in search mode at the same slot at the same time, " +
-          "this is not an error, but they share a search state, on item: " + JSON.stringify(this.props.itemDefinitionQualifiedName) +
-          " at id: " + JSON.stringify(this.props.forId || null) +
-          " and version: " + JSON.stringify(this.props.forVersion || null));
-      }
-      (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] = (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] || [];
-      (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].push(this);
-    }
-  }
-
-  /**
-   * internally used in development only to check for double slotting
-   * where two search items share a state and may be unnoticed
-   */
-  private removeDoubleSlotter(props: IActualItemProviderProps = this.props) {
-    if (process.env.NODE_ENV === "development" && props.itemDefinitionInstance.isInSearchMode() && (window as any).DOUBLE_SLOTTING_FAILSAFE) {
-      const slotId = props.itemDefinitionQualifiedName + "." + (props.forId || "") + "." + (props.forVersion || "");
-      if ((window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] && (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length) {
-        const indexToRemove = (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].findIndex(i => i === this);
-        if (indexToRemove !== -1) {
-          (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].splice(indexToRemove, 1);
-        }
-        if ((window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length === 0) {
-          delete (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId];
-        }
-        if ((window as any).DOUBLE_SLOTTING_FAILSAFE[slotId] && (window as any).DOUBLE_SLOTTING_FAILSAFE[slotId].length === 1) {
-          console.warn(
-            "The double slotting on item: " + JSON.stringify(this.props.itemDefinitionQualifiedName) +
-            " at id: " + JSON.stringify(this.props.forId || null) +
-            " and version: " + JSON.stringify(this.props.forVersion || null) + " has been removed");
-        }
-      }
-    }
-  }
-
-  public mountOrUpdateIdefForTesting(wasContentLoadedFromMemory?: boolean) {
-    if (process.env.NODE_ENV === "development") {
-      const current = window.TESTING.mountedItems.find(m => m.instanceUUID === this.internalUUID);
-      const idefId = this.props.itemDefinitionInstance.getQualifiedPathName();
-      const modId = this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName();
-      if (current) {
-        current.module = modId;
-        current.itemDefinition = idefId;
-        current.id = this.props.forId || null;
-        current.version = this.props.forVersion || null;
-        current.isSearchMode = this.props.itemDefinitionInstance.isInSearchMode();
-        current.isExtensions = this.props.itemDefinitionInstance.isExtensionsInstance();
-        current.wasFound = !this.state.notFound;
-        current.staticStatus = this.props.static;
-        if (typeof wasContentLoadedFromMemory !== "undefined") {
-          current.wasContentLoadedFromMemory = wasContentLoadedFromMemory;
-        }
-        current.hadAFallback = !!this.props.loadUnversionedFallback;
-        current.updateTime = (new Date()).toISOString();
-        current.avoidsLoading = !!this.props.avoidLoading;
-      } else {
-        window.TESTING.mountedItems.push({
-          instanceUUID: this.internalUUID,
-          module: modId,
-          itemDefinition: idefId,
-          id: this.props.forId || null,
-          version: this.props.forVersion || null,
-          isSearchMode: this.props.itemDefinitionInstance.isInSearchMode(),
-          isExtensions: this.props.itemDefinitionInstance.isExtensionsInstance(),
-          mountTime: (new Date()).toISOString(),
-          wasFound: !this.state.notFound,
-          hadAFallback: !!this.props.loadUnversionedFallback,
-          updateTime: null,
-          unmountTime: null,
-          staticStatus: this.props.static,
-          wasContentLoadedFromMemory: !!wasContentLoadedFromMemory,
-          avoidsLoading: !!this.props.avoidLoading,
-        });
-      }
-    }
+    const $this = this;
+    return await onMount(this.props.itemDefinitionInstance, this.props, true,
+      this.state, this.setState as any, this.props.remoteListener,
+      {
+        get current() {
+          return $this.isCMounted;
+        },
+        set current(v: boolean) {
+          $this.isCMounted = v;
+        },
+      },
+      {
+        get current() {
+          return $this.mountCbFns;
+        },
+        set current(v: Array<() => void>) {
+          $this.mountCbFns = v;
+        },
+      },
+      {
+        get current() {
+          return $this.changedSearchListenerLastCollectedSearchId;
+        },
+        set current(v: {id: string}) {
+          $this.changedSearchListenerLastCollectedSearchId = v;
+        },
+      },
+      {
+        get current() {
+          return $this.initialAutomaticNextSearch;
+        },
+        set current(v: boolean) {
+          $this.initialAutomaticNextSearch = v;
+        },
+      },
+      this.isUnmounted,
+      this.internalUUID,
+      this.lastUpdateId,
+    )
   }
 
   // setup the listeners is simple
@@ -3433,7 +2872,7 @@ export class ActualItemProvider extends
     this.setState(searchState);
   }
   private getItemState(props = this.props) {
-    return ActualItemProvider.getItemStateStatic(props);
+    return getItemState(props.itemDefinitionInstance, props);
   }
   public async changeListener(repairCorruption?: boolean) {
     if (this.isUnmounted) {
@@ -3659,43 +3098,6 @@ export class ActualItemProvider extends
 
   //   }
   // }
-  public async loadStoredState(location: IStoredStateLocation) {
-    // no polyfills for loaded states
-    if (CacheWorkerInstance.isSupportedAsWorker && location) {
-      const [storedState, metadata] = await CacheWorkerInstance.instance.retrieveState(
-        this.props.itemDefinitionQualifiedName,
-        location.id,
-        location.version,
-      );
-
-      if (storedState) {
-        this.props.itemDefinitionInstance.applyState(
-          this.props.forId || null,
-          this.props.forVersion || null,
-          storedState,
-        );
-        this.props.itemDefinitionInstance.triggerListeners(
-          "change",
-          this.props.forId || null,
-          this.props.forVersion || null,
-          this.changeListener,
-        );
-        this.setState({
-          itemState: this.getItemState(),
-        }, () => {
-          this.props.onStateLoadedFromStore && this.props.onStateLoadedFromStore(storedState, metadata, {
-            submit: this.submit,
-            delete: this.delete,
-            reload: this.loadValue,
-            clean: this.clean,
-            poke: this.poke,
-            search: this.search,
-            unpoke: this.unpoke,
-          });
-        });
-      }
-    }
-  }
   public async loadValue(denyCaches?: boolean): Promise<IActionResponseWithValue> {
     const forId = this.props.forId;
     const forVersion = this.props.forVersion || null;
@@ -4067,38 +3469,6 @@ export class ActualItemProvider extends
     };
     this.props.onLoad && this.props.onLoad(result);
     return result;
-  }
-  public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
-    // so when we want to externally check we first run the external check
-    // using the normal get state function which runs async
-    const newItemState = await this.props.itemDefinitionInstance.getState(
-      this.props.forId || null,
-      this.props.forVersion || null,
-      this.props.itemDefinitionInstance.isInSearchMode() ?
-        getPropertyListForSearchMode(
-          this.props.properties || [],
-          this.props.itemDefinitionInstance.getStandardCounterpart()
-        ) : getPropertyListDefault(this.props.properties),
-      this.props.includes || {},
-      !this.props.includePolicies,
-    );
-
-    // if the current update id is null (as in always update) or the last update id
-    // that was requested is the same as the current (this is important in order)
-    // to avoid situations where two external checks have been requested for some
-    // reason only the last should be applied
-    if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
-      // we set the state to the new state
-      if (!this.isUnmounted) {
-        this.setState({
-          itemState: newItemState,
-        });
-      }
-      // and trigger change listeners, all but our listener
-      // we still need to trigger all other listeners
-      this.props.itemDefinitionInstance.triggerListeners(
-        "change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
-    }
   }
   public onPropertyChangeOrRestoreFinal() {
     // trigger the listeners for change so everything updates nicely
@@ -5338,908 +4708,131 @@ export class ActualItemProvider extends
 
     return result;
   }
-
-  private searchListenersSetup(
-    state: IItemSearchStateType,
-    requestFeedbackToo?: boolean
-  ) {
-    if (!state.searchId) {
-      return;
-    }
-
-    if (state.searchListenPolicy === "none") {
-      if (requestFeedbackToo) {
-        this.searchFeedback(state);
-      }
-
-      return;
-    }
-
-    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
-
-    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-      standardCounterpart.getParentModule().getQualifiedPathName() :
-      standardCounterpart.getQualifiedPathName());
-    if (state.searchListenPolicy === "by-owner") {
-      this.props.remoteListener.addOwnedSearchListenerFor(
-        standardCounterpartQualifiedName,
-        state.searchOwner,
-        state.searchLastModified,
-        this.onSearchReload,
-        state.searchCachePolicy !== "none",
-        state.searchListenSlowPolling,
-      );
-    } else if (state.searchListenPolicy === "by-parent") {
-      this.props.remoteListener.addParentedSearchListenerFor(
-        standardCounterpartQualifiedName,
-        state.searchParent[0],//.itemDefinition.getQualifiedPathName(),
-        state.searchParent[1],//.id,
-        state.searchParent[2] || null,
-        state.searchLastModified,
-        this.onSearchReload,
-        state.searchCachePolicy !== "none",
-        state.searchListenSlowPolling,
-      );
-    } else if (state.searchListenPolicy === "by-owner-and-parent") {
-      this.props.remoteListener.addOwnedParentedSearchListenerFor(
-        standardCounterpartQualifiedName,
-        state.searchOwner,
-        state.searchParent[0],//.itemDefinition.getQualifiedPathName(),
-        state.searchParent[1],//.id,
-        state.searchParent[2] || null,
-        state.searchLastModified,
-        this.onSearchReload,
-        state.searchCachePolicy !== "none",
-        state.searchListenSlowPolling,
-      );
-    } else if (state.searchListenPolicy === "by-property") {
-      this.props.remoteListener.addPropertySearchListenerFor(
-        standardCounterpartQualifiedName,
-        state.searchCacheUsesProperty[0],
-        state.searchCacheUsesProperty[1],
-        state.searchLastModified,
-        this.onSearchReload,
-        state.searchCachePolicy !== "none",
-        state.searchListenSlowPolling,
-      );
-    }
-
-    if (requestFeedbackToo) {
-      this.searchFeedback(state);
-    }
-  }
-  private searchFeedback(
-    state: IItemSearchStateType,
-  ) {
-    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
-    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-      standardCounterpart.getParentModule().getQualifiedPathName() :
-      standardCounterpart.getQualifiedPathName());
-
-    if (state.searchListenPolicy === "by-owner" || state.searchCachePolicy === "by-owner") {
-      this.props.remoteListener.requestOwnedSearchFeedbackFor({
-        qualifiedPathName: standardCounterpartQualifiedName,
-        createdBy: state.searchOwner,
-        lastModified: state.searchLastModified,
-      });
-    }
-
-    if (state.searchListenPolicy === "by-owner-and-parent" || state.searchCachePolicy === "by-owner-and-parent") {
-      this.props.remoteListener.requestOwnedParentedSearchFeedbackFor({
-        createdBy: state.searchOwner,
-        qualifiedPathName: standardCounterpartQualifiedName,
-        parentType: state.searchParent[0],
-        parentId: state.searchParent[1],
-        parentVersion: state.searchParent[2],
-        lastModified: state.searchLastModified,
-      });
-    }
-
-    if (state.searchListenPolicy === "by-parent" || state.searchCachePolicy === "by-parent") {
-      this.props.remoteListener.requestParentedSearchFeedbackFor({
-        qualifiedPathName: standardCounterpartQualifiedName,
-        parentType: state.searchParent[0],
-        parentId: state.searchParent[1],
-        parentVersion: state.searchParent[2],
-        lastModified: state.searchLastModified,
-      });
-    }
-
-    if (state.searchListenPolicy === "by-property" || state.searchCachePolicy === "by-property") {
-      this.props.remoteListener.requestPropertySearchFeedbackFor({
-        qualifiedPathName: standardCounterpartQualifiedName,
-        propertyId: state.searchCacheUsesProperty[0],
-        propertyValue: state.searchCacheUsesProperty[1],
-        lastModified: state.searchLastModified,
-      });
-    }
-  }
+  
   public async search(
-    originalOptions: IActionSearchOptions,
+    options: IActionSearchOptions,
   ): Promise<IActionResponseWithSearchResults> {
-    if (!originalOptions || originalOptions.clientDisabled) {
-      return;
-    }
-
-    // had issues with pollution as other functions
-    // were calling search and passing a second argument
-    // causing initial automatic to be true
-    const initialAutomatic = this.initialAutomaticNextSearch;
-    const isReloadSearch = this.reloadNextSearch;
-    this.initialAutomaticNextSearch = false;
-    this.reloadNextSearch = false;
-
-    // we extract the hack variable
-    const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
-    this.preventSearchFeedbackOnPossibleStaleData = false;
-
-    let options = originalOptions;
-
-    const cancelledResponse: IActionResponseWithSearchResults = {
-      searchId: null,
-      cached: false,
-      polyfilled: false,
-      count: null,
-      limit: options.limit,
-      offset: options.offset,
-      records: null,
-      results: null,
-      cancelled: true,
-      error: null,
-    };
-
-    if (this.state.searching || this.activeSearchPromise) {
-      if (originalOptions.pileSearch) {
-        const id = uuid.v4();
-        this.activeSearchPromiseAwaiter = id;
-
-        const lastResponse = await this.activeSearchPromise;
-
-        // another pile element has overtaken us
-        // we must not execute, we have been cancelled
-        if (this.activeSearchPromiseAwaiter !== id) {
-          // cancelled
-          return cancelledResponse;
-        }
-
-        this.activeSubmitPromiseAwaiter = null;
-
-        // patch the submit action
-        if (typeof originalOptions.pileSearch === "function") {
-          const optionsOverride = originalOptions.pileSearch(lastResponse.response, lastResponse.options);
-
-          if (optionsOverride === false) {
-            // cancel
-            return cancelledResponse;
-          } else if (optionsOverride !== true) {
-            options = {
-              ...options,
-              ...optionsOverride,
-            }
-          }
-        }
-      } else {
-        console.warn(
-          "Can't search while searching to trigger at " + this.props.itemDefinitionQualifiedName + " newly provided options:",
-          originalOptions,
-          "active options:",
-          this.activeSearchOptions,
-          "id-version: " + JSON.stringify(this.props.forId || null) + "." + JSON.stringify(this.props.forVersion || null),
-        );
-        throw new Error("Can't search while searching, please consider your calls");
-      }
-    }
-
-    if (options.searchByProperties.includes("created_by") && options.createdBy) {
-      throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
-    } else if (options.searchByProperties.includes("since") && options.since) {
-      throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
-    } else if (options.searchByProperties.includes("until") && options.until) {
-      throw new Error("searchByProperties includes until yet in the options an override was included as " + options.until);
-    }
-
-    if (options.cachePolicy !== "none" && options.cachePolicy) {
-      options.searchByProperties.forEach((p) => {
-        const propertyId = typeof p === "string" ? p : p.id;
-
-        if (!options.requestedProperties.includes(propertyId)) {
-          throw new Error(
-            "searchByProperties is using " +
-            propertyId +
-            " but this property is not requested, yet you are using a cache mode " +
-            options.cachePolicy +
-            " this is a problem because searches are resolved locally and it will lack this field to resolve the search"
-          );
-        }
-      });
-    }
-
-    if (options.cachePolicy && options.cachePolicy !== "none" && options.useSearchEngine) {
-      // using a cache policy and then listening for changes could result in catasthrope if a record
-      // is invalid (inconsistent) in the search engine, the client will not realize and then ask to get fed
-      // changes, an invalid record may therefore remain invalid even after is fixed in a consistency check
-      // but the client will never realize; when using the SQL database which is the source of truth this is assured not
-      // to occur
-      throw new Error(
-        "Using a search engine with cache policy is not allowed for consistency reasons, "
-        + "search engine isn't 100% assured to be consistent, but the database is",
-      );
-    }
-
-    if (options.useSearchEngineFullHighlights && !options.useSearchEngine) {
-      throw new Error(
-        "Using a search engine full highlights without useSearchEngine enabled is not allowed"
-      );
-    }
-
-    // if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
-    //   console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
-    // }
-
-    if (options.ssrEnabled && !options.traditional) {
-      console.warn("You have a SSR enabled search that does not use traditional search, this will not execute in the server side due to conflicting instructions");
-    }
-
-    // we need the standard counterpart given we are in search mode right now, 
-    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
-    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-      standardCounterpart.getParentModule().getQualifiedPathName() :
-      standardCounterpart.getQualifiedPathName());
-    // first we calculate the properties that are to be submitted, by using the standard counterpart
-    // a search action is only to be executed if the item definition (either a real item definition or
-    // one representing a module) is actually in search mode, otherwise this would crash
-    const propertiesForArgs = getPropertyListForSearchMode(options.searchByProperties, standardCounterpart);
-
-    // now we use this function to check that everything is valid
-    const isValid = this.checkItemStateValidity({
-      properties: propertiesForArgs,
-      includes: options.searchByIncludes || {},
-    });
-
-    // if it's invalid let's return the emulated error
-    const pokedElements: IPokeElementsType = {
-      properties: propertiesForArgs,
-      includes: options.searchByIncludes || {},
-      policies: [],
-    };
-    if (!isValid) {
-      if (!this.isUnmounted) {
-        this.setState({
-          pokedElements,
-        });
-      }
-      this.cleanWithProps(this.props, options, "fail");
-      const result = this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
-      this.props.onWillSearch && this.props.onWillSearch();
-      this.props.onSearch && this.props.onSearch(result);
-
-      return result;;
-    }
-
-    // now we check the cache policy by owner
-    if ((options.cachePolicy === "by-owner" || options.cachePolicy === "by-owner-and-parent") && !options.createdBy) {
-      throw new Error("A by owner cache policy requires createdBy option to be set");
-    }
-
-    let trackedPropertyDef: PropertyDefinition = null;
-    let trackedPropertyVal: string = null;
-    if (options.cachePolicy === "by-property" && !options.trackedProperty && !options.listenPolicy) {
-      throw new Error("A by property cache policy requires trackedProperty option to be set");
-    } else if (options.trackedProperty && (options.cachePolicy ? options.cachePolicy !== "by-property" : options.listenPolicy !== "by-property")) {
-      throw new Error("trackedProperty can only be used with by-property cache policy or listen policy");
-    }
-
-    if (options.trackedProperty) {
-      trackedPropertyDef = standardCounterpart.getPropertyDefinitionFor(options.trackedProperty, true);
-      if (!trackedPropertyDef.isTracked()) {
-        throw new Error("trackedProperty can only be used with string properties that are tracked");
-      }
-    }
-
-    // and the cache policy by parenting
-    let searchParent: [string, string, string] = null;
-    if ((options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent") &&
-      (options.parentedBy === "NO_PARENT" || !options.parentedBy || !options.parentedBy.id)) {
-      throw new Error("A by owner-and-parent cache policy requires parentedBy option to be set with a specific id");
-    } else if (options.parentedBy && options.parentedBy !== "NO_PARENT" && options.parentedBy.id) {
-      // because the parenting rule goes by a path, eg.... module/module  and then idef/idef
-      // we need to loop and find it by the path in order to find both
-      const itemDefinitionInQuestion = this.props.itemDefinitionInstance.getParentModule()
-        .getParentRoot().registry[options.parentedBy.item] as ItemDefinition;
-
-      // and that way we calculate the search parent
-      searchParent = [
-        itemDefinitionInQuestion.getQualifiedPathName(),
-        options.parentedBy.id,
-        options.parentedBy.version || null,
-      ];
-    }
-
-    this.props.onWillSearch && this.props.onWillSearch();
-
-    // the args of the item definition depend on the search mode, hence we use
-    // our current item definition instance to get the arguments we want to load
-    // in order to perform the search based on the search mode
-    const {
-      argumentsForQuery,
-    } = getFieldsAndArgs({
-      includeArgs: true,
-      includeFields: false,
-      propertiesForArgs,
-      includesForArgs: options.searchByIncludes || {},
-      itemDefinitionInstance: this.props.itemDefinitionInstance,
-      forId: this.props.forId || null,
-      forVersion: this.props.forVersion || null,
-    });
-
-    let searchCacheUsesProperty: [string, string] = null;
-    if (trackedPropertyDef) {
-      trackedPropertyVal = argumentsForQuery["SEARCH_" + trackedPropertyDef.getId()];
-
-      if (!trackedPropertyVal) {
-        throw new Error(
-          "trackedProperty value for " + trackedPropertyDef.getId() + " is null or empty string, this is not allowed as a trackeable value"
-        );
-      }
-
-      searchCacheUsesProperty = [trackedPropertyDef.getId(), trackedPropertyVal];
-    }
-
-    const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
-
-    if (listenPolicy !== this.state.searchListenPolicy) {
-      // the listener is bad altogether
-      this.removePossibleSearchListeners();
-    } else {
-      if (listenPolicy.includes("owner")) {
-        if (options.createdBy !== this.state.searchOwner) {
-          // this search listener is bad because the search
-          // owner has changed, and the previously registered listener
-          // if any does not match the owner, remember the search owner is the created by
-          // value, and we are now redoing the search, and we might have a search listener
-          // registered already for this search if that is the case
-          this.removePossibleSearchListeners();
-        }
-      }
-
-      if (listenPolicy.includes("parent")) {
-        // we basically do the exact same here, same logic
-        if (!equals(searchParent, this.state.searchParent, { strict: true })) {
-          // this search listener is bad because the search
-          // parent has changed, and the previously registered listener
-          // if any does not match the owner
-          this.removePossibleSearchListeners();
-        }
-      }
-
-      if (listenPolicy.includes("property")) {
-        if (!equals(searchCacheUsesProperty, this.state.searchCacheUsesProperty, { strict: true })) {
-          this.removePossibleSearchListeners();
-        }
-      }
-    }
-
-    if (
-      options.cachePolicy &&
-      typeof options.markForDestructionOnLogout !== "undefined" &&
-      options.markForDestructionOnLogout !== null
-    ) {
-      if (options.cachePolicy === "by-owner") {
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          options.createdBy,
-          null,
-          null,
-          false,
-          // unmark
-          !options.markForDestructionOnLogout,
-        );
-      } else if (options.cachePolicy === "by-parent") {
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          null,
-          searchParent,
-          null,
-          false,
-          // unmark
-          !options.markForDestructionOnLogout,
-        );
-      } else if (options.cachePolicy === "by-owner-and-parent") {
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          options.createdBy,
-          searchParent,
-          null,
-          false,
-          // unmark
-          !options.markForDestructionOnLogout,
-        );
-      } else if (options.cachePolicy === "by-property") {
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          null,
-          null,
-          searchCacheUsesProperty,
-          false,
-          // unmark
-          !options.markForDestructionOnLogout,
-        );
-      }
-    }
-
-    if (
-      options.cachePolicy &&
-      typeof options.markForDestructionOnUnmount !== "undefined" &&
-      options.markForDestructionOnUnmount !== null
-    ) {
-      if (options.cachePolicy === "by-owner") {
-        this.installInternalSearchDestructionMarker([
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          options.createdBy,
-          null,
-          null,
-        ], !options.markForDestructionOnUnmount);
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          options.createdBy,
-          null,
-          null,
-          true,
-          !options.markForDestructionOnUnmount,
-        );
-      } else if (options.cachePolicy === "by-parent") {
-        this.installInternalSearchDestructionMarker([
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          null,
-          searchParent,
-          null,
-        ], !options.markForDestructionOnUnmount);
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          null,
-          searchParent,
-          null,
-          true,
-          !options.markForDestructionOnUnmount,
-        );
-      } else if (options.cachePolicy === "by-owner-and-parent") {
-        this.installInternalSearchDestructionMarker([
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          options.createdBy,
-          searchParent,
-          null,
-        ], !options.markForDestructionOnUnmount);
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          options.createdBy,
-          searchParent,
-          null,
-          true,
-          !options.markForDestructionOnUnmount,
-        );
-      } else if (options.cachePolicy === "by-property") {
-        this.installInternalSearchDestructionMarker([
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          null,
-          null,
-          searchCacheUsesProperty,
-        ], !options.markForDestructionOnUnmount);
-        this.markSearchForDestruction(
-          options.cachePolicy,
-          standardCounterpartQualifiedName,
-          null,
-          null,
-          searchCacheUsesProperty,
-          true,
-          !options.markForDestructionOnUnmount,
-        );
-      }
-    }
-
-    // and then set the state to searching
-    if (!this.isUnmounted) {
-      this.setState({
-        searching: true,
-      });
-    }
-
-    // the fields nevertheless are another story as it uses the standard logic
-    const searchFieldsAndArgs = getFieldsAndArgs({
-      includeArgs: false,
-      includeFields: true,
-      properties: options.requestedProperties,
-      includes: options.requestedIncludes || {},
-      itemDefinitionInstance: standardCounterpart,
-      forId: null,
-      forVersion: null,
-    });
-
-    let types: string[] = null;
-    if (options.types) {
-      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-      types = options.types.map((t) => root.registry[t].getQualifiedPathName());
-    }
-
-    // while these search fields are of virtually no use for standard searchs
-    // these are used when doing a traditional search and when doing a search
-    // in a cache policy mode
-    const requestedSearchFields = searchFieldsAndArgs.requestFields;
-
-    let parentedBy = null;
-    let parentNull = false;
-    if (options.parentedBy && options.parentedBy !== "NO_PARENT") {
-      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-      const parentIdef = root.registry[options.parentedBy.item] as ItemDefinition;
-      parentedBy = {
-        itemDefinition: parentIdef,
-        id: options.parentedBy.id || null,
-        version: options.parentedBy.version || null,
-      };
-    } else if (options.parentedBy === "NO_PARENT") {
-      parentNull = true;
-    }
-
-    const stateOfSearch = this.props.itemDefinitionInstance.getStateNoExternalChecking(
-      this.props.forId || null,
-      this.props.forVersion || null,
-    );
-
-    if ((listenPolicy === "by-owner" || listenPolicy === "by-owner-and-parent") && !options.createdBy || options.createdBy === UNSPECIFIED_OWNER) {
-      throw new Error("Listen policy is by-owner yet there's no creator specified");
-    } else if ((listenPolicy === "by-parent" || listenPolicy === "by-owner-and-parent") && (!parentedBy || !parentedBy.id)) {
-      throw new Error("Listen policy is by-parent yet there's no parent specified with a specific id");
-    }
-
-    let activeSearchPromiseResolve = null as any;
-    let activeSearchPromiseReject = null as any;
-    this.activeSearchPromise = new Promise((resolve, reject) => {
-      activeSearchPromiseResolve = resolve;
-      activeSearchPromiseReject = reject;
-    });
-    this.activeSearchOptions = options;
-
-    const {
-      results,
-      records,
-      count,
-      limit,
-      offset,
-      error,
-      lastModified,
-      highlights,
-      metadata,
-      cached,
-      polyfilled,
-    } = await runSearchQueryFor({
-      args: argumentsForQuery,
-      fields: requestedSearchFields,
-      itemDefinition: this.props.itemDefinitionInstance,
-      cachePolicy: options.cachePolicy || "none",
-      cacheDoNotFallbackToSimpleSearch: options.cacheDoNotFallbackToSimpleSearch,
-      cacheDoNotFallbackToPolyfill: options.cacheDoNotFallbackToPolyfill,
-      cacheNoLimitOffset: options.cacheNoLimitOffset,
-      trackedProperty: options.trackedProperty || null,
-      createdBy: options.createdBy || null,
-      since: options.since || null,
-      until: options.until || null,
-      orderBy: options.orderBy || {
-        created_at: {
-          priority: 0,
-          nulls: "last",
-          direction: "desc",
-        }
+    const $this = this;
+    return await search(
+      this.props.itemDefinitionInstance,
+      this.props,
+      options,
+      this.state,
+      this.setState as any,
+      {
+        get current() {
+          return $this.initialAutomaticNextSearch;
+        },
+        set current(v: boolean) {
+          $this.initialAutomaticNextSearch = v;
+        },
       },
-      types,
-      traditional: !!options.traditional,
-      token: this.props.tokenData.token,
-      language: this.props.localeData.language,
-      limit: options.limit,
-      offset: options.offset,
-      enableNulls: options.enableNulls,
-      parentedBy,
-      parentNull,
-      waitAndMerge: options.waitAndMerge,
-      progresser: options.progresser,
-      cacheStoreMetadata: options.cacheMetadata,
-      cacheStoreMetadataMismatchAction: options.cacheMetadataMismatchAction,
-      useSearchEngine: options.useSearchEngine,
-      useSearchEngineFullHighlights: options.useSearchEngineFullHighlights,
-      versionFilter: options.versionFilter,
-      idsFilter: options.idsFilter,
-      idsFilterOut: options.idsFilterOut,
-      createdByFilter: options.createdByFilter,
-      createdByFilterOut: options.createdByFilterOut,
-      parentTypeFilter: options.parentTypeFilter,
-      parentTypeFilterOut: options.parentTypeFilterOut,
-      parentIdsFilter: options.parentIdsFilter,
-      parentIdsFilterOut: options.parentIdsFilterOut,
-      versionFilterOut: options.versionFilterOut,
-    }, {
-      remoteListener: this.props.remoteListener,
-      preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
-    });
-
-    const searchId = uuid.v4();
-
-    if (error) {
-      const searchState = {
-        searchError: error,
-        searching: false,
-        searchResults: results,
-        searchHighlights: highlights,
-        searchMetadata: metadata,
-        searchRecords: records,
-        searchCount: count,
-        searchLimit: limit,
-        searchOffset: offset,
-        searchId,
-        searchOwner: options.createdBy || null,
-        searchParent,
-        searchCacheUsesProperty,
-        searchShouldCache: options.cachePolicy && options.cachePolicy !== "none",
-        searchFields: requestedSearchFields,
-        searchRequestedProperties: options.requestedProperties,
-        searchRequestedIncludes: options.requestedIncludes || {},
-        searchLastModified: lastModified,
-        searchEngineEnabled: !!options.useSearchEngine,
-        searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
-        searchEngineUsedFullHighlights: options.useSearchEngineFullHighlights || null,
-        searchEngineHighlightArgs: null as any,
-        searchCachePolicy: options.cachePolicy || "none",
-        searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
-        searchOriginalOptions: options,
-        searchListenSlowPolling: options.listenPolicySlowPolling || false,
-      };
-
-      // this would be a wasted instruction otherwise as it'd be reversed
-      if (
-        !options.cleanSearchResultsOnAny &&
-        !options.cleanSearchResultsOnFailure
-      ) {
-        this.props.itemDefinitionInstance.setSearchState(
-          this.props.forId || null,
-          this.props.forVersion || null,
-          {
-            searchState,
-            state: stateOfSearch,
-          },
-        );
-      }
-
-      if (!this.isUnmounted) {
-        this.setState({
-          ...searchState,
-          searchWasRestored: "NO",
-          pokedElements,
-        }, () => {
-          if (options.storeResultsInNavigation) {
-            // we need to use the current location in order to ensure
-            // that nothing changed during the set state event
-            const searchParams = new URLSearchParams(location.search);
-            const rFlagged = searchParams.get("r") === "t";
-            searchParams.delete("r");
-
-            let searchPart = searchParams.toString();
-            if (!searchPart.startsWith("?")) {
-              searchPart = "?" + searchPart;
-            }
-
-            setHistoryState(
-              {
-                state: this.props.location.state,
-                pathname: location.pathname,
-                search: searchPart,
-                hash: location.hash,
-              },
-              {
-                [options.storeResultsInNavigation]: {
-                  searchId,
-                  searchState,
-                  searchIdefState: ItemDefinition.getSerializableState(stateOfSearch),
-                }
-              },
-              initialAutomatic || rFlagged || isReloadSearch,
-            );
-          }
-        });
-      }
-      this.cleanWithProps(this.props, options, "fail");
-    } else {
-      let highlightArgs: any = null;
-
-      if (!options.traditional && options.useSearchEngine) {
-        // we are passing these highlight args that are used in the argument
-        // we don't need to pass them down the line otherwise
-        highlightArgs = {};
-        Object.keys(argumentsForQuery).forEach((pId) => {
-          if (this.props.itemDefinitionInstance.hasPropertyDefinitionFor(pId, true)) {
-            const pValue = this.props.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
-
-            if (pValue.getType() === "string" && pValue.getSubtype() === "search") {
-              const value = argumentsForQuery[pId];
-              // highlighting is only useful if it's not null
-              // otherwise it's plain useless
-              if (value !== null) {
-                highlightArgs[pId] = value;
-              }
-            }
-          }
-        });
-      }
-
-      const searchState = {
-        searchError: null as any,
-        searching: false,
-        searchResults: results,
-        searchHighlights: highlights,
-        searchMetadata: metadata,
-        searchRecords: records,
-        searchCount: count,
-        searchLimit: limit,
-        searchOffset: offset,
-        searchId,
-        searchOwner: options.createdBy || null,
-        searchParent,
-        searchCacheUsesProperty,
-        searchShouldCache: options.cachePolicy && options.cachePolicy !== "none",
-        searchFields: requestedSearchFields,
-        searchRequestedProperties: options.requestedProperties,
-        searchRequestedIncludes: options.requestedIncludes || {},
-        searchLastModified: lastModified,
-        searchEngineEnabled: !!options.useSearchEngine,
-        searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
-        searchEngineUsedFullHighlights: options.useSearchEngineFullHighlights || null,
-        searchEngineHighlightArgs: highlightArgs,
-        searchCachePolicy: options.cachePolicy || "none",
-        searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
-        searchOriginalOptions: options,
-        searchListenSlowPolling: options.listenPolicySlowPolling || false,
-      };
-
-      this.searchListenersSetup(
-        searchState,
-      );
-
-      // this would be a wasted instruction otherwise as it'd be reversed
-      if (
-        !options.cleanSearchResultsOnAny &&
-        !options.cleanSearchResultsOnSuccess
-      ) {
-        this.props.itemDefinitionInstance.setSearchState(
-          this.props.forId || null,
-          this.props.forVersion || null,
-          {
-            searchState,
-            state: stateOfSearch,
-          },
-        );
-      }
-
-      if (!this.isUnmounted) {
-        this.setState({
-          ...searchState,
-          searchWasRestored: "NO",
-          pokedElements,
-        }, () => {
-          if (options.storeResultsInNavigation) {
-            // we need to use the current location in order to ensure
-            // that nothing changed during the set state event
-            const searchParams = new URLSearchParams(location.search);
-            const rFlagged = searchParams.get("r") === "t";
-            searchParams.delete("r");
-
-            let searchPart = searchParams.toString();
-            if (!searchPart.startsWith("?")) {
-              searchPart = "?" + searchPart;
-            }
-
-            setHistoryState(
-              {
-                state: this.props.location.state,
-                pathname: location.pathname,
-                search: searchPart,
-                hash: location.hash,
-              },
-              {
-                [options.storeResultsInNavigation]: {
-                  searchId,
-                  searchState,
-                  searchIdefState: ItemDefinition.getSerializableState(stateOfSearch),
-                }
-              },
-              initialAutomatic || rFlagged,
-            );
-          }
-        });
-      }
-      this.cleanWithProps(this.props, options, "success");
-    }
-
-    this.props.itemDefinitionInstance.triggerListeners(
-      "search-change",
-      this.props.forId,
-      this.props.forVersion,
+      {
+        get current() {
+          return $this.reloadNextSearch;
+        },
+        set current(v: boolean) {
+          $this.reloadNextSearch = v;
+        },
+      },
+      {
+        get current() {
+          return $this.preventSearchFeedbackOnPossibleStaleData;
+        },
+        set current(v: boolean) {
+          $this.preventSearchFeedbackOnPossibleStaleData = v;
+        },
+      },
+      {
+        get current() {
+          return $this.activeSearchPromiseAwaiter;
+        },
+        set current(v: string) {
+          $this.activeSearchPromiseAwaiter = v;
+        },
+      },
+      {
+        get current() {
+          return $this.activeSearchPromise;
+        },
+        set current(v: Promise<{ response: IActionResponseWithSearchResults, options: IActionSearchOptions }>) {
+          $this.activeSearchPromise = v;
+        },
+      },
+      {
+        get current() {
+          return $this.activeSearchOptions;
+        },
+        set current(v: IActionSearchOptions) {
+          $this.activeSearchOptions = v;
+        },
+      },
+      {
+        get current() {
+          return $this.activeSubmitPromiseAwaiter;
+        },
+        set current(v: string) {
+          $this.activeSubmitPromiseAwaiter = v;
+        },
+      },
+      {
+        get current() {
+          return $this.internalSearchDestructionMarkers;
+        },
+        set current(v: Array<[string, string, string, [string, string, string], [string, string]]>) {
+          $this.internalSearchDestructionMarkers = v;
+        },
+      },
+      this.isUnmounted,
+      this.blockIdClean,
+      this.props.tokenData.token,
+      this.props.localeData.language,
+      this.props.remoteListener,
+      this.props.location,
+      this.onSearchReload,
       this.changeSearchListener,
     );
-
-    const result = {
-      searchId,
-      results,
-      records,
-      count,
-      limit,
-      offset,
-      error,
-      cached,
-      cancelled: false,
-      polyfilled,
-    };
-    this.props.onSearch && this.props.onSearch(result);
-    this.activeSearchPromise = null;
-    this.activeSearchOptions = null;
-    activeSearchPromiseResolve({ response: result, options });
-    return result;
   }
   public dismissLoadError() {
-    if (this.isUnmounted) {
-      return;
-    }
-    this.setState({
-      loadError: null,
-    });
+    dismissLoadError(
+      this.isUnmounted,
+      this.setState as any,
+    );
   }
   public dismissDeleteError() {
-    if (this.isUnmounted) {
-      return;
-    }
-    this.setState({
-      deleteError: null,
-    });
+    dismissDeleteError(
+      this.isUnmounted,
+      this.setState as any,
+    );
   }
   public dismissSubmitError() {
-    if (this.isUnmounted) {
-      return;
-    }
-    this.setState({
-      submitError: null,
-    });
+    dismissSubmitError(
+      this.isUnmounted,
+      this.setState as any,
+    );
   }
   public dismissSubmitted() {
-    if (this.isUnmounted) {
-      return;
-    }
-    this.setState({
-      submitted: false,
-    });
+    dismissSubmitted(
+      this.isUnmounted,
+      this.setState as any,
+    );
   }
   public dismissDeleted() {
-    if (this.isUnmounted) {
-      return;
-    }
-    this.setState({
-      deleted: false,
-    });
+    dismissDeleted(
+      this.isUnmounted,
+      this.setState as any,
+    );
   }
   public dismissSearchError() {
-    if (this.isUnmounted) {
-      return;
-    }
-    this.setState({
-      searchError: null,
-    });
+    dismissSearchError(
+      this.isUnmounted,
+      this.setState as any,
+    );
   }
-  public async onSearchReload(arg: IRemoteListenerRecordsCallbackArg) {
+
+  // Must be copied as it is unique to the Item Provider
+  // and should be a use callback in hook mode
+  private async onSearchReload(arg: IRemoteListenerRecordsCallbackArg) {
     // prevent double searches and warn the developer
     if (this.state.searching) {
       console.warn(
@@ -6273,59 +4866,16 @@ export class ActualItemProvider extends
       }
     });
   }
-  public removePossibleSearchListeners(
-    props: IActualItemProviderProps = this.props,
-    state: IActualItemProviderState = this.state,
-  ) {
-    if (props.itemDefinitionInstance.isInSearchMode()) {
-      const standardCounterpart = props.itemDefinitionInstance.getStandardCounterpart();
-      const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-        standardCounterpart.getParentModule().getQualifiedPathName() :
-        standardCounterpart.getQualifiedPathName());
 
-      if (state.searchOwner) {
-        props.remoteListener.removeOwnedSearchListenerFor(
-          this.onSearchReload,
-          standardCounterpartQualifiedName,
-          state.searchOwner,
-        );
-      }
-      if (state.searchParent) {
-        props.remoteListener.removeParentedSearchListenerFor(
-          this.onSearchReload,
-          standardCounterpartQualifiedName,
-          state.searchParent[0],
-          state.searchParent[1],
-          state.searchParent[2],
-        );
-      }
-      if (state.searchParent && state.searchOwner) {
-        props.remoteListener.removeOwnedParentedSearchListenerFor(
-          this.onSearchReload,
-          standardCounterpartQualifiedName,
-          state.searchOwner,
-          state.searchParent[0],
-          state.searchParent[1],
-          state.searchParent[2],
-        );
-      }
-    }
-  }
   public dismissSearchResults() {
-    this.removePossibleSearchListeners();
-    if (!this.isUnmounted) {
-      this.setState({
-        searchId: null,
-        searchFields: null,
-        searchOwner: null,
-        searchLastModified: null,
-        searchShouldCache: false,
-        searchRequestedIncludes: {},
-        searchRequestedProperties: [],
-        searchResults: null,
-        searchRecords: null,
-      });
-    }
+    return dismissSearchResults(
+      this.props.itemDefinitionInstance,
+      this.props.remoteListener,
+      this.state,
+      this.setState as any,
+      this.isUnmounted,
+      this.onSearchReload,
+    );
   }
   public poke(elements: IPokeElementsType) {
     if (this.isUnmounted) {

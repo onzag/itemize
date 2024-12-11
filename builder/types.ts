@@ -8,11 +8,83 @@ import { ISQLColumnDefinitionType } from "../base/Root/sql";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { getRQDefinitionForItemDefinition } from "../base/Root/Module/ItemDefinition/rq";
 import { getSQLTableDefinitionForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import { RESERVED_BASE_PROPERTIES_RQ } from "../constants";
 
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
 const fsAsync = fs.promises;
+
+const allTypes = {
+  "boolean": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean",
+    type: "PropertyDefinitionSupportedBooleanType",
+  },
+  "integer": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer",
+    type: "PropertyDefinitionSupportedIntegerType",
+  },
+  "number": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/number",
+    type: "PropertyDefinitionSupportedNumberType",
+  },
+  "currency": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/currency",
+    type: "IPropertyDefinitionSupportedCurrencyType",
+  },
+  "unit": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit",
+    type: "IPropertyDefinitionSupportedUnitType",
+  },
+  "string": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/string",
+    type: "PropertyDefinitionSupportedStringType",
+  },
+  "password": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/password",
+    type: "PropertyDefinitionSupportedPasswordType",
+  },
+  "text": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/text",
+    type: "IPropertyDefinitionSupportedTextType",
+  },
+  "year": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/year",
+    type: "PropertyDefinitionSupportedYearType",
+  },
+  "date": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/date",
+    type: "PropertyDefinitionSupportedDateType",
+  },
+  "datetime": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/datetime",
+    type: "PropertyDefinitionSupportedDateTimeType",
+  },
+  "time": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/time",
+    type: "PropertyDefinitionSupportedTimeType",
+  },
+  "location": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/location",
+    type: "IPropertyDefinitionSupportedLocationType",
+  },
+  "file": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/file",
+    type: "PropertyDefinitionSupportedFileType",
+  },
+  "files": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/files",
+    type: "PropertyDefinitionSupportedFilesType",
+  },
+  "payment": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment",
+    type: "IPropertyDefinitionSupportedPaymentType",
+  },
+  "taglist": {
+    location: "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition/types/taglist",
+    type: "PropertyDefinitionSupportedTagListType",
+  },
+}
 
 function rqToTypescriptDefinition(
   flat: boolean,
@@ -290,31 +362,82 @@ function itemTypeBuilder(item: ItemDefinition, mod: Module) {
   return rsRqSS + rsRqCS + rsSQL + rsSQLFull + itemData;
 }
 
+function buildItemProviderFor(
+  idef: ItemDefinition,
+  sc: boolean,
+  modPath: string,
+  idefPath: string,
+) {
+
+  const mappedGetters = idef.getAllPropertyDefinitionsAndExtensions().map((v) => (
+    RESERVED_BASE_PROPERTIES_RQ[v.getId()] ? "" : 
+`
+    get ${v.getId()}() {
+      return provider.getValueForProperty(${JSON.stringify(v.getId())}) as ${allTypes[v.getType()].type};
+    },
+    get ${v.getId()}_STATE() {
+      return provider.getStateForProperty<${allTypes[v.getType()].type}>(${JSON.stringify(v.getId())});
+    }
+`
+)).filter((v) => !!v).join(",\n");
+
+  return (
+`
+  const provider = useItemProvider({
+    itemDefinition: ${JSON.stringify(idefPath)},
+    module: ${JSON.stringify(modPath)},
+    searchCounterpart: ${JSON.stringify(sc)},
+  });
+
+  const value = useMemo(() => ({
+${mappedGetters ? mappedGetters + ",\n" : ""}
+${!sc ? Object.keys(RESERVED_BASE_PROPERTIES_RQ).map((pId) => (
+`
+    get ${pId}() {
+      return provider.getValueForProperty(${JSON.stringify(pId)}) as ${RESERVED_BASE_PROPERTIES_RQ[pId].type};
+    }
+`
+)).join(",\n") : ""}
+  }), [provider.getValueForProperty]);
+
+  return ({
+    ...provider,
+    value,
+  });
+`
+  )
+}
+
 function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
-  const typeNameRqSS = itemTypeNameGetterRqSS(idef);
-  const typeNameRqCS = itemTypeNameGetterRqCS(idef);
-  const typeNameSQL = itemTypeNameGetterSQL(idef);
-  
-  const hookDefault = "export function " + itemTypeNameGetterUseBase(idef) + "(options: ISchemaItemProviderOptions) {}\n";
-  const hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ISchemaItemProviderOptions) {}\n";
-  
+  let hookDefault = "export function " + itemTypeNameGetterUseBase(idef) + "(options: ISchemaItemProviderOptions) {\n";
+  hookDefault += buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName());
+  let hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ISchemaItemProviderOptions) {\n";
+  if (idef.isSearchable()) {
+    hookSearch += buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName());
+  }
+  hookDefault += "};\n"
+  hookSearch += "};\n"
+
   let itemData = "";
 
   idef.getChildDefinitions().forEach((c) => {
     itemData += itemSchemaJsBuilder(c, mod);
   });
 
-  return hookDefault + hookSearch + itemData;
+  return hookDefault + (idef.isSearchable ? hookSearch : "") + itemData;
 }
 
 function moduleSchemaJsBuilder(mod: Module): string {
-  const typeNameRqSS = modTypeNameGetterRqSS(mod);
-  const typeNameRqCS = modTypeNameGetterRqCS(mod);
-  const typeNameSQL = modTypeNameGetterSQL(mod);
-  
-  const hookDefault = "export function " + modTypeNameGetterUseBase(mod) + "(options: ISchemaItemProviderOptions) {}\n";
-  const hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ISchemaItemProviderOptions) {}\n";
-  
+  let hookDefault = "export function " + modTypeNameGetterUseBase(mod) + "(options: ISchemaItemProviderOptions) {\n";
+  hookDefault += buildItemProviderFor(mod.getPropExtensionItemDefinition(), false, mod.getQualifiedPathName(), null);
+  let hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ISchemaItemProviderOptions) {\n";
+  if (mod.isSearchable()) {
+    hookSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null);
+  }
+
+  hookDefault += "};\n"
+  hookSearch += "};\n"
+
   let itemData = "";
 
   mod.getAllChildItemDefinitions().forEach((c) => {
@@ -327,7 +450,7 @@ function moduleSchemaJsBuilder(mod: Module): string {
     childModData += moduleSchemaJsBuilder(m);
   });
 
-  return hookDefault + hookSearch + itemData + childModData;
+  return hookDefault + (mod.isSearchable() ? hookSearch : "") + itemData + childModData;
 }
 
 function moduleTypeBuilder(mod: Module): string {
@@ -356,7 +479,7 @@ function moduleTypeBuilder(mod: Module): string {
   Object.keys(rqModule).forEach((p) => {
     const rsDef = rqModule[p];
 
-    rsRqSS += "\t" + rqToTypescriptDefinition(true, mod, p, rsDef, null, 1)  + (p === "DATA" ? "\n" : ";\n");
+    rsRqSS += "\t" + rqToTypescriptDefinition(true, mod, p, rsDef, null, 1) + (p === "DATA" ? "\n" : ";\n");
     rsRqCS += "\t" + rqToTypescriptDefinition(false, mod, p, rsDef, null, 1) + ";\n";
   });
 
@@ -402,8 +525,13 @@ export async function rootTypesBuilder(data: IRootRawJSONDataType) {
 
   await ensureSrcFolder();
 
-  let schemaData = "import { useItemProvider, IItemProviderOptions } from @onzag/itemize/client/providers/item/hook\n\n";
-  schemaData += "interface ISchemaItemProviderOptions extends Omit<IItemProviderOptions, 'itemDefinition' | 'module' | 'searchCounterpart'>\n\n";
+  let schemaData = "import { useItemProvider, IItemProviderOptions } from \"@onzag/itemize/client/providers/item/hook\";\n";
+  schemaData += "import { useMemo } from \"react\";\n";
+  Object.keys(allTypes).forEach((type) => {
+    const info = allTypes[type];
+    schemaData += "import type {" + info.type + "} from \"" + info.location + "\";\n";
+  });
+  schemaData += "\ninterface ISchemaItemProviderOptions extends Omit<IItemProviderOptions, 'itemDefinition' | 'module' | 'searchCounterpart'> {};\n\n";
   processedRoot.getAllModules().forEach((m) => {
     schemaData += moduleSchemaJsBuilder(m);
   });
@@ -417,30 +545,30 @@ export async function rootTypesBuilder(data: IRootRawJSONDataType) {
 
 async function ensureTypes() {
   try {
-      // Check if the directory exists
-      await fsAsync.stat("types");
+    // Check if the directory exists
+    await fsAsync.stat("types");
   } catch (error) {
-      // If it doesn't exist, create it
-      if (error.code === 'ENOENT') {
-          await fsAsync.mkdir("types");
-      } else {
-          // Other error occurred, handle it appropriately
-          throw error;
-      }
+    // If it doesn't exist, create it
+    if (error.code === 'ENOENT') {
+      await fsAsync.mkdir("types");
+    } else {
+      // Other error occurred, handle it appropriately
+      throw error;
+    }
   }
 }
 
 async function ensureSrcFolder() {
   try {
-      // Check if the directory exists
-      await fsAsync.stat("src");
+    // Check if the directory exists
+    await fsAsync.stat("src");
   } catch (error) {
-      // If it doesn't exist, create it
-      if (error.code === 'ENOENT') {
-          await fsAsync.mkdir("src");
-      } else {
-          // Other error occurred, handle it appropriately
-          throw error;
-      }
+    // If it doesn't exist, create it
+    if (error.code === 'ENOENT') {
+      await fsAsync.mkdir("src");
+    } else {
+      // Other error occurred, handle it appropriately
+      throw error;
+    }
   }
 }
