@@ -1,13 +1,13 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { IActionResponseWithValue, IItemProviderProps, ILoadCompletedPayload, IPokeElementsType, LOAD_TIME, SSR_GRACE_TIME, SearchItemValueContext, getPropertyForSetter, resolveCoreProp } from ".";
+import { IActionResponseWithValue, IActionSearchOptions, IBasicFns, IItemProviderProps, IPokeElementsType, SearchItemValueContext } from ".";
 import { useRootRetriever } from "../../components/root/RootRetriever";
 import type Module from "../../../base/Root/Module";
-import ItemDefinition, { IItemSearchStateType } from "../../../base/Root/Module/ItemDefinition";
-import { IPropertyBaseProps, IPropertyCoreProps } from "../../components/property/base";
+import ItemDefinition, { IItemSearchStateType, IItemStateType } from "../../../base/Root/Module/ItemDefinition";
+import { IPropertyBaseProps } from "../../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { DESTRUCTION_MARKERS_LOCATION, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, RESERVED_BASE_PROPERTIES_RQ, SEARCH_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
+import { ENDPOINT_ERRORS, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, RESERVED_BASE_PROPERTIES_RQ, SEARCH_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
-import PropertyDefinition, { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
   IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode, SearchCacheMetadataMismatchActionFn, getPropertyListDefault
@@ -21,6 +21,13 @@ import { EndpointErrorType } from "../../../base/errors";
 import uuid from "uuid";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { useLocationRetriever } from "../../../client/components/navigation/LocationRetriever";
+import { TokenContext } from "../../../client/internal/providers/token-provider";
+import { LocaleContext } from "../../../client/internal/providers/locale-provider";
+import { ConfigContext } from "../../../client/internal/providers/config-provider";
+import { blockCleanup, changeListener, changeSearchListener, didUpdate, dismissSearchResults, downloadStateAt, getDerived, installPrefills, installSetters, loadListener, loadStateFromFileAt, loadValue, onConnectStatusChange, onMount, onPropertyRestore, onSearchReload, reloadListener, setStateToCurrentValueWithExternalChecking, setupInitialState, setupListeners, willUnmount } from "./util";
+import { IRemoteListenerRecordsCallbackArg } from "../../../client/internal/app/remote-listener";
+import { genericAnalyticsDataProvider } from "../../../client/components/analytics/util";
+import { IPropertyCoreProps, IPropertySetterProps } from "../../components/property/base";
 
 export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId'> {
   module: string | Module;
@@ -45,7 +52,7 @@ export class SSRError extends Error {
 
 export interface IHookItemProviderState extends IItemSearchStateType {
   searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION";
-  // itemState: IItemStateType;
+  itemState: IItemStateType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
@@ -69,16 +76,19 @@ export interface IItemProviderHookElement {
 
 
 export function useItemProvider(options: IItemProviderOptions): IItemProviderHookElement {
+  // getting the root and other context information
   const root = useRootRetriever();
   const mod = typeof options.module === "string" ? root.root.registry[options.module] as Module : options.module;
 
   const searchContext = useContext(SearchItemValueContext);
   const dataContext = useContext(DataContext);
+  const config = useContext(ConfigContext);
+  const localeData = useContext(LocaleContext);
+  const tokenData = useContext(TokenContext);
+  const location = useLocationRetriever();
 
-  // hack to update the options in real time in the ref object
-  const activeOptions = useRef(options);
-  activeOptions.current = options;
-
+  // first necessary functions
+  // getting the item definition
   const idef: ItemDefinition = useMemo(() => {
     let idef: ItemDefinition = null;
     if (typeof options.itemDefinition === "string") {
@@ -98,148 +108,40 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     return idef;
   }, [options.itemDefinition, mod]);
 
-  // START COPY/PASTE AND MODIFYING TO ADAPT TO A HOOK
-  // =============================================================================
+  // EMULATE of state and setState as well as derived state
+  const [stateBase, setStateBase] = useState<IHookItemProviderState>(
+    () => setupInitialState(idef, options),
+  );
+  const derived = getDerived(idef, location, options, stateBase);
+  const state = derived ? {
+    ...stateBase,
+    ...derived,
+  } : stateBase;
 
-  // COPY OF setupInitialState
-  const [stateInfo, setStateInfoOriginal] = useState<IHookItemProviderState>(() => {
-    // the value might already be available in memory, this is either because it was loaded
-    // by another instance or because of SSR during the initial render
-    const memoryLoaded = !!(options.forId && idef.hasAppliedValueTo(
-      options.forId || null, options.forVersion || null,
-    ));
-    let memoryLoadedAndValid = false;
-    // by default we don't know
-    let isNotFound = false;
-    let isBlocked = false;
-    let isBlockedButDataIsAccessible = false;
-    if (memoryLoaded) {
-      const appliedRQValue = idef.getRQAppliedValue(
-        options.forId || null, options.forVersion || null,
-      );
-      // this is the same as for loadValue we are tyring to predict
-      const { requestFields } = getFieldsAndArgs({
-        includeArgs: false,
-        includeFields: true,
-        uniteFieldsWithAppliedValue: true,
-        includes: options.includes || {},
-        properties: getPropertyListDefault(options.properties),
-        itemDefinitionInstance: idef,
-        forId: options.forId || null,
-        forVersion: options.forVersion || null,
-      });
-      // this will work even for null values, and null requestFields
-      memoryLoadedAndValid = (
-        appliedRQValue &&
-        requestFieldsAreContained(requestFields, appliedRQValue.requestFields)
-      );
-      isNotFound = memoryLoadedAndValid && appliedRQValue.rawValue === null;
-      isBlocked = !isNotFound && !!appliedRQValue.rawValue.blocked_at;
-      isBlockedButDataIsAccessible = isBlocked && !!appliedRQValue.rawValue.DATA;
-    }
-
-    let searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION" = "NO";
-    let searchState: IItemSearchStateType = {
-      searchError: null,
-      searching: false,
-      searchResults: null,
-      searchRecords: null,
-      searchLimit: null,
-      searchOffset: null,
-      searchCount: null,
-      searchId: null,
-      searchOwner: null,
-      searchLastModified: null,
-      searchParent: null,
-      searchCacheUsesProperty: null,
-      searchShouldCache: false,
-      searchFields: null,
-      searchRequestedIncludes: {},
-      searchRequestedProperties: [],
-      searchEngineEnabled: false,
-      searchEngineEnabledLang: null,
-      searchEngineUsedFullHighlights: null,
-      searchEngineHighlightArgs: null,
-      searchHighlights: {},
-      searchMetadata: null,
-      searchCachePolicy: "none",
-      searchListenPolicy: "none",
-      searchOriginalOptions: null,
-      searchListenSlowPolling: false,
-    };
-    const searchStateComplex = idef.getSearchState(
-      options.forId || null, options.forVersion || null,
-    );
-    if (searchStateComplex) {
-      searchState = searchStateComplex.searchState;
-
-      const state = searchStateComplex.state;
-      idef.applyState(
-        options.forId || null,
-        options.forVersion || null,
-        state,
-      );
-
-      searchWasRestored = "FROM_STATE";
-    }
-
-    // so the initial setup
-    return {
-      // DOES NOT EXIST IN HOOK MODE
-      // itemState: ActualItemProvider.getItemStateStatic(props),
-      // and we pass all this state
-      isBlocked,
-      isBlockedButDataIsAccessible,
-      notFound: isNotFound,
-      loadError: null,
-      // loading will be true if we are setting up with an id
-      // as after mount it will attempt to load such id, in order
-      // to avoid pointless refresh we set it up as true from
-      // the beggining
-      loading: memoryLoadedAndValid ? false : (options.avoidLoading ? false : !!options.forId),
-      // loaded will be whether is loaded or not only if there is an id
-      // otherwise it's technically loaded
-      loaded: options.forId ? memoryLoadedAndValid : true,
-
-      submitError: null,
-      submitting: false,
-      submitted: false,
-
-      deleteError: null,
-      deleting: false,
-      deleted: false,
-
-      ...searchState,
-      searchWasRestored,
-
-      pokedElements: {
-        properties: [],
-        includes: {},
-        policies: [],
-      },
-    };
-  });
-
-  const stateInfoCb = useRef<() => void>(null);
-
+  const cbRef = useRef<() => void>(null);
   useEffect(() => {
-    if (stateInfoCb.current) {
-      stateInfoCb.current();
-      stateInfoCb.current = null;
+    if (cbRef.current) {
+      cbRef.current();
+      cbRef.current = null;
     }
-  }, [stateInfo]);
-
-  // used as an alternative to set state
-  const setStateInfo = useCallback((value: Partial<IHookItemProviderState>, cb?: () => void) => {
-    setStateInfoOriginal({
-      ...stateInfo,
-      ...value,
-    });
-
+  }, [state]);
+  const setState = useCallback((newState: Partial<IHookItemProviderState>, cb?: () => void) => {
     if (cb) {
-      stateInfoCb.current = cb;
+      if (cbRef.current) {
+        const oldCb = cbRef.current;
+        cbRef.current = () => {
+          oldCb();
+          cb();
+        };
+      } else {
+        cbRef.current = cb;
+      }
     }
-  }, [stateInfo]);
+    setStateBase({
+      ...state,
+      ...newState,
+    });
+  }, [state]);
 
   // NOW THAT WE KNOW THE INITIAL STATE WE CAN CHECK THE REQUEST MANAGER
   // AND THROW THE ERROR IN CASE OF SSR
@@ -257,7 +159,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
         });
       }
     } else if (
-      stateInfo.loaded ||
+      state.loaded ||
       options.forId === null ||
       idef.isInSearchMode() ||
       idef.isExtensionsInstance() ||
@@ -310,502 +212,400 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     }
   }
 
-  const [, setNVar] = useState(0);
 
-  const onPropertyValuesChangedForceUpdate = useCallback(() => {
-    // Force a re-render by updating the state
-    setNVar((v) => v + 1);
+  // alwyas up to date options and state
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const idefRef = useRef(idef);
+  idefRef.current = idef;
+  const setStateRef = useRef(setState);
+  setStateRef.current = setState;
+  const tokenDataRef = useRef(tokenData);
+  tokenDataRef.current = tokenData;
+  const locationRef = useRef(location);
+  locationRef.current = location;
+  const localeDataRef = useRef(localeData);
+  localeDataRef.current = localeData;
+
+  // refs
+  // unlike the class this is used as reference, so it is always needed
+  const internalUUIDRef = useRef(uuid.v4());
+  const blockIdCleanRef = useRef(null as string);
+  const isUnmountedRef = useRef(false);
+  const isCMountedRef = useRef(false);
+  const mountCbsRef = useRef([] as Array<() => void>);
+  const repairCorruptionTimeoutRef = useRef(null as NodeJS.Timer);
+  const reloadListenerTimeoutRef = useRef(null as NodeJS.Timer);
+  const updateTimeoutRef = useRef(null as NodeJS.Timer);
+  const automaticSearchTimeoutRef = useRef(null as NodeJS.Timer);
+  const lastLoadingForIdRef = useRef(null as string);
+  const lastLoadingForVersionRef = useRef(null as string);
+  const lastLoadValuePromiseIsResolvedRef = useRef(true);
+  const lastLoadValuePromiseRef = useRef(null as Promise<void>);
+  const lastLoadValuePromiseResolveRef = useRef(null as () => void);
+  const changedSearchListenerLastCollectedSearchIdRef = useRef(null as { id: string });
+  const preventSearchFeedbackOnPossibleStaleDataRef = useRef(false);
+  const submitBlockPromisesRef = useRef([] as Array<Promise<any>>);
+  const reloadNextSearchRef = useRef(false);
+  const initialAutomaticNextSearchRef = useRef(false);
+  const lastUpdateIdRef = useRef<number>();
+  const storeStateTimeoutRef = useRef(null as NodeJS.Timer);
+  const internalSearchDestructionMarkersRef = useRef<Array<[string, string, string, [string, string, string], [string, string]]>>([]);
+  const consumableQsStateRef = useRef(null as any);
+  const consumeQsStateTimeoutRef = useRef(null as NodeJS.Timer);
+
+  // functions
+  const reloadListenerHook = useCallback(() => {
+    reloadListener(
+      idefRef.current,
+      optionsRef.current,
+      isCMountedRef.current,
+      mountCbsRef,
+      reloadListenerHook,
+      reloadListenerTimeoutRef,
+      loadValueHook,
+    )
   }, []);
 
-  const location = useLocationRetriever();
+  const changeListenerHook = useCallback((repairCorruption?: boolean) => {
+    changeListener(
+      idefRef.current,
+      optionsRef.current,
+      setStateRef.current,
+      isUnmountedRef,
+      isCMountedRef,
+      mountCbsRef,
+      repairCorruptionTimeoutRef,
+      lastLoadValuePromiseIsResolvedRef.current,
+      lastLoadValuePromiseRef.current,
+      changeListenerHook,
+      reloadListenerHook,
+      repairCorruption,
+    );
+  }, []);
 
-  // COPY FROM blockCleanup
-  const blockIdClean = useRef<string>(null);
+  const loadListenerHook = useCallback(async () => {
+    return await loadListener(
+      idefRef.current,
+      optionsRef.current,
+      stateRef.current,
+      setStateRef.current,
+      isUnmountedRef,
+      isCMountedRef,
+      mountCbsRef,
+      changeListenerHook,
+      loadListenerHook,
+    );
+  }, []);
 
-  // COPY FROM install setters and remove setters
-  const isCMounted = useRef(false);
-  const mountCbFns = useRef([]);
-  const changedSearchListenerLastCollectedSearchId = useRef(null as { id: string });
-  const initialAutomaticNextSearch = useRef(false);
+  const changeSearchListenerHook = useCallback(async () => {
+    changeSearchListener(
+      idefRef.current,
+      optionsRef.current,
+      changedSearchListenerLastCollectedSearchIdRef,
+      mountCbsRef,
+      isUnmountedRef.current,
+      isCMountedRef.current,
+      changeSearchListenerHook,
+      setStateRef.current,
+    );
+  }, []);
 
-  // COPY FROM prefills
-  
+  const onSearchReloadHook = useCallback(async (arg: IRemoteListenerRecordsCallbackArg) => {
+    return await onSearchReload(
+      idefRef.current,
+      stateRef.current,
+      preventSearchFeedbackOnPossibleStaleDataRef,
+      reloadNextSearchRef,
+      searchHook,
+      arg,
+    );
+  }, []);
 
-  // COPY FROM constructor
+  const dismissSearchResultsHook = useCallback(() => {
+    return dismissSearchResults(
+      idefRef.current,
+      dataContext.remoteListener,
+      stateRef.current,
+      setStateRef.current,
+      isUnmountedRef.current,
+      onSearchReloadHook,
+    );
+  }, []);
+
+  const poke = useCallback((elements: IPokeElementsType) => {
+    if (isUnmountedRef.current) {
+      return;
+    }
+
+    setStateRef.current({
+      pokedElements: elements,
+    });
+  }, []);
+
+  const unpoke = useCallback(() => {
+    if (isUnmountedRef.current) {
+      return;
+    }
+    setStateRef.current({
+      pokedElements: {
+        properties: [],
+        includes: {},
+        policies: [],
+      },
+    });
+  }, []);
+
+  const internalDataProviderForAnalyticsHook = useCallback(() => {
+    const generalData = genericAnalyticsDataProvider() as any;
+    generalData.id = options.forId;
+    generalData.version = options.forVersion || null;
+    generalData.type = idef.getQualifiedPathName();
+    return generalData;
+  }, [
+    options.forId,
+    options.forVersion,
+    idef,
+  ]);
+
+  const injectSubmitBlockPromiseImmutable = useCallback((p: Promise<any>) => {
+    submitBlockPromisesRef.current.push(p);
+  }, []);
+
+  const onConnectStatusChangeHook = useCallback(() => {
+    return onConnectStatusChange(
+      optionsRef.current,
+      dataContext.remoteListener,
+      stateRef.current,
+      searchHook,
+      loadValueHook,
+    );
+  }, []);
+
+  const basicFnsRetrieverImmutable = useCallback(() => {
+    return {
+      clean: cleanHook,
+      delete: deleteHook,
+      poke: poke,
+      reload: reloadHook,
+      search: searchHook,
+      submit: submitHook,
+      unpoke: unpoke,
+    } as IBasicFns;
+  }, []);
+
+  const loadStateFromFileAtHook = useCallback(async (
+    stateFile: File | Blob,
+    id: string,
+    version?: string,
+    specificProperties?: string[],
+    specificIncludes?: { [includeId: string]: string[] },
+  ) => {
+    return await loadStateFromFileAt(
+      idefRef.current,
+      stateFile,
+      id,
+      version,
+      specificProperties,
+      specificIncludes,
+    );
+  }, []);
+
+  const loadStateFromFileHook = useCallback((stateFile: File | Blob, specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }) => {
+    loadStateFromFileAtHook(stateFile, this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes);
+  }, []);
+
+  const downloadStateAtHook = useCallback(async (
+    id: string,
+    version: string,
+    specificProperties?: string[],
+    specificIncludes?: { [includeId: string]: string[] },
+  ) => {
+    return await downloadStateAt(
+      idefRef.current,
+      lastLoadValuePromiseIsResolvedRef.current,
+      lastLoadValuePromiseRef.current,
+      id,
+      version,
+      specificProperties,
+      specificIncludes,
+    );
+  }, []);
+
+  const downloadStateHook = useCallback((specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }) => {
+    return downloadStateAtHook(this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes)
+  }, []);
+
+  const loadValueHook = useCallback((denyCaches?: boolean) => {
+    return loadValue(
+      idefRef.current,
+      optionsRef.current,
+      stateRef.current,
+      setStateRef.current,
+      dataContext.remoteListener,
+      lastLoadingForIdRef,
+      lastLoadingForVersionRef,
+      lastLoadValuePromiseIsResolvedRef,
+      lastLoadValuePromiseRef,
+      lastLoadValuePromiseResolveRef,
+      isUnmountedRef,
+      tokenDataRef.current.token,
+      localeDataRef.current.language,
+      lastUpdateIdRef,
+      internalUUIDRef.current,
+      searchContext,
+      changeListenerHook,
+      denyCaches,
+    );
+  }, []);
+
+  // EMULATE OF CONSTRUCTOR
   const isConstruct = useRef(true);
   useEffect(() => {
     isConstruct.current = false;
   }, []);
   if (isConstruct.current) {
-    installSetters(options);
-    installPrefills(options);
+    // first we setup the listeners, this includes the on change listener that would make
+    // the entire app respond to actions, otherwise the fields might as well be disabled
+    // we do this here to avoid useless callback changes as the listeners are not ready
+    installSetters(idef, options, isCMountedRef.current, this.search);
+    installPrefills(idef, options, location);
 
     if (typeof document !== "undefined") {
-      setupListeners();
-      blockCleanup(blockIdClean, idef, options);
+      setupListeners(
+        idef,
+        options,
+        dataContext.remoteListener,
+        changeListenerHook,
+        loadListenerHook,
+        changeSearchListenerHook,
+        reloadListenerHook,
+        internalUUIDRef.current,
+      );
+      blockCleanup(
+        blockIdCleanRef,
+        idef,
+        options,
+      );
     }
   }
 
-  // COPY FROM loadValue
-  const lastLoadingForId = useRef<string>(null);
-  const lastLoadingForVersion = useRef<string>(null);
-  const lastLoadValuePromiseIsResolved = useRef(false);
-  const lastLoadValuePromise = useRef<Promise<void>>(null);
-  const lastLoadValuePromiseResolve = useRef<() => void>(null);
-  const isUnmounted = useRef(false);
+  // EMULATE OF MOUNT
+  useEffect(() => {
+    onMount(idefRef.current, optionsRef.current, state, setState, dataContext.remoteListener,
+      isCMountedRef,
+      mountCbsRef,
+      changedSearchListenerLastCollectedSearchIdRef,
+      initialAutomaticNextSearchRef,
+      isUnmountedRef,
+      internalUUIDRef.current,
+      lastUpdateIdRef,
+      basicFnsRetrieverImmutable,
+      onConnectStatusChangeHook,
+      onSearchReloadHook,
+      searchHook,
+      loadValueHook,
+      changeListenerHook,
+    );
 
-  
-  const loadValueCompleted: (value: ILoadCompletedPayload) => IActionResponseWithValue = useCallback((value: ILoadCompletedPayload) => {
-    // basically if it's unmounted, or what we were updating for does not match
-    // what we are supposed to be updating for, this basically means load value got called once
-    // again before the previous value managed to load, this can happen, when switching forId and/or
-    // for version very rapidly
-    const shouldNotUpdateState =
-      isUnmounted.current ||
-      value.id !== lastLoadingForId.current ||
-      value.version !== lastLoadingForVersion.current;
-
-    // return immediately
-    if (shouldNotUpdateState) {
-      lastLoadValuePromiseIsResolved.current = true;
-      lastLoadValuePromiseResolve.current();
-
-      const result = {
-        value: value.value,
-        error: value.error,
-        cached: value.cached,
-        id: value.id,
-        version: value.version,
-      };
-      options.onLoad && options.onLoad(result);
-      return result;
-    }
-
-    // so once everything has been completed this function actually runs per instance
-    if (value.error) {
-      // if we got an error we basically have no value
-      !isUnmounted.current && setStateInfo({
-        // set the load error and all the logical states, we are not loading
-        // anymore
-        loadError: value.error,
-        loaded: false,
-        isBlocked: false,
-        isBlockedButDataIsAccessible: false,
-        notFound: false,
-        loading: false,
-      });
-
-      // load later when connection is available
-      // unnecessary this is done already by the connection state listener
-      // using the load error
-      // if (
-      //   !isUnmounted.current &&
-      //   value.error.code === ENDPOINT_ERRORS.CANT_CONNECT &&
-      //   !options.doNotAutomaticReloadIfCantConnect
-      // ) {
-      //   options.remoteListener.addOnConnectOnceListener(this.loadValue);
-      // }
-      // otherwise if there's no value, it means the item is not found
-    } else if (!value.value) {
-      // we mark it as so, it is not found
-      !isUnmounted.current && setStateInfo({
-        loadError: null,
-        notFound: true,
-        isBlocked: false,
-        isBlockedButDataIsAccessible: false,
-        loading: false,
-        loaded: true,
-      });
-    } else if (value.value) {
-      // otherwise if we have a value, we check all these options
-      !isUnmounted.current && setStateInfo({
-        loadError: null,
-        notFound: false,
-        isBlocked: !!value.value.blocked_at,
-        isBlockedButDataIsAccessible: value.value.blocked_at ? !!value.value.DATA : false,
-        loading: false,
-        loaded: true,
-      });
-    }
-
-    lastLoadValuePromiseIsResolved.current = true;
-    lastLoadValuePromiseResolve.current();
-
-    // now we return
-    const result = {
-      value: value.value,
-      error: value.error,
-      cached: value.cached,
-      id: value.id,
-      version: value.version,
-    };
-    options.onLoad && options.onLoad(result);
-    return result;
-  }, [])
-  const loadValue = useCallback(async (denyCaches?: boolean) => {
-    const forId = options.forId;
-    const forVersion = options.forVersion || null;
-
-    lastLoadingForId.current = forId;
-    lastLoadingForVersion.current = forVersion;
-
-    // we don't use loading here because there's one big issue
-    // elements are assumed into the loading state by the constructor
-    // if they have an id
-    if (!forId || options.searchCounterpart) {
-      if ((stateInfo.loading || stateInfo.loaded || stateInfo.loadError) && !isUnmounted.current) {
-        setStateInfo({
-          loadError: null,
-          loaded: false,
-          notFound: false,
-          loading: false,
-          isBlocked: false,
-          isBlockedButDataIsAccessible: false,
-        });
-      }
-      return null;
-    }
-
-    // We get the request fields that we are going to use
-    // in order to load the value, we use the optimizers
-    // so as to request only what is necessary for it to be populated
-    // there is however one thing, different optimizers might have been
-    // used accross the application, and two components with different
-    // optimizations might have been used at the same time for the
-    // same id
-    const { requestFields } = getFieldsAndArgs({
-      includeArgs: false,
-      includeFields: true,
-      uniteFieldsWithAppliedValue: true,
-      includes: options.includes || {},
-      properties: getPropertyListDefault(options.properties),
-      itemDefinitionInstance: idef,
-      forId: forId,
-      forVersion: forVersion,
-    });
-
-    // the reason why we use deny cache here is simple
-    // the search context is a form of a memory cache, it might be loading
-    // still when for some reason it was asked to reload, I can think of a extreme case
-    // when the client loads from memory, a reload is requested, but the search conxtext hasn't
-    // released yet the value
-    if (
-      !denyCaches &&
-      !options.doNotUseMemoryCache &&
-      searchContext &&
-      searchContext.currentlySearching.find(
-        (s) =>
-          s.id === forId &&
-          s.version === forVersion &&
-          s.type === idef.getQualifiedPathName(),
-      ) &&
-      requestFieldsAreContained(requestFields, searchContext.searchFields)
-    ) {
-      // now we wait for the search loader to trigger the load event
-      if (!isUnmounted.current) {
-        setStateInfo({
-          loading: true,
-          loaded: false,
-        });
-      }
-      return null;
-    }
-
-    options.onWillLoad && options.onWillLoad();
-
-    // we wil reuse the old promise in case
-    // there's an overlapping value being loaded
-    // the old call won't trigger the promise
-    // as it won't match the current signature
-    if (lastLoadValuePromiseIsResolved.current) {
-      lastLoadValuePromise.current = new Promise((resolve) => {
-        lastLoadValuePromiseResolve.current = resolve;
-      });
-      lastLoadValuePromiseIsResolved.current = false;
-    }
-
-    const qualifiedName = idef.getQualifiedPathName();
-
-    let currentMetadata: ICacheMetadataMatchType;
-    let denyMemoryCache: boolean = false;
-    let denyCacheWorker: boolean = false;
-    if (
-      !denyCaches &&
-      !options.doNotUseMemoryCache &&
-      options.longTermCachingMetadata &&
-      // no polyfilling for loading value and related meatadat
-      CacheWorkerInstance.isSupportedAsWorker
-    ) {
-      currentMetadata = await CacheWorkerInstance.instance.readMetadata(
-        PREFIX_GET + qualifiedName,
-        forId,
-        forVersion || null,
+    // EMULATE OF UNMOUNT
+    return () => {
+      willUnmount(
+        idefRef.current,
+        optionsRef.current,
+        stateRef.current,
+        setStateRef.current,
+        dataContext.remoteListener,
+        isUnmountedRef,
+        blockIdCleanRef,
+        internalSearchDestructionMarkersRef,
+        isCMountedRef.current,
+        changeListenerHook,
+        loadListenerHook,
+        changeSearchListenerHook,
+        reloadListenerHook,
+        onSearchReloadHook,
+        onConnectStatusChangeHook,
+        searchHook,
+        internalUUIDRef.current,
+        internalUUIDRef.current,
       );
-
-      if (!equals(options.longTermCachingMetadata, currentMetadata) && options.longTermCachingMetadataMismatchAction) {
-        // we deny the memory cache because we are now unsure of whether
-        // the value held in memory is valid due to the metadata
-        // as this value might have come from the cache when it was loaded
-        // with such unmatching metadata
-        denyMemoryCache = true;
-        denyCacheWorker = true;
-      }
-    }
-
-    if (!denyCaches && !denyMemoryCache && !options.doNotUseMemoryCache) {
-      // Prevent loading at all if value currently available and memoryCached
-      const appliedRQValue = idef.getRQAppliedValue(
-        forId, forVersion,
-      );
-      if (
-        appliedRQValue &&
-        requestFieldsAreContained(requestFields, appliedRQValue.requestFields)
-      ) {
-        // if (window.TESTING && process.env.NODE_ENV === "development") {
-        //   this.mountOrUpdateIdefForTesting(true);
-        // }
-
-        if (options.static !== "TOTAL") {
-          dataContext.remoteListener.requestFeedbackFor({
-            itemDefinition: idef.getQualifiedPathName(),
-            id: forId,
-            version: forVersion || null,
-          });
-        }
-        // in some situations the value can be in memory but not yet permanently cached
-        // (eg. when there is a search context)
-        // and another item without a search context attempts to load the value this will
-        // make it so that when we are exiting the search context it caches
-        let cached: boolean = false;
-        if (
-          CacheWorkerInstance.isSupportedAsWorker &&
-          options.longTermCaching &&
-          !searchContext
-        ) {
-          if (appliedRQValue.rawValue) {
-            try {
-              cached = await CacheWorkerInstance.instance.mergeCachedValue(
-                PREFIX_GET + qualifiedName,
-                forId,
-                forVersion || null,
-                appliedRQValue.rawValue,
-                appliedRQValue.requestFields,
-              );
-            } catch { }
-          } else {
-            try {
-              cached = await CacheWorkerInstance.instance.setCachedValue(
-                PREFIX_GET + qualifiedName,
-                forId,
-                forVersion || null,
-                null,
-                null,
-              );
-            } catch { }
-          }
-        }
-
-        return loadValueCompleted({
-          value: appliedRQValue.rawValue,
-          error: null,
-          cached,
-          id: forId,
-          version: forVersion,
-        });
-      }
-    }
-  }, [
-    idef,
-    searchContext,
-    options.forId,
-    options.forVersion,
-    stateInfo.loaded,
-    stateInfo.loading,
-    stateInfo.loadError,
-    options.includes,
-    options.properties,
-    options.doNotUseMemoryCache,
-    options.static,
-    options.longTermCachingMetadata,
-    loadValueCompleted,
-  ]);
-
-  const onConnectStatusChange = useCallback(() => {
-    const isConnected = !dataContext.remoteListener.isOffline();
-    if (isConnected) {
-      if (
-        stateInfo.loadError &&
-        stateInfo.loadError.code === ENDPOINT_ERRORS.CANT_CONNECT &&
-        !options.doNotAutomaticReloadIfCantConnect
-      ) {
-        loadValue();
-      }
-      if (
-        stateInfo.searchError &&
-        stateInfo.searchError.code === ENDPOINT_ERRORS.CANT_CONNECT &&
-        !options.doNotAutomaticReloadSearchIfCantConnect
-      ) {
-        search(stateInfo.searchOriginalOptions);
-      }
-    }
-  }, [
-    dataContext.remoteListener,
-    loadValue,
-    search,
-    stateInfo.searchError,
-    stateInfo.loadError,
-    options.doNotAutomaticReloadIfCantConnect,
-    stateInfo.searchOriginalOptions,
-  ]);
-
-  const markSearchForDestruction = useCallback(async (
-    type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
-    qualifiedName: string,
-    owner: string,
-    parent: [string, string, string],
-    property: [string, string],
-    unmount: boolean,
-    unmark: boolean,
-  ) => {
-    if (typeof document === "undefined") {
-      return;
-    }
-
-    if (CacheWorkerInstance.instance) {
-      await CacheWorkerInstance.instance.waitForInitializationBlock();
-    }
-
-    const locationMemcached =
-      unmount ? MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION;
-    const locationReal =
-      unmount ? UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : SEARCH_DESTRUCTION_MARKERS_LOCATION;
-
-    (window as any)[locationMemcached] =
-      (window as any)[locationMemcached] ||
-      JSON.parse(localStorage.getItem(locationReal) || "{}");
-    let changed = false;
-
-    if (unmark) {
-      if (!(window as any)[locationMemcached][qualifiedName]) {
-        // already not there
-      } else {
-        const foundValueIndex = (window as any)[locationMemcached][qualifiedName]
-          .findIndex((m: [string, string, [string, string, string], [string, string]]) =>
-            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }));
-        if (foundValueIndex !== -1) {
-          changed = true;
-          (window as any)[locationMemcached][qualifiedName].splice(foundValueIndex, 1);
-        }
-      }
-    } else {
-      if (!(window as any)[locationMemcached][qualifiedName]) {
-        (window as any)[locationMemcached][qualifiedName] = [
-          [type, owner, parent, property],
-        ];
-        changed = true;
-      } else {
-        if (
-          !(window as any)[locationMemcached][qualifiedName]
-            .find((m: [string, string, [string, string, string], [string, string]]) =>
-              m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }))
-        ) {
-          changed = true;
-          (window as any)[locationMemcached][qualifiedName].push([type, owner, parent, property]);
-        }
-      }
-    }
-
-    if (changed) {
-      localStorage.setItem(locationReal, JSON.stringify((window as any)[locationMemcached]));
     }
   }, []);
 
-  // LIFECYCLE
-
+  // EMULATE OF DID UPDATE
   useEffect(() => {
-    // COPY from componentDidMount
-    isCMounted.current = true;
-    mountCbFns.current.forEach((c) => c());
-    dataContext.remoteListener.addConnectStatusListener(this.onConnectStatusChange);
-
-    // now we retrieve the externally checked value
-    if (idef.containsAnExternallyCheckedProperty() && options.enableExternalChecks) {
-      this.setStateToCurrentValueWithExternalChecking(null);
-    }
-
-    const listenersSetup = () => {
-      const currentSearch = this.state;
-
-      // when we have a search that was done during SSR and was not stored
-      // somewherue in our stuff, we don't want to request feedback
-      // when we jst loaded the app because then it makes no sense
-      // as the information should be up to date
-      const shouldRequestFeedback = currentSearch.searchId === "SSR_SEARCH" && !options.automaticSearchNoGraceTime ? (
-        (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
-      ) : true;
-
-      searchListenersSetup(
-        currentSearch,
-        shouldRequestFeedback,
-      );
-    };
-
-    let searchWasRedone = false;
-    if (options.automaticSearch && !options.automaticSearch.clientDisabled) {
-      // the search listener might have triggered during the mount callback,
-      // which means this function won't see the new state and won't trigger
-      // automatic search so we use this variable to check it
-      const searchIdToCheckAgainst = changedSearchListenerLastCollectedSearchId.current ?
-        changedSearchListenerLastCollectedSearchId.current.id : stateInfo.searchId;
-
-      if (
-        // no search id at all, not in the state, not on the changed listener, nowhere
-        (!searchIdToCheckAgainst) ||
-        // search is forced and we didn't load from location
-        (options.automaticSearchForce && this.state.searchWasRestored !== "FROM_LOCATION") ||
-        // cache policies searches that have been resolved by SSR need to be redone
-        // this is only relevant during mount of course
-        // the reason is that the cache may have changes or not be inline with whatever
-        // was calculated from the server side
-        // that's the issue with ssrEnabled searches that are also cache
-        (searchIdToCheckAgainst === "SSR_SEARCH" && options.automaticSearch.cachePolicy !== "none") ||
-        (searchIdToCheckAgainst === "SSR_SEARCH" && options.automaticSearch.ssrRequestedProperties)
-      ) {
-        // this variable that is passed into the search is used to set the initial
-        // state in case it needs to be saved in the history
-        searchWasRedone = true;
-        (async () => {
-          try {
-            initialAutomaticNextSearch.current = true;
-            await this.search(options.automaticSearch);
-          } catch (err) {
-            console.error(err);
-            // setup listeners just in case
-            // for a failed search
-            listenersSetup();
-          }
-        })();
-      }
-    }
+    const prevOptions = options;
+    const prevState = state;
+    const prevIdef = idef;
+    const prevTokenData = tokenData;
 
     return () => {
-      isUnmounted.current = true;
-      releaseCleanupBlock();
-      unSetupListeners();
-      removeSetters();
-      runDismountOn();
-      this.props.remoteListener.removeConnectStatusListener(this.onConnectStatusChange);
-
-      if (window.TESTING && process.env.NODE_ENV === "development") {
-        const mountItem = window.TESTING.mountedItems.find(m => m.instanceUUID === this.internalUUID);
-        if (mountItem) {
-          mountItem.unmountTime = (new Date()).toISOString();
-        }
-      }
-
-      this.removeDoubleSlotter();
+      // should shouldComponentUpdate be here?
+      didUpdate(
+        prevIdef,
+        idefRef.current,
+        prevOptions,
+        prevState,
+        optionsRef.current,
+        prevTokenData,
+        tokenDataRef.current,
+        stateRef.current,
+        setStateRef.current,
+        blockIdCleanRef,
+        storeStateTimeoutRef,
+        internalSearchDestructionMarkersRef,
+        isCMountedRef,
+        internalUUIDRef.current,
+        locationRef.current,
+        dataContext.remoteListener,
+        isUnmountedRef,
+        lastUpdateIdRef,
+        searchHook,
+        loadValueHook,
+        reloadListenerHook,
+        loadListenerHook,
+        changeListenerHook,
+        changeSearchListenerHook,
+        onSearchReloadHook,
+        basicFnsRetrieverImmutable,
+      );
     }
-  }, []);
+  }, [tokenData, idef, options, state]);
+
+  const onPropertyRestoreHook = useCallback((property: PropertyDefinition | string | IPropertyCoreProps) => {
+    return onPropertyRestore(
+      idefRef.current,
+      optionsRef.current,
+      stateRef.current,
+      lastUpdateIdRef,
+      updateTimeoutRef,
+      automaticSearchTimeoutRef,
+      preventSearchFeedbackOnPossibleStaleDataRef,
+      consumableQsStateRef,
+      consumeQsStateTimeoutRef,
+      locationRef.current,
+      (currentUpdateId: number) => {
+        setStateToCurrentValueWithExternalChecking(
+          idefRef.current,
+          setStateRef.current,
+          optionsRef.current,
+          isUnmountedRef,
+          lastUpdateIdRef,
+          currentUpdateId,
+          changeListenerHook,
+        );
+      },
+      searchHook,
+      // typescript bug
+      property as any,
+    );
+  }, [])
+
+  // START COPY/PASTE AND MODIFYING TO ADAPT TO A HOOK
+  // =============================================================================
 
   // CUSTOMS FOR THIS ALONE
 
@@ -890,7 +690,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   }, [idef, options.forId, options.forVersion]) as <T>(pId: string | IPropertyBasePropsWInclude) => IPropertyDefinitionState<T>;
 
   return {
-    state: stateInfo,
+    state,
     getValueForProperty: getValueFor,
     getStateForProperty: getStateFor,
   }

@@ -175,16 +175,7 @@ const GLOBAL_TRACK_CONTEXT_POOL: {
   }
 } = {};
 
-/**
- * Represents the timetrack as a component
- * 
- * this component has the special property of prevent overlapping tracks within the same context
- * so they will not interfere with one another
- * 
- * @param options 
- * @returns 
- */
-export default function Timetrack(props: ITimetrackProps) {
+export function useFunctionalTimetrack(props: ITimetrackProps) {
   const [startTrack, stopLastTrack] = useTimetrack();
 
   const userData = useUserDataRetriever();
@@ -194,7 +185,7 @@ export default function Timetrack(props: ITimetrackProps) {
 
   const realEnabled = props.enabled && (props.trackAnonymous ? true : !!userData.id);
 
-    // now we are to use an effect every time our described options
+  // now we are to use an effect every time our described options
   // that trigger a hit have changed
   useEffect(() => {
     // so we will check just like when we do the hit
@@ -244,6 +235,19 @@ export default function Timetrack(props: ITimetrackProps) {
     previousOptionsEffected.current = props;
     previousRealEnabledEffected.current = realEnabled;
   }, [realEnabled, props.trackId, props.context]);
+}
+
+/**
+ * Represents the timetrack as a component
+ * 
+ * this component has the special property of prevent overlapping tracks within the same context
+ * so they will not interfere with one another
+ * 
+ * @param options 
+ * @returns 
+ */
+export default function Timetrack(props: ITimetrackProps) {
+  useFunctionalTimetrack(props);
 
   return null;
 }
