@@ -2141,7 +2141,7 @@ export class ActualItemProvider extends
   public async componentDidMount() {
     const $this = this;
     return await onMount(this.props.itemDefinitionInstance, this.props,
-      this.stateAsRef, this.setState as any, this.props.remoteListener,
+      this.stateAsRef, this.setState.bind(this), this.props.remoteListener,
       {
         get current() {
           return $this.isCMounted;
@@ -2253,7 +2253,7 @@ export class ActualItemProvider extends
       prevProps.tokenData,
       this.props.tokenData,
       this.stateAsRef,
-      this.setState as any,
+      this.setState.bind(this),
       {
         get current() {
           return $this.blockIdClean;
@@ -2368,7 +2368,7 @@ export class ActualItemProvider extends
       this.isUnmounted,
       this.isCMounted,
       this.changeSearchListener,
-      this.setState as any,
+      this.setState.bind(this),
     );
   }
   public async changeListener(repairCorruption?: boolean) {
@@ -2376,7 +2376,7 @@ export class ActualItemProvider extends
     return await changeListener(
       this.props.itemDefinitionInstance,
       this.props,
-      this.setState as any,
+      this.setState.bind(this),
       {
         get current() {
           return $this.isUnmounted;
@@ -2427,7 +2427,7 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance,
       this.props,
       this.stateAsRef,
-      this.setState as any,
+      this.setState.bind(this),
       {
         get current() {
           return $this.isUnmounted;
@@ -2515,7 +2515,7 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance,
       this.props,
       this.stateAsRef,
-      this.setState as any,
+      this.setState.bind(this),
       this.props.remoteListener,
       {
         get current() {
@@ -2647,7 +2647,7 @@ export class ActualItemProvider extends
       (currentUpdateId: number) => {
         setStateToCurrentValueWithExternalChecking(
           this.props.itemDefinitionInstance,
-          this.setState as any,
+          this.setState.bind(this),
           this.props,
           {
             get current() {
@@ -2743,7 +2743,7 @@ export class ActualItemProvider extends
       (currentUpdateId: number) => {
         setStateToCurrentValueWithExternalChecking(
           this.props.itemDefinitionInstance,
-          this.setState as any,
+          this.setState.bind(this),
           this.props,
           {
             get current() {
@@ -2812,7 +2812,7 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance,
       this.props,
       this.state,
-      this.setState as any,
+      this.setState.bind(this),
       this.props.remoteListener,
       {
         get current() {
@@ -2875,7 +2875,7 @@ export class ActualItemProvider extends
       (currentUpdateId: number) => {
         setStateToCurrentValueWithExternalChecking(
           this.props.itemDefinitionInstance,
-          this.setState as any,
+          this.setState.bind(this),
           this.props,
           {
             get current() {
@@ -2908,7 +2908,7 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance,
       this.props,
       this.stateAsRef,
-      this.setState as any,
+      this.setState.bind(this),
       {
         get current() {
           return $this.isUnmounted;
@@ -2944,7 +2944,7 @@ export class ActualItemProvider extends
       this.blockIdClean,
       options,
       state,
-      this.setState as any,
+      this.setState.bind(this),
       avoidTriggeringUpdate,
     );
   }
@@ -2955,7 +2955,7 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance,
       this.props,
       this.stateAsRef,
-      this.setState as any,
+      this.setState.bind(this),
       {
         get current() {
           return $this.activeSubmitPromise;
@@ -3021,7 +3021,7 @@ export class ActualItemProvider extends
       this.props,
       options,
       this.stateAsRef,
-      this.setState as any,
+      this.setState.bind(this),
       {
         get current() {
           return $this.initialAutomaticNextSearch;
@@ -3113,37 +3113,37 @@ export class ActualItemProvider extends
   public dismissLoadError() {
     dismissLoadError(
       this.isUnmounted,
-      this.setState as any,
+      this.setState.bind(this),
     );
   }
   public dismissDeleteError() {
     dismissDeleteError(
       this.isUnmounted,
-      this.setState as any,
+      this.setState.bind(this),
     );
   }
   public dismissSubmitError() {
     dismissSubmitError(
       this.isUnmounted,
-      this.setState as any,
+      this.setState.bind(this),
     );
   }
   public dismissSubmitted() {
     dismissSubmitted(
       this.isUnmounted,
-      this.setState as any,
+      this.setState.bind(this),
     );
   }
   public dismissDeleted() {
     dismissDeleted(
       this.isUnmounted,
-      this.setState as any,
+      this.setState.bind(this),
     );
   }
   public dismissSearchError() {
     dismissSearchError(
       this.isUnmounted,
-      this.setState as any,
+      this.setState.bind(this),
     );
   }
 
@@ -3180,7 +3180,7 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance,
       this.props.remoteListener,
       this.state,
-      this.setState as any,
+      this.setState.bind(this),
       this.isUnmounted,
       this.onSearchReload,
     );
