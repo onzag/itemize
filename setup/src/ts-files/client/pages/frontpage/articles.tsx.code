@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemProvider, ParentItemContextProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider, ItemContextPhase, ItemContextRetrieve } from "@onzag/itemize/client/providers/item";
 import SearchLoader from "@onzag/itemize/client/components/search/SearchLoader";
 import View from "@onzag/itemize/client/components/property/View";
 import Reader from "@onzag/itemize/client/components/property/Reader";
@@ -273,22 +273,23 @@ export function Articles() {
 																			"profile_picture",
 																			"role",
 																		]}
-																		injectParentContext={true}
 																	>
-																		<PublisherInfoBox>
-																			<Avatar
-																				hideFlag={true}
-																				size="small"
-																			/>
-																			<Box sx={style.publisherInfoDetailsBox}>
-																				<Typography variant="body1"><View id="username" /></Typography>
-																				<Typography variant="body2">
-																					<ParentItemContextProvider>
-																						<View id="created_at" rendererArgs={{ dateFormat: "LLL" }} />
-																					</ParentItemContextProvider>
-																				</Typography>
-																			</Box>
-																		</PublisherInfoBox>
+																		<ItemContextPhase>
+																			<PublisherInfoBox>
+																				<Avatar
+																					hideFlag={true}
+																					size="small"
+																				/>
+																				<Box sx={style.publisherInfoDetailsBox}>
+																					<Typography variant="body1"><View id="username" /></Typography>
+																					<Typography variant="body2">
+																						<ItemContextRetrieve>
+																							<View id="created_at" rendererArgs={{ dateFormat: "LLL" }} />
+																						</ItemContextRetrieve>
+																					</Typography>
+																				</Box>
+																			</PublisherInfoBox>
+																		</ItemContextPhase>
 																	</ItemProvider>
 																</ModuleProvider>
 															)}

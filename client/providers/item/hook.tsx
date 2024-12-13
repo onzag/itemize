@@ -1,12 +1,12 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { IActionResponseWithValue, IActionSearchOptions, IBasicFns, IItemProviderProps, IPokeElementsType, SearchItemValueContext } from ".";
+import { IActionCleanOptions, IActionDeleteOptions, IActionResponseWithSearchResults, IActionResponseWithValue, IActionSearchOptions, IActionSubmitOptions, IActionSubmitResponse, IBasicFns, IItemAnalyticsProps, IItemContextType, IItemProviderProps, IPokeElementsType, SearchItemValueContext } from ".";
 import { useRootRetriever } from "../../components/root/RootRetriever";
 import type Module from "../../../base/Root/Module";
 import ItemDefinition, { IItemSearchStateType, IItemStateType } from "../../../base/Root/Module/ItemDefinition";
 import { IPropertyBaseProps } from "../../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ENDPOINT_ERRORS, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, RESERVED_BASE_PROPERTIES_RQ, SEARCH_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
-import Include from "../../../base/Root/Module/ItemDefinition/Include";
+import Include, { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
@@ -24,13 +24,16 @@ import { useLocationRetriever } from "../../../client/components/navigation/Loca
 import { TokenContext } from "../../../client/internal/providers/token-provider";
 import { LocaleContext } from "../../../client/internal/providers/locale-provider";
 import { ConfigContext } from "../../../client/internal/providers/config-provider";
-import { blockCleanup, changeListener, changeSearchListener, didUpdate, dismissSearchResults, downloadStateAt, getDerived, installPrefills, installSetters, loadListener, loadStateFromFileAt, loadValue, onConnectStatusChange, onMount, onPropertyRestore, onSearchReload, reloadListener, setStateToCurrentValueWithExternalChecking, setupInitialState, setupListeners, willUnmount } from "./util";
+import { blockCleanup, changeListener, changeSearchListener, cleanWithProps, del, didUpdate, dismissDeleteError, dismissDeleted, dismissLoadError, dismissSearchError, dismissSearchResults, dismissSubmitError, dismissSubmitted, downloadStateAt, getDerived, installPrefills, installSetters, loadListener, loadStateFromFileAt, loadValue, onConnectStatusChange, onIncludeSetExclusionState, onMount, onPropertyChange, onPropertyClearEnforce, onPropertyEnforce, onPropertyRestore, onSearchReload, reloadListener, search, setStateToCurrentValueWithExternalChecking, setupInitialState, setupListeners, submit, willUnmount } from "./util";
 import { IRemoteListenerRecordsCallbackArg } from "../../../client/internal/app/remote-listener";
 import { genericAnalyticsDataProvider } from "../../../client/components/analytics/util";
 import { IPropertyCoreProps, IPropertySetterProps } from "../../components/property/base";
+import { useFunctionalHit } from "../../../client/components/analytics/Hit";
+import { useFunctionalTimetrack } from "../../../client/components/analytics/Timetrack";
 
-export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId'> {
+export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId' | 'loadUnversionedFallback'> {
   module: string | Module;
+  suppressWarnings?: boolean;
 }
 
 export interface IPropertyBasePropsWInclude extends IPropertyBaseProps {
@@ -70,8 +73,15 @@ export interface IHookItemProviderState extends IItemSearchStateType {
 
 export interface IItemProviderHookElement {
   state: IHookItemProviderState;
+  context: IItemContextType;
+
   getStateForProperty<T>(pId: string | IPropertyBasePropsWInclude): IPropertyDefinitionState<T>;
   getValueForProperty<T>(pId: string | IPropertyBasePropsWInclude): T;
+
+  hooks: {
+    useAnalytics: () => void;
+    useUnversioned: () => IItemProviderHookElement;
+  }
 }
 
 
@@ -255,6 +265,11 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   const internalSearchDestructionMarkersRef = useRef<Array<[string, string, string, [string, string, string], [string, string]]>>([]);
   const consumableQsStateRef = useRef(null as any);
   const consumeQsStateTimeoutRef = useRef(null as NodeJS.Timer);
+  const activeSubmitPromiseRef = useRef(null as Promise<{ response: IActionSubmitResponse, options: IActionSubmitOptions }>);
+  const activeSubmitPromiseAwaiterRef = useRef(null as string);
+  const activeSearchPromiseRef = useRef(null as Promise<{ response: IActionResponseWithSearchResults, options: IActionSearchOptions }>);
+  const activeSearchPromiseAwaiterRef = useRef(null as string);
+  const activeSearchOptionsRef = useRef(null as IActionSearchOptions);
 
   // functions
   const reloadListenerHook = useCallback(() => {
@@ -335,7 +350,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     );
   }, []);
 
-  const poke = useCallback((elements: IPokeElementsType) => {
+  const pokeHook = useCallback((elements: IPokeElementsType) => {
     if (isUnmountedRef.current) {
       return;
     }
@@ -345,7 +360,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     });
   }, []);
 
-  const unpoke = useCallback(() => {
+  const unpokeHook = useCallback(() => {
     if (isUnmountedRef.current) {
       return;
     }
@@ -388,11 +403,11 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     return {
       clean: cleanHook,
       delete: deleteHook,
-      poke: poke,
-      reload: reloadHook,
+      poke: pokeHook,
+      reload: loadValueHook,
       search: searchHook,
       submit: submitHook,
-      unpoke: unpoke,
+      unpoke: unpokeHook,
     } as IBasicFns;
   }, []);
 
@@ -460,6 +475,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       denyCaches,
     );
   }, []);
+
 
   // EMULATE OF CONSTRUCTOR
   const isConstruct = useRef(true);
@@ -602,7 +618,221 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       // typescript bug
       property as any,
     );
-  }, [])
+  }, []);
+
+  const onPropertyChangeHook = useCallback((
+    property: PropertyDefinition | string | IPropertyCoreProps,
+    value: PropertyDefinitionSupportedType,
+    internalValue: any,
+  ) => {
+    return onPropertyChange(
+      idefRef.current,
+      optionsRef.current,
+      stateRef.current,
+      lastLoadValuePromiseRef.current,
+      lastUpdateIdRef,
+      updateTimeoutRef,
+      automaticSearchTimeoutRef,
+      preventSearchFeedbackOnPossibleStaleDataRef,
+      consumableQsStateRef,
+      consumeQsStateTimeoutRef,
+      locationRef.current,
+      (currentUpdateId: number) => {
+        setStateToCurrentValueWithExternalChecking(
+          idefRef.current,
+          setStateRef.current,
+          optionsRef.current,
+          isCMountedRef,
+          lastUpdateIdRef,
+          currentUpdateId,
+          changeListenerHook,
+        );
+      },
+      searchHook,
+      // typescript bug
+      property as any,
+      value,
+      internalValue,
+    );
+  }, []);
+
+  const onPropertyEnforceHook = useCallback((
+    property: PropertyDefinition | string | IPropertyCoreProps,
+    value: PropertyDefinitionSupportedType,
+    givenForId: string,
+    givenForVersion: string,
+  ) => {
+    return onPropertyEnforce(
+      idefRef.current,
+      optionsRef.current,
+      isCMountedRef.current,
+      property as any,
+      value,
+      givenForId,
+      givenForVersion,
+      searchHook,
+    );
+  }, []);
+
+  const onPropertyClearEnforceHook = useCallback((
+    property: PropertyDefinition | string | IPropertyCoreProps,
+    givenForId: string,
+    givenForVersion: string,
+  ) => {
+    return onPropertyClearEnforce(
+      idefRef.current,
+      optionsRef.current,
+      isCMountedRef.current,
+      property as any,
+      givenForId,
+      givenForVersion,
+      searchHook,
+    );
+  }, []);
+
+  const onIncludeSetExclusionStateHook = useCallback((
+    include: Include,
+    state: IncludeExclusionState,
+  ) => {
+    return onIncludeSetExclusionState(
+      idefRef.current,
+      optionsRef.current,
+      lastUpdateIdRef,
+      updateTimeoutRef,
+      (currentUpdateId: number) => {
+        setStateToCurrentValueWithExternalChecking(
+          idefRef.current,
+          setStateRef.current,
+          optionsRef.current,
+          isUnmountedRef,
+          lastUpdateIdRef,
+          currentUpdateId,
+          changeListenerHook,
+        );
+      },
+      include,
+      state,
+    );
+  }, []);
+
+  const deleteHook = useCallback((options: IActionDeleteOptions = {}) => {
+    return del(
+      idefRef.current,
+      optionsRef.current,
+      stateRef.current,
+      setStateRef.current,
+      isUnmountedRef,
+      blockIdCleanRef,
+      tokenDataRef.current.token,
+      localeDataRef.current.language,
+      dataContext.remoteListener,
+      options,
+    );
+  }, []);
+
+  const cleanHook = useCallback((
+    options: IActionCleanOptions,
+    state: "success" | "fail",
+    avoidTriggeringUpdate?: boolean,
+  ) => {
+    return cleanWithProps(
+      idefRef.current,
+      optionsRef.current,
+      isUnmountedRef.current,
+      blockIdCleanRef.current,
+      options,
+      state,
+      setStateRef.current,
+      avoidTriggeringUpdate,
+    );
+  }, []);
+
+  const submitHook = useCallback((options: IActionSubmitOptions) => {
+    return submit(
+      idefRef.current,
+      optionsRef.current,
+      stateRef.current,
+      setStateRef.current,
+      activeSubmitPromiseRef,
+      activeSearchPromiseAwaiterRef,
+      submitBlockPromisesRef,
+      isUnmountedRef,
+      lastLoadValuePromiseRef,
+      blockIdCleanRef,
+      config,
+      tokenDataRef.current.token,
+      localeDataRef.current.language,
+      dataContext.remoteListener,
+      options,
+    );
+  }, []);
+
+  const searchHook = useCallback((options: IActionSearchOptions) => {
+    return search(
+      idefRef.current,
+      optionsRef.current,
+      options,
+      stateRef.current,
+      setStateRef.current,
+      initialAutomaticNextSearchRef,
+      reloadNextSearchRef,
+      preventSearchFeedbackOnPossibleStaleDataRef,
+      activeSearchPromiseAwaiterRef,
+      activeSearchPromiseRef,
+      activeSearchOptionsRef,
+      activeSubmitPromiseAwaiterRef,
+      internalSearchDestructionMarkersRef,
+      isUnmountedRef,
+      blockIdCleanRef,
+      tokenDataRef.current.token,
+      localeDataRef.current.language,
+      dataContext.remoteListener,
+      locationRef.current,
+      onSearchReloadHook,
+      changeSearchListenerHook,
+    );
+  }, []);
+
+  const dismissLoadErrorHook = useCallback(() => {
+    dismissLoadError(
+      isUnmountedRef.current,
+      setStateRef.current,
+    );
+  }, []);
+  const dismissDeleteErrorHook = useCallback(() => {
+    dismissDeleteError(
+      isUnmountedRef.current,
+      setStateRef.current,
+    );
+  }, []);
+  const dismissSubmitErrorHook = useCallback(() => {
+    dismissSubmitError(
+      isUnmountedRef.current,
+      setStateRef.current,
+    );
+  }, []);
+  const dismissSubmittedHook = useCallback(() => {
+    dismissSubmitted(
+      isUnmountedRef.current,
+      setStateRef.current,
+    );
+  }, []);
+  const dismissDeletedHook = useCallback(() => {
+    dismissDeleted(
+      isUnmountedRef.current,
+      setStateRef.current,
+    );
+  }, []);
+  const dismissSearchErrorHook = useCallback(() => {
+    dismissSearchError(
+      isUnmountedRef.current,
+      setStateRef.current,
+    );
+  }, []);
+
+  const injectSubmitBlockPromiseHook = useCallback((p: Promise<any>) => {
+    submitBlockPromisesRef.current.push(p);
+  }, []);
 
   // START COPY/PASTE AND MODIFYING TO ADAPT TO A HOOK
   // =============================================================================
@@ -610,59 +840,26 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   // CUSTOMS FOR THIS ALONE
 
   const getValueFor = useCallback((idOrBase: string | IPropertyBasePropsWInclude) => {
-    if (idOrBase === null || typeof idOrBase === "undefined") {
-      return null;
-    } else if (typeof idOrBase === "string") {
-      const pDef = idef.getPropertyDefinitionFor(idOrBase, true);
-      return pDef.getCurrentValue(options.forId || null, options.forVersion || null);
-    } else {
-      let actualId = idOrBase.id;
-      if (idOrBase.searchVariant) {
-        // for that we just get the prefix and add it
-        actualId =
-          PropertyDefinitionSearchInterfacesPrefixes[idOrBase.searchVariant.toUpperCase().replace("-", "_")] + idOrBase.id;
-      }
-
-      // now we need to check if this is a meta property such a created_at, edited_at, etc...
-      const isMetaProperty = !!RESERVED_BASE_PROPERTIES_RQ[actualId];
-
-      if (isMetaProperty) {
-        if (actualId === "id") {
-          return options.forId;
-        } else if (actualId === "version") {
-          return options.forVersion;
-        } else {
-          const internalValue = idef.getStateNoExternalChecking(options.forId || null, options.forVersion || null, true, [], {}, true);
-          return (internalValue.rqOriginalFlattenedValue && internalValue.rqOriginalFlattenedValue[actualId]);
-        }
-      }
-
-      const include = typeof idOrBase.include === "string" ? idef.getIncludeFor(idOrBase.include) : idOrBase.include;
-      // and once we know that we can get the value, basically we
-      // don't have a property definition if is a meta property, and we need to extract
-      // it from the include if it's available
-      const property = (
-        include ?
-          include.getSinkingPropertyFor(actualId) :
-          (
-            (idOrBase.policyType && idOrBase.policyName) ?
-              idef
-                .getPropertyDefinitionForPolicy(idOrBase.policyType, idOrBase.policyName, actualId) :
-              idef
-                .getPropertyDefinitionFor(actualId, true)
-          )
-      );
-
-      return property.getCurrentValue(options.forId || null, options.forVersion || null);
-    }
-  }, [idef, options.forId, options.forVersion]) as <T>(pId: string | IPropertyBasePropsWInclude) => T;
+    const state = getStateFor(idOrBase);
+    return state?.value;
+  }, []) as <T>(pId: string | IPropertyBasePropsWInclude) => T;
 
   const getStateFor = useCallback((idOrBase: string | IPropertyBasePropsWInclude) => {
     if (idOrBase === null || typeof idOrBase === "undefined") {
       return null;
     } else if (typeof idOrBase === "string") {
-      const pDef = idef.getPropertyDefinitionFor(idOrBase, true);
-      return pDef.getStateNoExternalChecking(options.forId || null, options.forVersion || null, true);
+      const state = stateRef.current.itemState.properties.find((p) => p.propertyId === idOrBase);
+      if (!state) {
+        if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
+          console.warn(
+            "Possibly unwanted behaviour, you attempted to read a property " +
+            idOrBase +
+            " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
+          );
+        }
+        return null;
+      }
+      return state;
     } else {
       let actualId = idOrBase.id;
       if (idOrBase.searchVariant) {
@@ -671,27 +868,230 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
           PropertyDefinitionSearchInterfacesPrefixes[idOrBase.searchVariant.toUpperCase().replace("-", "_")] + idOrBase.id;
       }
 
-      const include = typeof idOrBase.include === "string" ? idef.getIncludeFor(idOrBase.include) : idOrBase.include;
+      const include = typeof idOrBase.include === "string" ? idOrBase.include : idOrBase.include.getId();
 
-      const property = (
-        include ?
-          include.getSinkingPropertyFor(actualId) :
-          (
-            (idOrBase.policyType && idOrBase.policyName) ?
-              idef
-                .getPropertyDefinitionForPolicy(idOrBase.policyType, idOrBase.policyName, actualId) :
-              idef
-                .getPropertyDefinitionFor(actualId, true)
-          )
-      );
+      if (include) {
+        const stateInclude = stateRef.current.itemState.includes.find((i) => i.includeId === idOrBase.include);
 
-      return property.getStateNoExternalChecking(options.forId || null, options.forVersion || null, true);
+        if (!stateInclude) {
+          if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
+            console.warn(
+              "Possibly unwanted behaviour, you attempted to read a property in an include " +
+              include +
+              " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
+            );
+          }
+          return null;
+        } else {
+          const state = stateInclude.itemState.properties.find((p) => p.propertyId === actualId);
+          if (!state) {
+            if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
+              console.warn(
+                "Possibly unwanted behaviour, you attempted to read a property " +
+                idOrBase + " within the include " + include +
+                " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
+              );
+            }
+            return null;
+          }
+          return state;
+        }
+      } else {
+        const state = stateRef.current.itemState.properties.find((p) => p.propertyId === actualId);
+        if (!state) {
+          if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
+            console.warn(
+              "Possibly unwanted behaviour, you attempted to read a property " +
+              idOrBase +
+              " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
+            );
+          }
+          return null;
+        }
+        return state;
+      }
     }
-  }, [idef, options.forId, options.forVersion]) as <T>(pId: string | IPropertyBasePropsWInclude) => IPropertyDefinitionState<T>;
+  }, []) as <T>(pId: string | IPropertyBasePropsWInclude) => IPropertyDefinitionState<T>;
+
+  // PRETENDING TO DO RENDER
+  const useUnversioned = () => {
+    const newOptions: IItemProviderOptions = {
+      ...options,
+      forVersion: null,
+    };
+
+    return useItemProvider(newOptions);
+  }
+
+  const useAnalytics = () => {
+    const realAnalytics = typeof options.analytics === "boolean" || !options.analytics ? {
+      enabled: !!options.analytics,
+      offlineTimeTrackId: "item",
+    } : options.analytics;
+
+    const actualEnabled = realAnalytics.enabled && state.loaded && !state.notFound && options.forId;
+
+    const context = this.props.itemDefinitionQualifiedName + "." + this.props.forId + "." + (this.props.forVersion || "");
+
+    useFunctionalHit({
+      trackId: realAnalytics.offlineHitTrackId,
+      enabled: actualEnabled && !!realAnalytics.offlineHitTrackId,
+      context: context,
+      dataGenerator: internalDataProviderForAnalyticsHook,
+      weight: realAnalytics.weight,
+      trackOffline: true,
+      trackAnonymous: realAnalytics.trackAnonymous,
+    });
+
+    useFunctionalHit({
+      trackId: realAnalytics.onlineHitTrackId,
+      enabled: actualEnabled && !!realAnalytics.onlineHitTrackId,
+      context: context,
+      dataGenerator: internalDataProviderForAnalyticsHook,
+      weight: realAnalytics.weight,
+      trackOffline: true,
+      trackAnonymous: realAnalytics.trackAnonymous,
+    });
+
+    useFunctionalTimetrack({
+      trackId: realAnalytics.offlineTimeTrackId,
+      enabled: actualEnabled && !!realAnalytics.offlineTimeTrackId,
+      context: context,
+      dataGenerator: internalDataProviderForAnalyticsHook,
+      trackOffline: true,
+      trackAnonymous: realAnalytics.trackAnonymous,
+    });
+
+    useFunctionalTimetrack({
+      trackId: realAnalytics.onlineTimeTrackId,
+      enabled: actualEnabled && !!realAnalytics.onlineTimeTrackId,
+      context: context,
+      dataGenerator: internalDataProviderForAnalyticsHook,
+      trackOffline: true,
+      trackAnonymous: realAnalytics.trackAnonymous,
+    });
+  }
+
+  const context: IItemContextType = useMemo(() => ({
+    idef: idef,
+    state: state.itemState,
+    // typescript bugs
+    onPropertyChange: onPropertyChangeHook as any,
+    onPropertyRestore: onPropertyRestoreHook as any,
+    onIncludeSetExclusionState: onIncludeSetExclusionStateHook,
+    onPropertyEnforce: onPropertyEnforceHook as any,
+    onPropertyClearEnforce: onPropertyClearEnforce as any,
+    notFound: state.notFound,
+    blocked: state.isBlocked,
+    blockedButDataAccessible: state.isBlockedButDataIsAccessible,
+    loadError: state.loadError,
+    loading: state.loading,
+    loaded: state.loaded,
+    holdsRemoteState: !!state.itemState.rqOriginalFlattenedValue,
+    submitError: state.submitError,
+    submitting: state.submitting,
+    submitted: state.submitted,
+    deleteError: state.deleteError,
+    deleting: state.deleting,
+    deleted: state.deleted,
+    searchError: state.searchError,
+    searching: state.searching,
+    searchRecords: state.searchRecords,
+    searchResults: state.searchResults,
+    searchLimit: state.searchLimit,
+    searchCount: state.searchCount,
+    searchOffset: state.searchOffset,
+    searchId: state.searchId,
+    searchWasRestored: state.searchWasRestored,
+    searchOwner: state.searchOwner,
+    searchLastModified: state.searchLastModified,
+    searchShouldCache: state.searchShouldCache,
+    searchFields: state.searchFields,
+    searchRequestedProperties: state.searchRequestedProperties,
+    searchRequestedIncludes: state.searchRequestedIncludes,
+    searchEngineEnabled: state.searchEngineEnabled,
+    searchEngineEnabledLang: state.searchEngineEnabledLang,
+    searchEngineUsedFullHighlights: state.searchEngineUsedFullHighlights,
+    searchEngineHighlightArgs: state.searchEngineHighlightArgs,
+    searchHighlights: state.searchHighlights,
+    searchMetadata: state.searchMetadata,
+    highlights: options.highlights,
+    pokedElements: state.pokedElements,
+    submit: submitHook,
+    reload: loadValueHook,
+    delete: deleteHook,
+    clean: cleanHook,
+    search: searchHook,
+    forId: options.forId || null,
+    forVersion: options.forVersion || null,
+    dismissLoadError: dismissLoadErrorHook,
+    dismissSubmitError: dismissSubmitErrorHook,
+    dismissSubmitted: dismissSubmittedHook,
+    dismissDeleteError: dismissDeleteErrorHook,
+    dismissDeleted: dismissDeletedHook,
+    dismissSearchError: dismissSearchErrorHook,
+    dismissSearchResults: dismissSearchResultsHook,
+    poke: pokeHook,
+    unpoke: unpokeHook,
+    remoteListener: dataContext.remoteListener,
+    injectSubmitBlockPromise: injectSubmitBlockPromiseHook,
+    downloadState: this.downloadState,
+    downloadStateAt: this.downloadStateAt,
+    loadStateFromFile: this.loadStateFromFile,
+    loadStateFromFileAt: this.loadStateFromFileAt,
+  }), [
+    idef,
+    state.itemState,
+    state.notFound,
+    state.isBlocked,
+    state.isBlockedButDataIsAccessible,
+    state.loadError,
+    state.loading,
+    state.loaded,
+    !!state.itemState.rqOriginalFlattenedValue,
+    state.submitError,
+    state.submitting,
+    state.submitted,
+    state.deleteError,
+    state.deleting,
+    state.deleted,
+    state.searchError,
+    state.searching,
+    state.searchRecords,
+    state.searchResults,
+    state.searchLimit,
+    state.searchCount,
+    state.searchOffset,
+    state.searchId,
+    state.searchWasRestored,
+    state.searchOwner,
+    state.searchLastModified,
+    state.searchShouldCache,
+    state.searchFields,
+    state.searchRequestedProperties,
+    state.searchRequestedIncludes,
+    state.searchEngineEnabled,
+    state.searchEngineEnabledLang,
+    state.searchEngineUsedFullHighlights,
+    state.searchEngineHighlightArgs,
+    state.searchHighlights,
+    state.searchMetadata,
+    options.highlights,
+    state.pokedElements,
+    options.forId || null,
+    options.forVersion || null,
+  ]);
 
   return {
     state,
     getValueForProperty: getValueFor,
     getStateForProperty: getStateFor,
+
+    context,
+
+    hooks: {
+      useUnversioned,
+      useAnalytics,
+    }
   }
 }

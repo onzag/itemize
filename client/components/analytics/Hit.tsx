@@ -94,12 +94,7 @@ export function useHit() {
   return sendHit;
 }
 
-/**
- * Represents the hit as a component
- * @param options 
- * @returns 
- */
-export default function Hit(props: IHitProps) {
+export function useFunctionalHit(props: IHitProps) {
   const sendHit = useHit();
 
   const userData = useUserDataRetriever();
@@ -131,6 +126,15 @@ export default function Hit(props: IHitProps) {
     previousOptionsEffected.current = props;
     previousRealEnabledEffected.current = realEnabled;
   }, [realEnabled, props.trackId, props.context]);
+}
+
+/**
+ * Represents the hit as a component
+ * @param options 
+ * @returns 
+ */
+export default function Hit(props: IHitProps) {
+  useFunctionalHit(props);
 
   return null;
 }

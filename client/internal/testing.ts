@@ -35,7 +35,6 @@ export interface IMountedItem {
   version: string;
   wasContentLoadedFromMemory: boolean;
   wasFound: boolean;
-  hadAFallback: boolean;
   staticStatus: "TOTAL" | "NO_LISTENING";
   avoidsLoading: boolean;
   mountTime: string;

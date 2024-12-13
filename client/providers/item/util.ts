@@ -2237,7 +2237,6 @@ export function mountOrUpdateIdefForTesting(
       if (typeof wasContentLoadedFromMemory !== "undefined") {
         current.wasContentLoadedFromMemory = wasContentLoadedFromMemory;
       }
-      current.hadAFallback = !!propsOrOptions.loadUnversionedFallback;
       current.updateTime = (new Date()).toISOString();
       current.avoidsLoading = !!propsOrOptions.avoidLoading;
     } else {
@@ -2251,7 +2250,6 @@ export function mountOrUpdateIdefForTesting(
         isExtensions: idef.isExtensionsInstance(),
         mountTime: (new Date()).toISOString(),
         wasFound: !state.notFound,
-        hadAFallback: !!propsOrOptions.loadUnversionedFallback,
         updateTime: null,
         unmountTime: null,
         staticStatus: propsOrOptions.static,

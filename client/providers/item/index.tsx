@@ -1345,12 +1345,6 @@ export interface IItemContextType extends IBasicFns {
   remoteListener: RemoteListener;
 
   /**
-   * A parent context that has been injected
-   * @deprecated
-   */
-  injectedParentContext: IItemContextType;
-
-  /**
    * Injects a promise so that the submit cannot resolve until this promise
    * is resolved
    * @param arg 
@@ -1628,11 +1622,6 @@ export interface IItemProviderProps {
    */
   waitAndMerge?: boolean;
   /**
-   * allows insertion of the parent context within the children
-   * @deprecated please use ItemContextPhase and ItemContextRetrieve instead
-   */
-  injectParentContext?: boolean;
-  /**
    * Triggers if it will search for whatever reason
    */
   onWillSearch?: () => void;
@@ -1806,11 +1795,6 @@ export interface IActualItemProviderProps extends IItemProviderProps {
    * the searching context to pull values from
    */
   searchContext: ISearchItemValueContextType;
-  /**
-   * injected parent context
-   * @deprecated
-   */
-  injectedParentContext: IItemContextType;
   /**
    * config that comes from the config provider
    */
@@ -2242,7 +2226,6 @@ export class ActualItemProvider extends
       !equals(nextProps.longTermCachingMetadata, this.props.longTermCachingMetadata, { strict: true }) ||
       !equals(nextProps.setters, this.props.setters, { strict: true }) ||
       nextProps.location !== this.props.location ||
-      !equals(nextProps.injectedParentContext, this.props.injectedParentContext, { strict: true }) ||
       !equals(nextProps.highlights, this.props.highlights) ||
       !equals(nextProps.analytics, this.props.analytics);
   }
@@ -3261,7 +3244,7 @@ export class ActualItemProvider extends
         <>
           {realAnalytics.offlineHitTrackId ? (
             <Hit
-              trackId={realAnalytics.offlineTimeTrackId}
+              trackId={realAnalytics.offlineHitTrackId}
               enabled={realAnalytics.enabled}
               context={context}
               dataGenerator={this.internalDataProviderForAnalytics}
@@ -3374,7 +3357,6 @@ export class ActualItemProvider extends
             unpoke: this.unpoke,
             remoteListener: this.props.remoteListener,
             injectSubmitBlockPromise: this.injectSubmitBlockPromise,
-            injectedParentContext: this.props.injectedParentContext,
             downloadState: this.downloadState,
             downloadStateAt: this.downloadStateAt,
             loadStateFromFile: this.loadStateFromFile,
@@ -3445,46 +3427,12 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
     ...props,
   }
 
-  if (props.injectParentContext) {
-    if (props.loadSearchFromNavigation || (props.queryStringSync && props.queryStringSync.length)) {
-      return (
-        <LocationRetriever>
-          {(location) => (
-            <ItemContext.Consumer>{
-              (value) => (
-                <ActualItemProvider
-                  {...actualProps}
-                  injectedParentContext={value}
-                  location={location}
-                  ref={ref}
-                />
-              )
-            }</ItemContext.Consumer>
-          )}
-        </LocationRetriever>
-      );
-    } else {
-      return (
-        <ItemContext.Consumer>{
-          (value) => (
-            <ActualItemProvider
-              {...actualProps}
-              injectedParentContext={value}
-              ref={ref}
-            />
-          )
-        }</ItemContext.Consumer>
-      );
-    }
-  }
-
   if (props.loadSearchFromNavigation || (props.queryStringSync && props.queryStringSync.length)) {
     return (
       <LocationRetriever>
         {(location) => (
           <ActualItemProvider
             {...actualProps}
-            injectedParentContext={null}
             location={location}
             ref={ref}
           />
@@ -3495,7 +3443,6 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
     return (
       <ActualItemProvider
         {...actualProps}
-        injectedParentContext={null}
         ref={ref}
       />
     );
@@ -3577,27 +3524,6 @@ export function NoStateItemProvider(props: INoStateItemProviderProps) {
       }
     </ModuleContext.Consumer>
   )
-}
-
-/**
- * Provides a previously injected parent context
- * @deprecated please use ItemContextPhase and ItemContextRetrieve instead
- * @param props 
- * @returns 
- */
-export function ParentItemContextProvider(props: { children: React.ReactNode }) {
-  return (
-    <ItemContext.Consumer>
-      {(value) => {
-        if (!value.injectedParentContext) {
-          console.warn("No parent context was injected during the usage of parent item context provider, defaulting to null");
-        }
-        return (<ItemContext.Provider value={value.injectedParentContext || null}>
-          {props.children}
-        </ItemContext.Provider>);
-      }}
-    </ItemContext.Consumer>
-  );
 }
 
 interface IItemContextPhaseProps {
