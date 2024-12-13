@@ -939,7 +939,7 @@ export async function search(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
   originalOptions: IActionSearchOptions,
-  state: IHookItemProviderState | IActualItemProviderState,
+  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>, cb?: () => void) => void,
   initialAutomaticNextSearchRef: { current: boolean },
   reloadNextSearchRef: { current: boolean },
@@ -989,7 +989,7 @@ export async function search(
     error: null,
   };
 
-  if (state.searching || activeSearchPromiseRef.current) {
+  if (state.current.searching || activeSearchPromiseRef.current) {
     if (originalOptions.pileSearch) {
       const id = uuid.v4();
       activeSearchPromiseAwaiterRef.current = id;
@@ -1092,7 +1092,7 @@ export async function search(
   const propertiesForArgs = getPropertyListForSearchMode(options.searchByProperties, standardCounterpart);
 
   // now we use this function to check that everything is valid
-  const isValid = checkItemStateValidity(idef, propsOrOptions, state, {
+  const isValid = checkItemStateValidity(idef, propsOrOptions, state.current, {
     properties: propertiesForArgs,
     includes: options.searchByIncludes || {},
   });
@@ -1196,17 +1196,17 @@ export async function search(
 
   const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
 
-  if (listenPolicy !== state.searchListenPolicy) {
+  if (listenPolicy !== state.current.searchListenPolicy) {
     // the listener is bad altogether
     removePossibleSearchListeners(
       idef,
       remoteListener,
-      state,
+      state.current,
       onSearchReload,
     );
   } else {
     if (listenPolicy.includes("owner")) {
-      if (options.createdBy !== state.searchOwner) {
+      if (options.createdBy !== state.current.searchOwner) {
         // this search listener is bad because the search
         // owner has changed, and the previously registered listener
         // if any does not match the owner, remember the search owner is the created by
@@ -1215,7 +1215,7 @@ export async function search(
         removePossibleSearchListeners(
           idef,
           remoteListener,
-          state,
+          state.current,
           onSearchReload,
         );
       }
@@ -1223,25 +1223,25 @@ export async function search(
 
     if (listenPolicy.includes("parent")) {
       // we basically do the exact same here, same logic
-      if (!equals(searchParent, state.searchParent, { strict: true })) {
+      if (!equals(searchParent, state.current.searchParent, { strict: true })) {
         // this search listener is bad because the search
         // parent has changed, and the previously registered listener
         // if any does not match the owner
         removePossibleSearchListeners(
           idef,
           remoteListener,
-          state,
+          state.current,
           onSearchReload,
         );
       }
     }
 
     if (listenPolicy.includes("property")) {
-      if (!equals(searchCacheUsesProperty, state.searchCacheUsesProperty, { strict: true })) {
+      if (!equals(searchCacheUsesProperty, state.current.searchCacheUsesProperty, { strict: true })) {
         removePossibleSearchListeners(
           idef,
           remoteListener,
-          state,
+          state.current,
           onSearchReload,
         );
       }
@@ -2034,7 +2034,7 @@ export const LOAD_TIME = (new Date()).getTime();
 export async function onMount(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: IHookItemProviderState | IActualItemProviderState,
+  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>, cb?: () => void) => void,
   remoteListener: RemoteListener,
   isCMountedRef: { current: boolean },
@@ -2061,7 +2061,7 @@ export async function onMount(
   }
 
   const listenersSetup = () => {
-    const currentSearch = state;
+    const currentSearch = state.current;
 
     // when we have a search that was done during SSR and was not stored
     // somewherue in our stuff, we don't want to request feedback
@@ -2086,13 +2086,13 @@ export async function onMount(
     // which means this function won't see the new state and won't trigger
     // automatic search so we use this variable to check it
     const searchIdToCheckAgainst = changedSearchListenerLastCollectedSearchIdRef.current ?
-      changedSearchListenerLastCollectedSearchIdRef.current.id : state.searchId;
+      changedSearchListenerLastCollectedSearchIdRef.current.id : state.current.searchId;
 
     if (
       // no search id at all, not in the state, not on the changed listener, nowhere
       (!searchIdToCheckAgainst) ||
       // search is forced and we didn't load from location
-      (propsOrOptions.automaticSearchForce && state.searchWasRestored !== "FROM_LOCATION") ||
+      (propsOrOptions.automaticSearchForce && state.current.searchWasRestored !== "FROM_LOCATION") ||
       // cache policies searches that have been resolved by SSR need to be redone
       // this is only relevant during mount of course
       // the reason is that the cache may have changes or not be inline with whatever
@@ -2123,7 +2123,7 @@ export async function onMount(
   }
 
   if (propsOrOptions.onSearchStateLoaded || propsOrOptions.onSearchStateChange) {
-    const searchState = getSearchStateOf(state);
+    const searchState = getSearchStateOf(state.current);
     if (searchState.searchId) {
       propsOrOptions.onSearchStateLoaded && propsOrOptions.onSearchStateLoaded(searchState);
       propsOrOptions.onSearchStateChange && propsOrOptions.onSearchStateChange(searchState);
@@ -2147,7 +2147,7 @@ export async function onMount(
   }
 
   if (window.TESTING && process.env.NODE_ENV === "development") {
-    mountOrUpdateIdefForTesting(idef, propsOrOptions, state, internalUUID);
+    mountOrUpdateIdefForTesting(idef, propsOrOptions, state.current, internalUUID);
   }
 
   // and we attempt to load the current value
@@ -2351,7 +2351,7 @@ export function removeDoubleSlotter(
 export async function loadValue(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: IHookItemProviderState | IActualItemProviderState,
+  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   remoteListener: RemoteListener,
   lastLoadingForIdRef: { current: string },
@@ -2378,7 +2378,7 @@ export async function loadValue(
   // elements are assumed into the loading state by the constructor
   // if they have an id
   if (!forId || propsOrOptions.searchCounterpart) {
-    if ((state.loading || state.loaded || state.loadError) && !isUnmountedRef.current) {
+    if ((state.current.loading || state.current.loaded || state.current.loadError) && !isUnmountedRef.current) {
       setState({
         loadError: null,
         loaded: false,
@@ -2487,7 +2487,7 @@ export async function loadValue(
       requestFieldsAreContained(requestFields, appliedRQValue.requestFields)
     ) {
       if (window.TESTING && process.env.NODE_ENV === "development") {
-        mountOrUpdateIdefForTesting(idef, propsOrOptions, state, internalUUID, true);
+        mountOrUpdateIdefForTesting(idef, propsOrOptions, state.current, internalUUID, true);
       }
 
       if (propsOrOptions.static !== "TOTAL") {
@@ -2550,7 +2550,7 @@ export async function loadValue(
   // you might wonder why in the loader and not in the waiter
   // well it's because the waiter might only executes for the active
   // instance
-  if (!state.loading && !isUnmountedRef.current) {
+  if (!state.current.loading && !isUnmountedRef.current) {
     setState({
       loading: true,
       loaded: false,
@@ -2890,7 +2890,7 @@ export async function didUpdate(
     role: string,
     token: string,
   },
-  state: IActualItemProviderState | IHookItemProviderState,
+  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   blockIdCleanRef: { current: string },
   storeStateTimeoutRef: { current: any },
@@ -2910,7 +2910,7 @@ export async function didUpdate(
   onSearchReload: (arg: IRemoteListenerRecordsCallbackArg) => void,
   basicFnsRetriever: () => IBasicFns,
 ) {
-  let currentSearch: IItemSearchStateType = state;
+  let currentSearch: IItemSearchStateType = state.current;
   let prevSearchState: IItemSearchStateType = prevState;
 
   if (
@@ -2978,7 +2978,7 @@ export async function didUpdate(
     mountOrUpdateIdefForTesting(
       idef,
       propsOrOptions,
-      state,
+      state.current,
       internalUUID,
     );
   }
@@ -3151,7 +3151,7 @@ export async function didUpdate(
       if (ownerChanged || parentChanged || propertyChanged) {
         removePossibleSearchListeners(prevIdef, remoteListener, prevState, onSearchReload);
         // only request feedback if this was a loaded state that came from the state
-        searchListenersSetup(idef, remoteListener, onSearchReload, currentSearch, state.searchWasRestored === "FROM_STATE");
+        searchListenersSetup(idef, remoteListener, onSearchReload, currentSearch, state.current.searchWasRestored === "FROM_STATE");
       }
     }
   }
@@ -3159,7 +3159,7 @@ export async function didUpdate(
   // when get derived made it so that it loaded a new search state because
   // we have a new item definition slot id or anything
   // and we need to invalidate those search results that we got
-  const getDerivedTriggeredASearchChange = state.searchWasRestored !== "NO" && (
+  const getDerivedTriggeredASearchChange = state.current.searchWasRestored !== "NO" && (
     itemDefinitionWasUpdated || uniqueIDChanged ||
     (
       (
@@ -3175,7 +3175,7 @@ export async function didUpdate(
     // if the automatic search is not setup to just initial
     !propsOrOptions.automaticSearchIsOnlyInitial &&
     // if automatic search is only fallback there must not be an active search id as well
-    (propsOrOptions.automaticSearchIsOnlyFallback ? !state.searchId : true) &&
+    (propsOrOptions.automaticSearchIsOnlyFallback ? !state.current.searchId : true) &&
     // if there was previously an automatic search
     (
       (
@@ -3194,33 +3194,33 @@ export async function didUpdate(
           // no search id for example if the slot changed during
           // an update of forId and forVersion and as a result
           // the search is empty in this slot
-          state.searchId === null
+          state.current.searchId === null
         )
       ) ||
       (!prevPropsOrOptions.automaticSearch && propsOrOptions.automaticSearch)
-    ) && !state.searching
+    ) && !state.current.searching
   ) {
     // maybe there's no new automatic search
     if (propsOrOptions.automaticSearch && !propsOrOptions.automaticSearch.clientDisabled) {
       // always perform the search even if there's a state
-      if (propsOrOptions.automaticSearchForce || state.searchId === null) {
+      if (propsOrOptions.automaticSearchForce || state.current.searchId === null) {
         search(propsOrOptions.automaticSearch);
       } else {
         // so knowing that let's check wether it loaded a search state that is currently active
         // well it must be because state.searchId must be something right now
         // so now we can assume getDerived loaded something into the search
         if (getDerivedTriggeredASearchChange) {
-          propsOrOptions.onSearchStateLoaded && propsOrOptions.onSearchStateLoaded(getSearchStateOf(state));
+          propsOrOptions.onSearchStateLoaded && propsOrOptions.onSearchStateLoaded(getSearchStateOf(state.current));
         } else {
           // otherwise we automatically search
           search(propsOrOptions.automaticSearch);
         }
       }
     } else if (!propsOrOptions.automaticSearchDoNotAutoDismissDuringChanges) {
-      dismissSearchResults(idef, remoteListener, state, setState, isUnmountedRef.current, onSearchReload);
+      dismissSearchResults(idef, remoteListener, state.current, setState, isUnmountedRef.current, onSearchReload);
     }
-  } else if (getDerivedTriggeredASearchChange && state.searchId) {
-    propsOrOptions.onSearchStateLoaded && propsOrOptions.onSearchStateLoaded(getSearchStateOf(state));
+  } else if (getDerivedTriggeredASearchChange && state.current.searchId) {
+    propsOrOptions.onSearchStateLoaded && propsOrOptions.onSearchStateLoaded(getSearchStateOf(state.current));
   }
 
   // this is a different instance, we consider it dismounted
@@ -3248,10 +3248,10 @@ export async function didUpdate(
           CacheWorkerInstance.isSupportedAsWorker
         )
       ) &&
-      !equals(state.itemState, state.itemState, { strict: true })
+      !equals(state.current.itemState, state.current.itemState, { strict: true })
     )
   ) {
-    propsOrOptions.onStateChange && propsOrOptions.onStateChange(state.itemState, prevState.itemState);
+    propsOrOptions.onStateChange && propsOrOptions.onStateChange(state.current.itemState, prevState.itemState);
 
     if (propsOrOptions.storeStateOnChange) {
       clearTimeout(storeStateTimeoutRef.current);
@@ -3330,14 +3330,14 @@ export function runDismountOn(
 export async function storeStateDelayed(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: IActualItemProviderState | IHookItemProviderState,
+  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
 ) {
   if (propsOrOptions.storeStateOnChange && CacheWorkerInstance.isSupportedAsWorker) {
     const location = getStoredStateLocation(propsOrOptions.storeStateOnChange, propsOrOptions.forId, propsOrOptions.forVersion);
-    const serializable = ItemDefinition.getSerializableState(state.itemState, null, propsOrOptions.storeStateOnChangeApplyEnforced);
-    const metadataSource = state.itemState &&
-      state.itemState.rqOriginalFlattenedValue &&
-      (state.itemState.rqOriginalFlattenedValue as any);
+    const serializable = ItemDefinition.getSerializableState(state.current.itemState, null, propsOrOptions.storeStateOnChangeApplyEnforced);
+    const metadataSource = state.current.itemState &&
+      state.current.itemState.rqOriginalFlattenedValue &&
+      (state.current.itemState.rqOriginalFlattenedValue as any);
     const stateWasStored = await CacheWorkerInstance.instance.storeState(
       idef.getQualifiedPathName(),
       location.id,
@@ -3352,9 +3352,9 @@ export async function storeStateDelayed(
     );
 
     if (stateWasStored) {
-      propsOrOptions.onStateStored && propsOrOptions.onStateStored(state.itemState);
+      propsOrOptions.onStateStored && propsOrOptions.onStateStored(state.current.itemState);
     } else {
-      propsOrOptions.onStateStoreFailed && propsOrOptions.onStateStoreFailed(state.itemState);
+      propsOrOptions.onStateStoreFailed && propsOrOptions.onStateStoreFailed(state.current.itemState);
     }
   }
 }
@@ -3554,7 +3554,7 @@ export async function changeListener(
 export async function loadListener(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: IActualItemProviderState | IHookItemProviderState,
+  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   isUnmountedRef: { current: boolean },
   isCMountedRef: { current: boolean },
@@ -3577,7 +3577,7 @@ export async function loadListener(
 
   // already loaded this can happen if during a search it triggers load
   // but there's another component around holding the same value
-  if (state.loaded) {
+  if (state.current.loaded) {
     return;
   }
 
@@ -3683,7 +3683,7 @@ export async function downloadStateAt(
 export async function onPropertyChange(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: IActualItemProviderState | IHookItemProviderState,
+  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
   lastLoadValuePromise: Promise<void>,
   lastUpdateIdRef: { current: number },
   updateTimeoutRef: { current: any },
@@ -3699,7 +3699,7 @@ export async function onPropertyChange(
   value: PropertyDefinitionSupportedType,
   internalValue: any,
 ) {
-  if (state.loading) {
+  if (state.current.loading) {
     // loading will overwrite any possible property changes
     // so we await for it to end
     await lastLoadValuePromise;
@@ -3970,7 +3970,7 @@ export function onIncludeSetExclusionState(
 export async function del(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: IHookItemProviderState | IActualItemProviderState,
+  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   isUnmountedRef: { current: boolean },
   blockIdCleanRef: { current: string },
@@ -3980,7 +3980,7 @@ export async function del(
 
   options: IActionDeleteOptions = {},
 ): Promise<IBasicActionResponse> {
-  if (state.deleting) {
+  if (state.current.deleting) {
     throw new Error("Can't delete while deleting, please consider your calls")
   }
 
@@ -3991,7 +3991,7 @@ export async function del(
   const isValid = checkItemStateValidity(
     idef,
     propsOrOptions,
-    state,
+    state.current,
     {
       properties: [],
       ...options,
@@ -4113,7 +4113,7 @@ export async function del(
 export async function submit(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: IHookItemProviderState | IActualItemProviderState,
+  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   activeSubmitPromiseRef: { current: Promise<{ response: IActionSubmitResponse, options: IActionSubmitOptions }> },
   activeSubmitPromiseAwaiterRef: { current: string },
@@ -4136,9 +4136,9 @@ export async function submit(
   // loading the applied value matters in order to unite the applied fields, however
   // if we are avoiding loading this doesn't really matter as it's truly loading and somehow
   // the submit button was pressed really fast
-  const waitingForLoad = propsOrOptions.forId && !state.loaded && !propsOrOptions.avoidLoading;
+  const waitingForLoad = propsOrOptions.forId && !state.current.loaded && !propsOrOptions.avoidLoading;
   if (waitingForLoad) {
-    if (state.loadError) {
+    if (state.current.loadError) {
       console.warn(
         "Attempted to submit with a loaded value in an error state, the result is that the value is not loaded " +
         "in memory, this is not an error, it simply means that the value was not considered for the update",
@@ -4167,7 +4167,7 @@ export async function submit(
     error: null as any,
   };
 
-  if (state.submitting || activeSubmitPromiseRef.current) {
+  if (state.current.submitting || activeSubmitPromiseRef.current) {
     if (originalOptions.pileSubmit) {
       const id = uuid.v4();
       activeSubmitPromiseAwaiterRef.current = id;
@@ -4212,7 +4212,7 @@ export async function submit(
   const isValid = checkItemStateValidity(
     idef,
     propsOrOptions,
-    state,
+    state.current,
     options,
   );
   const pokedElements = {
@@ -4226,7 +4226,7 @@ export async function submit(
 
   const determinedActionIsEdit = options.action ?
     options.action === "edit" :
-    (submitForId && submitForId === (propsOrOptions.forId || null) && !state.notFound);
+    (submitForId && submitForId === (propsOrOptions.forId || null) && !state.current.notFound);
 
   // if it's invalid let's return the emulated error
   if (!isValid) {

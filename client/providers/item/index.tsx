@@ -22,7 +22,7 @@ import {
 import { IPropertyCoreProps, IPropertySetterProps } from "../../components/property/base";
 import { ConfigContext } from "../../internal/providers/config-provider";
 import { IConfigRawJSONDataType } from "../../../config";
-import LocationRetriever from "../../components/navigation/LocationRetriever";
+import { useLocationRetriever } from "../../components/navigation/LocationRetriever";
 import { Location } from "history";
 import type { ICacheStateMetadata } from "../../internal/workers/cache/cache.worker.class";
 import Hit from "../../components/analytics/Hit";
@@ -1800,9 +1800,9 @@ export interface IActualItemProviderProps extends IItemProviderProps {
    */
   config: IConfigRawJSONDataType;
   /**
-   * only available when supporting search from navigation
+   * the current location
    */
-  location?: Location<any>;
+  location: Location<any>;
 }
 
 // This is the state of such, it's basically a copy of the
@@ -2021,6 +2021,8 @@ export class ActualItemProvider extends
   // it doesn't hurt to catch them all and create a timeout
   private reloadListenerTimeout: NodeJS.Timeout = null;
 
+  private stateAsRef: {readonly current: IActualItemProviderState};
+
   constructor(props: IActualItemProviderProps) {
     super(props);
 
@@ -2100,6 +2102,13 @@ export class ActualItemProvider extends
 
     // we get the initial state
     this.state = setupInitialState(props.itemDefinitionInstance, props);
+
+    const $this = this;
+    this.stateAsRef = {
+      get current() {
+        return $this.state;
+      },
+    };
   }
 
   public injectSubmitBlockPromise(p: Promise<any>) {
@@ -2132,7 +2141,7 @@ export class ActualItemProvider extends
   public async componentDidMount() {
     const $this = this;
     return await onMount(this.props.itemDefinitionInstance, this.props,
-      this.state, this.setState as any, this.props.remoteListener,
+      this.stateAsRef, this.setState as any, this.props.remoteListener,
       {
         get current() {
           return $this.isCMounted;
@@ -2243,7 +2252,7 @@ export class ActualItemProvider extends
       this.props,
       prevProps.tokenData,
       this.props.tokenData,
-      this.state,
+      this.stateAsRef,
       this.setState as any,
       {
         get current() {
@@ -2309,7 +2318,7 @@ export class ActualItemProvider extends
 
   public reloadListener() {
     const $this = this;
-    reloadListener(
+    return reloadListener(
       this.props.itemDefinitionInstance,
       this.props,
       this.isCMounted,
@@ -2337,7 +2346,7 @@ export class ActualItemProvider extends
   }
   public changeSearchListener() {
     const $this = this;
-    changeSearchListener(
+    return changeSearchListener(
       this.props.itemDefinitionInstance,
       this.props,
       {
@@ -2417,7 +2426,7 @@ export class ActualItemProvider extends
     return await loadListener(
       this.props.itemDefinitionInstance,
       this.props,
-      this.state,
+      this.stateAsRef,
       this.setState as any,
       {
         get current() {
@@ -2448,7 +2457,7 @@ export class ActualItemProvider extends
     );
   }
   public async loadStateFromFile(stateFile: File | Blob, specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }) {
-    this.loadStateFromFileAt(stateFile, this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes);
+    return this.loadStateFromFileAt(stateFile, this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes);
   }
   public async loadStateFromFileAt(
     stateFile: File | Blob,
@@ -2505,7 +2514,7 @@ export class ActualItemProvider extends
     return await loadValue(
       this.props.itemDefinitionInstance,
       this.props,
-      this.state,
+      this.stateAsRef,
       this.setState as any,
       this.props.remoteListener,
       {
@@ -2680,7 +2689,7 @@ export class ActualItemProvider extends
     return onPropertyChange(
       this.props.itemDefinitionInstance,
       this.props,
-      this.state,
+      this.stateAsRef,
       this.lastLoadValuePromise,
       {
         get current() {
@@ -2841,10 +2850,10 @@ export class ActualItemProvider extends
       this,
     );
   }
-  
+
   public onIncludeSetExclusionState(include: Include, state: IncludeExclusionState) {
     const $this = this;
-    onIncludeSetExclusionState(
+    return onIncludeSetExclusionState(
       this.props.itemDefinitionInstance,
       this.props,
       {
@@ -2892,13 +2901,13 @@ export class ActualItemProvider extends
       state,
     );
   }
-  
+
   public async delete(options: IActionDeleteOptions = {}): Promise<IBasicActionResponse> {
     const $this = this;
     return await del(
       this.props.itemDefinitionInstance,
       this.props,
-      this.state,
+      this.stateAsRef,
       this.setState as any,
       {
         get current() {
@@ -2939,13 +2948,13 @@ export class ActualItemProvider extends
       avoidTriggeringUpdate,
     );
   }
-  
+
   public async submit(options: IActionSubmitOptions): Promise<IActionSubmitResponse> {
     const $this = this;
     return await submit(
       this.props.itemDefinitionInstance,
       this.props,
-      this.state,
+      this.stateAsRef,
       this.setState as any,
       {
         get current() {
@@ -3011,7 +3020,7 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance,
       this.props,
       options,
-      this.state,
+      this.stateAsRef,
       this.setState as any,
       {
         get current() {
@@ -3176,7 +3185,7 @@ export class ActualItemProvider extends
       this.onSearchReload,
     );
   }
-  
+
   public poke(elements: IPokeElementsType) {
     if (this.isUnmounted) {
       return;
@@ -3382,6 +3391,7 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
   const tokenData = useContext(TokenContext);
   const data = useContext(ModuleContext);
   const searchContext = useContext(SearchItemValueContext);
+  const location = useLocationRetriever();
 
   if (!data) {
     console.error("At element with props: ", props);
@@ -3424,29 +3434,16 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
     remoteListener: data.remoteListener,
     searchContext: searchContext,
     config: config,
+    location,
     ...props,
   }
 
-  if (props.loadSearchFromNavigation || (props.queryStringSync && props.queryStringSync.length)) {
-    return (
-      <LocationRetriever>
-        {(location) => (
-          <ActualItemProvider
-            {...actualProps}
-            location={location}
-            ref={ref}
-          />
-        )}
-      </LocationRetriever>
-    );
-  } else {
-    return (
-      <ActualItemProvider
-        {...actualProps}
-        ref={ref}
-      />
-    );
-  }
+  return (
+    <ActualItemProvider
+      {...actualProps}
+      ref={ref}
+    />
+  );
 });
 
 /**

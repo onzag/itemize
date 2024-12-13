@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } 
 import { IActionCleanOptions, IActionDeleteOptions, IActionResponseWithSearchResults, IActionResponseWithValue, IActionSearchOptions, IActionSubmitOptions, IActionSubmitResponse, IBasicFns, IItemAnalyticsProps, IItemContextType, IItemProviderProps, IPokeElementsType, SearchItemValueContext } from ".";
 import { useRootRetriever } from "../../components/root/RootRetriever";
 import type Module from "../../../base/Root/Module";
-import ItemDefinition, { IItemSearchStateType, IItemStateType } from "../../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemSearchStateType, IItemStateType, IPolicyStateType } from "../../../base/Root/Module/ItemDefinition";
 import { IPropertyBaseProps } from "../../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ENDPOINT_ERRORS, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, RESERVED_BASE_PROPERTIES_RQ, SEARCH_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
@@ -31,7 +31,7 @@ import { IPropertyCoreProps, IPropertySetterProps } from "../../components/prope
 import { useFunctionalHit } from "../../../client/components/analytics/Hit";
 import { useFunctionalTimetrack } from "../../../client/components/analytics/Timetrack";
 
-export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId' | 'loadUnversionedFallback'> {
+export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId' | 'loadUnversionedFallback' | 'analytics'> {
   module: string | Module;
   suppressWarnings?: boolean;
 }
@@ -79,7 +79,23 @@ export interface IItemProviderHookElement {
   getValueForProperty<T>(pId: string | IPropertyBasePropsWInclude): T;
 
   hooks: {
+    /**
+     * When providing analytics in the options you should also call this hook in order
+     * to ensure they are properly setup, otherwise analytics will not function
+     * 
+     * @returns 
+     */
     useAnalytics: () => void;
+    /**
+     * Actually only provides the unversioned if
+     * the current is not found, otherwise it will provide
+     * id: null, version: "__UNVERSIONED__" this will ensure
+     * that the unversioned only loads if the versioned is not found
+     * 
+     * it has to do this when using hooks
+     * 
+     * @returns 
+     */
     useUnversioned: () => IItemProviderHookElement;
   }
 }
@@ -135,6 +151,10 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       cbRef.current = null;
     }
   }, [state]);
+
+  const alwaysUpToDateStateRef = useRef(state);
+  alwaysUpToDateStateRef.current = null;
+
   const setState = useCallback((newState: Partial<IHookItemProviderState>, cb?: () => void) => {
     if (cb) {
       if (cbRef.current) {
@@ -147,11 +167,13 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
         cbRef.current = cb;
       }
     }
-    setStateBase({
-      ...state,
+    const newValue = {
+      ...alwaysUpToDateStateRef.current,
       ...newState,
-    });
-  }, [state]);
+    };
+    alwaysUpToDateStateRef.current = newValue;
+    setStateBase(newValue);
+  }, []);
 
   // NOW THAT WE KNOW THE INITIAL STATE WE CAN CHECK THE REQUEST MANAGER
   // AND THROW THE ERROR IN CASE OF SSR
@@ -205,11 +227,8 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
         requestFieldsAreContained(requestFields, searchContext.searchFields)
       ) {
         // no need to load they are already in memory and the collector
-        return null;
-      }
-
-      // cheesy way to get to the root
-      if (root.root.needsRequestManager(idef, id, version, requestFields)) {
+        // PASS
+      } else if (root.root.needsRequestManager(idef, id, version, requestFields)) {
         throw new SSRError(async () => {
           await root.root.callRequestManager(
             idef,
@@ -230,8 +249,6 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   stateRef.current = state;
   const idefRef = useRef(idef);
   idefRef.current = idef;
-  const setStateRef = useRef(setState);
-  setStateRef.current = setState;
   const tokenDataRef = useRef(tokenData);
   tokenDataRef.current = tokenData;
   const locationRef = useRef(location);
@@ -273,22 +290,24 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
   // functions
   const reloadListenerHook = useCallback(() => {
-    reloadListener(
+    return reloadListener(
       idefRef.current,
       optionsRef.current,
       isCMountedRef.current,
       mountCbsRef,
       reloadListenerHook,
       reloadListenerTimeoutRef,
-      loadValueHook,
+      () => {
+        loadValueHook(true)
+      },
     )
   }, []);
 
   const changeListenerHook = useCallback((repairCorruption?: boolean) => {
-    changeListener(
+    return changeListener(
       idefRef.current,
       optionsRef.current,
-      setStateRef.current,
+      setState,
       isUnmountedRef,
       isCMountedRef,
       mountCbsRef,
@@ -302,11 +321,11 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   }, []);
 
   const loadListenerHook = useCallback(async () => {
-    return await loadListener(
+    return loadListener(
       idefRef.current,
       optionsRef.current,
-      stateRef.current,
-      setStateRef.current,
+      stateRef,
+      setState,
       isUnmountedRef,
       isCMountedRef,
       mountCbsRef,
@@ -316,7 +335,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   }, []);
 
   const changeSearchListenerHook = useCallback(async () => {
-    changeSearchListener(
+    return changeSearchListener(
       idefRef.current,
       optionsRef.current,
       changedSearchListenerLastCollectedSearchIdRef,
@@ -324,7 +343,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       isUnmountedRef.current,
       isCMountedRef.current,
       changeSearchListenerHook,
-      setStateRef.current,
+      setState,
     );
   }, []);
 
@@ -344,7 +363,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       idefRef.current,
       dataContext.remoteListener,
       stateRef.current,
-      setStateRef.current,
+      setState,
       isUnmountedRef.current,
       onSearchReloadHook,
     );
@@ -355,7 +374,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       return;
     }
 
-    setStateRef.current({
+    setState({
       pokedElements: elements,
     });
   }, []);
@@ -364,7 +383,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     if (isUnmountedRef.current) {
       return;
     }
-    setStateRef.current({
+    setState({
       pokedElements: {
         properties: [],
         includes: {},
@@ -384,10 +403,6 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     options.forVersion,
     idef,
   ]);
-
-  const injectSubmitBlockPromiseImmutable = useCallback((p: Promise<any>) => {
-    submitBlockPromisesRef.current.push(p);
-  }, []);
 
   const onConnectStatusChangeHook = useCallback(() => {
     return onConnectStatusChange(
@@ -429,7 +444,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   }, []);
 
   const loadStateFromFileHook = useCallback((stateFile: File | Blob, specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }) => {
-    loadStateFromFileAtHook(stateFile, this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes);
+    return loadStateFromFileAtHook(stateFile, optionsRef.current.forId || null, optionsRef.current.forVersion || null, specificProperties, specificIncludes);
   }, []);
 
   const downloadStateAtHook = useCallback(async (
@@ -450,15 +465,15 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   }, []);
 
   const downloadStateHook = useCallback((specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }) => {
-    return downloadStateAtHook(this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes)
+    return downloadStateAtHook(optionsRef.current.forId || null, optionsRef.current.forVersion || null, specificProperties, specificIncludes)
   }, []);
 
   const loadValueHook = useCallback((denyCaches?: boolean) => {
     return loadValue(
       idefRef.current,
       optionsRef.current,
-      stateRef.current,
-      setStateRef.current,
+      stateRef,
+      setState,
       dataContext.remoteListener,
       lastLoadingForIdRef,
       lastLoadingForVersionRef,
@@ -476,121 +491,6 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     );
   }, []);
 
-
-  // EMULATE OF CONSTRUCTOR
-  const isConstruct = useRef(true);
-  useEffect(() => {
-    isConstruct.current = false;
-  }, []);
-  if (isConstruct.current) {
-    // first we setup the listeners, this includes the on change listener that would make
-    // the entire app respond to actions, otherwise the fields might as well be disabled
-    // we do this here to avoid useless callback changes as the listeners are not ready
-    installSetters(idef, options, isCMountedRef.current, this.search);
-    installPrefills(idef, options, location);
-
-    if (typeof document !== "undefined") {
-      setupListeners(
-        idef,
-        options,
-        dataContext.remoteListener,
-        changeListenerHook,
-        loadListenerHook,
-        changeSearchListenerHook,
-        reloadListenerHook,
-        internalUUIDRef.current,
-      );
-      blockCleanup(
-        blockIdCleanRef,
-        idef,
-        options,
-      );
-    }
-  }
-
-  // EMULATE OF MOUNT
-  useEffect(() => {
-    onMount(idefRef.current, optionsRef.current, state, setState, dataContext.remoteListener,
-      isCMountedRef,
-      mountCbsRef,
-      changedSearchListenerLastCollectedSearchIdRef,
-      initialAutomaticNextSearchRef,
-      isUnmountedRef,
-      internalUUIDRef.current,
-      lastUpdateIdRef,
-      basicFnsRetrieverImmutable,
-      onConnectStatusChangeHook,
-      onSearchReloadHook,
-      searchHook,
-      loadValueHook,
-      changeListenerHook,
-    );
-
-    // EMULATE OF UNMOUNT
-    return () => {
-      willUnmount(
-        idefRef.current,
-        optionsRef.current,
-        stateRef.current,
-        setStateRef.current,
-        dataContext.remoteListener,
-        isUnmountedRef,
-        blockIdCleanRef,
-        internalSearchDestructionMarkersRef,
-        isCMountedRef.current,
-        changeListenerHook,
-        loadListenerHook,
-        changeSearchListenerHook,
-        reloadListenerHook,
-        onSearchReloadHook,
-        onConnectStatusChangeHook,
-        searchHook,
-        internalUUIDRef.current,
-        internalUUIDRef.current,
-      );
-    }
-  }, []);
-
-  // EMULATE OF DID UPDATE
-  useEffect(() => {
-    const prevOptions = options;
-    const prevState = state;
-    const prevIdef = idef;
-    const prevTokenData = tokenData;
-
-    return () => {
-      // should shouldComponentUpdate be here?
-      didUpdate(
-        prevIdef,
-        idefRef.current,
-        prevOptions,
-        prevState,
-        optionsRef.current,
-        prevTokenData,
-        tokenDataRef.current,
-        stateRef.current,
-        setStateRef.current,
-        blockIdCleanRef,
-        storeStateTimeoutRef,
-        internalSearchDestructionMarkersRef,
-        isCMountedRef,
-        internalUUIDRef.current,
-        locationRef.current,
-        dataContext.remoteListener,
-        isUnmountedRef,
-        lastUpdateIdRef,
-        searchHook,
-        loadValueHook,
-        reloadListenerHook,
-        loadListenerHook,
-        changeListenerHook,
-        changeSearchListenerHook,
-        onSearchReloadHook,
-        basicFnsRetrieverImmutable,
-      );
-    }
-  }, [tokenData, idef, options, state]);
-
   const onPropertyRestoreHook = useCallback((property: PropertyDefinition | string | IPropertyCoreProps) => {
     return onPropertyRestore(
       idefRef.current,
@@ -606,7 +506,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       (currentUpdateId: number) => {
         setStateToCurrentValueWithExternalChecking(
           idefRef.current,
-          setStateRef.current,
+          setState,
           optionsRef.current,
           isUnmountedRef,
           lastUpdateIdRef,
@@ -628,7 +528,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     return onPropertyChange(
       idefRef.current,
       optionsRef.current,
-      stateRef.current,
+      stateRef,
       lastLoadValuePromiseRef.current,
       lastUpdateIdRef,
       updateTimeoutRef,
@@ -640,7 +540,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       (currentUpdateId: number) => {
         setStateToCurrentValueWithExternalChecking(
           idefRef.current,
-          setStateRef.current,
+          setState,
           optionsRef.current,
           isCMountedRef,
           lastUpdateIdRef,
@@ -702,7 +602,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       (currentUpdateId: number) => {
         setStateToCurrentValueWithExternalChecking(
           idefRef.current,
-          setStateRef.current,
+          setState,
           optionsRef.current,
           isUnmountedRef,
           lastUpdateIdRef,
@@ -719,8 +619,8 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     return del(
       idefRef.current,
       optionsRef.current,
-      stateRef.current,
-      setStateRef.current,
+      stateRef,
+      setState,
       isUnmountedRef,
       blockIdCleanRef,
       tokenDataRef.current.token,
@@ -742,7 +642,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       blockIdCleanRef.current,
       options,
       state,
-      setStateRef.current,
+      setState,
       avoidTriggeringUpdate,
     );
   }, []);
@@ -751,8 +651,8 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     return submit(
       idefRef.current,
       optionsRef.current,
-      stateRef.current,
-      setStateRef.current,
+      stateRef,
+      setState,
       activeSubmitPromiseRef,
       activeSearchPromiseAwaiterRef,
       submitBlockPromisesRef,
@@ -772,8 +672,8 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       idefRef.current,
       optionsRef.current,
       options,
-      stateRef.current,
-      setStateRef.current,
+      stateRef,
+      setState,
       initialAutomaticNextSearchRef,
       reloadNextSearchRef,
       preventSearchFeedbackOnPossibleStaleDataRef,
@@ -796,43 +696,158 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   const dismissLoadErrorHook = useCallback(() => {
     dismissLoadError(
       isUnmountedRef.current,
-      setStateRef.current,
+      setState,
     );
   }, []);
   const dismissDeleteErrorHook = useCallback(() => {
     dismissDeleteError(
       isUnmountedRef.current,
-      setStateRef.current,
+      setState,
     );
   }, []);
   const dismissSubmitErrorHook = useCallback(() => {
     dismissSubmitError(
       isUnmountedRef.current,
-      setStateRef.current,
+      setState,
     );
   }, []);
   const dismissSubmittedHook = useCallback(() => {
     dismissSubmitted(
       isUnmountedRef.current,
-      setStateRef.current,
+      setState,
     );
   }, []);
   const dismissDeletedHook = useCallback(() => {
     dismissDeleted(
       isUnmountedRef.current,
-      setStateRef.current,
+      setState,
     );
   }, []);
   const dismissSearchErrorHook = useCallback(() => {
     dismissSearchError(
       isUnmountedRef.current,
-      setStateRef.current,
+      setState,
     );
   }, []);
 
   const injectSubmitBlockPromiseHook = useCallback((p: Promise<any>) => {
     submitBlockPromisesRef.current.push(p);
   }, []);
+
+  // LIFECYCLE
+
+  // EMULATE OF CONSTRUCTOR
+  const isConstruct = useRef(true);
+  useEffect(() => {
+    isConstruct.current = false;
+  }, []);
+  if (isConstruct.current) {
+    // first we setup the listeners, this includes the on change listener that would make
+    // the entire app respond to actions, otherwise the fields might as well be disabled
+    // we do this here to avoid useless callback changes as the listeners are not ready
+    installSetters(idef, options, isCMountedRef.current, searchHook);
+    installPrefills(idef, options, location);
+
+    if (typeof document !== "undefined") {
+      setupListeners(
+        idef,
+        options,
+        dataContext.remoteListener,
+        changeListenerHook,
+        loadListenerHook,
+        changeSearchListenerHook,
+        reloadListenerHook,
+        internalUUIDRef.current,
+      );
+      blockCleanup(
+        blockIdCleanRef,
+        idef,
+        options,
+      );
+    }
+  }
+
+  // EMULATE OF MOUNT
+  useEffect(() => {
+    onMount(idefRef.current, optionsRef.current, stateRef, setState, dataContext.remoteListener,
+      isCMountedRef,
+      mountCbsRef,
+      changedSearchListenerLastCollectedSearchIdRef,
+      initialAutomaticNextSearchRef,
+      isUnmountedRef,
+      internalUUIDRef.current,
+      lastUpdateIdRef,
+      basicFnsRetrieverImmutable,
+      onConnectStatusChangeHook,
+      onSearchReloadHook,
+      searchHook,
+      loadValueHook,
+      changeListenerHook,
+    );
+
+    // EMULATE OF UNMOUNT
+    return () => {
+      willUnmount(
+        idefRef.current,
+        optionsRef.current,
+        stateRef.current,
+        setState,
+        dataContext.remoteListener,
+        isUnmountedRef,
+        blockIdCleanRef,
+        internalSearchDestructionMarkersRef,
+        isCMountedRef.current,
+        changeListenerHook,
+        loadListenerHook,
+        changeSearchListenerHook,
+        reloadListenerHook,
+        onSearchReloadHook,
+        onConnectStatusChangeHook,
+        searchHook,
+        internalUUIDRef.current,
+        internalUUIDRef.current,
+      );
+    }
+  }, []);
+
+  // EMULATE OF DID UPDATE
+  useEffect(() => {
+    const prevOptions = options;
+    const prevState = state;
+    const prevIdef = idef;
+    const prevTokenData = tokenData;
+
+    return () => {
+      didUpdate(
+        prevIdef,
+        idefRef.current,
+        prevOptions,
+        prevState,
+        optionsRef.current,
+        prevTokenData,
+        tokenDataRef.current,
+        stateRef,
+        setState,
+        blockIdCleanRef,
+        storeStateTimeoutRef,
+        internalSearchDestructionMarkersRef,
+        isCMountedRef,
+        internalUUIDRef.current,
+        locationRef.current,
+        dataContext.remoteListener,
+        isUnmountedRef,
+        lastUpdateIdRef,
+        searchHook,
+        loadValueHook,
+        reloadListenerHook,
+        loadListenerHook,
+        changeListenerHook,
+        changeSearchListenerHook,
+        onSearchReloadHook,
+        basicFnsRetrieverImmutable,
+      );
+    }
+  }, [tokenData, idef, options, state]);
 
   // START COPY/PASTE AND MODIFYING TO ADAPT TO A HOOK
   // =============================================================================
@@ -868,7 +883,24 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
           PropertyDefinitionSearchInterfacesPrefixes[idOrBase.searchVariant.toUpperCase().replace("-", "_")] + idOrBase.id;
       }
 
+      const policyType = idOrBase.policyType;
+      const policyName = idOrBase.policyName;
+
       const include = typeof idOrBase.include === "string" ? idOrBase.include : idOrBase.include.getId();
+
+      if ((policyType || policyName) && include) {
+        console.error(
+          "Unwanted behaviour you tried to read a policy type/name property with an include",
+        );
+        return null;
+      }
+
+      if ((policyType && !policyName) || (policyName && !policyType)) {
+        console.error(
+          "Unwanted behaviour you need to specify both policy type and policy name",
+        );
+        return null;
+      }
 
       if (include) {
         const stateInclude = stateRef.current.itemState.includes.find((i) => i.includeId === idOrBase.include);
@@ -896,7 +928,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
           }
           return state;
         }
-      } else {
+      } else if (!policyType) {
         const state = stateRef.current.itemState.properties.find((p) => p.propertyId === actualId);
         if (!state) {
           if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
@@ -909,68 +941,93 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
           return null;
         }
         return state;
+      } else {
+        const stateOfPolicy = stateRef.current.itemState.policies[policyType] as IPolicyStateType;
+        const stateArray = stateOfPolicy && stateOfPolicy[policyName];
+        const state = stateArray && stateArray.find((v) => v.propertyId === actualId);
+        if (!state) {
+          if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
+            console.warn(
+              "Possibly unwanted behaviour, you attempted to read a property " +
+              idOrBase + " with policy type " + policyType + " and a type " + policyType +
+              " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
+            );
+          }
+          return null;
+        }
+
+        return state;
       }
     }
   }, []) as <T>(pId: string | IPropertyBasePropsWInclude) => IPropertyDefinitionState<T>;
 
   // PRETENDING TO DO RENDER
-  const useUnversioned = () => {
+  const useUnversioned = useCallback(() => {
     const newOptions: IItemProviderOptions = {
       ...options,
       forVersion: null,
     };
 
+    const willLoadUnversioned = (
+      options.forId &&
+      options.forVersion &&
+      state.notFound
+    );
+
+    if (!willLoadUnversioned) {
+      newOptions.forId = null;
+      newOptions.forVersion = "__UNVERSIONED__";
+    };
+
     return useItemProvider(newOptions);
-  }
+  }, [options, state.notFound]);
 
-  const useAnalytics = () => {
-    const realAnalytics = typeof options.analytics === "boolean" || !options.analytics ? {
-      enabled: !!options.analytics,
-      offlineTimeTrackId: "item",
-    } : options.analytics;
+  const useAnalytics = useCallback((analyticsOptions: IItemAnalyticsProps = {
+    enabled: true,
+    offlineTimeTrackId: "item",
+  }) => {
+    const actualEnabled = analyticsOptions.enabled && state.loaded && !state.notFound && options.forId;
 
-    const actualEnabled = realAnalytics.enabled && state.loaded && !state.notFound && options.forId;
-
-    const context = this.props.itemDefinitionQualifiedName + "." + this.props.forId + "." + (this.props.forVersion || "");
+    const context = idef.getQualifiedPathName() + "." + options.forId + "." + (options.forVersion || "");
 
     useFunctionalHit({
-      trackId: realAnalytics.offlineHitTrackId,
-      enabled: actualEnabled && !!realAnalytics.offlineHitTrackId,
+      trackId: analyticsOptions.offlineHitTrackId,
+      enabled: actualEnabled && !!analyticsOptions.offlineHitTrackId,
       context: context,
       dataGenerator: internalDataProviderForAnalyticsHook,
-      weight: realAnalytics.weight,
+      weight: analyticsOptions.weight,
       trackOffline: true,
-      trackAnonymous: realAnalytics.trackAnonymous,
+      trackAnonymous: analyticsOptions.trackAnonymous,
     });
 
     useFunctionalHit({
-      trackId: realAnalytics.onlineHitTrackId,
-      enabled: actualEnabled && !!realAnalytics.onlineHitTrackId,
+      trackId: analyticsOptions.onlineHitTrackId,
+      enabled: actualEnabled && !!analyticsOptions.onlineHitTrackId,
       context: context,
       dataGenerator: internalDataProviderForAnalyticsHook,
-      weight: realAnalytics.weight,
+      weight: analyticsOptions.weight,
       trackOffline: true,
-      trackAnonymous: realAnalytics.trackAnonymous,
+      trackAnonymous: analyticsOptions.trackAnonymous,
     });
 
     useFunctionalTimetrack({
-      trackId: realAnalytics.offlineTimeTrackId,
-      enabled: actualEnabled && !!realAnalytics.offlineTimeTrackId,
+      trackId: analyticsOptions.offlineTimeTrackId,
+      enabled: actualEnabled && !!analyticsOptions.offlineTimeTrackId,
       context: context,
       dataGenerator: internalDataProviderForAnalyticsHook,
       trackOffline: true,
-      trackAnonymous: realAnalytics.trackAnonymous,
+      trackAnonymous: analyticsOptions.trackAnonymous,
     });
 
     useFunctionalTimetrack({
-      trackId: realAnalytics.onlineTimeTrackId,
-      enabled: actualEnabled && !!realAnalytics.onlineTimeTrackId,
+      trackId: analyticsOptions.onlineTimeTrackId,
+      enabled: actualEnabled && !!analyticsOptions.onlineTimeTrackId,
       context: context,
       dataGenerator: internalDataProviderForAnalyticsHook,
       trackOffline: true,
-      trackAnonymous: realAnalytics.trackAnonymous,
+      trackAnonymous: analyticsOptions.trackAnonymous,
     });
-  }
+  }, [idef, state.loaded, state.notFound, options.forId])
 
   const context: IItemContextType = useMemo(() => ({
     idef: idef,
@@ -980,7 +1037,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     onPropertyRestore: onPropertyRestoreHook as any,
     onIncludeSetExclusionState: onIncludeSetExclusionStateHook,
     onPropertyEnforce: onPropertyEnforceHook as any,
-    onPropertyClearEnforce: onPropertyClearEnforce as any,
+    onPropertyClearEnforce: onPropertyClearEnforceHook as any,
     notFound: state.notFound,
     blocked: state.isBlocked,
     blockedButDataAccessible: state.isBlockedButDataIsAccessible,
@@ -1035,10 +1092,10 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     unpoke: unpokeHook,
     remoteListener: dataContext.remoteListener,
     injectSubmitBlockPromise: injectSubmitBlockPromiseHook,
-    downloadState: this.downloadState,
-    downloadStateAt: this.downloadStateAt,
-    loadStateFromFile: this.loadStateFromFile,
-    loadStateFromFileAt: this.loadStateFromFileAt,
+    downloadState: downloadStateHook,
+    downloadStateAt: downloadStateAtHook,
+    loadStateFromFile: loadStateFromFileHook,
+    loadStateFromFileAt: loadStateFromFileAtHook,
   }), [
     idef,
     state.itemState,
@@ -1084,6 +1141,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
   return {
     state,
+
     getValueForProperty: getValueFor,
     getStateForProperty: getStateFor,
 
