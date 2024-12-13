@@ -14,7 +14,6 @@ import { RESERVED_BASE_PROPERTIES_RQ, SearchVariants } from "../../../constants"
 import PropertyView, { RawBasePropertyView } from "../../internal/components/PropertyView";
 import PropertyEntry from "../../internal/components/PropertyEntry";
 import PropertySetter from "../../internal/components/PropertySetter";
-import { IncludeContext } from "../../providers/include";
 import { fileURLAbsoluter, fileArrayURLAbsoluter } from "../../../util";
 import { IRQFile } from "../../../rq-querier";
 import { ConfigContext } from "../../internal/providers/config-provider";
@@ -45,6 +44,10 @@ export interface IPropertyBaseProps extends IPropertyCoreProps {
    * the policy name, should be provided with a policy type
    */
   policyName?: string;
+  /**
+   * an include if provided
+   */
+  include?: string;
 }
 
 /**
@@ -259,7 +262,6 @@ export function EntryViewReadSet(
 ): any {
   const config = useContext(ConfigContext);
   const itemContextualValue = useContext(ItemContext);
-  const includeContextualValue = useContext(IncludeContext);
 
   let props = originalProps as IPropertyEntryViewReadSetProps<any, any>;
   if (typeof originalProps === "string" || originalProps === null) {
@@ -273,6 +275,8 @@ export function EntryViewReadSet(
   if (!itemContextualValue) {
     throw new Error("The Entry/View/Read/Set must be in a ItemProvider context");
   }
+
+  const include = props.include ? itemContextualValue.idef.getIncludeFor(props.include) : null;
 
   // now we need the actual id, because search variants
   // cause another id
@@ -302,8 +306,8 @@ export function EntryViewReadSet(
   // don't have a property definition if is a meta property, and we need to extract
   // it from the include if it's available
   const property = !isMetaProperty ? (
-    includeContextualValue ?
-      includeContextualValue.include.getSinkingPropertyFor(actualId) :
+    include ?
+      include.getSinkingPropertyFor(actualId) :
       (
         (props.policyType && props.policyName) ?
           itemContextualValue.idef
@@ -318,11 +322,12 @@ export function EntryViewReadSet(
   // if it's not a meta property we can access it
   if (!isMetaProperty) {
     // if we are into an include
-    if (includeContextualValue) {
+    if (include) {
       // this might be null if the state is excluded, which makes the property state
       // be null and unknown
-      if (includeContextualValue.state.itemState) {
-        propertyState = includeContextualValue.state.itemState.properties
+      const includeState = itemContextualValue.state.includes.find((i) => i.includeId === include.getId());
+      if (includeState.itemState) {
+        propertyState = includeState.itemState.properties
           .find((p) => p.propertyId === actualId);
       }
     } else if (props.policyType && props.policyName) {
@@ -364,7 +369,7 @@ export function EntryViewReadSet(
             itemContextualValue.idef,
             itemContextualValue.forId,
             itemContextualValue.forVersion,
-            includeContextualValue && includeContextualValue.include,
+            include,
             property,
             !!props.cacheFiles,
           );
@@ -383,7 +388,7 @@ export function EntryViewReadSet(
             itemContextualValue.idef,
             itemContextualValue.forId,
             itemContextualValue.forVersion,
-            includeContextualValue && includeContextualValue.include,
+            include,
             property,
             !!props.cacheFiles,
           );
@@ -471,7 +476,7 @@ export function EntryViewReadSet(
       // if we have a state it's simple, and we pass these values into it
       return (
         <PropertyView
-          include={includeContextualValue && includeContextualValue.include}
+          include={include}
           property={property}
           state={propertyState}
           capitalize={props.capitalize}
@@ -598,10 +603,10 @@ export function EntryViewReadSet(
           pElement[0] === props.policyType &&
           pElement[1] === props.policyName &&
           pElement[2] === property.getId());
-    } else if (includeContextualValue) {
+    } else if (include) {
       // for the includes we do something similar as well
       const pokeInclude = Object.keys(itemContextualValue.pokedElements.includes).find((iId) => {
-        return iId === includeContextualValue.include.getId();
+        return iId === include.getId();
       });
       isPoked = pokeInclude && pokeInclude.includes(property.getId());
     } else {
@@ -616,7 +621,7 @@ export function EntryViewReadSet(
       <PropertyEntry
         itemDefinition={itemContextualValue.idef}
         injectSubmitBlockPromise={itemContextualValue.injectSubmitBlockPromise}
-        include={(includeContextualValue && includeContextualValue.include) || null}
+        include={include || null}
         property={property}
         state={propertyState}
         onChange={onChange}

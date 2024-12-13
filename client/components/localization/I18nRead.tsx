@@ -9,7 +9,6 @@ import React, { useContext } from "react";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { ItemContext } from "../../providers/item";
 import { localeReplacerToArray, localeReplacer } from "../../../util";
-import { IncludeContext } from "../../providers/include";
 import { ModuleContext } from "../../providers/module";
 import { capitalize } from "../../../util";
 import Module from "../../../base/Root/Module";
@@ -76,6 +75,10 @@ export interface I18nReadOptions {
    * A policy name to use as context, must go along policy type
    */
   policyName?: string;
+  /**
+   * An include to use as context
+   */
+  include?: string;
   /**
    * Arbitrary parameters to replace dynamic i18n strings
    * these can be plain string, for simple replacement or literal react
@@ -411,7 +414,7 @@ interface I18nReadInternalOptimizedProps extends II18nReadProps {
   localeContext: ILocaleContextType;
   mod: Module;
   idef: ItemDefinition;
-  include: Include;
+  incl: Include;
 }
 
 /**
@@ -427,7 +430,7 @@ export class I18nReadInternalOptimized extends React.PureComponent<I18nReadInter
       this.props.localeContext,
       this.props.mod,
       this.props.idef,
-      this.props.include,
+      this.props.incl,
       this.props,
     );
   };
@@ -465,7 +468,7 @@ export default function I18nRead(props: II18nReadProps) {
                       localeContext={localeContext}
                       mod={mod}
                       idef={idef}
-                      include={null}
+                      incl={null}
                     />
                   );
                 }
@@ -487,19 +490,13 @@ export default function I18nRead(props: II18nReadProps) {
                 <ItemContext.Consumer>
                   {
                     (itemContextualValue) => (
-                      <IncludeContext.Consumer>
-                        {
-                          (includeContext) => (
-                            <I18nReadInternalOptimized
-                              {...props}
-                              localeContext={localeContext}
-                              mod={moduleContextualValue && moduleContextualValue.mod}
-                              idef={itemContextualValue && itemContextualValue.idef}
-                              include={includeContext && includeContext.include}
-                            />
-                          )
-                        }
-                      </IncludeContext.Consumer>
+                      <I18nReadInternalOptimized
+                        {...props}
+                        localeContext={localeContext}
+                        mod={moduleContextualValue && moduleContextualValue.mod}
+                        idef={itemContextualValue && itemContextualValue.idef}
+                        incl={itemContextualValue && props.include && itemContextualValue.idef.getIncludeFor(props.include)}
+                      />
                     )
                   }
                 </ItemContext.Consumer>
@@ -521,7 +518,6 @@ export function useI18nRead(options: I18nReadOptions): React.ReactNode {
   const localeContext = useContext(LocaleContext);
   const moduleContextualValue = useContext(ModuleContext);
   const itemContextualValue = useContext(ItemContext);
-  const includeContext = useContext(IncludeContext);
   const root = useRootRetriever();
 
   if (!options.id) {
@@ -552,7 +548,7 @@ export function useI18nRead(options: I18nReadOptions): React.ReactNode {
     localeContext,
     moduleContextualValue && moduleContextualValue.mod,
     itemContextualValue && itemContextualValue.idef,
-    includeContext && includeContext.include,
+    itemContextualValue && options.include && itemContextualValue.idef.getIncludeFor(options.include),
     options,
   );
 }

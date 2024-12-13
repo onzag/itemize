@@ -2071,7 +2071,7 @@ export class ActualItemProvider extends
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
     // we do this here to avoid useless callback changes as the listeners are not ready
-    installSetters(props.itemDefinitionInstance, props, this.isCMounted, this.search);
+    installSetters(props.itemDefinitionInstance, props, this.isCMounted, this.search, this);
     installPrefills(props.itemDefinitionInstance, props, props.location);
 
     if (typeof document !== "undefined") {
@@ -2313,6 +2313,7 @@ export class ActualItemProvider extends
       this.changeSearchListener,
       this.onSearchReload,
       this.basicFnsRetriever,
+      this,
     );
   }
 
@@ -2788,6 +2789,7 @@ export class ActualItemProvider extends
       givenForId,
       givenForVersion,
       this.search,
+      this,
     );
   }
   public onPropertyClearEnforce(
@@ -2803,6 +2805,7 @@ export class ActualItemProvider extends
       givenForId,
       givenForVersion,
       this.search,
+      this,
     );
   }
 

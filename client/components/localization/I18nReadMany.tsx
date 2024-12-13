@@ -12,11 +12,11 @@ import { ILocaleContextType, LocaleContext } from "../../internal/providers/loca
 import { DataContext, IDataContextType } from "../../internal/providers/appdata-provider";
 import { IModuleContextType, ModuleContext } from "../../providers/module";
 import { IItemContextType, ItemContext } from "../../providers/item";
-import { IIncludeContext, IncludeContext } from "../../providers/include";
 import type Root from "./../../../base/Root";
 import { useRootRetriever } from "../root/RootRetriever";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import type Module from "../../../base/Root/Module";
+import Include from "../../../base/Root/Module/ItemDefinition/Include";
 
 /**
  * The props for the read many
@@ -54,7 +54,6 @@ export function i18nReadManyInternal(
   dataContext: IDataContextType,
   moduleContextualValue: IModuleContextType,
   itemContextualValue: IItemContextType,
-  includeContext: IIncludeContext,
   props: Ii18nReadManyProps,
 ) {
   // so we build the args based on the component required, note how
@@ -76,6 +75,7 @@ export function i18nReadManyInternal(
 
         const idef = itemDefOrModule instanceof ItemDefinition ? itemDefOrModule : null;
         const mod: Module = idef ? idef.getParentModule() : itemDefOrModule as Module;
+        const include: Include = idef && toProvidePropsAsStdProps.include ? idef.getIncludeFor(toProvidePropsAsStdProps.include) : null;
 
         return (
           <I18nReadInternalOptimized
@@ -83,16 +83,20 @@ export function i18nReadManyInternal(
             localeContext={localeContext}
             mod={mod}
             idef={idef}
-            include={null}
+            incl={include}
           />
         );
       }
+
+      const include: Include = itemContextualValue?.idef && toProvidePropsAsStdProps.include ?
+        itemContextualValue.idef.getIncludeFor(toProvidePropsAsStdProps.include) : null;
+
       return (
         <I18nReadInternalOptimized
           localeContext={localeContext}
           mod={moduleContextualValue && moduleContextualValue.mod}
           idef={itemContextualValue && itemContextualValue.idef}
-          include={includeContext && includeContext.include}
+          incl={include}
           {...toProvidePropsAsStdProps}
         />
       );
@@ -148,7 +152,7 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
             <DataContext.Consumer>
               {
                 (dataContext) => {
-                  return i18nReadManyInternal(root.root, localeContext, dataContext, null, null, null, props);
+                  return i18nReadManyInternal(root.root, localeContext, dataContext, null, null, props);
                 }
               }
             </DataContext.Consumer>
@@ -168,13 +172,7 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
                   <ItemContext.Consumer>
                     {
                       (itemContextualValue) => (
-                        <IncludeContext.Consumer>
-                          {
-                            (includeContext) => {
-                              return i18nReadManyInternal(root.root, localeContext, null, moduleContextualValue, itemContextualValue, includeContext, props);
-                            }
-                          }
-                        </IncludeContext.Consumer>
+                        i18nReadManyInternal(root.root, localeContext, null, moduleContextualValue, itemContextualValue, props)
                       )
                     }
                   </ItemContext.Consumer>
@@ -200,13 +198,7 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
                         <ItemContext.Consumer>
                           {
                             (itemContextualValue) => (
-                              <IncludeContext.Consumer>
-                                {
-                                  (includeContext) => {
-                                    return i18nReadManyInternal(root.root, localeContext, dataContext, moduleContextualValue, itemContextualValue, includeContext, props);
-                                  }
-                                }
-                              </IncludeContext.Consumer>
+                              i18nReadManyInternal(root.root, localeContext, dataContext, moduleContextualValue, itemContextualValue, props)
                             )
                           }
                         </ItemContext.Consumer>

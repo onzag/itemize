@@ -7,7 +7,7 @@ import uuid from "uuid";
 import equals from "deep-equal";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { IPropertySetterProps, IPropertyCoreProps } from "../../../client/components/property/base";
+import { IPropertySetterProps, IPropertyCoreProps, IPropertyBaseProps } from "../../../client/components/property/base";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { Location } from "history";
 import {
@@ -26,25 +26,20 @@ import { IConfigRawJSONDataType } from "../../../config";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-export function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSupportedType>, itemDefinition: ItemDefinition) {
-  let actualId: string = setter.id;
-  if (setter.searchVariant) {
-    actualId = PropertyDefinitionSearchInterfacesPrefixes[setter.searchVariant.toUpperCase().replace("-", "_")] + setter.id;
+export function getPropertyFromCoreRule(baseRule: string | IPropertyBaseProps, itemDefinition: ItemDefinition) {
+  const rule: IPropertyBaseProps = typeof baseRule === "string" ? {id: baseRule} : baseRule; 
+  let actualId: string = rule.id;
+  if (rule.searchVariant) {
+    actualId = PropertyDefinitionSearchInterfacesPrefixes[rule.searchVariant.toUpperCase().replace("-", "_")] + rule.id;
   }
-  if (setter.policyName && setter.policyType) {
-    return itemDefinition.getPropertyDefinitionForPolicy(setter.policyType, setter.policyName, actualId);
+  if (rule.policyName && rule.policyType) {
+    return itemDefinition.getPropertyDefinitionForPolicy(rule.policyType, rule.policyName, actualId);
+  }
+  if (rule.include) {
+    const include = itemDefinition.getIncludeFor(rule.include);
+    return include.getSinkingPropertyFor(actualId);
   }
   return itemDefinition.getPropertyDefinitionFor(actualId, true);
-}
-
-export function resolveCoreProp(value: string | IPropertyCoreProps) {
-  if (typeof value === "string") {
-    return value;
-  } else if (value.searchVariant) {
-    return PropertyDefinitionSearchInterfacesPrefixes[value.searchVariant.toUpperCase().replace("-", "_")] + value.id;
-  }
-
-  return value.id;
 }
 
 export function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOptions) {
@@ -385,16 +380,17 @@ export function onPropertyEnforce(
   givenForId: string,
   givenForVersion: string,
   performSearch: (options: IActionSearchOptions) => void,
+  parentInstanceTrack: any,
   internal?: boolean,
   // doNotCleanSearchState?: boolean,
 ) {
   const actualProperty = property instanceof PropertyDefinition ?
-    property : idef.getPropertyDefinitionFor(resolveCoreProp(property), true);
+    property : getPropertyFromCoreRule(property, idef);
 
   // this function is basically run by the setter
   // since they might be out of sync that's why the id is passed
   // the setter enforces values
-  actualProperty.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
+  actualProperty.setSuperEnforced(givenForId || null, givenForVersion || null, value, parentInstanceTrack);
   // !doNotCleanSearchState && options.itemDefinitionInstance.cleanSearchState(options.forId || null, options.forVersion || null);
   onPropertyEnforceOrClearFinal(idef, options, isCMounted, givenForId, givenForVersion, performSearch, internal);
 };
@@ -407,12 +403,13 @@ export function onPropertyClearEnforce(
   givenForId: string,
   givenForVersion: string,
   performSearch: (options: IActionSearchOptions) => void,
+  parentInstanceTrack: any,
   internal?: boolean,
 ) {
   const actualProperty = property instanceof PropertyDefinition ?
-    property : idef.getPropertyDefinitionFor(resolveCoreProp(property), true);
+    property : getPropertyFromCoreRule(property, idef);
   // same but removes the enforcement
-  actualProperty.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
+  actualProperty.clearSuperEnforced(givenForId || null, givenForVersion || null, parentInstanceTrack);
   // options.itemDefinitionInstance.cleanSearchState(options.forId || null, options.forVersion || null);
   onPropertyEnforceOrClearFinal(idef, options, isCMounted, givenForId, givenForVersion, performSearch, internal);
 };
@@ -422,11 +419,12 @@ export function installSetters(
   options: IItemProviderOptions | IActualItemProviderProps,
   isCMounted: boolean,
   performSearch: (options: IActionSearchOptions) => void,
+  parentInstanceTrack: any,
 ) {
   if (options.setters) {
     options.setters.forEach((setter) => {
-      const property = getPropertyForSetter(setter, idef);
-      onPropertyEnforce(idef, options, isCMounted, property, setter.value, options.forId || null, options.forVersion || null, performSearch, true);
+      const property = getPropertyFromCoreRule(setter, idef);
+      onPropertyEnforce(idef, options, isCMounted, property, setter.value, options.forId || null, options.forVersion || null, performSearch, parentInstanceTrack, true);
     });
   }
 };
@@ -436,11 +434,12 @@ export function removeSetters(
   options: IItemProviderOptions | IActualItemProviderProps,
   isCMounted: boolean,
   performSearch: (options: IActionSearchOptions) => void,
+  parentInstanceTrack: any,
 ) {
   if (options.setters) {
     options.setters.forEach((setter) => {
-      const property = getPropertyForSetter(setter, idef);
-      onPropertyClearEnforce(idef, options, isCMounted, property, options.forId || null, options.forVersion || null, performSearch, true);
+      const property = getPropertyFromCoreRule(setter, idef);
+      onPropertyClearEnforce(idef, options, isCMounted, property, options.forId || null, options.forVersion || null, performSearch, parentInstanceTrack, true);
     });
   }
 };
@@ -452,7 +451,7 @@ export function installPrefills(
 ) {
   if (options.prefills) {
     options.prefills.forEach((prefill) => {
-      const property = getPropertyForSetter(prefill, idef);
+      const property = getPropertyFromCoreRule(prefill, idef);
       property.setCurrentValue(
         options.forId || null,
         options.forVersion || null,
@@ -2909,6 +2908,7 @@ export async function didUpdate(
   changeSearchListener: () => void,
   onSearchReload: (arg: IRemoteListenerRecordsCallbackArg) => void,
   basicFnsRetriever: () => IBasicFns,
+  parentInstanceTrack: any,
 ) {
   let currentSearch: IItemSearchStateType = state.current;
   let prevSearchState: IItemSearchStateType = prevState;
@@ -2984,8 +2984,8 @@ export async function didUpdate(
   }
 
   if (didSomethingThatInvalidatedSetters) {
-    removeSetters(prevIdef, prevPropsOrOptions, isCMountedRef.current, search);
-    installSetters(idef, propsOrOptions, isCMountedRef.current, search);
+    removeSetters(prevIdef, prevPropsOrOptions, isCMountedRef.current, search, parentInstanceTrack);
+    installSetters(idef, propsOrOptions, isCMountedRef.current, search, parentInstanceTrack);
   }
 
   if (didSomethingThatInvalidatedPrefills) {
@@ -3023,7 +3023,7 @@ export async function didUpdate(
         "reload", prevPropsOrOptions.forId, prevPropsOrOptions.forVersion, reloadListener,
       );
       remoteListener.removeItemDefinitionListenerFor(
-        this, prevIdef.getQualifiedPathName(),
+        parentInstanceTrack, prevIdef.getQualifiedPathName(),
         prevPropsOrOptions.forId, prevPropsOrOptions.forVersion || null,
       );
     } else if (!isStatic && wasStatic && propsOrOptions.forId) {
@@ -3032,7 +3032,7 @@ export async function didUpdate(
         "reload", propsOrOptions.forId, propsOrOptions.forVersion || null, reloadListener,
       );
       remoteListener.addItemDefinitionListenerFor(
-        this, idef.getQualifiedPathName(),
+        parentInstanceTrack, idef.getQualifiedPathName(),
         propsOrOptions.forId, propsOrOptions.forVersion || null,
         propsOrOptions.slowPolling,
       );
@@ -3061,7 +3061,7 @@ export async function didUpdate(
           "reload", prevPropsOrOptions.forId, prevPropsOrOptions.forVersion || null, reloadListener,
         );
         remoteListener.removeItemDefinitionListenerFor(
-          this, prevIdef.getQualifiedPathName(),
+          parentInstanceTrack, prevIdef.getQualifiedPathName(),
           prevPropsOrOptions.forId, prevPropsOrOptions.forVersion || null,
         );
       }
@@ -3083,7 +3083,7 @@ export async function didUpdate(
           "reload", propsOrOptions.forId, propsOrOptions.forVersion || null, reloadListener,
         );
         remoteListener.addItemDefinitionListenerFor(
-          this, idef.getQualifiedPathName(),
+          parentInstanceTrack, idef.getQualifiedPathName(),
           propsOrOptions.forId,
           propsOrOptions.forVersion || null,
           propsOrOptions.slowPolling,
@@ -3533,7 +3533,7 @@ export async function changeListener(
       // is checked again and we pass true as the flag in order to ensure
       // that any corruption will be immediately fixed
       clearTimeout(repairCorruptionTimeoutRef.current);
-      repairCorruptionTimeoutRef.current = setTimeout(changeListener.bind(this, true), 70);
+      repairCorruptionTimeoutRef.current = setTimeout(changeListener.bind(null, true), 70);
     } else {
       // that is done here
       reloadListener();
@@ -3706,7 +3706,7 @@ export async function onPropertyChange(
   }
 
   const actualProperty = property instanceof PropertyDefinition ?
-    property : idef.getPropertyDefinitionFor(resolveCoreProp(property), true);
+    property : getPropertyFromCoreRule(property, idef);
 
   // we simply set the current value in the property
   actualProperty.setCurrentValue(
@@ -3751,7 +3751,7 @@ export function onPropertyRestore(
   }
 
   const actualProperty = property instanceof PropertyDefinition ?
-    property : idef.getPropertyDefinitionFor(resolveCoreProp(property), true);
+    property : getPropertyFromCoreRule(property, idef);
 
   actualProperty.restoreValueFor(
     propsOrOptions.forId || null,
@@ -3919,6 +3919,7 @@ export function willUnmount(
     propsOrOptions,
     isCMounted,
     search,
+    parentInstanceTrack,
   );
   runDismountOn(
     idef,

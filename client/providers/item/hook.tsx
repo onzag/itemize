@@ -1,10 +1,10 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IActionCleanOptions, IActionDeleteOptions, IActionResponseWithSearchResults, IActionSearchOptions, IActionSubmitOptions, IActionSubmitResponse,
-  IBasicFns, IItemAnalyticsProps, IItemContextType, IItemProviderProps, IPokeElementsType, SearchItemValueContext } from ".";
+  IBasicFns, IItemAnalyticsProps, IItemContextType, IItemProviderProps, IPokeElementsType, ItemContext, SearchItemValueContext } from ".";
 import { useRootRetriever } from "../../components/root/RootRetriever";
 import type Module from "../../../base/Root/Module";
 import ItemDefinition, { IItemSearchStateType, IItemStateType, IPolicyStateType } from "../../../base/Root/Module/ItemDefinition";
-import { IPropertyBaseProps } from "../../components/property/base";
+import { IPropertyBaseProps, IPropertyEntryProps, IPropertyViewProps } from "../../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import Include, { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -32,14 +32,14 @@ import { genericAnalyticsDataProvider } from "../../../client/components/analyti
 import { IPropertyCoreProps } from "../../components/property/base";
 import { useFunctionalHit } from "../../../client/components/analytics/Hit";
 import { useFunctionalTimetrack } from "../../../client/components/analytics/Timetrack";
+import { IPropertyEntryRendererProps } from "../../../client/internal/components/PropertyEntry";
+import Entry from "../../../client/components/property/Entry";
+import View from "../../../client/components/property/View";
+import { IPropertyViewRendererProps } from "../../../client/internal/components/PropertyView";
 
 export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId' | 'loadUnversionedFallback' | 'analytics'> {
   module: string | Module;
   suppressWarnings?: boolean;
-}
-
-export interface IPropertyBasePropsWInclude extends IPropertyBaseProps {
-  include: string | Include;
 }
 
 export class SSRError extends Error {
@@ -77,8 +77,14 @@ export interface IItemProviderHookElement {
   state: IHookItemProviderState;
   context: IItemContextType;
 
-  getStateForProperty<T>(pId: string | IPropertyBasePropsWInclude): IPropertyDefinitionState<T>;
-  getValueForProperty<T>(pId: string | IPropertyBasePropsWInclude): T;
+  getStateForProperty<T>(pId: string | IPropertyBaseProps): IPropertyDefinitionState<T>;
+  getValueForProperty<T>(pId: string | IPropertyBaseProps): T;
+  getEntryForProperty(options: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>): React.ReactNode;
+  getViewForProperty(options: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>): React.ReactNode;
+  setValueForProperty(property: PropertyDefinition | string | IPropertyCoreProps, value: PropertyDefinitionSupportedType, internalValue: any): void;
+  enforceValueOnProperty(property: PropertyDefinition | string | IPropertyCoreProps, value: PropertyDefinitionSupportedType): void;
+  clearEnforcementOnProperty(property: PropertyDefinition | string | IPropertyCoreProps): void;
+  restoreProperty(property: PropertyDefinition | string | IPropertyCoreProps): void;
 
   hooks: {
     /**
@@ -573,6 +579,24 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       givenForId,
       givenForVersion,
       searchHook,
+      internalUUIDRef.current,
+    );
+  }, []);
+
+  const onPropertyEnforceHookForClient = useCallback((
+    property: PropertyDefinition | string | IPropertyCoreProps,
+    value: PropertyDefinitionSupportedType,
+  ) => {
+    return onPropertyEnforce(
+      idefRef.current,
+      optionsRef.current,
+      isCMountedRef.current,
+      property as any,
+      value,
+      optionsRef.current.forId,
+      optionsRef.current.forVersion,
+      searchHook,
+      internalUUIDRef.current,
     );
   }, []);
 
@@ -589,6 +613,22 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       givenForId,
       givenForVersion,
       searchHook,
+      internalUUIDRef.current,
+    );
+  }, []);
+
+  const onPropertyClearEnforceHookForClient = useCallback((
+    property: PropertyDefinition | string | IPropertyCoreProps,
+  ) => {
+    return onPropertyClearEnforce(
+      idefRef.current,
+      optionsRef.current,
+      isCMountedRef.current,
+      property as any,
+      optionsRef.current.forId,
+      optionsRef.current.forVersion,
+      searchHook,
+      internalUUIDRef.current,
     );
   }, []);
 
@@ -747,7 +787,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
     // we do this here to avoid useless callback changes as the listeners are not ready
-    installSetters(idef, options, isCMountedRef.current, searchHook);
+    installSetters(idef, options, isCMountedRef.current, searchHook, internalUUIDRef.current);
     installPrefills(idef, options, location);
 
     if (typeof document !== "undefined") {
@@ -847,6 +887,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
         changeSearchListenerHook,
         onSearchReloadHook,
         basicFnsRetrieverImmutable,
+        internalUUIDRef.current,
       );
     }
   }, [tokenData, idef, options, state]);
@@ -856,12 +897,12 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
   // CUSTOMS FOR THIS ALONE
 
-  const getValueFor = useCallback((idOrBase: string | IPropertyBasePropsWInclude) => {
+  const getValueFor = useCallback((idOrBase: string | IPropertyBaseProps) => {
     const state = getStateFor(idOrBase);
     return state?.value;
-  }, []) as <T>(pId: string | IPropertyBasePropsWInclude) => T;
+  }, []) as <T>(pId: string | IPropertyBaseProps) => T;
 
-  const getStateFor = useCallback((idOrBase: string | IPropertyBasePropsWInclude) => {
+  const getStateFor = useCallback((idOrBase: string | IPropertyBaseProps) => {
     if (idOrBase === null || typeof idOrBase === "undefined") {
       return null;
     } else if (typeof idOrBase === "string") {
@@ -888,9 +929,9 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       const policyType = idOrBase.policyType;
       const policyName = idOrBase.policyName;
 
-      const include = typeof idOrBase.include === "string" ? idOrBase.include : idOrBase.include.getId();
+      const includeId = idOrBase.include;
 
-      if ((policyType || policyName) && include) {
+      if ((policyType || policyName) && includeId) {
         console.error(
           "Unwanted behaviour you tried to read a policy type/name property with an include",
         );
@@ -904,14 +945,14 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
         return null;
       }
 
-      if (include) {
-        const stateInclude = stateRef.current.itemState.includes.find((i) => i.includeId === idOrBase.include);
+      if (includeId) {
+        const stateInclude = stateRef.current.itemState.includes.find((i) => i.includeId === includeId);
 
         if (!stateInclude) {
           if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
             console.warn(
               "Possibly unwanted behaviour, you attempted to read a property in an include " +
-              include +
+              includeId +
               " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
             );
           }
@@ -922,7 +963,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
             if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
               console.warn(
                 "Possibly unwanted behaviour, you attempted to read a property " +
-                idOrBase + " within the include " + include +
+                idOrBase + " within the include " + includeId +
                 " but it has not been loaded on this context, if you wish to ignore this, use suppressWarnings={true}"
               );
             }
@@ -961,7 +1002,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
         return state;
       }
     }
-  }, []) as <T>(pId: string | IPropertyBasePropsWInclude) => IPropertyDefinitionState<T>;
+  }, []) as <T>(pId: string | IPropertyBaseProps) => IPropertyDefinitionState<T>;
 
   // PRETENDING TO DO RENDER
   const useUnversioned = useCallback(() => {
@@ -1029,7 +1070,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
       trackOffline: true,
       trackAnonymous: analyticsOptions.trackAnonymous,
     });
-  }, [idef, state.loaded, state.notFound, options.forId])
+  }, [idef, state.loaded, state.notFound, options.forId]);
 
   const context: IItemContextType = useMemo(() => ({
     idef: idef,
@@ -1141,11 +1182,37 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     options.forVersion || null,
   ]);
 
+  const getEntryFor = useCallback((
+    options: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
+  ) => {
+    return (
+      <ItemContext.Provider value={context}>
+        <Entry {...options} />
+      </ItemContext.Provider>
+    );
+  }, [context]);
+
+  const getViewFor = useCallback((
+    options: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>,
+  ) => {
+    return (
+      <ItemContext.Provider value={context}>
+        <View {...options} />
+      </ItemContext.Provider>
+    );
+  }, [context]);
+
   return {
     state,
 
     getValueForProperty: getValueFor,
     getStateForProperty: getStateFor,
+    getEntryForProperty: getEntryFor,
+    getViewForProperty: getViewFor,
+    setValueForProperty: onPropertyChangeHook,
+    enforceValueOnProperty: onPropertyEnforceHookForClient,
+    restoreProperty: onPropertyRestoreHook,
+    clearEnforcementOnProperty: onPropertyClearEnforceHookForClient,
 
     context,
 
