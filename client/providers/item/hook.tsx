@@ -1,6 +1,8 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { IActionCleanOptions, IActionDeleteOptions, IActionResponseWithSearchResults, IActionSearchOptions, IActionSubmitOptions, IActionSubmitResponse,
-  IBasicFns, IItemAnalyticsProps, IItemContextType, IItemProviderProps, IPokeElementsType, ItemContext, SearchItemValueContext } from ".";
+import {
+  IActionCleanOptions, IActionDeleteOptions, IActionResponseWithSearchResults, IActionSearchOptions, IActionSubmitOptions, IActionSubmitResponse,
+  IBasicFns, IItemAnalyticsProps, IItemContextType, IItemProviderProps, IItemProviderPropsWSpecificArrayProperties, IPokeElementsType, ItemContext, SearchItemValueContext
+} from ".";
 import { useRootRetriever } from "../../components/root/RootRetriever";
 import type Module from "../../../base/Root/Module";
 import ItemDefinition, { IItemSearchStateType, IItemStateType, IPolicyStateType } from "../../../base/Root/Module/ItemDefinition";
@@ -20,13 +22,15 @@ import { useLocationRetriever } from "../../../client/components/navigation/Loca
 import { TokenContext } from "../../../client/internal/providers/token-provider";
 import { LocaleContext } from "../../../client/internal/providers/locale-provider";
 import { ConfigContext } from "../../../client/internal/providers/config-provider";
-import { blockCleanup, changeListener, changeSearchListener, cleanWithProps, del, didUpdate,
+import {
+  blockCleanup, changeListener, changeSearchListener, cleanWithProps, del, didUpdate,
   dismissDeleteError, dismissDeleted, dismissLoadError, dismissSearchError,
   dismissSearchResults, dismissSubmitError, dismissSubmitted, downloadStateAt, getDerived,
   installPrefills, installSetters, loadListener, loadStateFromFileAt, loadValue, onConnectStatusChange,
   onIncludeSetExclusionState, onMount, onPropertyChange, onPropertyClearEnforce, onPropertyEnforce, onPropertyRestore,
   onSearchReload, reloadListener, search, setStateToCurrentValueWithExternalChecking, setupInitialState,
-  setupListeners, submit, willUnmount } from "./util";
+  setupListeners, submit, willUnmount
+} from "./util";
 import { IRemoteListenerRecordsCallbackArg } from "../../../client/internal/app/remote-listener";
 import { genericAnalyticsDataProvider } from "../../../client/components/analytics/util";
 import { IPropertyCoreProps } from "../../components/property/base";
@@ -36,6 +40,7 @@ import { IPropertyEntryRendererProps } from "../../../client/internal/components
 import Entry from "../../../client/components/property/Entry";
 import View from "../../../client/components/property/View";
 import { IPropertyViewRendererProps } from "../../../client/internal/components/PropertyView";
+import { EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, RESERVED_ADD_PROPERTIES_RQ, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from "../../../constants";
 
 export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId' | 'loadUnversionedFallback' | 'analytics'> {
   module: string | Module;
@@ -73,7 +78,7 @@ export interface IHookItemProviderState extends IItemSearchStateType {
   pokedElements: IPokeElementsType;
 }
 
-export interface IItemProviderHookElement {
+export interface IItemProviderHookElementSearchOnly {
   state: IHookItemProviderState;
   context: IItemContextType;
 
@@ -85,27 +90,29 @@ export interface IItemProviderHookElement {
   enforceValueOnProperty(property: PropertyDefinition | string | IPropertyCoreProps, value: PropertyDefinitionSupportedType): void;
   clearEnforcementOnProperty(property: PropertyDefinition | string | IPropertyCoreProps): void;
   restoreProperty(property: PropertyDefinition | string | IPropertyCoreProps): void;
+}
 
-  hooks: {
-    /**
-     * When providing analytics in the options you should also call this hook in order
-     * to ensure they are properly setup, otherwise analytics will not function
-     * 
-     * @returns 
-     */
-    useAnalytics: () => void;
-    /**
-     * Actually only provides the unversioned if
-     * the current is not found, otherwise it will provide
-     * id: null, version: "__UNVERSIONED__" this will ensure
-     * that the unversioned only loads if the versioned is not found
-     * 
-     * it has to do this when using hooks
-     * 
-     * @returns 
-     */
-    useUnversioned: () => IItemProviderHookElement;
-  }
+export interface IItemProviderHookElement extends IItemProviderHookElementSearchOnly {
+  
+
+  /**
+   * When providing analytics in the options you should also call this hook in order
+   * to ensure they are properly setup, otherwise analytics will not function
+   * 
+   * @returns 
+   */
+  useAnalytics: () => void;
+  /**
+   * Actually only provides the unversioned if
+   * the current is not found, otherwise it will provide
+   * id: null, version: "__UNVERSIONED__" this will ensure
+   * that the unversioned only loads if the versioned is not found
+   * 
+   * it has to do this when using hooks
+   * 
+   * @returns 
+   */
+  useUnversioned: () => IItemProviderHookElement;
 }
 
 
@@ -161,7 +168,7 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
   }, [state]);
 
   const alwaysUpToDateStateRef = useRef(state);
-  alwaysUpToDateStateRef.current = null;
+  alwaysUpToDateStateRef.current = state;
 
   const setState = useCallback((newState: Partial<IHookItemProviderState>, cb?: () => void) => {
     if (cb) {
@@ -1216,9 +1223,111 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
     context,
 
-    hooks: {
-      useUnversioned,
-      useAnalytics,
-    }
+    
+    useUnversioned,
+    useAnalytics,
   }
 }
+
+export interface ICustomItemProviderOptions<T extends string, SP extends Record<string, {variant: string; value: any}>> extends Omit<
+ IItemProviderPropsWSpecificArrayProperties<T, SP>,
+  'children' |
+  'itemDefinition' |
+  'module' |
+  'searchCounterpart' |
+  'automaticSearch' |
+  'doNotAutomaticReloadSearchIfCantConnect' |
+  'searchCounterpartHasTwin' |
+  'automaticSearchForce' |
+  'automaticSearchNoGraceTime' |
+  'automaticSearchIsOnlyInitial' |
+  'automaticSearchIsOnlyFallback' |
+  'automaticSearchInstant' |
+  'automaticSearchDoNotAutoDismissDuringChanges' |
+  'loadSearchFromNavigation' |
+  'onWillSearch' |
+  'onSearch' |
+  'onSearchStateChange' |
+  'onSearchStateLoaded'
+> {
+};
+
+export interface ICustomItemProviderSearchOptions<T extends string, SP extends Record<string, {variant: string; value: any}> = {}> extends Omit<
+  IItemProviderPropsWSpecificArrayProperties<T, SP>,
+  'children' |
+  'itemDefinition' |
+  'module' |
+  'searchCounterpart' |
+  'doNotAutomaticReloadIfCantConnect' |
+  'static' |
+  'slowPolling' |
+  'longTermCaching' |
+  'longTermCachingMetadata' |
+  'longTermCachingMetadataMismatchAction' |
+  'markForDestructionOnLogout' |
+  'markForDestructionOnUnmount' |
+  'avoidLoading' |
+  'waitAndMerge' |
+  'onSubmit' |
+  'onWillLoad' |
+  'onLoad' |
+  'onDelete' |
+  'doNotUseMemoryCache' |
+  'doNotUseCache' |
+  'analytics'
+> {
+};
+
+export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IItemProviderHookElement) {
+  return useMemo(() => {
+    const result: any = {};
+    properties.forEach((pId) => {
+      if (RESERVED_ADD_PROPERTIES_RQ[pId]) {
+        Object.defineProperty(result, pId, {
+          get: () => {
+            return provider.getValueForProperty(pId);
+          },
+          writable: false,
+        });
+      } else {
+        result[pId] = {
+          get value() {
+            return provider.getValueForProperty(pId);
+          },
+          get state() {
+            return provider.getStateForProperty(pId);
+          },
+          setValue(value: PropertyDefinitionSupportedType, internalValue?: any) {
+            provider.setValueForProperty(pId, value, internalValue);
+          },
+          enforceWith(value: PropertyDefinitionSupportedType) {
+            provider.enforceValueOnProperty(pId, value);
+          },
+          clearEnforcement() {
+            provider.clearEnforcementOnProperty(pId);
+          },
+          restore() {
+            provider.restoreProperty(pId);
+          },
+        }
+      }
+    });
+  }, [
+    provider.getValueForProperty, provider.getStateForProperty, provider.setValueForProperty,
+    provider.enforceValueOnProperty, provider.clearEnforcementOnProperty, provider.restoreProperty,
+    provider.getEntryForProperty, provider.getViewForProperty
+  ]) as T;
+}
+
+type ReservedKeysExternal = typeof EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES[number];
+type ReservedKeysInternal = typeof STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES[number];
+
+export interface IPropertiesMemoBase extends Record<ReservedKeysExternal, string>, Record<ReservedKeysInternal, string> { };
+export interface IPropertiesMemoProperty<T> {
+  readonly value: T;
+  readonly state: IPropertyDefinitionState<T>;
+  setValue(value: T, internalValue?: any): void;
+  enforceWith(value: T);
+  clearEnforcement(): void;
+  restore(): void;
+};

@@ -155,7 +155,7 @@ export function checkMismatchCondition(
   if (!isNotFound && !isBlocked && condition.custom) {
     return Object.keys(condition.custom).some((propertyOrInclude: string) => {
       let baseValue: any;
-      if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(propertyOrInclude)) {
+      if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(propertyOrInclude as any)) {
         baseValue = dbValue.value[propertyOrInclude];
       } else if (!isBlocked) {
         baseValue = dbValue.value.DATA[propertyOrInclude];

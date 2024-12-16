@@ -49,7 +49,7 @@ export function getRQDefinitionForModule(
 
   if (!options.excludeBase) {
     Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((property) => {
-      if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(property)) {
+      if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(property as any)) {
         stdFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
       } else {
         if (!stdFields.DATA) {

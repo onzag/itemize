@@ -719,7 +719,7 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "blocked_until",
   "blocked_reason",
   "last_modified",
-];
+] as const;
 /**
  * These attributes are however protected, they exist only within
  * the DATA field
@@ -734,7 +734,7 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "parent_id",
   "parent_version",
   "parent_type",
-];
+] as const;
 
 /**
  * The format that dates are expected to have in order to be exchanged

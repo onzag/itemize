@@ -247,17 +247,17 @@ function modTypeNameGetterBase(mod: Module) {
   if (mod.getParentModule()) {
     prefix = modTypeNameGetterBase(mod.getParentModule());
   }
-  return prefix + "Mod" + mod.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1));
+  return prefix + "Mod" + mod.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)).join("_");
 }
 
 function itemTypeNameGetterBase(item: ItemDefinition) {
   return modTypeNameGetterBase(item.getParentModule()) +
-    "Idef" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1));
+    "Idef" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)).join("_");
 }
 
 function itemTypeNameGetterBaseOnly(item: ItemDefinition) {
   return modTypeNameGetterBase(item.getParentModule()) +
-    "IdefOnly" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1));
+    "IdefOnly" + item.getName().split(/-|_/g).filter((v) => v).map((v) => v[0].toUpperCase() + v.substring(1)).join("_");
 }
 
 function modTypeNameGetterRqSS(mod: Module) {
@@ -368,50 +368,65 @@ function buildItemProviderFor(
   modPath: string,
   idefPath: string,
 ) {
-
-  const mappedGetters = idef.getAllPropertyDefinitionsAndExtensions().map((v) => (
-    RESERVED_BASE_PROPERTIES_RQ[v.getId()] ? "" : 
-`
-    get ${v.getId()}() {
-      return provider.getValueForProperty(${JSON.stringify(v.getId())}) as ${allTypes[v.getType()].type};
-    },
-    get ${v.getId()}_STATE() {
-      return provider.getStateForProperty<${allTypes[v.getType()].type}>(${JSON.stringify(v.getId())});
-    }
-`
-)).filter((v) => !!v).join(",\n");
+  const allPropertiesLocation = "allProperties" + itemTypeNameGetterBase(idef);
+  const propertiesTypeName = "IPropertiesMemo" + itemTypeNameGetterBase(idef);
 
   return (
-`
+    `
   const provider = useItemProvider({
+    ...options,
     itemDefinition: ${JSON.stringify(idefPath)},
     module: ${JSON.stringify(modPath)},
     searchCounterpart: ${JSON.stringify(sc)},
   });
 
-  const value = useMemo(() => ({
-${mappedGetters ? mappedGetters + ",\n" : ""}
-${!sc ? Object.keys(RESERVED_BASE_PROPERTIES_RQ).map((pId) => (
-`
-    get ${pId}() {
-      return provider.getValueForProperty(${JSON.stringify(pId)}) as ${RESERVED_BASE_PROPERTIES_RQ[pId].type};
-    }
-`
-)).join(",\n") : ""}
-  }), [provider.getValueForProperty]);
+  const properties = usePropertiesMemoFor<${propertiesTypeName}>(${allPropertiesLocation}, provider);
 
   return ({
     ...provider,
-    value,
-  });
+    properties,
+  })${idef.isInSearchMode() ? " as IItemProviderHookElementSearchOnly" : ""};
 `
   )
 }
 
+function defineAllFor(idef: ItemDefinition, onlyBaseAndNothingElse?: boolean) {
+  const propDefs = idef.getAllPropertyDefinitionsAndExtensions();
+  const properties = propDefs.map((v) => v.getId());
+  const nameIdef = itemTypeNameGetterBase(idef);
+
+  if (onlyBaseAndNothingElse) {
+    return `const propertiesBase${nameIdef} = ${JSON.stringify(properties)} as const;`;
+  }
+
+  const result = `
+const propertiesBase${nameIdef} = ${JSON.stringify(properties)} as const;
+const allProperties${nameIdef} = (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES as unknown as string[])
+  .concat(STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES as unknown as string[])
+  .concat(propertiesBase${nameIdef} as unknown as string[]);
+interface IPropertiesMemo${nameIdef} extends IPropertiesMemoBase {
+${propDefs.map((v) => {
+    if (v.getId() === "created_by") {
+      return null;
+    }
+    return v.getId() + ": IPropertiesMemoProperty<" + allTypes[v.getType()].type + ">";
+  }).filter((v) => !!v).join(";\n")}
+};
+`;
+
+  if (idef.isSearchable() && !idef.isInSearchMode()) {
+    return result + defineAllFor(idef.getSearchModeCounterpart());
+  }
+
+  return result;
+}
+
 function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
-  let hookDefault = "export function " + itemTypeNameGetterUseBase(idef) + "(options: ISchemaItemProviderOptions) {\n";
+  const propertiesDefinition = defineAllFor(idef);
+  const nameIdef = itemTypeNameGetterBase(idef);
+  let hookDefault = "export function " + itemTypeNameGetterUseBase(idef) + "(options: ICustomItemProviderOptions<typeof propertiesBase" + nameIdef + "[number]> = {}) {\n";
   hookDefault += buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName());
-  let hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ISchemaItemProviderOptions) {\n";
+  let hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" + nameIdef + "[number]> = {}) {\n";
   if (idef.isSearchable()) {
     hookSearch += buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName());
   }
@@ -424,19 +439,21 @@ function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
     itemData += itemSchemaJsBuilder(c, mod);
   });
 
-  return hookDefault + (idef.isSearchable ? hookSearch : "") + itemData;
+  return propertiesDefinition + hookDefault + (idef.isSearchable ? hookSearch : "") + itemData;
 }
 
 function moduleSchemaJsBuilder(mod: Module): string {
-  let hookDefault = "export function " + modTypeNameGetterUseBase(mod) + "(options: ISchemaItemProviderOptions) {\n";
-  hookDefault += buildItemProviderFor(mod.getPropExtensionItemDefinition(), false, mod.getQualifiedPathName(), null);
-  let hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ISchemaItemProviderOptions) {\n";
-  if (mod.isSearchable()) {
-    hookSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null);
-  }
 
-  hookDefault += "};\n"
-  hookSearch += "};\n"
+  let propertiesDefinition: string = "";
+  let hookSearch: string = "";
+
+  if (mod.isSearchable()) {
+    const nameIdef = itemTypeNameGetterBase(mod.getPropExtensionItemDefinition());
+    propertiesDefinition = defineAllFor(mod.getPropExtensionItemDefinition(), true) + defineAllFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart());
+    hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" + nameIdef + "[number]> = {}) {\n";
+    hookSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null);
+    hookSearch += "};\n"
+  }
 
   let itemData = "";
 
@@ -450,7 +467,7 @@ function moduleSchemaJsBuilder(mod: Module): string {
     childModData += moduleSchemaJsBuilder(m);
   });
 
-  return hookDefault + (mod.isSearchable() ? hookSearch : "") + itemData + childModData;
+  return propertiesDefinition + hookSearch + itemData + childModData;
 }
 
 function moduleTypeBuilder(mod: Module): string {
@@ -525,13 +542,14 @@ export async function rootTypesBuilder(data: IRootRawJSONDataType) {
 
   await ensureSrcFolder();
 
-  let schemaData = "import { useItemProvider, IItemProviderOptions } from \"@onzag/itemize/client/providers/item/hook\";\n";
+  let schemaData = "import { useItemProvider, ICustomItemProviderOptions, ICustomItemProviderSearchOptions, IItemProviderHookElementSearchOnly, "
+    + "usePropertiesMemoFor, IPropertiesMemoBase, IPropertiesMemoProperty } from \"@onzag/itemize/client/providers/item/hook\";\n";
   schemaData += "import { useMemo } from \"react\";\n";
   Object.keys(allTypes).forEach((type) => {
     const info = allTypes[type];
     schemaData += "import type {" + info.type + "} from \"" + info.location + "\";\n";
   });
-  schemaData += "\ninterface ISchemaItemProviderOptions extends Omit<IItemProviderOptions, 'itemDefinition' | 'module' | 'searchCounterpart'> {};\n\n";
+  schemaData += "import { EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from \"@onzag/itemize/constants\";\n\n"
   processedRoot.getAllModules().forEach((m) => {
     schemaData += moduleSchemaJsBuilder(m);
   });

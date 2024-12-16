@@ -1393,7 +1393,9 @@ export const SearchItemValueContext = React.createContext<ISearchItemValueContex
 /**
  * The props for the item provider
  */
-export interface IItemProviderProps {
+export interface IItemProviderProps<
+  T extends string = string,
+> {
   /**
    * children that will be feed into the context
    */
@@ -1514,13 +1516,13 @@ export interface IItemProviderProps {
    * Setters for setting values for the properties within the item definition
    * itself, useful not to depend on mounting at time
    */
-  setters?: IPropertySetterProps<PropertyDefinitionSupportedType>[];
+  setters?: Array<IPropertySetterProps<PropertyDefinitionSupportedType>>;
   /**
    * Similar to setters but the values are just prefilled and as such are not
    * readonly, prefills only get executed during the initial mount
    * of the component
    */
-  prefills?: IPropertySetterProps<PropertyDefinitionSupportedType>[];
+  prefills?: Array<IPropertySetterProps<PropertyDefinitionSupportedType>>;
   /**
    * Synchronizes a property based on a query string it behaves like a prefill
    * (and overrides the prefill) if it finds a value in the query string
@@ -1529,7 +1531,7 @@ export interface IItemProviderProps {
    * Some properties cannot be qs tracked, such as files, only
    * values representing serializable objects can be tracked
    */
-  queryStringSync?: Array<string | IPropertyCoreProps>;
+  queryStringSync?: Array<T | IPropertyCoreProps<T>>;
   /**
    * When using the query string sync it will replace the current history state
    */
@@ -1538,7 +1540,8 @@ export interface IItemProviderProps {
    * only downloads and includes the properties specified in the list
    * in the state
    */
-  properties?: Array<string | IPropertyCoreProps>;
+  properties?: Array<T | IPropertyCoreProps<T>>;
+  // TODO have types for the includes too that can be set somehow
   /**
    * only includes the items specified in the list in the state
    */
@@ -1709,6 +1712,27 @@ export interface IItemProviderProps {
    * }
    */
   analytics?: IItemAnalyticsProps | boolean;
+}
+
+export interface IItemProviderPropsWSpecificArrayProperties<
+  T extends string = string,
+  SP extends Record<string, {variant: string; value: any}> = {},
+> extends Omit<IItemProviderProps<T>, 'setters' | 'prefills'> {
+  /**
+   * Setters for setting values for the properties within the item definition
+   * itself, useful not to depend on mounting at time
+   */
+  setters?: Array<{
+    [K in keyof SP & string]: IPropertySetterProps<SP[K]["value"], K, SP[K]["variant"]>;
+  }[keyof SP & string]>;
+  /**
+   * Similar to setters but the values are just prefilled and as such are not
+   * readonly, prefills only get executed during the initial mount
+   * of the component
+   */
+  prefills?: Array<{
+    [K in keyof SP & string]: IPropertySetterProps<SP[K]["value"], K, SP[K]["variant"]>;
+  }[keyof SP & string]>;
 }
 
 /**
@@ -2021,7 +2045,7 @@ export class ActualItemProvider extends
   // it doesn't hurt to catch them all and create a timeout
   private reloadListenerTimeout: NodeJS.Timeout = null;
 
-  private stateAsRef: {readonly current: IActualItemProviderState};
+  private stateAsRef: { readonly current: IActualItemProviderState };
 
   constructor(props: IActualItemProviderProps) {
     super(props);
