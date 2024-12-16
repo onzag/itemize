@@ -81,9 +81,15 @@ export interface IHookItemProviderState extends IItemSearchStateType {
   pokedElements: IPokeElementsType;
 }
 
-export interface IItemProviderHookElementBase<PlainProperties extends string = string> {
+export interface IItemProviderHookElementBase<PlainProperties extends string = string, RawType = IRQValue> {
+  /**
+   * State information that the hook is currently in
+   */
   state: IHookItemProviderState;
-  context: IItemContextType;
+  /**
+   * Context information that the hook is currently in
+   */
+  context: IItemContextType<PlainProperties, RawType>;
 
   /**
    * Provides the curent known state of a property
@@ -137,7 +143,7 @@ export interface IItemProviderHookElementBase<PlainProperties extends string = s
   restoreProperty(property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>): void;
 }
 
-export interface IItemProviderHookElementSearchOnly<PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue> extends IItemProviderHookElementBase<PlainProperties> {
+export interface IItemProviderHookElementSearchOnly<PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue> extends IItemProviderHookElementBase<PlainProperties, RawType> {
   /**
    * Provides a generic search loader that is tied to the context
    * of the search mode item definition
@@ -148,7 +154,7 @@ export interface IItemProviderHookElementSearchOnly<PlainProperties extends stri
   useSearchLoader: (options: ISearchLoaderOptions) => ISearchLoaderHookArg<RawType, FlatType>;
 }
 
-export interface IItemProviderHookElementNonSearchOnly<PlainProperties extends string = string> extends IItemProviderHookElementBase<PlainProperties> {
+export interface IItemProviderHookElementNonSearchOnly<PlainProperties extends string = string, RawType = IRQValue > extends IItemProviderHookElementBase<PlainProperties, RawType> {
   /**
    * When providing analytics in the options you should also call this hook in order
    * to ensure they are properly setup, otherwise analytics will not function
@@ -170,7 +176,7 @@ export interface IItemProviderHookElementNonSearchOnly<PlainProperties extends s
 }
 
 export interface IItemProviderHookElement<PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue> extends
-  IItemProviderHookElementSearchOnly<PlainProperties, RawType, FlatType>, IItemProviderHookElementNonSearchOnly<PlainProperties> {
+  IItemProviderHookElementSearchOnly<PlainProperties, RawType, FlatType>, IItemProviderHookElementNonSearchOnly<PlainProperties, RawType> {
 }
 
 export function useItemProvider
@@ -595,7 +601,7 @@ export function useItemProvider
   }, []);
 
   const onPropertyChangeHook = useCallback((
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) => {
@@ -631,7 +637,7 @@ export function useItemProvider
   }, []);
 
   const onPropertyEnforceHook = useCallback((
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
     value: PropertyDefinitionSupportedType,
     givenForId: string,
     givenForVersion: string,
@@ -650,7 +656,7 @@ export function useItemProvider
   }, []);
 
   const onPropertyEnforceHookForClient = useCallback((
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
     value: PropertyDefinitionSupportedType,
   ) => {
     return onPropertyEnforce(
@@ -667,7 +673,7 @@ export function useItemProvider
   }, []);
 
   const onPropertyClearEnforceHook = useCallback((
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
     givenForId: string,
     givenForVersion: string,
   ) => {
@@ -684,7 +690,7 @@ export function useItemProvider
   }, []);
 
   const onPropertyClearEnforceHookForClient = useCallback((
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
   ) => {
     return onPropertyClearEnforce(
       idefRef.current,
@@ -1138,15 +1144,15 @@ export function useItemProvider
     });
   }, [idef, state.loaded, state.notFound, options.forId]);
 
-  const context: IItemContextType = useMemo(() => ({
+  const context: IItemContextType<PlainProperties, RawType> = useMemo(() => ({
     idef: idef,
     state: state.itemState,
-    // typescript bugs
+    // typescript rejects this despite being correct
     onPropertyChange: onPropertyChangeHook as any,
     onPropertyRestore: onPropertyRestoreHook as any,
-    onIncludeSetExclusionState: onIncludeSetExclusionStateHook,
+    onIncludeSetExclusionState: onIncludeSetExclusionStateHook  as any,
     onPropertyEnforce: onPropertyEnforceHook as any,
-    onPropertyClearEnforce: onPropertyClearEnforceHook as any,
+    onPropertyClearEnforce: onPropertyClearEnforceHook  as any,
     notFound: state.notFound,
     blocked: state.isBlocked,
     blockedButDataAccessible: state.isBlockedButDataIsAccessible,
@@ -1163,7 +1169,7 @@ export function useItemProvider
     searchError: state.searchError,
     searching: state.searching,
     searchRecords: state.searchRecords,
-    searchResults: state.searchResults,
+    searchResults: state.searchResults as any,
     searchLimit: state.searchLimit,
     searchCount: state.searchCount,
     searchOffset: state.searchOffset,
@@ -1251,7 +1257,7 @@ export function useItemProvider
   const useSearchLoaderHook = useCallback((options: Omit<ISearchLoaderOptions, 'context'>) => {
     return useSearchLoader<RawType, FlatType>({
       ...options,
-      context,
+      context: (context as IItemContextType),
     });
   }, [context]);
 
@@ -1259,7 +1265,7 @@ export function useItemProvider
     options: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
   ) => {
     return (
-      <ItemContext.Provider value={context}>
+      <ItemContext.Provider value={context as IItemContextType}>
         <Entry {...options} />
       </ItemContext.Provider>
     );
@@ -1269,7 +1275,7 @@ export function useItemProvider
     options: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>,
   ) => {
     return (
-      <ItemContext.Provider value={context}>
+      <ItemContext.Provider value={context as IItemContextType}>
         <View {...options} />
       </ItemContext.Provider>
     );

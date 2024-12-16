@@ -1077,7 +1077,7 @@ export interface IBasicFns {
 /**
  * The whole item definition context
  */
-export interface IItemContextType extends IBasicFns {
+export interface IItemContextType<PlainProperties extends string = string, SearchResultType = IRQValue> extends IBasicFns {
   /**
    * the item definition in question
    */
@@ -1172,7 +1172,7 @@ export interface IItemContextType extends IBasicFns {
   /**
    * The search results (only available if a traditional search was performed)
    */
-  searchResults: IRQValue[];
+  searchResults: SearchResultType[];
   /**
    * The limit used in the given search
    */
@@ -1274,7 +1274,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyChange: (
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) => void;
@@ -1284,7 +1284,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyRestore: (
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
   ) => void;
   /**
    * this is yet another passed function that does the same as properties
@@ -1308,7 +1308,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyEnforce: (
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
     value: PropertyDefinitionSupportedType,
     givenForId: string,
     givenForVersion: string,
@@ -1321,7 +1321,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyClearEnforce: (
-    property: PropertyDefinition | string | IPropertyCoreProps,
+    property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>,
     givenForId: string,
     givenForVersion: string,
   ) => void;
@@ -1367,7 +1367,7 @@ export interface IItemContextType extends IBasicFns {
    * @param specificIncludes 
    * @returns 
    */
-  downloadState: (specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
+  downloadState: (specificProperties?: PlainProperties[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
   /**
    * Downloads the state as a blob (file) of the current item but at a given id, version combo
    * @param id 
@@ -1376,7 +1376,7 @@ export interface IItemContextType extends IBasicFns {
    * @param specificIncludes 
    * @returns 
    */
-  downloadStateAt: (id: string, version?: string, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
+  downloadStateAt: (id: string, version?: string, specificProperties?: PlainProperties[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
   /**
    * Loads the state from a given file
    * @param f 
@@ -1384,7 +1384,7 @@ export interface IItemContextType extends IBasicFns {
    * @param specificIncludes 
    * @returns 
    */
-  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<void>;
+  loadStateFromFile: (f: Blob | File, specificProperties?: PlainProperties[], specificIncludes?: { [id: string]: string[] }) => Promise<void>;
   /**
    * Loads the state for a given file in the current item location at a given slot id and version
    * @param f 
@@ -1398,7 +1398,7 @@ export interface IItemContextType extends IBasicFns {
     f: Blob | File,
     id: string,
     version?: string,
-    specificProperties?: string[],
+    specificProperties?: PlainProperties[],
     specificIncludes?: { [id: string]: string[] },
   ) => Promise<void>;
 
