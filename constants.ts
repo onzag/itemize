@@ -1265,13 +1265,13 @@ export const ORDERBY_RULE_RQ: RQArg = {
 
 export type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search" | "in" | "payment-status" | "payment-type";
 
-export interface IOrderByRuleType {
-  [property: string]: {
-    direction: "asc" | "desc",
-    priority: number,
-    nulls: "first" | "last",
-  },
-}
+export type IOrderByRuleType<T extends string = string> = {
+  [property in T]?: {
+    direction: "asc" | "desc";
+    priority: number;
+    nulls: "first" | "last";
+  };
+};
 
 /**
  * These are the base query properties that are

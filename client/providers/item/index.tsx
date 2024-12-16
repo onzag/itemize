@@ -521,10 +521,70 @@ export interface IActionDeleteOptions extends IActionCleanOptions {
  */
 export type CacheMetadataGeneratorFn = (record: IRQSearchRecord) => any;
 
+export interface IActionSearchOptionsWithSpecificArrayProperties<T extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<IActionSearchOptions<T>, 'searchByProperties'> {
+  /**
+     * The properties to be used to search with, properties to be used in search in the
+     * search mode item (or module) must be searchable and used for search (or search only)
+     * 
+     * This represents an array of strings, normally you may use the standard property id
+     * in here and that will include the default search counterparts ids, however you may be more specific
+     * 
+     * For example, a string type has SEARCH counterpart and IN counterpart, by default the search counterpart
+     * will be used, however you may be more interested in using the IN counterpart for a list
+     * 
+     * In that sense
+     * 
+     * ["username"]
+     * 
+     * Is equivalent to
+     * 
+     * [
+     *   {
+     *     id: "username",
+     *     searchVariant: "search",
+     *   }
+     * ]
+     * 
+     * And
+     * 
+     * [
+     *   {
+     *     id: "username",
+     *     searchVariant: "in",
+     *   }
+     * ]
+     * 
+     * Will allow to use in type taglist search using that counterpart
+     * 
+     * type         default variants [optional variants]
+     * =============================
+     * boolean      exact
+     * currency     from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     * date         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     * datetime     from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     * file
+     * files
+     * integer      from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     * location     location, radius
+     * number       from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     * password
+     * payment      from, to, payment-status, payment-type (disableRangedSearch=false) exact, payment-status, payment-type (disableRangedSearch=true)
+     * string       search, [in]
+     * taglist      search
+     * text         search
+     * time         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     * unit         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     * year         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+     */
+  searchByProperties: Array<T | {
+    [K in keyof SP]: IPropertyCoreProps<SP[K]["id"], SP[K]["variant"]>;
+  }[keyof SP]>;
+}
+
 /**
  * The options for searching
  */
-export interface IActionSearchOptions extends IActionCleanOptions {
+export interface IActionSearchOptions<T extends string = string> extends IActionCleanOptions {
   /**
    * Disables the search in the client side
    * 
@@ -541,7 +601,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * for example if you have users and you want to search and retrieve the username
    * but you also need the profile_picture, you will put username and profile_picture here
    */
-  requestedProperties: string[];
+  requestedProperties: T[];
   /**
    * Use for server side optimization to avoid large payloads when doing SSR specific
    * renders, since the search is built and then stored as its state the mismatch
@@ -550,7 +610,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * searches done using ssrRequestedProperties will unavoidably get re-requested
    * by the client side once it is mounted, similar to the case of cache policies
    */
-  ssrRequestedProperties?: string[];
+  ssrRequestedProperties?: T[];
   /**
    * The requested includes and the sinking properties related to these includes
    */
@@ -613,7 +673,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * unit         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
    * year         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
    */
-  searchByProperties: Array<string | IPropertyCoreProps>;
+  searchByProperties: Array<T | IPropertyCoreProps<T>>;
   /**
    * The includes to be used to search with
    */
@@ -639,7 +699,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * in this case the property "order" which may be a number will be used first
    * to sort, and later the property for the username will be used for sorting
    */
-  orderBy?: IOrderByRuleType;
+  orderBy?: IOrderByRuleType<T>;
   /**
    * By whom it was created, this allows to limit the results that are by a specific
    * creator, this is very useful for example to ensure security policies are met
@@ -1716,23 +1776,48 @@ export interface IItemProviderProps<
 
 export interface IItemProviderPropsWSpecificArrayProperties<
   T extends string = string,
-  SP extends Record<string, {variant: string; value: any}> = {},
-> extends Omit<IItemProviderProps<T>, 'setters' | 'prefills'> {
+  SP extends Record<string, { id: string; variant: string; value: any }> = {},
+> extends Omit<IItemProviderProps<T>, 'setters' | 'prefills' | 'properties' | 'queryStringSync' | 'automaticSearch'> {
+  /**
+   * automatic search triggers an automatic search when the item mounts
+   * or it detects a change in the properties, this basically triggers
+   * the .search function with these arguments whenever it is detected
+   * it should do so
+   */
+  automaticSearch?: IActionSearchOptionsWithSpecificArrayProperties<T, SP>;
+  /**
+   * Synchronizes a property based on a query string it behaves like a prefill
+   * (and overrides the prefill) if it finds a value in the query string
+   * and it will keep it updated bsed on that
+   * 
+   * Some properties cannot be qs tracked, such as files, only
+   * values representing serializable objects can be tracked
+   */
+  queryStringSync?: Array<T | {
+    [K in keyof SP]: IPropertyCoreProps<SP[K]["id"], SP[K]["variant"]>;
+  }[keyof SP]>;
+  /**
+   * only downloads and includes the properties specified in the list
+   * in the state
+   */
+  properties?: Array<T | {
+    [K in keyof SP]: IPropertyCoreProps<SP[K]["id"], SP[K]["variant"]>;
+  }[keyof SP]>;
   /**
    * Setters for setting values for the properties within the item definition
    * itself, useful not to depend on mounting at time
    */
   setters?: Array<{
-    [K in keyof SP & string]: IPropertySetterProps<SP[K]["value"], K, SP[K]["variant"]>;
-  }[keyof SP & string]>;
+    [K in keyof SP]: IPropertySetterProps<SP[K]["value"], SP[K]["id"], SP[K]["variant"]>;
+  }[keyof SP]>;
   /**
    * Similar to setters but the values are just prefilled and as such are not
    * readonly, prefills only get executed during the initial mount
    * of the component
    */
   prefills?: Array<{
-    [K in keyof SP & string]: IPropertySetterProps<SP[K]["value"], K, SP[K]["variant"]>;
-  }[keyof SP & string]>;
+    [K in keyof SP]: IPropertySetterProps<SP[K]["value"], SP[K]["id"], SP[K]["variant"]>;
+  }[keyof SP]>;
 }
 
 /**

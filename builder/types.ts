@@ -8,11 +8,12 @@ import { ISQLColumnDefinitionType } from "../base/Root/sql";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { getRQDefinitionForItemDefinition } from "../base/Root/Module/ItemDefinition/rq";
 import { getSQLTableDefinitionForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
-import { RESERVED_BASE_PROPERTIES_RQ } from "../constants";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
+
 const fsAsync = fs.promises;
 
 const allTypes = {
@@ -280,6 +281,10 @@ function modTypeNameGetterUseSearch(mod: Module) {
   return "use" + modTypeNameGetterBase(mod) + "SearchItemProvider";
 }
 
+function modTypeNameGetterIPSearch(mod: Module) {
+  return modTypeNameGetterBase(mod) + "SearchItemProvider";
+}
+
 function itemTypeNameGetterRqSS(item: ItemDefinition) {
   return itemTypeNameGetterBase(item) + "FlatRqType";
 }
@@ -300,8 +305,16 @@ function itemTypeNameGetterUseBase(item: ItemDefinition) {
   return "use" + itemTypeNameGetterBase(item) + "ItemProvider";
 }
 
+function itemTypeNameGetterIPBase(item: ItemDefinition) {
+  return itemTypeNameGetterBase(item) + "ItemProvider";
+}
+
 function itemTypeNameGetterUseSearch(item: ItemDefinition) {
   return "use" + itemTypeNameGetterBase(item) + "SearchItemProvider";
+}
+
+function itemTypeNameGetterIPSearch(item: ItemDefinition) {
+  return itemTypeNameGetterBase(item) + "SearchItemProvider";
 }
 
 function itemTypeBuilder(item: ItemDefinition, mod: Module) {
@@ -367,9 +380,25 @@ function buildItemProviderFor(
   sc: boolean,
   modPath: string,
   idefPath: string,
+  nonHook: boolean,
 ) {
   const allPropertiesLocation = "allProperties" + itemTypeNameGetterBase(idef);
   const propertiesTypeName = "IPropertiesMemo" + itemTypeNameGetterBase(idef);
+
+  if (nonHook) {
+    if (idefPath === null) {
+      return (
+        `
+  return (<ModuleProvider module=${JSON.stringify(modPath)}><ItemProvider searchCounterpart={${JSON.stringify(sc)}} {...props}/></ModuleProvider>);
+`
+      );  
+    }
+    return (
+      `
+  return (<ItemProvider itemDefinition=${JSON.stringify(idefPath)} searchCounterpart={${JSON.stringify(sc)}} {...props}/>);
+`
+    );
+  }
 
   return (
     `
@@ -387,7 +416,7 @@ function buildItemProviderFor(
     properties,
   })${idef.isInSearchMode() ? " as IItemProviderHookElementSearchOnly" : ""};
 `
-  )
+  );
 }
 
 function defineAllFor(idef: ItemDefinition, onlyBaseAndNothingElse?: boolean) {
@@ -395,8 +424,28 @@ function defineAllFor(idef: ItemDefinition, onlyBaseAndNothingElse?: boolean) {
   const properties = propDefs.map((v) => v.getId());
   const nameIdef = itemTypeNameGetterBase(idef);
 
+const forSetting = `
+type PropertiesForSetting${nameIdef} = {
+${propDefs.map((v) => {
+    const hasVariant = Object.keys(PropertyDefinitionSearchInterfacesPrefixes)
+    .find((prefix) => v.getId().startsWith(PropertyDefinitionSearchInterfacesPrefixes[prefix]));
+    if (hasVariant) {
+      const variantName = hasVariant;
+      const propertyId = v.getId().replace(PropertyDefinitionSearchInterfacesPrefixes[variantName], "");
+      const variantNameInType = variantName.toLowerCase().replace("_", "-");
+
+      return v.getId() + ": {id: \"" + propertyId + "\", value: " + allTypes[v.getType()].type + ", variant: \"" + variantNameInType + "\"}";
+    }
+    return v.getId() + ": {id: \"" + v.getId() + "\", value: " + allTypes[v.getType()].type + ", variant: never}";
+  }).filter((v) => !!v).join(";\n")}
+};
+`
+
   if (onlyBaseAndNothingElse) {
-    return `const propertiesBase${nameIdef} = ${JSON.stringify(properties)} as const;`;
+    return `
+const propertiesBase${nameIdef} = ${JSON.stringify(properties)} as const;
+${forSetting}
+`;
   }
 
   const result = `
@@ -412,6 +461,7 @@ ${propDefs.map((v) => {
     return v.getId() + ": IPropertiesMemoProperty<" + allTypes[v.getType()].type + ">";
   }).filter((v) => !!v).join(";\n")}
 };
+${forSetting}
 `;
 
   if (idef.isSearchable() && !idef.isInSearchMode()) {
@@ -424,14 +474,30 @@ ${propDefs.map((v) => {
 function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
   const propertiesDefinition = defineAllFor(idef);
   const nameIdef = itemTypeNameGetterBase(idef);
-  let hookDefault = "export function " + itemTypeNameGetterUseBase(idef) + "(options: ICustomItemProviderOptions<typeof propertiesBase" + nameIdef + "[number]> = {}) {\n";
-  hookDefault += buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName());
-  let hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" + nameIdef + "[number]> = {}) {\n";
+  const nameIdefSearchMode = itemTypeNameGetterBase(idef.getSearchModeCounterpart());
+  let hookDefault = "export function " + itemTypeNameGetterUseBase(idef) + "(options: ICustomItemProviderOptions<typeof propertiesBase" +
+    nameIdef + "[number], PropertiesForSetting" + nameIdef + "> = {}) {\n";
+  let ipDefault = "export function " + itemTypeNameGetterIPBase(idef) + "(props: ICustomItemProviderProps<typeof propertiesBase" +
+  nameIdef + "[number], PropertiesForSetting" + nameIdef + "> = {}) {\n";
+  ipDefault += buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName(), true);
+  hookDefault += buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName(), false);
+
+  let hookSearch = "";
+  let ipSearch = "";
   if (idef.isSearchable()) {
-    hookSearch += buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName());
+    ipSearch = "export function " + itemTypeNameGetterIPSearch(idef) + "(props: ICustomItemProviderSearchProps<typeof propertiesBase" +
+    nameIdef + "[number], PropertiesForSetting" + nameIdefSearchMode + "> = {}) {\n";
+    hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" +
+    nameIdef + "[number], PropertiesForSetting" + nameIdefSearchMode + "> = {}) {\n";
+  
+    hookSearch += buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName(), false);
+    ipSearch += buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName(), true);
+    hookSearch += "};\n";
+    ipSearch += "};\n";
   }
-  hookDefault += "};\n"
-  hookSearch += "};\n"
+  
+  hookDefault += "};\n";
+  ipDefault += "};\n";
 
   let itemData = "";
 
@@ -439,20 +505,26 @@ function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
     itemData += itemSchemaJsBuilder(c, mod);
   });
 
-  return propertiesDefinition + hookDefault + (idef.isSearchable ? hookSearch : "") + itemData;
+  return propertiesDefinition + hookDefault + ipDefault + (idef.isSearchable() ? hookSearch + ipSearch : "") + itemData;
 }
 
 function moduleSchemaJsBuilder(mod: Module): string {
 
   let propertiesDefinition: string = "";
   let hookSearch: string = "";
+  let ipSearch: string = "";
 
   if (mod.isSearchable()) {
     const nameIdef = itemTypeNameGetterBase(mod.getPropExtensionItemDefinition());
     propertiesDefinition = defineAllFor(mod.getPropExtensionItemDefinition(), true) + defineAllFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart());
-    hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" + nameIdef + "[number]> = {}) {\n";
-    hookSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null);
+    hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" + nameIdef +
+      "[number], PropertiesForSetting" + nameIdef  + "> = {}) {\n";
+    ipSearch = "export function " + modTypeNameGetterIPSearch(mod) + "(props: ICustomItemProviderSearchProps<typeof propertiesBase" + nameIdef +
+      "[number], PropertiesForSetting" + nameIdef  + "> = {}) {\n";
+    hookSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, false);
+    ipSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, true);
     hookSearch += "};\n"
+    ipSearch += "};\n"
   }
 
   let itemData = "";
@@ -467,7 +539,7 @@ function moduleSchemaJsBuilder(mod: Module): string {
     childModData += moduleSchemaJsBuilder(m);
   });
 
-  return propertiesDefinition + hookSearch + itemData + childModData;
+  return propertiesDefinition + hookSearch + ipSearch + itemData + childModData;
 }
 
 function moduleTypeBuilder(mod: Module): string {
@@ -543,18 +615,21 @@ export async function rootTypesBuilder(data: IRootRawJSONDataType) {
   await ensureSrcFolder();
 
   let schemaData = "import { useItemProvider, ICustomItemProviderOptions, ICustomItemProviderSearchOptions, IItemProviderHookElementSearchOnly, "
+    + "ICustomItemProviderSearchProps, ICustomItemProviderProps, "
     + "usePropertiesMemoFor, IPropertiesMemoBase, IPropertiesMemoProperty } from \"@onzag/itemize/client/providers/item/hook\";\n";
-  schemaData += "import { useMemo } from \"react\";\n";
+  schemaData += "import React, { useMemo } from \"react\";\n";
   Object.keys(allTypes).forEach((type) => {
     const info = allTypes[type];
     schemaData += "import type {" + info.type + "} from \"" + info.location + "\";\n";
   });
+  schemaData += "import { ItemProvider } from \"@onzag/itemize/client/providers/item\";\n";
+  schemaData += "import { ModuleProvider } from \"@onzag/itemize/client/providers/module\";\n";
   schemaData += "import { EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from \"@onzag/itemize/constants\";\n\n"
   processedRoot.getAllModules().forEach((m) => {
     schemaData += moduleSchemaJsBuilder(m);
   });
 
-  const outputFile2 = path.join("src", "schema.ts");
+  const outputFile2 = path.join("src", "schema.tsx");
   console.log("emiting " + colors.green(outputFile2));
 
   await fsAsync.writeFile(outputFile2, schemaData);

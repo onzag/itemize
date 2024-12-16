@@ -368,7 +368,7 @@ export async function ssrGenerator(
     // in order to build or signature
     root.setRequestManager(collector.collect, collector.needsCollect);
     root.setRequestManagerSearch(collector.collectSearch, collector.needsCollectSearch);
-    root.setRequestManagerResource(collector.collectResource, collector.needsCollectResource);
+    root.setRequestManagerResource(collector.collectResource, collector.needsCollectResource, collector.getCollectedResource);
 
     try {
       let redirectedTo: string = null;

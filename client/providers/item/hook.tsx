@@ -93,7 +93,7 @@ export interface IItemProviderHookElementSearchOnly {
 }
 
 export interface IItemProviderHookElement extends IItemProviderHookElementSearchOnly {
-  
+
 
   /**
    * When providing analytics in the options you should also call this hook in order
@@ -1223,15 +1223,14 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
     context,
 
-    
+
     useUnversioned,
     useAnalytics,
   }
 }
 
-export interface ICustomItemProviderOptions<T extends string, SP extends Record<string, {variant: string; value: any}>> extends Omit<
- IItemProviderPropsWSpecificArrayProperties<T, SP>,
-  'children' |
+export interface ICustomItemProviderProps<T extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<
+  IItemProviderPropsWSpecificArrayProperties<T, SP>,
   'itemDefinition' |
   'module' |
   'searchCounterpart' |
@@ -1252,9 +1251,8 @@ export interface ICustomItemProviderOptions<T extends string, SP extends Record<
 > {
 };
 
-export interface ICustomItemProviderSearchOptions<T extends string, SP extends Record<string, {variant: string; value: any}> = {}> extends Omit<
+export interface ICustomItemProviderSearchProps<T extends string, SP extends Record<string, { id: string; variant: string; value: any }> = {}> extends Omit<
   IItemProviderPropsWSpecificArrayProperties<T, SP>,
-  'children' |
   'itemDefinition' |
   'module' |
   'searchCounterpart' |
@@ -1278,16 +1276,28 @@ export interface ICustomItemProviderSearchOptions<T extends string, SP extends R
 > {
 };
 
+export interface ICustomItemProviderOptions<T extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<
+  ICustomItemProviderProps<T, SP>,
+  'children'
+> {
+};
+
+export interface ICustomItemProviderSearchOptions<T extends string, SP extends Record<string, { id: string; variant: string; value: any }> = {}> extends Omit<
+  ICustomItemProviderSearchProps<T, SP>,
+  'children'
+> {
+};
+
 export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IItemProviderHookElement) {
   return useMemo(() => {
-    const result: any = {};
+    const result = {};
     properties.forEach((pId) => {
       if (RESERVED_ADD_PROPERTIES_RQ[pId]) {
         Object.defineProperty(result, pId, {
           get: () => {
             return provider.getValueForProperty(pId);
           },
-          writable: false,
+          enumerable: true,
         });
       } else {
         result[pId] = {
@@ -1312,6 +1322,7 @@ export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IIt
         }
       }
     });
+    return result;
   }, [
     provider.getValueForProperty, provider.getStateForProperty, provider.setValueForProperty,
     provider.enforceValueOnProperty, provider.clearEnforcementOnProperty, provider.restoreProperty,

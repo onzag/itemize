@@ -108,7 +108,7 @@ export class Collector {
    * All the collection statuses per result
    */
   private collectionData: {
-    [mergedID: string]: any;
+    [mergedID: string]: IQueryCollectionResult | string;
   } = {};
   /**
    * Collection requests callbacks of other
@@ -157,6 +157,7 @@ export class Collector {
     this.needsCollect = this.needsCollect.bind(this);
     this.needsCollectSearch = this.needsCollectSearch.bind(this);
     this.needsCollectResource = this.needsCollectResource.bind(this);
+    this.getCollectedResource = this.getCollectedResource.bind(this);
   }
 
   /**
@@ -240,6 +241,11 @@ export class Collector {
       return false;
     }
     return true;
+  }
+
+  public getCollectedResource(finalPath: string) {
+    const mergedID = "__RESOURCE__" + finalPath;
+    return this.collectionData[mergedID] as string;
   }
 
   public async collectResource(finalPath: string, customResolver: (appData: IAppDataType, finalPath: string) => Promise<IResourceCollectionResult>): Promise<string> {
@@ -649,7 +655,7 @@ export class Collector {
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
 
     const onRequestDone = () => {
-      const query: IQueryCollectionResult = this.collectionData[mergedID];
+      const query: IQueryCollectionResult = this.collectionData[mergedID] as IQueryCollectionResult;
 
       // was forbidden
       if (query === null) {

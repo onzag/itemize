@@ -83,6 +83,7 @@ type RequestManagerSearchFn = (itemDefinition: ItemDefinition, id: string, versi
 type RequestManagerNeedsSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => boolean;
 type RequestManagerResourceFn = (finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>) => Promise<string>;
 type RequestManagerNeedsResourceFn = (finalPath: string) => boolean;
+type RequestManagerGetResourceFn = (finalPath: string) => string;
 
 
 /**
@@ -257,6 +258,7 @@ export default class Root {
    */
   private requestManagerResource: RequestManagerResourceFn = null;
   private requestManagerNeedsResource: RequestManagerNeedsResourceFn = null;
+  private requestManagerGetResource: RequestManagerGetResourceFn = null;
 
   /**
    * Used by the server side to set server flags to flag
@@ -361,9 +363,14 @@ export default class Root {
    * @param manager the manager in question
    * @internal
    */
-   public setRequestManagerResource(manager: RequestManagerResourceFn, managerNeeds: RequestManagerNeedsResourceFn) {
+   public setRequestManagerResource(
+    manager: RequestManagerResourceFn,
+    managerNeeds: RequestManagerNeedsResourceFn,
+    managerGetCollected: RequestManagerGetResourceFn,
+  ) {
     this.requestManagerResource = manager;
     this.requestManagerNeedsResource = managerNeeds;
+    this.requestManagerGetResource = managerGetCollected;
   }
 
   /**
@@ -414,12 +421,16 @@ export default class Root {
    * @param customResolver
    * @internal
    */
-   public async callRequestManagerResource(finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>): Promise<string> {
+  public async callRequestManagerResource(finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>): Promise<string> {
     return await this.requestManagerResource(finalPath, customResolver);
   }
 
   public needsRequestManagerResource(finalPath: string) {
     return this.requestManagerNeedsResource(finalPath);
+  }
+
+  public getRequestManagerResource(finalPath: string) {
+    return this.requestManagerGetResource(finalPath);
   }
 
   /**

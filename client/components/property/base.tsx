@@ -19,7 +19,7 @@ import { IRQFile } from "../../../rq-querier";
 import { ConfigContext } from "../../internal/providers/config-provider";
 import equals from "deep-equal";
 
-export interface IPropertyCoreProps<T extends string = string, VV extends string = SearchVariants> {
+export interface IPropertyCoreProps<T extends string = string, SV extends string | never = SearchVariants> {
   /**
     * the id of the property that must exist under the item definition
     * provider
@@ -29,13 +29,13 @@ export interface IPropertyCoreProps<T extends string = string, VV extends string
    * A search variant, exact, from, to, radius, etc...
    * only truly available in search mode
    */
-  searchVariant?: VV;
+  searchVariant?: SV extends never ? undefined : SV;
 }
 
 /**
  * The base interface, all entry, read, view, set contain these attributes
  */
-export interface IPropertyBaseProps<T extends string = string, VV extends string = SearchVariants> extends IPropertyCoreProps<T, VV> {
+export interface IPropertyBaseProps<T extends string = string, SV extends string | never = SearchVariants> extends IPropertyCoreProps<T, SV> {
   /**
    * the policy type, should be provided with a policy name
    */
@@ -164,7 +164,7 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
 /**
  * The setter props
  */
-export interface IPropertySetterProps<V extends PropertyDefinitionSupportedType, T extends string = string, VV extends string = SearchVariants> extends IPropertyBaseProps<T, VV> {
+export interface IPropertySetterProps<V extends PropertyDefinitionSupportedType, T extends string = string, SV extends string | never = SearchVariants> extends IPropertyBaseProps<T, SV> {
   /**
    * The value to provide to such property
    */
