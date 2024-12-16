@@ -41,8 +41,11 @@ import Entry from "../../../client/components/property/Entry";
 import View from "../../../client/components/property/View";
 import { IPropertyViewRendererProps } from "../../../client/internal/components/PropertyView";
 import { EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, RESERVED_ADD_PROPERTIES_RQ, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from "../../../constants";
+import { ISearchLoaderHookArg, ISearchLoaderOptions, useSearchLoader } from "../../../client/components/search/SearchLoader";
+import type { IRQValue } from "../../../rq-querier";
 
-export interface IItemProviderOptions extends Omit<IItemProviderProps, 'mountId' | 'loadUnversionedFallback' | 'analytics'> {
+export interface IItemProviderOptions<PlainProperties extends string = string> extends
+  Omit<IItemProviderProps<PlainProperties>, 'mountId' | 'loadUnversionedFallback' | 'analytics'> {
   module: string | Module;
   suppressWarnings?: boolean;
 }
@@ -78,23 +81,74 @@ export interface IHookItemProviderState extends IItemSearchStateType {
   pokedElements: IPokeElementsType;
 }
 
-export interface IItemProviderHookElementSearchOnly {
+export interface IItemProviderHookElementBase<PlainProperties extends string = string> {
   state: IHookItemProviderState;
   context: IItemContextType;
 
-  getStateForProperty<T>(pId: string | IPropertyBaseProps): IPropertyDefinitionState<T>;
-  getValueForProperty<T>(pId: string | IPropertyBaseProps): T;
+  /**
+   * Provides the curent known state of a property
+   * @param pId 
+   */
+  getStateForProperty<T>(pId: PlainProperties | IPropertyBaseProps<PlainProperties>): IPropertyDefinitionState<T>;
+  /**
+   * Provides the current known value of a property
+   * @param pId 
+   */
+  getValueForProperty<T>(pId: PlainProperties | IPropertyBaseProps<PlainProperties>): T;
+  /**
+   * Provides the entry component of a property
+   * @param options 
+   */
   getEntryForProperty(options: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>): React.ReactNode;
+  /**
+   * Provides the view component of a property
+   * @param options 
+   */
   getViewForProperty(options: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>): React.ReactNode;
-  setValueForProperty(property: PropertyDefinition | string | IPropertyCoreProps, value: PropertyDefinitionSupportedType, internalValue: any): void;
-  enforceValueOnProperty(property: PropertyDefinition | string | IPropertyCoreProps, value: PropertyDefinitionSupportedType): void;
-  clearEnforcementOnProperty(property: PropertyDefinition | string | IPropertyCoreProps): void;
-  restoreProperty(property: PropertyDefinition | string | IPropertyCoreProps): void;
+  /**
+   * Set value for property
+   * 
+   * @param property 
+   * @param value the value to set
+   * @param internalValue a payload to give of any type to keep track of an internal renderer
+   * use it as you wish with a specific renderer
+   */
+  setValueForProperty(property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>, value: PropertyDefinitionSupportedType, internalValue: any): void;
+  /**
+   * Enforce value on a property
+   * 
+   * once it's set it should be cleared with clearEnforcementOnProperty
+   * 
+   * this value cannot be changed with set
+   * 
+   * @param property 
+   * @param value the value to enforce
+   */
+  enforceValueOnProperty(property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>, value: PropertyDefinitionSupportedType): void;
+  /**
+   * Clear enforcement of a property
+   * @param property 
+   */
+  clearEnforcementOnProperty(property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>): void;
+  /**
+   * Restore a property to its original value, if known a value from the server side
+   * @param property 
+   */
+  restoreProperty(property: PropertyDefinition | PlainProperties | IPropertyCoreProps<PlainProperties>): void;
 }
 
-export interface IItemProviderHookElement extends IItemProviderHookElementSearchOnly {
+export interface IItemProviderHookElementSearchOnly<PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue> extends IItemProviderHookElementBase<PlainProperties> {
+  /**
+   * Provides a generic search loader that is tied to the context
+   * of the search mode item definition
+   * 
+   * @param options 
+   * @returns 
+   */
+  useSearchLoader: (options: ISearchLoaderOptions) => ISearchLoaderHookArg<RawType, FlatType>;
+}
 
-
+export interface IItemProviderHookElementNonSearchOnly<PlainProperties extends string = string> extends IItemProviderHookElementBase<PlainProperties> {
   /**
    * When providing analytics in the options you should also call this hook in order
    * to ensure they are properly setup, otherwise analytics will not function
@@ -112,11 +166,16 @@ export interface IItemProviderHookElement extends IItemProviderHookElementSearch
    * 
    * @returns 
    */
-  useUnversioned: () => IItemProviderHookElement;
+  useUnversioned: () => IItemProviderHookElementNonSearchOnly<PlainProperties>;
 }
 
+export interface IItemProviderHookElement<PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue> extends
+  IItemProviderHookElementSearchOnly<PlainProperties, RawType, FlatType>, IItemProviderHookElementNonSearchOnly<PlainProperties> {
+}
 
-export function useItemProvider(options: IItemProviderOptions): IItemProviderHookElement {
+export function useItemProvider
+<PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue>
+(options: IItemProviderOptions<PlainProperties>): IItemProviderHookElement<PlainProperties, RawType, FlatType> {
   // getting the root and other context information
   const root = useRootRetriever();
   const mod = typeof options.module === "string" ? root.root.registry[options.module] as Module : options.module;
@@ -1189,6 +1248,13 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
     options.forVersion || null,
   ]);
 
+  const useSearchLoaderHook = useCallback((options: Omit<ISearchLoaderOptions, 'context'>) => {
+    return useSearchLoader<RawType, FlatType>({
+      ...options,
+      context,
+    });
+  }, [context]);
+
   const getEntryFor = useCallback((
     options: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
   ) => {
@@ -1223,14 +1289,14 @@ export function useItemProvider(options: IItemProviderOptions): IItemProviderHoo
 
     context,
 
-
     useUnversioned,
     useAnalytics,
+    useSearchLoader: useSearchLoaderHook,
   }
 }
 
-export interface ICustomItemProviderProps<T extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<
-  IItemProviderPropsWSpecificArrayProperties<T, SP>,
+export interface ICustomItemProviderProps<PlainProperties extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<
+  IItemProviderPropsWSpecificArrayProperties<PlainProperties, SP>,
   'itemDefinition' |
   'module' |
   'searchCounterpart' |
@@ -1251,8 +1317,8 @@ export interface ICustomItemProviderProps<T extends string, SP extends Record<st
 > {
 };
 
-export interface ICustomItemProviderSearchProps<T extends string, SP extends Record<string, { id: string; variant: string; value: any }> = {}> extends Omit<
-  IItemProviderPropsWSpecificArrayProperties<T, SP>,
+export interface ICustomItemProviderSearchProps<PlainProperties extends string, SP extends Record<string, { id: string; variant: string; value: any }> = {}> extends Omit<
+  IItemProviderPropsWSpecificArrayProperties<PlainProperties, SP>,
   'itemDefinition' |
   'module' |
   'searchCounterpart' |
@@ -1276,19 +1342,23 @@ export interface ICustomItemProviderSearchProps<T extends string, SP extends Rec
 > {
 };
 
-export interface ICustomItemProviderOptions<T extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<
-  ICustomItemProviderProps<T, SP>,
+export interface ICustomItemProviderOptions<PlainProperties extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<
+  ICustomItemProviderProps<PlainProperties, SP>,
   'children'
 > {
 };
 
-export interface ICustomItemProviderSearchOptions<T extends string, SP extends Record<string, { id: string; variant: string; value: any }> = {}> extends Omit<
-  ICustomItemProviderSearchProps<T, SP>,
+export interface ICustomItemProviderSearchOptions<PlainProperties extends string, SP extends Record<string, { id: string; variant: string; value: any }> = {}> extends Omit<
+  ICustomItemProviderSearchProps<PlainProperties, SP>,
   'children'
 > {
 };
 
-export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IItemProviderHookElement) {
+export interface ICustomItemProviderHookElement<MemoType, PlainProperties extends string, RawType, FlatType> extends IItemProviderHookElement<PlainProperties, RawType, FlatType> {
+  properties: MemoType;
+}
+
+export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IItemProviderHookElement<any, any, any>) {
   return useMemo(() => {
     const result = {};
     properties.forEach((pId) => {

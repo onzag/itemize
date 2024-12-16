@@ -474,15 +474,15 @@ export enum ItemDefinitionIOActions {
  * the item definition, using this structure, for the
  * application state
  */
-export interface IItemDefinitionRQValueType {
+export interface IItemDefinitionRQValueType<RawType = IRQValue, FlatType = IRQValue> {
   /**
    * The value as it came from rq endpoint
    */
-  rawValue: IRQValue;
+  rawValue: RawType;
   /**
    * The flattened value without DATA fields
    */
-  flattenedValue: IRQValue;
+  flattenedValue: FlatType;
   /**
    * The requested fields that were used
    */
@@ -2112,10 +2112,10 @@ export default class ItemDefinition {
    * @param version the version
    * @returns the applied value structure
    */
-  public getRQAppliedValue(id: string, version: string): IItemDefinitionRQValueType {
+  public getRQAppliedValue<T = IItemDefinitionRQValueType>(id: string, version: string): T {
     const mergedID = id + "." + (version || "");
     const appliedRQValue = this.stateRQAppliedValue[mergedID] || null;
-    return appliedRQValue;
+    return appliedRQValue as T;
   }
 
   /**

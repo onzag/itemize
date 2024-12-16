@@ -521,7 +521,7 @@ export interface IActionDeleteOptions extends IActionCleanOptions {
  */
 export type CacheMetadataGeneratorFn = (record: IRQSearchRecord) => any;
 
-export interface IActionSearchOptionsWithSpecificArrayProperties<T extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<IActionSearchOptions<T>, 'searchByProperties'> {
+export interface IActionSearchOptionsWithSpecificArrayProperties<PlainProperties extends string, SP extends Record<string, { id: string; variant: string; value: any }>> extends Omit<IActionSearchOptions<PlainProperties>, 'searchByProperties'> {
   /**
      * The properties to be used to search with, properties to be used in search in the
      * search mode item (or module) must be searchable and used for search (or search only)
@@ -576,7 +576,7 @@ export interface IActionSearchOptionsWithSpecificArrayProperties<T extends strin
      * unit         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
      * year         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
      */
-  searchByProperties: Array<T | {
+  searchByProperties: Array<PlainProperties | {
     [K in keyof SP]: IPropertyCoreProps<SP[K]["id"], SP[K]["variant"]>;
   }[keyof SP]>;
 }
@@ -584,7 +584,7 @@ export interface IActionSearchOptionsWithSpecificArrayProperties<T extends strin
 /**
  * The options for searching
  */
-export interface IActionSearchOptions<T extends string = string> extends IActionCleanOptions {
+export interface IActionSearchOptions<PlainProperties extends string = string> extends IActionCleanOptions {
   /**
    * Disables the search in the client side
    * 
@@ -601,7 +601,7 @@ export interface IActionSearchOptions<T extends string = string> extends IAction
    * for example if you have users and you want to search and retrieve the username
    * but you also need the profile_picture, you will put username and profile_picture here
    */
-  requestedProperties: T[];
+  requestedProperties: PlainProperties[];
   /**
    * Use for server side optimization to avoid large payloads when doing SSR specific
    * renders, since the search is built and then stored as its state the mismatch
@@ -610,7 +610,7 @@ export interface IActionSearchOptions<T extends string = string> extends IAction
    * searches done using ssrRequestedProperties will unavoidably get re-requested
    * by the client side once it is mounted, similar to the case of cache policies
    */
-  ssrRequestedProperties?: T[];
+  ssrRequestedProperties?: PlainProperties[];
   /**
    * The requested includes and the sinking properties related to these includes
    */
@@ -673,7 +673,7 @@ export interface IActionSearchOptions<T extends string = string> extends IAction
    * unit         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
    * year         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
    */
-  searchByProperties: Array<T | IPropertyCoreProps<T>>;
+  searchByProperties: Array<PlainProperties | IPropertyCoreProps<PlainProperties>>;
   /**
    * The includes to be used to search with
    */
@@ -699,7 +699,7 @@ export interface IActionSearchOptions<T extends string = string> extends IAction
    * in this case the property "order" which may be a number will be used first
    * to sort, and later the property for the username will be used for sorting
    */
-  orderBy?: IOrderByRuleType<T>;
+  orderBy?: IOrderByRuleType<PlainProperties>;
   /**
    * By whom it was created, this allows to limit the results that are by a specific
    * creator, this is very useful for example to ensure security policies are met
@@ -918,6 +918,9 @@ export interface IActionSearchOptions<T extends string = string> extends IAction
   /**
    * Uses the full highlights during a search engine query, the number specified should be
    * between 1 and 50 as it highlights (10 recommended)
+   * 
+   * Whether to use and provide full highlight support for the searchengine highlights,
+   * the number should be between 1 and 50 and specifies the fragment_size (elasticsearch)
    */
   useSearchEngineFullHighlights?: number;
 
@@ -1227,7 +1230,8 @@ export interface IItemContextType extends IBasicFns {
    */
   searchEngineEnabledLang: string;
   /**
-   * The language that was used for the search using the search engine
+   * Whether to use and provide full highlight support for the searchengine highlights,
+   * the number should be between 1 and 50 and specifies the fragment_size (elasticsearch)
    */
   searchEngineUsedFullHighlights: number;
   /**
@@ -1454,7 +1458,7 @@ export const SearchItemValueContext = React.createContext<ISearchItemValueContex
  * The props for the item provider
  */
 export interface IItemProviderProps<
-  T extends string = string,
+  PlainProperties extends string = string,
 > {
   /**
    * children that will be feed into the context
@@ -1591,7 +1595,7 @@ export interface IItemProviderProps<
    * Some properties cannot be qs tracked, such as files, only
    * values representing serializable objects can be tracked
    */
-  queryStringSync?: Array<T | IPropertyCoreProps<T>>;
+  queryStringSync?: Array<PlainProperties | IPropertyCoreProps<PlainProperties>>;
   /**
    * When using the query string sync it will replace the current history state
    */
@@ -1600,7 +1604,7 @@ export interface IItemProviderProps<
    * only downloads and includes the properties specified in the list
    * in the state
    */
-  properties?: Array<T | IPropertyCoreProps<T>>;
+  properties?: Array<PlainProperties | IPropertyCoreProps<PlainProperties>>;
   // TODO have types for the includes too that can be set somehow
   /**
    * only includes the items specified in the list in the state
@@ -1772,19 +1776,24 @@ export interface IItemProviderProps<
    * }
    */
   analytics?: IItemAnalyticsProps | boolean;
+  /**
+   * For internal usage, given by the search provider for contextual
+   * information about the context when in hook mode
+   */
+  searchContext?: ISearchItemValueContextType;
 }
 
 export interface IItemProviderPropsWSpecificArrayProperties<
-  T extends string = string,
+  PlainProperties extends string = string,
   SP extends Record<string, { id: string; variant: string; value: any }> = {},
-> extends Omit<IItemProviderProps<T>, 'setters' | 'prefills' | 'properties' | 'queryStringSync' | 'automaticSearch'> {
+> extends Omit<IItemProviderProps<PlainProperties>, 'setters' | 'prefills' | 'properties' | 'queryStringSync' | 'automaticSearch'> {
   /**
    * automatic search triggers an automatic search when the item mounts
    * or it detects a change in the properties, this basically triggers
    * the .search function with these arguments whenever it is detected
    * it should do so
    */
-  automaticSearch?: IActionSearchOptionsWithSpecificArrayProperties<T, SP>;
+  automaticSearch?: IActionSearchOptionsWithSpecificArrayProperties<PlainProperties, SP>;
   /**
    * Synchronizes a property based on a query string it behaves like a prefill
    * (and overrides the prefill) if it finds a value in the query string
@@ -1793,14 +1802,14 @@ export interface IItemProviderPropsWSpecificArrayProperties<
    * Some properties cannot be qs tracked, such as files, only
    * values representing serializable objects can be tracked
    */
-  queryStringSync?: Array<T | {
+  queryStringSync?: Array<PlainProperties | {
     [K in keyof SP]: IPropertyCoreProps<SP[K]["id"], SP[K]["variant"]>;
   }[keyof SP]>;
   /**
    * only downloads and includes the properties specified in the list
    * in the state
    */
-  properties?: Array<T | {
+  properties?: Array<PlainProperties | {
     [K in keyof SP]: IPropertyCoreProps<SP[K]["id"], SP[K]["variant"]>;
   }[keyof SP]>;
   /**

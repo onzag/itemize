@@ -1937,7 +1937,7 @@ export function EmailClient(props: IEmailClientProps) {
                   <InternalWrapperComponent>
                     {noResults || arg.error ? <NoResultsComponent err={arg.error} /> : <ListComponent>
                       {arg.searchRecords.map((v) => (
-                        <ItemProvider {...v.providerProps}>
+                        <ItemProvider {...v.providerArgs}>
                           <ReaderMany data={["id", "source", "subject", "read", "target"]}>
                             {(id: string, source: string, subject: IPropertyDefinitionSupportedTextType, read: boolean, target: string[]) => {
                               const isUnread = (props.location === "inbox" || props.location === "spam" || props.location === "unread") && !read;

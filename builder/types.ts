@@ -385,6 +385,29 @@ function buildItemProviderFor(
   const allPropertiesLocation = "allProperties" + itemTypeNameGetterBase(idef);
   const propertiesTypeName = "IPropertiesMemo" + itemTypeNameGetterBase(idef);
 
+  const plainProperties = "typeof propertiesBase" + itemTypeNameGetterBase(idef) + "[number]";
+
+  let flatType: string = null;
+  let rawType: string = null;
+  if (idef.isInSearchMode()) {
+    const standardCounterpart = idef.getStandardCounterpart();
+    if (standardCounterpart.isExtensionsInstance()) {
+      rawType = modTypeNameGetterRqCS(standardCounterpart.getParentModule());
+      flatType = modTypeNameGetterRqSS(standardCounterpart.getParentModule());
+    } else {
+      rawType = itemTypeNameGetterRqCS(standardCounterpart);
+      flatType = itemTypeNameGetterRqSS(standardCounterpart);
+    }
+  } else {
+    if (idef.isExtensionsInstance()) {
+      rawType = modTypeNameGetterRqCS(idef.getParentModule());
+      flatType = modTypeNameGetterRqSS(idef.getParentModule());
+    } else {
+      rawType = itemTypeNameGetterRqCS(idef);
+      flatType = itemTypeNameGetterRqSS(idef);
+    }
+  }
+
   if (nonHook) {
     if (idefPath === null) {
       return (
@@ -402,7 +425,7 @@ function buildItemProviderFor(
 
   return (
     `
-  const provider = useItemProvider({
+  const provider = useItemProvider<string, unknown, unknown>({
     ...options,
     itemDefinition: ${JSON.stringify(idefPath)},
     module: ${JSON.stringify(modPath)},
@@ -412,9 +435,11 @@ function buildItemProviderFor(
   const properties = usePropertiesMemoFor<${propertiesTypeName}>(${allPropertiesLocation}, provider);
 
   return ({
-    ...provider,
+    ...(provider${idef.isInSearchMode() ? 
+      " as IItemProviderHookElementSearchOnly<" + plainProperties + "," + rawType + "," + flatType + ">" :
+      " as IItemProviderHookElementNonSearchOnly<" + plainProperties + ">"}),
     properties,
-  })${idef.isInSearchMode() ? " as IItemProviderHookElementSearchOnly" : ""};
+  });
 `
   );
 }
@@ -516,11 +541,12 @@ function moduleSchemaJsBuilder(mod: Module): string {
 
   if (mod.isSearchable()) {
     const nameIdef = itemTypeNameGetterBase(mod.getPropExtensionItemDefinition());
+    const nameIdefSearchMode = itemTypeNameGetterBase(mod.getPropExtensionItemDefinition().getSearchModeCounterpart());;
     propertiesDefinition = defineAllFor(mod.getPropExtensionItemDefinition(), true) + defineAllFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart());
     hookSearch = "export function " + modTypeNameGetterUseSearch(mod) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" + nameIdef +
       "[number], PropertiesForSetting" + nameIdef  + "> = {}) {\n";
     ipSearch = "export function " + modTypeNameGetterIPSearch(mod) + "(props: ICustomItemProviderSearchProps<typeof propertiesBase" + nameIdef +
-      "[number], PropertiesForSetting" + nameIdef  + "> = {}) {\n";
+      "[number], PropertiesForSetting" + nameIdefSearchMode  + "> = {}) {\n";
     hookSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, false);
     ipSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, true);
     hookSearch += "};\n"
@@ -615,7 +641,7 @@ export async function rootTypesBuilder(data: IRootRawJSONDataType) {
   await ensureSrcFolder();
 
   let schemaData = "import { useItemProvider, ICustomItemProviderOptions, ICustomItemProviderSearchOptions, IItemProviderHookElementSearchOnly, "
-    + "ICustomItemProviderSearchProps, ICustomItemProviderProps, "
+    + "ICustomItemProviderSearchProps, ICustomItemProviderProps, IItemProviderHookElementNonSearchOnly, "
     + "usePropertiesMemoFor, IPropertiesMemoBase, IPropertiesMemoProperty } from \"@onzag/itemize/client/providers/item/hook\";\n";
   schemaData += "import React, { useMemo } from \"react\";\n";
   Object.keys(allTypes).forEach((type) => {
