@@ -1,6 +1,6 @@
 import { Location } from "history";
 import { useLocationRetriever } from "../navigation/LocationRetriever";
-import Timetrack from "./Timetrack";
+import Timetrack, { useFunctionalTimetrack } from "./Timetrack";
 import { genericAnalyticsDataProvider } from "./util";
 import React from "react";
 
@@ -76,4 +76,24 @@ export default function PageTimetrack(props: IPageTimetrackProps) {
       ) : null}
     </>
   );
+}
+
+export function usePageTimeTrack(options: IPageTimetrackProps) {
+  const location = useLocationRetriever();
+
+  const context = options.locationContextGenerator ? options.locationContextGenerator(location) : (location.pathname + location.search);
+  const dataGenerator = typeof options.dataGenerator === "undefined" ? genericAnalyticsDataProvider : options.dataGenerator;
+
+  useFunctionalTimetrack({
+    ...options,
+    dataGenerator,
+    context,
+  });
+
+  useFunctionalTimetrack({
+    ...options,
+    dataGenerator,
+    context,
+    enabled: options.enabled && !!options.trackOfflineAtTrack,
+  });
 }

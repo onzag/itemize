@@ -17,6 +17,7 @@ import { IPropertyViewRendererProps } from "../../internal/components/PropertyVi
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { IPropertyEntryRendererProps } from "../../internal/components/PropertyEntry";
 import type { EndpointErrorType } from "../../../base/errors";
+import { SearchVariants } from "../../../constants";
 
 /**
  * Argument that the fragment provides
@@ -114,14 +115,14 @@ export interface IFragmentProps {
    * hide description
    */
   viewProps?: {
-    [id: string]: Partial<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>>,
+    [id: string]: Partial<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, string, SearchVariants>>,
   };
 
   /**
    * hide label
    */
   entryProps?: {
-    [id: string]: Partial<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>>,
+    [id: string]: Partial<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>, string, SearchVariants>>,
   };
 
   /**

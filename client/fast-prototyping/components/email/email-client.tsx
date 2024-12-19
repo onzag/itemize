@@ -41,7 +41,7 @@ import ItemLoader from "../../../components/item/ItemLoader";
 import { ConfigContext } from "../../../internal/providers/config-provider";
 import { runSearchQueryFor } from "../../../internal/rq-client-util";
 import { TokenContext } from "../../../internal/providers/token-provider";
-import { UNSPECIFIED_OWNER } from "../../../../constants";
+import { SearchVariants, UNSPECIFIED_OWNER } from "../../../../constants";
 import type { ITagListSuggestion } from "../../renderers/PropertyEntry/PropertyEntryTagList";
 import Setter from "../../../components/property/Setter";
 import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
@@ -793,7 +793,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
     props.targetEntryRendererArgs && props.targetEntryRendererArgs.fieldVariant,
   ])
 
-  const prefills: IPropertySetterProps<PropertyDefinitionSupportedType>[] = [];
+  const prefills: IPropertySetterProps<PropertyDefinitionSupportedType, string, SearchVariants>[] = [];
   if (props.targetPrefill) {
     prefills.push({
       id: "target",

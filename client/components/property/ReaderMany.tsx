@@ -3,8 +3,10 @@ import type { IPropertyReadProps } from "./base";
 import Reader from "./Reader";
 import React from "react";
 import equals from "deep-equal";
+import { SearchVariants } from "../../../constants";
 
-interface IPropertyReadOneProp<T extends PropertyDefinitionSupportedType> extends Omit<IPropertyReadProps<T>, 'children'> {
+interface IPropertyReadOneProp<PDEF extends PropertyDefinitionSupportedType> extends
+  Omit<IPropertyReadProps<PDEF, string, SearchVariants>, 'children'> {
 }
 
 interface IReaderManyProps {

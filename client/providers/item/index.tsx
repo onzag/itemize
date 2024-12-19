@@ -7,6 +7,7 @@ import Include, { IncludeExclusionState } from "../../../base/Root/Module/ItemDe
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import {
   IOrderByRuleType,
+  SearchVariants,
 } from "../../../constants";
 import { IRQSearchRecord, IRQValue, IRQRequestFields, ProgresserFn } from "../../../rq-querier";
 import { requestFieldsAreContained } from "../../../rq-util";
@@ -1054,7 +1055,7 @@ export interface IBasicFns {
    * Simply deletes
    * @returns a response with the status
    */
-  delete: () => Promise<IBasicActionResponse>;
+  delete: (options: IActionDeleteOptions) => Promise<IBasicActionResponse>;
   /**
    * cleans performs the cleanup of properties and policies
    * @param options 
@@ -1580,13 +1581,13 @@ export interface IItemProviderProps<
    * Setters for setting values for the properties within the item definition
    * itself, useful not to depend on mounting at time
    */
-  setters?: Array<IPropertySetterProps<PropertyDefinitionSupportedType>>;
+  setters?: Array<Omit<IPropertySetterProps<PropertyDefinitionSupportedType, PlainProperties, SearchVariants>, 'context'>>;
   /**
    * Similar to setters but the values are just prefilled and as such are not
    * readonly, prefills only get executed during the initial mount
    * of the component
    */
-  prefills?: Array<IPropertySetterProps<PropertyDefinitionSupportedType>>;
+  prefills?: Array<Omit<IPropertySetterProps<PropertyDefinitionSupportedType, PlainProperties, SearchVariants>, 'context'>>;
   /**
    * Synchronizes a property based on a query string it behaves like a prefill
    * (and overrides the prefill) if it finds a value in the query string

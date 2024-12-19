@@ -8,7 +8,7 @@
 import React, { useContext } from "react";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { ItemContext } from "../../providers/item";
+import { IItemContextType, ItemContext } from "../../providers/item";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { RESERVED_BASE_PROPERTIES_RQ, SearchVariants } from "../../../constants";
 import PropertyView, { RawBasePropertyView } from "../../internal/components/PropertyView";
@@ -50,10 +50,17 @@ export interface IPropertyBaseProps<T extends string = string, SV extends string
   include?: string;
 }
 
+export interface IPropertyBasePropsWithItemContext<T extends string = string, SV extends string | never = SearchVariants> extends IPropertyBaseProps<T, SV> {
+  /**
+   * Specify a context if not given
+   */
+  context?: IItemContextType;
+}
+
 /**
  * The base interface with renderers this time
  */
-export interface IPropertyBaseWithRendererProps<RendererPropsType> extends IPropertyBaseProps {
+export interface IPropertyBaseWithRendererProps<RendererPropsType, T extends string, SV extends string | never> extends IPropertyBasePropsWithItemContext<T, SV> {
   /**
    * the renderer in charge of rendering the output
    */
@@ -67,7 +74,7 @@ export interface IPropertyBaseWithRendererProps<RendererPropsType> extends IProp
 /**
  * The entry props for all read, view, and entry
  */
-export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWithRendererProps<RendererPropsType> {
+export interface IPropertyEntryProps<RendererPropsType, T extends string, SV extends string | never> extends IPropertyBaseWithRendererProps<RendererPropsType, T, SV> {
   /**
    * an optional function to get the value as the property changes
    * these changes are given by the entry and do not come when
@@ -164,7 +171,7 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
 /**
  * The setter props
  */
-export interface IPropertySetterProps<V extends PropertyDefinitionSupportedType, T extends string = string, SV extends string | never = SearchVariants> extends IPropertyBaseProps<T, SV> {
+export interface IPropertySetterProps<V extends PropertyDefinitionSupportedType, T extends string, SV extends string | never> extends IPropertyBasePropsWithItemContext<T, SV> {
   /**
    * The value to provide to such property
    */
@@ -174,7 +181,7 @@ export interface IPropertySetterProps<V extends PropertyDefinitionSupportedType,
 /**
  * The reader props
  */
-export interface IPropertyReadPropsWOChildren extends IPropertyBaseProps {
+export interface IPropertyReadPropsWOChildren<T extends string, SV extends string | never> extends IPropertyBasePropsWithItemContext<T, SV> {
   /**
    * whether to use the applied value rather than the
    * actual current value the applied value is synced
@@ -195,17 +202,17 @@ export type ReadSetterCallback<T> = (v: T, internalValue: any) => void;
 /**
  * The reader props
  */
-export interface IPropertyReadProps<T extends PropertyDefinitionSupportedType> extends IPropertyReadPropsWOChildren {
+export interface IPropertyReadProps<PDEF extends PropertyDefinitionSupportedType, T extends string, SV extends string | never> extends IPropertyReadPropsWOChildren<T, SV> {
   /**
    * The reader callback
    */
-  children?: (value: T, state: IPropertyDefinitionState<T>, setter: ReadSetterCallback<T>) => React.ReactNode;
+  children?: (value: PDEF, state: IPropertyDefinitionState<PDEF>, setter: ReadSetterCallback<PDEF>) => React.ReactNode;
 }
 
 /**
  * The view props
  */
-export interface IPropertyViewProps<RendererPropsType> extends IPropertyBaseWithRendererProps<RendererPropsType> {
+export interface IPropertyViewProps<RendererPropsType, T extends string, SV extends string | never> extends IPropertyBaseWithRendererProps<RendererPropsType, T, SV> {
   /**
    * Whether to capitalize
    */
@@ -244,8 +251,8 @@ export interface IPropertyViewProps<RendererPropsType> extends IPropertyBaseWith
 /**
  * The props it takes basically extends everything
  */
-interface IPropertyEntryViewReadSetProps<T extends PropertyDefinitionSupportedType, RendererPropsType> extends
-  IPropertyEntryProps<RendererPropsType>, IPropertyViewProps<RendererPropsType>, IPropertySetterProps<T>, IPropertyReadProps<T> { }
+interface IPropertyEntryViewReadSetProps<PDEF extends PropertyDefinitionSupportedType, RendererPropsType, T extends string, SV extends string | never> extends
+  IPropertyEntryProps<RendererPropsType, T, SV>, IPropertyViewProps<RendererPropsType, T, SV>, IPropertySetterProps<PDEF, T, SV>, IPropertyReadProps<PDEF, T, SV> { }
 
 /**
  * This is a legit function that takes all the props in order to pipe them
@@ -255,19 +262,21 @@ interface IPropertyEntryViewReadSetProps<T extends PropertyDefinitionSupportedTy
  * @returns a react component
  */
 export function EntryViewReadSet(
-  originalProps: IPropertyEntryViewReadSetProps<any, any> | string,
+  originalProps: IPropertyEntryViewReadSetProps<any, any, string, SearchVariants> | string,
   type: "entry" | "view" | "read" | "set",
   use?: boolean,
 ): any {
   const config = useContext(ConfigContext);
-  const itemContextualValue = useContext(ItemContext);
+  const itemContextualValueFromContext = useContext(ItemContext);
 
-  let props = originalProps as IPropertyEntryViewReadSetProps<any, any>;
+  let props = originalProps as IPropertyEntryViewReadSetProps<any, any, string, SearchVariants>;
   if (typeof originalProps === "string" || originalProps === null) {
     props = {
       id: originalProps,
     } as any;
   }
+
+  const itemContextualValue = props.context || itemContextualValueFromContext;
 
   // so we need to be in an item definition contextual value
   // because otherwise we just can't get the property we need

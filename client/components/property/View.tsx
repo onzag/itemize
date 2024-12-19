@@ -8,6 +8,7 @@
 import { IPropertyViewProps, EntryViewReadSet } from "./base";
 import { IPropertyViewRendererProps } from "../../internal/components/PropertyView";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { SearchVariants } from "../../../constants";
 
 /**
  * Creates an view for a given property id
@@ -17,6 +18,6 @@ import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemD
  * @param props the props for the view
  * @returns a react component
  */
-export default function View(props: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>) {
+export default function View(props: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, string, SearchVariants>) {
   return EntryViewReadSet(props as any, "view");
 }

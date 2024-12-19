@@ -7,6 +7,7 @@ import { IBaseSyncerHandle, IBaseSyncerHandleMechanism, useHandleMechanism } fro
 import { IPropertySetterProps } from "../property/base";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import SearchLoader from "./SearchLoader";
+import { SearchVariants } from "../../../constants";
 
 interface ISearchSyncerProps {
   id: string;
@@ -34,7 +35,7 @@ interface ISearchSyncerProps {
  * Setters for setting values for the properties within the item definition
  * itself, useful not to depend on mounting at time
  */
-  setters?: IPropertySetterProps<PropertyDefinitionSupportedType>[];
+  setters?: IPropertySetterProps<PropertyDefinitionSupportedType, string, SearchVariants>[];
   /**
    * for the item provider
    * only downloads and includes the properties specified in the list

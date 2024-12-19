@@ -40,7 +40,7 @@ import { IPropertyEntryRendererProps } from "../../../client/internal/components
 import Entry from "../../../client/components/property/Entry";
 import View from "../../../client/components/property/View";
 import { IPropertyViewRendererProps } from "../../../client/internal/components/PropertyView";
-import { EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, RESERVED_ADD_PROPERTIES_RQ, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from "../../../constants";
+import { EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, RESERVED_BASE_PROPERTIES_RQ, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES, SearchVariants } from "../../../constants";
 import { ISearchLoaderHookArg, ISearchLoaderOptions, useSearchLoader } from "../../../client/components/search/SearchLoader";
 import type { IRQValue } from "../../../rq-querier";
 
@@ -105,12 +105,12 @@ export interface IItemProviderHookElementBase<PlainProperties extends string = s
    * Provides the entry component of a property
    * @param options 
    */
-  getEntryForProperty(options: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>): React.ReactNode;
+  getEntryForProperty(options: Omit<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>): React.ReactNode;
   /**
    * Provides the view component of a property
    * @param options 
    */
-  getViewForProperty(options: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>): React.ReactNode;
+  getViewForProperty(options: Omit<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>): React.ReactNode;
   /**
    * Set value for property
    * 
@@ -154,7 +154,7 @@ export interface IItemProviderHookElementSearchOnly<PlainProperties extends stri
   useSearchLoader: (options: ISearchLoaderOptions) => ISearchLoaderHookArg<RawType, FlatType>;
 }
 
-export interface IItemProviderHookElementNonSearchOnly<PlainProperties extends string = string, RawType = IRQValue > extends IItemProviderHookElementBase<PlainProperties, RawType> {
+export interface IItemProviderHookElementNonSearchOnly<PlainProperties extends string = string, RawType = IRQValue> extends IItemProviderHookElementBase<PlainProperties, RawType> {
   /**
    * When providing analytics in the options you should also call this hook in order
    * to ensure they are properly setup, otherwise analytics will not function
@@ -180,8 +180,8 @@ export interface IItemProviderHookElement<PlainProperties extends string = strin
 }
 
 export function useItemProvider
-<PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue>
-(options: IItemProviderOptions<PlainProperties>): IItemProviderHookElement<PlainProperties, RawType, FlatType> {
+  <PlainProperties extends string = string, RawType = IRQValue, FlatType = IRQValue>
+  (options: IItemProviderOptions<PlainProperties>): IItemProviderHookElement<PlainProperties, RawType, FlatType> {
   // getting the root and other context information
   const root = useRootRetriever();
   const mod = typeof options.module === "string" ? root.root.registry[options.module] as Module : options.module;
@@ -975,9 +975,47 @@ export function useItemProvider
   }, []) as <T>(pId: string | IPropertyBaseProps) => T;
 
   const getStateFor = useCallback((idOrBase: string | IPropertyBaseProps) => {
+    const giveMetaProperty = (actualId: string) => {
+      let rqValue: any;
+      if (actualId === "id") {
+        rqValue = stateRef.current.itemState.forId;
+      } else if (actualId === "version") {
+        rqValue = stateRef.current.itemState.forVersion;
+      } else {
+        rqValue = stateRef.current.itemState.rqOriginalFlattenedValue &&
+          stateRef.current.itemState.rqOriginalFlattenedValue[actualId];
+      }
+
+      // if it's undefined we give null
+      if (typeof rqValue === "undefined") {
+        rqValue = null;
+      }
+
+      return {
+        default: false,
+        enforced: false,
+        hidden: false,
+        internalValue: null,
+        invalidReason: null,
+        propertyId: actualId,
+        stateAppliedValue: rqValue,
+        stateValue: rqValue,
+        stateValueHasBeenManuallySet: false,
+        stateValueModified: false,
+        userSet: false,
+        valid: true,
+        value: rqValue,
+      }
+    }
     if (idOrBase === null || typeof idOrBase === "undefined") {
       return null;
     } else if (typeof idOrBase === "string") {
+      if (
+        RESERVED_BASE_PROPERTIES_RQ[idOrBase]
+      ) {
+        return giveMetaProperty(idOrBase);
+      }
+
       const state = stateRef.current.itemState.properties.find((p) => p.propertyId === idOrBase);
       if (!state) {
         if (process.env.NODE_ENV === "development" && !optionsRef.current.suppressWarnings) {
@@ -996,6 +1034,15 @@ export function useItemProvider
         // for that we just get the prefix and add it
         actualId =
           PropertyDefinitionSearchInterfacesPrefixes[idOrBase.searchVariant.toUpperCase().replace("-", "_")] + idOrBase.id;
+      }
+
+      if (
+        RESERVED_BASE_PROPERTIES_RQ[actualId] &&
+        !idOrBase.policyName &&
+        !idOrBase.policyType &&
+        !idOrBase.include
+      ) {
+        return giveMetaProperty(actualId);
       }
 
       const policyType = idOrBase.policyType;
@@ -1150,9 +1197,9 @@ export function useItemProvider
     // typescript rejects this despite being correct
     onPropertyChange: onPropertyChangeHook as any,
     onPropertyRestore: onPropertyRestoreHook as any,
-    onIncludeSetExclusionState: onIncludeSetExclusionStateHook  as any,
+    onIncludeSetExclusionState: onIncludeSetExclusionStateHook as any,
     onPropertyEnforce: onPropertyEnforceHook as any,
-    onPropertyClearEnforce: onPropertyClearEnforceHook  as any,
+    onPropertyClearEnforce: onPropertyClearEnforceHook as any,
     notFound: state.notFound,
     blocked: state.isBlocked,
     blockedButDataAccessible: state.isBlockedButDataIsAccessible,
@@ -1262,22 +1309,18 @@ export function useItemProvider
   }, [context]);
 
   const getEntryFor = useCallback((
-    options: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
+    options: Omit<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>,
   ) => {
     return (
-      <ItemContext.Provider value={context as IItemContextType}>
-        <Entry {...options} />
-      </ItemContext.Provider>
+      <Entry {...options} context={context as IItemContextType} />
     );
   }, [context]);
 
   const getViewFor = useCallback((
-    options: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>,
+    options: Omit<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>,
   ) => {
     return (
-      <ItemContext.Provider value={context as IItemContextType}>
-        <View {...options} />
-      </ItemContext.Provider>
+      <View {...options} context={context as IItemContextType} />
     );
   }, [context]);
 
@@ -1368,7 +1411,9 @@ export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IIt
   return useMemo(() => {
     const result = {};
     properties.forEach((pId) => {
-      if (RESERVED_ADD_PROPERTIES_RQ[pId]) {
+      if (
+        RESERVED_BASE_PROPERTIES_RQ[pId]
+      ) {
         Object.defineProperty(result, pId, {
           get: () => {
             return provider.getValueForProperty(pId);
@@ -1394,7 +1439,7 @@ export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IIt
           },
           restore() {
             provider.restoreProperty(pId);
-          },
+          }
         }
       }
     });

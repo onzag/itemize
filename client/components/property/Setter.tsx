@@ -23,6 +23,7 @@ import { PropertyDefinitionSupportedFilesType } from "../../../base/Root/Module/
 import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { PropertyDefinitionSupportedTimeType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/time";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { SearchVariants } from "../../../constants";
 
 /**
  * Allows to set the value for a property using components, this property
@@ -53,7 +54,7 @@ import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemD
  * @param props the props for the entry
  * @returns a react component
  */
-export default function Setter(props: IPropertySetterProps<PropertyDefinitionSupportedType>) {
+export default function Setter(props: IPropertySetterProps<PropertyDefinitionSupportedType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -69,7 +70,7 @@ export default function Setter(props: IPropertySetterProps<PropertyDefinitionSup
  * @param props the props for the entry
  * @returns a react component
  */
-export function BooleanSetter(props: IPropertySetterProps<PropertyDefinitionSupportedBooleanType>) {
+export function BooleanSetter(props: IPropertySetterProps<PropertyDefinitionSupportedBooleanType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -85,7 +86,7 @@ export function BooleanSetter(props: IPropertySetterProps<PropertyDefinitionSupp
  * @param props the props for the entry
  * @returns a react component
  */
-export function StringSetter(props: IPropertySetterProps<PropertyDefinitionSupportedStringType>) {
+export function StringSetter(props: IPropertySetterProps<PropertyDefinitionSupportedStringType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -102,7 +103,7 @@ export function StringSetter(props: IPropertySetterProps<PropertyDefinitionSuppo
  * @param props the props for the entry
  * @returns a react component
  */
-export function IntegerSetter(props: IPropertySetterProps<PropertyDefinitionSupportedIntegerType>) {
+export function IntegerSetter(props: IPropertySetterProps<PropertyDefinitionSupportedIntegerType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -118,7 +119,7 @@ export function IntegerSetter(props: IPropertySetterProps<PropertyDefinitionSupp
  * @param props the props for the entry
  * @returns a react component
  */
-export function NumberSetter(props: IPropertySetterProps<PropertyDefinitionSupportedNumberType>) {
+export function NumberSetter(props: IPropertySetterProps<PropertyDefinitionSupportedNumberType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -134,7 +135,7 @@ export function NumberSetter(props: IPropertySetterProps<PropertyDefinitionSuppo
  * @param props the props for the entry
  * @returns a react component
  */
-export function CurrencySetter(props: IPropertySetterProps<IPropertyDefinitionSupportedCurrencyType>) {
+export function CurrencySetter(props: IPropertySetterProps<IPropertyDefinitionSupportedCurrencyType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -150,9 +151,26 @@ export function CurrencySetter(props: IPropertySetterProps<IPropertyDefinitionSu
  * @param props the props for the entry
  * @returns a react component
  */
-export function UnitSetter(props: IPropertySetterProps<IPropertyDefinitionSupportedUnitType>) {
+export function UnitSetter(props: IPropertySetterProps<IPropertyDefinitionSupportedUnitType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
+
+/**
+ * Allows to set the value for a location property using components, this property
+ * will then be marked as super enforced into this value and cannot really
+ * be modified until the setter is unmounted
+ * 
+ * Note that for usage with automatic search, you should use the setter functionality
+ * provided within the item definition provider search function as automatic search triggers before
+ * the elements inside it mount, making this setter not execute but after automatic search is executed
+ * 
+ * @param props the props for the entry
+ * @returns a react component
+ */
+export function LocationSetter(props: IPropertySetterProps<IPropertyDefinitionSupportedLocationType, string, SearchVariants>) {
+  return EntryViewReadSet(props, "set") as any;
+}
+
 
 /**
  * Allows to set the value for a text property using components, this property
@@ -166,7 +184,7 @@ export function UnitSetter(props: IPropertySetterProps<IPropertyDefinitionSuppor
  * @param props the props for the entry
  * @returns a react component
  */
-export function TextSetter(props: IPropertySetterProps<IPropertyDefinitionSupportedTextType>) {
+export function TextSetter(props: IPropertySetterProps<IPropertyDefinitionSupportedTextType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -182,7 +200,7 @@ export function TextSetter(props: IPropertySetterProps<IPropertyDefinitionSuppor
  * @param props the props for the entry
  * @returns a react component
  */
-export function YearSetter(props: IPropertySetterProps<PropertyDefinitionSupportedYearType>) {
+export function YearSetter(props: IPropertySetterProps<PropertyDefinitionSupportedYearType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -198,7 +216,7 @@ export function YearSetter(props: IPropertySetterProps<PropertyDefinitionSupport
  * @param props the props for the entry
  * @returns a react component
  */
-export function DateSetter(props: IPropertySetterProps<PropertyDefinitionSupportedDateType>) {
+export function DateSetter(props: IPropertySetterProps<PropertyDefinitionSupportedDateType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -214,7 +232,7 @@ export function DateSetter(props: IPropertySetterProps<PropertyDefinitionSupport
  * @param props the props for the entry
  * @returns a react component
  */
-export function DateTimeSetter(props: IPropertySetterProps<PropertyDefinitionSupportedDateTimeType>) {
+export function DateTimeSetter(props: IPropertySetterProps<PropertyDefinitionSupportedDateTimeType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -230,7 +248,7 @@ export function DateTimeSetter(props: IPropertySetterProps<PropertyDefinitionSup
  * @param props the props for the entry
  * @returns a react component
  */
-export function PaymentSetter(props: IPropertySetterProps<IPropertyDefinitionSupportedPaymentType>) {
+export function PaymentSetter(props: IPropertySetterProps<IPropertyDefinitionSupportedPaymentType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -246,7 +264,7 @@ export function PaymentSetter(props: IPropertySetterProps<IPropertyDefinitionSup
  * @param props the props for the entry
  * @returns a react component
  */
-export function TagListSetter(props: IPropertySetterProps<PropertyDefinitionSupportedTagListType>) {
+export function TagListSetter(props: IPropertySetterProps<PropertyDefinitionSupportedTagListType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -262,7 +280,7 @@ export function TagListSetter(props: IPropertySetterProps<PropertyDefinitionSupp
  * @param props the props for the entry
  * @returns a react component
  */
-export function FileSetter(props: IPropertySetterProps<PropertyDefinitionSupportedFileType>) {
+export function FileSetter(props: IPropertySetterProps<PropertyDefinitionSupportedFileType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -278,7 +296,7 @@ export function FileSetter(props: IPropertySetterProps<PropertyDefinitionSupport
  * @param props the props for the entry
  * @returns a react component
  */
-export function FilesSetter(props: IPropertySetterProps<PropertyDefinitionSupportedFilesType>) {
+export function FilesSetter(props: IPropertySetterProps<PropertyDefinitionSupportedFilesType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
 
@@ -294,6 +312,6 @@ export function FilesSetter(props: IPropertySetterProps<PropertyDefinitionSuppor
  * @param props the props for the entry
  * @returns a react component
  */
-export function TimeSetter(props: IPropertySetterProps<PropertyDefinitionSupportedTimeType>) {
+export function TimeSetter(props: IPropertySetterProps<PropertyDefinitionSupportedTimeType, string, SearchVariants>) {
   return EntryViewReadSet(props, "set") as any;
 }
