@@ -8,8 +8,10 @@ import React, { useCallback } from "react";
 import Pagination from '@mui/material/Pagination';
 import { PaginationItem } from "@mui/material";
 import { AltBadgeReactioner } from "./alt-badge-reactioner";
-import SearchLoader, { ISearchLoaderArg } from "../../components/search/SearchLoader";
+import SearchLoader, { ISearchLoaderArg, useSearchLoader } from "../../components/search/SearchLoader";
 import { IPaginatorInternalObject } from "../../components/search/Pagination";
+import { IItemContextType } from "../../../client/providers/item";
+import { IRQValue } from "../../../rq-querier";
 
 
 /**
@@ -74,6 +76,7 @@ export interface ISearchLoaderWithPaginationProps {
    * starts at true
    */
   startInSearchingState?: boolean;
+  context?: IItemContextType<string, any>;
 
   accessiblePriority?: number;
   accessibleUseInFlow?: boolean;
@@ -90,6 +93,78 @@ function defaultRenderItem(x: any) {
   )
 }
 
+const useRenderItemFn = (props: Omit<ISearchLoaderWithPaginationProps, 'children'>) => useCallback((x: any) => {
+  if (!props.accessible) {
+    return defaultRenderItem(x);
+  }
+  return (
+    <AltBadgeReactioner
+      reactionKey={
+        x.type === "page" || x.type === "start-ellipsis" || x.type === "end-ellipsis" ? (
+          props.accessiblePageReactionKey || "p"
+        ) : (
+          x.type === "first" || x.type === "previous" ? (
+            props.accessibleStartReactionKey || "f"
+          ) : (
+            props.accessibleEndReactionKey || "l"
+          )
+        )}
+      action="click"
+      selector="button"
+      priority={props.accessiblePriority}
+      disabled={x.disabled}
+      useInFlow={props.accessibleUseInFlow}
+    >
+      {defaultRenderItem(x)}
+    </AltBadgeReactioner>
+  )
+}, [
+  props.accessible,
+  props.accessiblePageReactionKey,
+  props.accessiblePageReactionKey,
+  props.accessibleStartReactionKey,
+  props.accessiblePriority,
+  props.accessibleEndReactionKey,
+  props.accessibleUseInFlow,
+]);
+
+export function useSearchLoaderWithPagination<RawType = IRQValue, FlatType = IRQValue>(args: Omit<ISearchLoaderWithPaginationProps, 'children'>) {
+  const renderItemFn = useRenderItemFn(args);
+
+  const searchLoader = useSearchLoader<RawType, FlatType>({
+    currentPage: args.paginator.page - 1,
+    pageSize: args.paginator.pageSize,
+    cleanOnDismount: args.cleanOnDismount,
+    static: args.static,
+    enableExternalChecks: args.enableExternalChecks,
+    startInSearchingState: args.startInSearchingState,
+    context: args.context,
+  });
+
+  const handlePageChange = useCallback((e: React.ChangeEvent, value: number) => {
+    args.paginator.goToPage(value + 1);
+  }, [args.paginator.goToPage]);
+
+  const pageCount = args.total ? searchLoader.pageCountTotal : searchLoader.pageCount;
+  const currentPage = args.total ? args.paginator.pageTotal : args.paginator.page;
+
+  const pagination = (
+    pageCount === 0 ?
+      null :
+      <Pagination
+        count={pageCount}
+        color="primary"
+        page={currentPage}
+        onChange={handlePageChange}
+        variant={args.paginationVariant}
+        renderItem={renderItemFn} />
+  );
+
+  return (
+    [searchLoader, pagination, !!(searchLoader.searchId && pageCount === 0)] as [typeof searchLoader, React.ReactNode, boolean]
+  );
+}
+
 /**
  * Has a search loader section and provides its own pagination component that is to be displayed with
  * already handlers to update the navigation page, it uses the LocationStateReader in order to keep its
@@ -98,40 +173,7 @@ function defaultRenderItem(x: any) {
  * @param props the search loader props
  */
 export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationProps) {
-  const renderItemFn = useCallback((x: any) => {
-    if (!props.accessible) {
-      return defaultRenderItem(x);
-    }
-    return (
-      <AltBadgeReactioner
-        reactionKey={
-          x.type === "page" || x.type === "start-ellipsis" || x.type === "end-ellipsis" ? (
-            props.accessiblePageReactionKey || "p"
-          ) : (
-            x.type === "first" || x.type === "previous" ? (
-              props.accessibleStartReactionKey || "f"
-            ) : (
-              props.accessibleEndReactionKey || "l"
-            )
-          )}
-        action="click"
-        selector="button"
-        priority={props.accessiblePriority}
-        disabled={x.disabled}
-        useInFlow={props.accessibleUseInFlow}
-      >
-        {defaultRenderItem(x)}
-      </AltBadgeReactioner>
-    )
-  }, [
-    props.accessible,
-    props.accessiblePageReactionKey,
-    props.accessiblePageReactionKey,
-    props.accessibleStartReactionKey,
-    props.accessiblePriority,
-    props.accessibleEndReactionKey,
-    props.accessibleUseInFlow,
-  ]);
+  const renderItemFn = useRenderItemFn(props);
 
   return (
     <SearchLoader
@@ -142,6 +184,7 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
       static={props.static}
       enableExternalChecks={props.enableExternalChecks}
       startInSearchingState={props.startInSearchingState}
+      context={props.context}
     >
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {
@@ -160,7 +203,7 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
               page={currentPage}
               onChange={handlePageChange}
               variant={props.paginationVariant}
-              renderItem={renderItemFn}/>
+              renderItem={renderItemFn} />
         );
 
         return (
@@ -168,5 +211,5 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
         );
       }}
     </SearchLoader>
-  )
+  );
 }

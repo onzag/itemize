@@ -243,7 +243,7 @@ export interface ISearchLoaderOptions {
    * if not provided it will try to get it from
    * the current context
    */
-  context?: IItemContextType;
+  context?: IItemContextType<string, any>;
   /**
    * Triggers when the search data changes, as in a new search id
    */
@@ -353,6 +353,7 @@ function loadSearchResults(
 }
 
 function loadValues(
+  isDerived: boolean,
   itemContext: IItemContextType,
   props: ISearchLoaderOptions,
   state: IActualSearchLoaderState,
@@ -434,7 +435,8 @@ function loadValues(
       searchWillProduceNewHighlights: false,
       searchCanProduceHighlights: false,
     };
-    loadSearchResults(itemContext);
+    // if non derived will be picked up by the did update
+    !isDerived && loadSearchResults(itemContext);
 
     !isConstruct && setState && setState(newState as any);
     return newState;
@@ -522,7 +524,7 @@ function getDerived(
     // then we load the values
     // this will set the flag so that on did update
     // it is picked by the async part which will actually do the loading
-    return loadValues(itemContext, props, state, currentSearchRecords, false, false);
+    return loadValues(true, itemContext, props, state, currentSearchRecords, false, false);
   }
 
   return null;
@@ -530,8 +532,7 @@ function getDerived(
 
 function construct(
   itemContext: IItemContextType,
-  startInSearchingState: boolean,
-  refreshPageFn: (isConstruct: boolean) => Partial<IActualSearchLoaderState>,
+  options: ISearchLoaderOptions,
 ): IActualSearchLoaderState {
   const state = {
     currentlySearching: [],
@@ -547,10 +548,10 @@ function construct(
     searchResultsNeedToBeLoaded: false,
     searchWillProduceNewHighlights: false,
     searchCanProduceHighlights: false,
-    showAsSearching: !!startInSearchingState && !itemContext.searchId,
+    showAsSearching: !!options.startInSearchingState && !itemContext.searchId,
   };
 
-  Object.assign(state, refreshPageFn(true));
+  Object.assign(state, refreshPage(itemContext, true, options, state, false, null));
 
   return state;
 }
@@ -571,6 +572,7 @@ function refreshPage(
     sliceEnd,
   ) : (itemContext.searchRecords || []);
   return loadValues(
+    false,
     itemContext,
     options,
     state,
@@ -619,6 +621,7 @@ async function loadValuesAsyncPart(
   currentSearchResultsFromTheRecords: IRQValue[],
   currentSearchRecords: IRQSearchRecord[],
   willItProduceNewHighlights: boolean,
+  lastRetrievedHighlightsAtTheTime: IElasticHighlightRecordInfo,
   setState: (v: Partial<IActualSearchLoaderState>) => void,
 ): Promise<void> {
   // We are done with this since all that follows is async and cannot be executed
@@ -870,7 +873,7 @@ async function loadValuesAsyncPart(
       // value with new highlights, otherwise if we have recycled, we may still have
       // new stuff around that we needed to add, so we merge with the old
       finalState.retrievedHighlights = willItProduceNewHighlights ? newHighlights : {
-        ...this.state.retrievedHighlights,
+        ...lastRetrievedHighlightsAtTheTime,
         ...newHighlights,
       };
       // we remove all highlights if we are not supposed to be capable of producing any
@@ -1030,6 +1033,7 @@ function didUpdate(
       state.currentSearchResultsFromTheRecords,
       state.currentSearchRecords,
       state.searchWillProduceNewHighlights,
+      state.retrievedHighlights,
       setState,
     );
   }
@@ -1062,8 +1066,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     // the refresh page will populate the values based on the load
     this.state = construct(
       this.props.itemContext,
-      this.props.startInSearchingState,
-      this.refreshPage,
+      this.props,
     );
   }
   public componentDidMount() {
@@ -1087,6 +1090,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         this.state.currentSearchResultsFromTheRecords,
         this.state.currentSearchRecords,
         this.state.searchWillProduceNewHighlights,
+        this.state.retrievedHighlights,
         this.setState.bind(this),
       );
     }
@@ -1287,9 +1291,20 @@ export function useSearchLoader<RawType = IRQValue, FlatType = IRQValue>(options
     console.error("Used pageSize of ALL and current page not zero at SearchLoader");
   }
 
+  const refreshPageHook = useCallback((isConstruct?: boolean) => {
+    return refreshPage(
+      itemContextRef.current,
+      isConstruct,
+      isConstruct ? options : optionsRef.current,
+      isConstruct ? null : stateRef.current,
+      isConstruct ? false : unmountRef.current,
+      isConstruct ? null : setState.bind(this),
+    );
+  }, []);
+
   // EMULATE of state and setState as well as derived state
   const x = useState<IActualSearchLoaderState>(
-    () => construct(itemContext, options.startInSearchingState, refreshPageHook),
+    () => construct(itemContext, options),
   );
   // done like this due to a bug on typescript
   const stateBase = x[0] as IActualSearchLoaderState;
@@ -1355,7 +1370,7 @@ export function useSearchLoader<RawType = IRQValue, FlatType = IRQValue>(options
       didUpdate(
         prevItemContext,
         prevOptions,
-        itemContext,
+        itemContextRef.current,
         tokenDataRef.current.token,
         localeDataRef.current.language,
         {
@@ -1370,17 +1385,6 @@ export function useSearchLoader<RawType = IRQValue, FlatType = IRQValue>(options
       );
     }
   }, [tokenData, itemContext, options, state]);
-
-  const refreshPageHook = useCallback((isConstruct?: boolean) => {
-    return refreshPage(
-      itemContextRef.current,
-      isConstruct,
-      optionsRef.current,
-      stateRef.current,
-      this.isUnmounted,
-      this.setState.bind(this),
-    );
-  }, []);
 
   const refreshPageNonCbHook = useCallback(() => {
     refreshPageHook();

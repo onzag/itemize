@@ -81,6 +81,9 @@ export interface IHookItemProviderState extends IItemSearchStateType {
   pokedElements: IPokeElementsType;
 }
 
+type EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE = typeof EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES[number];
+type STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE = typeof STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES[number];
+
 export interface IItemProviderHookElementBase<PlainProperties extends string = string, RawType = IRQValue> {
   /**
    * State information that the hook is currently in
@@ -95,22 +98,40 @@ export interface IItemProviderHookElementBase<PlainProperties extends string = s
    * Provides the curent known state of a property
    * @param pId 
    */
-  getStateForProperty<T>(pId: PlainProperties | IPropertyBaseProps<PlainProperties>): IPropertyDefinitionState<T>;
+  getStateForProperty<T>(pId:
+      PlainProperties |
+      EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE |
+      STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE |
+      IPropertyBaseProps<PlainProperties>
+  ): IPropertyDefinitionState<T>;
   /**
    * Provides the current known value of a property
    * @param pId 
    */
-  getValueForProperty<T>(pId: PlainProperties | IPropertyBaseProps<PlainProperties>): T;
+  getValueForProperty<T>(pId:
+    PlainProperties |
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE |
+    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE |
+    IPropertyBaseProps<PlainProperties>
+  ): T;
   /**
    * Provides the entry component of a property
    * @param options 
    */
-  getEntryForProperty(options: Omit<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>): React.ReactNode;
+  getEntryForProperty(options:
+    PlainProperties |
+    Omit<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>
+  ): React.ReactNode;
   /**
    * Provides the view component of a property
    * @param options 
    */
-  getViewForProperty(options: Omit<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>): React.ReactNode;
+  getViewForProperty(options:
+    PlainProperties | 
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE |
+    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES_TYPE |
+    Omit<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>
+  ): React.ReactNode;
   /**
    * Set value for property
    * 
@@ -211,8 +232,12 @@ export function useItemProvider
       idef = options.itemDefinition;
     }
 
+    if (options.searchCounterpart) {
+      idef = idef.getSearchModeCounterpart();
+    }
+
     return idef;
-  }, [options.itemDefinition, mod]);
+  }, [options.itemDefinition, options.searchCounterpart, mod]);
 
   // EMULATE of state and setState as well as derived state
   const [stateBase, setStateBase] = useState<IHookItemProviderState>(
@@ -1309,16 +1334,26 @@ export function useItemProvider
   }, [context]);
 
   const getEntryFor = useCallback((
-    options: Omit<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>,
+    options: string | Omit<IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>,
   ) => {
+    if (typeof options === "string") {
+      return (
+        <Entry id={options} context={context as IItemContextType} />
+      );
+    }
     return (
       <Entry {...options} context={context as IItemContextType} />
     );
   }, [context]);
 
   const getViewFor = useCallback((
-    options: Omit<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>,
+    options: string | Omit<IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>, PlainProperties, SearchVariants>, 'context'>,
   ) => {
+    if (typeof options === "string") {
+      return (
+        <View id={options} context={context as IItemContextType} />
+      );
+    }
     return (
       <View {...options} context={context as IItemContextType} />
     );
@@ -1414,12 +1449,14 @@ export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IIt
       if (
         RESERVED_BASE_PROPERTIES_RQ[pId]
       ) {
-        Object.defineProperty(result, pId, {
-          get: () => {
-            return provider.getValueForProperty(pId);
-          },
-          enumerable: true,
-        });
+        if (!provider.context.idef.isInSearchMode()) {
+          Object.defineProperty(result, pId, {
+            get: () => {
+              return provider.getValueForProperty(pId);
+            },
+            enumerable: true,
+          });
+        }
       } else {
         result[pId] = {
           get value() {
@@ -1447,7 +1484,7 @@ export function usePropertiesMemoFor<T>(properties: Array<string>, provider: IIt
   }, [
     provider.getValueForProperty, provider.getStateForProperty, provider.setValueForProperty,
     provider.enforceValueOnProperty, provider.clearEnforcementOnProperty, provider.restoreProperty,
-    provider.getEntryForProperty, provider.getViewForProperty
+    provider.getEntryForProperty, provider.getViewForProperty, provider.context.idef.isInSearchMode(),
   ]) as T;
 }
 

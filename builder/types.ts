@@ -381,9 +381,13 @@ function buildItemProviderFor(
   modPath: string,
   idefPath: string,
   nonHook: boolean,
-) {
+): {
+  idef: string,
+  types: string,
+} {
   const allPropertiesLocation = "allProperties" + itemTypeNameGetterBase(idef);
   const propertiesTypeName = "IPropertiesMemo" + itemTypeNameGetterBase(idef);
+  const itemProviderType = "ItemProviderFor" + itemTypeNameGetterBase(idef);
 
   const plainProperties = "typeof propertiesBase" + itemTypeNameGetterBase(idef) + "[number]";
 
@@ -410,20 +414,24 @@ function buildItemProviderFor(
 
   if (nonHook) {
     if (idefPath === null) {
-      return (
+      return {idef: (
         `
   return (<ModuleProvider module=${JSON.stringify(modPath)}><ItemProvider searchCounterpart={${JSON.stringify(sc)}} {...props}/></ModuleProvider>);
 `
-      );  
+      ), types: null};
     }
-    return (
+    return {idef: (
       `
   return (<ItemProvider itemDefinition=${JSON.stringify(idefPath)} searchCounterpart={${JSON.stringify(sc)}} {...props}/>);
 `
-    );
+    ), types: null};
   }
 
-  return (
+  const providerType = idef.isInSearchMode() ? 
+  "IItemProviderHookElementSearchOnly<" + plainProperties + "," + rawType + "," + flatType + ">" :
+  "IItemProviderHookElementNonSearchOnly<" + plainProperties + ">";
+
+  return {idef: (
     `
   const provider = useItemProvider<string, unknown, unknown>({
     ...options,
@@ -435,13 +443,11 @@ function buildItemProviderFor(
   const properties = usePropertiesMemoFor<${propertiesTypeName}>(${allPropertiesLocation}, provider);
 
   return ({
-    ...(provider${idef.isInSearchMode() ? 
-      " as IItemProviderHookElementSearchOnly<" + plainProperties + "," + rawType + "," + flatType + ">" :
-      " as IItemProviderHookElementNonSearchOnly<" + plainProperties + ">"}),
+    ...(provider as ${providerType}),
     properties,
-  });
+  }) as ${itemProviderType};
 `
-  );
+  ), types: `export interface ${itemProviderType} extends ${providerType} {properties: ${propertiesTypeName}};`};
 }
 
 function defineAllFor(idef: ItemDefinition, onlyBaseAndNothingElse?: boolean) {
@@ -504,8 +510,13 @@ function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
     nameIdef + "[number], PropertiesForSetting" + nameIdef + "> = {}) {\n";
   let ipDefault = "export function " + itemTypeNameGetterIPBase(idef) + "(props: ICustomItemProviderProps<typeof propertiesBase" +
   nameIdef + "[number], PropertiesForSetting" + nameIdef + "> = {}) {\n";
-  ipDefault += buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName(), true);
-  hookDefault += buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName(), false);
+
+  const defaultBuilt = buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName(), true);
+  const hookDefaultBuilt = buildItemProviderFor(idef, false, mod.getQualifiedPathName(), idef.getQualifiedPathName(), false);
+
+  ipDefault += defaultBuilt.idef;
+  hookDefault = hookDefaultBuilt.types + "\n" + hookDefault;
+  hookDefault += hookDefaultBuilt.idef;
 
   let hookSearch = "";
   let ipSearch = "";
@@ -515,8 +526,11 @@ function itemSchemaJsBuilder(idef: ItemDefinition, mod: Module): string {
     hookSearch = "export function " + itemTypeNameGetterUseSearch(idef) + "(options: ICustomItemProviderSearchOptions<typeof propertiesBase" +
     nameIdef + "[number], PropertiesForSetting" + nameIdefSearchMode + "> = {}) {\n";
   
-    hookSearch += buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName(), false);
-    ipSearch += buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName(), true);
+    const searchBuilt = buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName(), true);
+    const hookSearchBuilt = buildItemProviderFor(idef.getSearchModeCounterpart(), true, mod.getQualifiedPathName(), idef.getQualifiedPathName(), false);
+    hookSearch += hookSearchBuilt.idef;
+    hookSearch = hookSearchBuilt.types + "\n" + hookSearch;
+    ipSearch += searchBuilt.idef;
     hookSearch += "};\n";
     ipSearch += "};\n";
   }
@@ -547,8 +561,12 @@ function moduleSchemaJsBuilder(mod: Module): string {
       "[number], PropertiesForSetting" + nameIdef  + "> = {}) {\n";
     ipSearch = "export function " + modTypeNameGetterIPSearch(mod) + "(props: ICustomItemProviderSearchProps<typeof propertiesBase" + nameIdef +
       "[number], PropertiesForSetting" + nameIdefSearchMode  + "> = {}) {\n";
-    hookSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, false);
-    ipSearch += buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, true);
+
+    const hookSearchBuilt = buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, false);
+    const searchBuilt = buildItemProviderFor(mod.getPropExtensionItemDefinition().getSearchModeCounterpart(), true, mod.getQualifiedPathName(), null, true);
+    hookSearch += hookSearchBuilt.idef;
+    hookSearch = hookSearchBuilt.types + "\n" + hookSearch;
+    ipSearch += searchBuilt.idef;
     hookSearch += "};\n"
     ipSearch += "};\n"
   }

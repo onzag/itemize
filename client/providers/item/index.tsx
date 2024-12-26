@@ -700,7 +700,7 @@ export interface IActionSearchOptions<PlainProperties extends string = string> e
    * in this case the property "order" which may be a number will be used first
    * to sort, and later the property for the username will be used for sorting
    */
-  orderBy?: IOrderByRuleType<PlainProperties>;
+  orderBy?: IOrderByRuleType<PlainProperties | "created_at" | "blocked_at" | "blocked_until" | "last_modified" | "edited_at" | "reviewed_at">;
   /**
    * By whom it was created, this allows to limit the results that are by a specific
    * creator, this is very useful for example to ensure security policies are met
