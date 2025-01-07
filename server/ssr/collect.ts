@@ -582,6 +582,7 @@ export class Collector {
         // we don't need because they are traditional
         searchEngineHighlightArgs: null as any,
         searchListenSlowPolling: args.listenPolicySlowPolling || false,
+        searchListenPolicyUpdateGraceTime: args.listenPolicyUpdateGraceTime || 0,
       };
 
       const state = {

@@ -163,7 +163,7 @@ export function SubmitButton(props: ISubmitButtonProps) {
                 onClick={submitAction}
                 sx={props.buttonSx}
               >
-                <I18nRead capitalize={true} id={props.i18nId} />
+                <I18nRead capitalize={true} i18nId={props.i18nId} />
               </Button>
             </ProgressingElement>
             {
@@ -216,7 +216,7 @@ export function SearchButton(props: ISearchButtonProps) {
                 onClick={actioner.search.bind(null, props.options)}
                 sx={props.buttonSx}
               >
-                <I18nRead capitalize={true} id={props.i18nId} />
+                <I18nRead capitalize={true} i18nId={props.i18nId} />
               </Button>
             </ProgressingElement>
           </>
@@ -319,7 +319,7 @@ export function DeleteButton(props: IDeleteButtonProps) {
                 onClick={deleteAction}
                 sx={props.buttonSx}
               >
-                <I18nRead capitalize={true} id={props.i18nId} />
+                <I18nRead capitalize={true} i18nId={props.i18nId} />
               </Button>
             </ProgressingElement>
             {
@@ -357,7 +357,7 @@ export function ReportButton(props: IReportButtonProps) {
         sx={props.buttonSx}
         onClick={setIsActive.bind(null, true)}
       >
-        <I18nRead capitalize={true} id={props.i18nId} />
+        <I18nRead capitalize={true} i18nId={props.i18nId} />
       </Button>
       <CreateReportDialog
         isOpened={isActive}

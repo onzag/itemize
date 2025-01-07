@@ -381,6 +381,7 @@ export function useItemProvider
   const preventSearchFeedbackOnPossibleStaleDataRef = useRef(false);
   const submitBlockPromisesRef = useRef([] as Array<Promise<any>>);
   const reloadNextSearchRef = useRef(false);
+  const awaitingSearchReloadRemoteArgsRef = useRef<IRemoteListenerRecordsCallbackArg[]>(null);
   const initialAutomaticNextSearchRef = useRef(false);
   const lastUpdateIdRef = useRef<number>();
   const storeStateTimeoutRef = useRef(null as NodeJS.Timer);
@@ -458,6 +459,7 @@ export function useItemProvider
       stateRef.current,
       preventSearchFeedbackOnPossibleStaleDataRef,
       reloadNextSearchRef,
+      awaitingSearchReloadRemoteArgsRef,
       searchHook,
       arg,
     );
@@ -528,6 +530,7 @@ export function useItemProvider
       search: searchHook,
       submit: submitHook,
       unpoke: unpokeHook,
+      redoSearch: redoSearchHook,
     } as IBasicFns;
   }, []);
 
@@ -832,6 +835,10 @@ export function useItemProvider
     );
   }, []);
 
+  const redoSearchHook = useCallback(() => {
+    return searchHook(stateRef.current.searchOriginalOptions);
+  }, []);
+
   const dismissLoadErrorHook = useCallback(() => {
     dismissLoadError(
       isUnmountedRef.current,
@@ -958,11 +965,12 @@ export function useItemProvider
 
     return () => {
       didUpdate(
-        prevIdef,
+        prevIdef, 
         idefRef.current,
         prevOptions,
         prevState,
         optionsRef.current,
+        activeSearchOptionsRef,
         prevTokenData,
         tokenDataRef.current,
         stateRef,
@@ -1266,6 +1274,7 @@ export function useItemProvider
     delete: deleteHook,
     clean: cleanHook,
     search: searchHook,
+    redoSearch: redoSearchHook,
     forId: options.forId || null,
     forVersion: options.forVersion || null,
     dismissLoadError: dismissLoadErrorHook,

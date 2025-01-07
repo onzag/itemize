@@ -170,7 +170,7 @@ export function Navbar(props: INavbarProps) {
             {(offline) => (
               <AppBar sx={offline ? navbarStyles.appBarOffline : navbarStyles.appBarDefault}>
                 <Toolbar>
-                  <I18nRead id="menu">
+                  <I18nRead i18nId="menu">
                     {
                       (value: string) => (
                         <AltBadgeReactioner

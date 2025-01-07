@@ -34,7 +34,7 @@ const visuallyHidden = {
 type Formatter = (options: ICurrencyDisplayerProps) => string | React.ReactNode;
 
 export function useCurrencyDisplayerFormatter(): Formatter {
-  const format = useI18nRead({ id: "currency_format" });
+  const format = useI18nRead({ i18nId: "currency_format" });
 
   return (options: ICurrencyDisplayerProps) => {
     const currencyType = currencies[options.currency];

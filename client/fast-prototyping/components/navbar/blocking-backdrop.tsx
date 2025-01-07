@@ -68,7 +68,7 @@ export function BlockingBackdrop(props: BlockingBackdropProps) {
         return (
           <Backdrop sx={blockingBackdropStyles.backdrop} open={isBlocked}>
             <BackDropTextContainer>
-              <I18nRead id="blocked_update" />
+              <I18nRead i18nId="blocked_update" />
             </BackDropTextContainer>
             <CircularProgress color="inherit" />
           </Backdrop>

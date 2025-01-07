@@ -24,7 +24,7 @@ const externalDialogsStyle = {
 
 /**
  * The external dialogs component, given a
- * err, msg, and msgTitle in the query string, all as string will
+ * err, msg, and i18nMsgTitle in the query string, all as string will
  * display a dialog as long as they are there
  * @returns a react element
  */
@@ -50,9 +50,9 @@ export function ExternalDialogs() {
 
         return <React.Fragment>
           <I18nReadMany data={[
-            { id: title, capitalize: true },
-            { id: description, capitalize: true },
-            { id: "ok", capitalize: true }
+            { i18nId: title, capitalize: true },
+            { i18nId: description, capitalize: true },
+            { i18nId: "ok", capitalize: true }
           ]}>
             {(i18nTitle, i18nDescription, ok) => {
               return (

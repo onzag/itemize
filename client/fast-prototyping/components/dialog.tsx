@@ -135,7 +135,7 @@ function Dialog(props: IDialogProps) {
     >
       {props.title ? <AppBar sx={props.appbarSx ? props.appbarSx : dialogStyles.appbar}>
         <Toolbar>
-          <I18nRead id="close">
+          <I18nRead i18nId="close">
             {(i18nClose: string) => (
               <IconButton
                 color="inherit"

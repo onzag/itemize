@@ -57,14 +57,14 @@ export function OutdatedDialog(props: IOutdatedDialogProps) {
             <I18nReadMany
               data={[
                 {
-                  id: "needs_update_title",
+                  i18nId: "needs_update_title",
                   capitalize: true,
                 },
                 {
-                  id: "needs_update_content",
+                  i18nId: "needs_update_content",
                 },
                 {
-                  id: "needs_update_action",
+                  i18nId: "needs_update_action",
                 },
               ]}
             >

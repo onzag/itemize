@@ -841,6 +841,11 @@ export interface IActionSearchOptions<PlainProperties extends string = string> e
    */
   listenPolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   /**
+   * A number in milliseconds that will wait for multiple updates from the server (eg. if you are expecting a stream)
+   * of updates, and combine them to perform into a single search, rather than many searches that may conflict with each other
+   */
+  listenPolicyUpdateGraceTime?: number;
+  /**
    * uses slow polling rather than realtime listening
    * this is not recommended to use, values update each minute more or less
    */
@@ -1073,6 +1078,11 @@ export interface IBasicFns {
    * @returns 
    */
   search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
+  /**
+   * performs a search with the same options as the last search
+   * @returns 
+   */
+  redoSearch: () => Promise<IActionResponseWithSearchResults>;
 }
 
 /**
@@ -2000,6 +2010,13 @@ export class ActualItemProvider extends
   private preventSearchFeedbackOnPossibleStaleData: boolean = false;
 
   /**
+   * This variable is used for the search reload event in order to accumulate
+   * aka it's an accumulator of several calls of the search reload that occur almost
+   * simultaneously
+   */
+  private awaitingSearchReloadRemoteArgs: IRemoteListenerRecordsCallbackArg[] = null;
+
+  /**
    * During loading both the id and version might be suddenly hot
    * updated before the server had time to reply this ensures
    * that we will only apply the value for the last loading
@@ -2175,6 +2192,7 @@ export class ActualItemProvider extends
     this.poke = this.poke.bind(this);
     this.unpoke = this.unpoke.bind(this);
     this.search = this.search.bind(this);
+    this.redoSearch = this.redoSearch.bind(this);
     this.dismissSearchError = this.dismissSearchError.bind(this);
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
     this.onSearchReload = this.onSearchReload.bind(this);
@@ -2253,6 +2271,7 @@ export class ActualItemProvider extends
       search: this.search,
       submit: this.submit,
       unpoke: this.unpoke,
+      redoSearch: this.redoSearch,
     };
   }
 
@@ -2369,6 +2388,14 @@ export class ActualItemProvider extends
       prevProps,
       prevState,
       this.props,
+      {
+        get current() {
+          return $this.activeSearchOptions;
+        },
+        set current(v: IActionSearchOptions) {
+          $this.activeSearchOptions = v;
+        },
+      },
       prevProps.tokenData,
       this.props.tokenData,
       this.stateAsRef,
@@ -3292,6 +3319,14 @@ export class ActualItemProvider extends
           $this.reloadNextSearch = v;
         }
       },
+      {
+        get current() {
+          return $this.awaitingSearchReloadRemoteArgs;
+        },
+        set current(v) {
+          $this.awaitingSearchReloadRemoteArgs = v;
+        }
+      },
       this.search,
       arg,
     );
@@ -3329,6 +3364,14 @@ export class ActualItemProvider extends
         policies: [],
       },
     });
+  }
+
+  public async redoSearch() {
+    if (this.isUnmounted) {
+      return;
+    }
+
+    return await this.search(this.state.searchOriginalOptions);
   }
 
   private internalDataProviderForAnalytics() {
@@ -3475,6 +3518,7 @@ export class ActualItemProvider extends
             delete: this.delete,
             clean: this.clean,
             search: this.search,
+            redoSearch: this.redoSearch,
             forId: this.props.forId || null,
             forVersion: this.props.forVersion || null,
             dismissLoadError: this.dismissLoadError,

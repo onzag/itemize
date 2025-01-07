@@ -103,7 +103,7 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
     const autoHideDuration = this.props.noAutoHide ? null : 3000;
 
     if (typeof this.props.i18nDisplay === "string") {
-      message = <I18nRead id={this.props.i18nDisplay} capitalize={true} context={this.props.i18nContext} args={this.props.i18nArgs}/>;
+      message = <I18nRead i18nId={this.props.i18nDisplay} capitalize={true} context={this.props.i18nContext} args={this.props.i18nArgs}/>;
     } else if (this.props.i18nDisplay) {
       message = <I18nReadError error={this.props.i18nDisplay} capitalize={true}   />;
     }
@@ -112,7 +112,7 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
 
     if (!this.props.noClose) {
       closeButton = (
-        <I18nRead id="close">
+        <I18nRead i18nId="close">
           {(i18nClose: string) => (
             <IconButton
               aria-label={i18nClose}

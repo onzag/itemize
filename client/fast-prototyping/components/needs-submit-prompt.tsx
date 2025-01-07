@@ -132,20 +132,20 @@ interface NeedsSubmitPromptProps {
 export class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPromptProps> {
   public render() {
     return (
-      <I18nRead id={this.props.i18nMessage || "unsaved_changes"} capitalize={true}>
+      <I18nRead i18nId={this.props.i18nMessage || "unsaved_changes"} capitalize={true}>
         {(message: string) => (
           <I18nReadMany
             data={[
               {
-                id: this.props.i18nTitle || "generic_warning",
+                i18nId: this.props.i18nTitle || "generic_warning",
                 capitalize: true,
               },
               {
-                id: this.props.i18nConfirm || "save",
+                i18nId: this.props.i18nConfirm || "save",
                 capitalize: true,
               },
               {
-                id: this.props.i18nDiscard || "discard",
+                i18nId: this.props.i18nDiscard || "discard",
                 capitalize: true
               }
             ]}

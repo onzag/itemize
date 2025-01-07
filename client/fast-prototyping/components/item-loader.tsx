@@ -138,12 +138,12 @@ export function ItemLoader(props: ItemLoaderProps) {
           let errorComponent = null;
           let imageComponent = null;
           if (notFound) {
-            errorComponent = <I18nRead id={props.notFoundMessageI18nId || "error.NOT_FOUND"} capitalize={true}/>;
+            errorComponent = <I18nRead i18nId={props.notFoundMessageI18nId || "error.NOT_FOUND"} capitalize={true}/>;
             if (props.notFoundImage) {
               imageComponent = <img src={props.notFoundImage} />
             }
           } else if (blocked) {
-            errorComponent = <I18nRead id={props.blockedMessageI18nId || "error.BLOCKED"} capitalize={true}/>;
+            errorComponent = <I18nRead i18nId={props.blockedMessageI18nId || "error.BLOCKED"} capitalize={true}/>;
             if (props.blockedImage) {
               imageComponent = <img src={props.blockedImage} />
             }
@@ -157,7 +157,7 @@ export function ItemLoader(props: ItemLoaderProps) {
             <FlexingContainer className={props.errorClassName} sx={props.errorSx}>
               <Typography>{errorComponent}</Typography>
               {imageComponent}
-              <I18nRead id="reload">
+              <I18nRead i18nId="reload">
                 {(i18nReload: string) => (
                   <IconButton color="inherit" onClick={arg.reload} aria-label={i18nReload} size="large">
                     <RefreshIcon />

@@ -21,13 +21,19 @@ import { ICacheMetadataMatchType } from "../../../client/internal/workers/cache/
 import { setHistoryQSState, setHistoryState } from "../../components/navigation";
 import Include, { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 import { blobToTransferrable } from "../../../util";
-import { IRQRequestFields, IRQValue } from "../../../rq-querier";
+import { IRQRequestFields, IRQSearchRecord, IRQValue } from "../../../rq-querier";
 import { IConfigRawJSONDataType } from "../../../config";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
+function wait(n: number) {
+  return new Promise((r) => {
+    setTimeout(r, n);
+  });
+}
+
 export function getPropertyFromCoreRule(baseRule: string | IPropertyBaseProps, itemDefinition: ItemDefinition) {
-  const rule: IPropertyBaseProps = typeof baseRule === "string" ? {id: baseRule} : baseRule; 
+  const rule: IPropertyBaseProps = typeof baseRule === "string" ? { id: baseRule } : baseRule;
   let actualId: string = rule.id;
   if (rule.searchVariant) {
     actualId = PropertyDefinitionSearchInterfacesPrefixes[rule.searchVariant.toUpperCase().replace("-", "_")] + rule.id;
@@ -155,6 +161,7 @@ export function setupInitialState(
     searchListenPolicy: "none",
     searchOriginalOptions: null,
     searchListenSlowPolling: false,
+    searchListenPolicyUpdateGraceTime: 0,
   };
   const searchStateComplex = idef.getSearchState(
     propsOrOptions.forId || null, propsOrOptions.forVersion || null,
@@ -938,7 +945,7 @@ export async function search(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
   originalOptions: IActionSearchOptions,
-  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
+  state: { readonly current: IHookItemProviderState | IActualItemProviderState },
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>, cb?: () => void) => void,
   initialAutomaticNextSearchRef: { current: boolean },
   reloadNextSearchRef: { current: boolean },
@@ -1528,6 +1535,7 @@ export async function search(
       searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
       searchOriginalOptions: options,
       searchListenSlowPolling: options.listenPolicySlowPolling || false,
+      searchListenPolicyUpdateGraceTime: options.listenPolicyUpdateGraceTime || 0,
     };
 
     // this would be a wasted instruction otherwise as it'd be reversed
@@ -1633,6 +1641,7 @@ export async function search(
       searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
       searchOriginalOptions: options,
       searchListenSlowPolling: options.listenPolicySlowPolling || false,
+      searchListenPolicyUpdateGraceTime: options.listenPolicyUpdateGraceTime || 0,
     };
 
     searchListenersSetup(
@@ -2033,7 +2042,7 @@ export const LOAD_TIME = (new Date()).getTime();
 export async function onMount(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
+  state: { readonly current: IHookItemProviderState | IActualItemProviderState },
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>, cb?: () => void) => void,
   remoteListener: RemoteListener,
   isCMountedRef: { current: boolean },
@@ -2287,6 +2296,7 @@ export function getSearchStateOf(state: IActualItemProviderState | IHookItemProv
     searchListenPolicy: state.searchListenPolicy,
     searchOriginalOptions: state.searchOriginalOptions,
     searchListenSlowPolling: state.searchListenSlowPolling,
+    searchListenPolicyUpdateGraceTime: state.searchListenPolicyUpdateGraceTime,
   };
 }
 
@@ -2350,7 +2360,7 @@ export function removeDoubleSlotter(
 export async function loadValue(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
+  state: { readonly current: IHookItemProviderState | IActualItemProviderState },
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   remoteListener: RemoteListener,
   lastLoadingForIdRef: { current: string },
@@ -2879,6 +2889,7 @@ export async function didUpdate(
   prevPropsOrOptions: IItemProviderOptions | IActualItemProviderProps,
   prevState: IActualItemProviderState | IHookItemProviderState,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
+  activeSearchOptionsRef: { current: IActionSearchOptions },
   prevUser: {
     id: string,
     role: string,
@@ -2889,7 +2900,7 @@ export async function didUpdate(
     role: string,
     token: string,
   },
-  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
+  state: { readonly current: IActualItemProviderState | IHookItemProviderState },
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   blockIdCleanRef: { current: string },
   storeStateTimeoutRef: { current: any },
@@ -3171,6 +3182,7 @@ export async function didUpdate(
     )
   )
 
+  const isSearchUnequalV = isSearchUnequal(propsOrOptions.automaticSearch, prevPropsOrOptions.automaticSearch);
   if (
     // if the automatic search is not setup to just initial
     !propsOrOptions.automaticSearchIsOnlyInitial &&
@@ -3181,7 +3193,7 @@ export async function didUpdate(
       (
         prevPropsOrOptions.automaticSearch &&
         (
-          isSearchUnequal(propsOrOptions.automaticSearch, prevPropsOrOptions.automaticSearch) ||
+          isSearchUnequalV ||
           // these two would cause search results to be dismissed because
           // the fact the token is a key part of the search itself so we would
           // dismiss the search in such a case as the token is different
@@ -3194,17 +3206,63 @@ export async function didUpdate(
           // no search id for example if the slot changed during
           // an update of forId and forVersion and as a result
           // the search is empty in this slot
-          state.current.searchId === null
+          (!state.current.searching && state.current.searchId === null)
         )
       ) ||
       (!prevPropsOrOptions.automaticSearch && propsOrOptions.automaticSearch)
-    ) && !state.current.searching
+    )
   ) {
     // maybe there's no new automatic search
     if (propsOrOptions.automaticSearch && !propsOrOptions.automaticSearch.clientDisabled) {
       // always perform the search even if there's a state
       if (propsOrOptions.automaticSearchForce || state.current.searchId === null) {
-        search(propsOrOptions.automaticSearch);
+        if (state.current.searching) {
+          if (propsOrOptions.automaticSearch.pileSearch) {
+            search(propsOrOptions.automaticSearch);
+          } else if (isSearchUnequalV) {
+            console.error(
+              "Automatic search parameters changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+              "changed from:",
+              prevPropsOrOptions.automaticSearch || null,
+              "to:",
+              propsOrOptions.automaticSearch || null,
+              "the real active search options is:",
+              activeSearchOptionsRef.current || null,
+            );
+          } else if (uniqueIDChanged) {
+            console.error(
+              "Automatic search unique id/version combination changed while it was searching, this caused the last search to be ignored, please consider your calls",
+              [prevPropsOrOptions.forId, prevPropsOrOptions.forVersion],
+              [propsOrOptions.forId, propsOrOptions.forVersion],
+            );
+          } else if (itemDefinitionWasUpdated) {
+            console.error(
+              "Automatic search item changed while it was searching, this caused the last search to be ignored, please consider your calls",
+              prevIdef.getQualifiedPathName(),
+              idef.getQualifiedPathName(),
+            );
+          } else if (didSomethingThatInvalidatedSetters) {
+            console.error(
+              "Automatic search setters changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+              prevPropsOrOptions.setters || null,
+              propsOrOptions.setters || null,
+            );
+          } else if (didSomethingThatInvalidatedPrefills) {
+            console.error(
+              "Automatic search prefills changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+              prevPropsOrOptions.prefills || null,
+              propsOrOptions.prefills || null,
+            );
+          } else if (prevUser.token !== user.token) {
+            console.error(
+              "Automatic search token changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+            );
+          } else {
+            console.error("Unknown reason why search changed, please consider your calls")
+          }
+        } else {
+          search(propsOrOptions.automaticSearch);
+        }
       } else {
         // so knowing that let's check wether it loaded a search state that is currently active
         // well it must be because state.searchId must be something right now
@@ -3213,7 +3271,53 @@ export async function didUpdate(
           propsOrOptions.onSearchStateLoaded && propsOrOptions.onSearchStateLoaded(getSearchStateOf(state.current));
         } else {
           // otherwise we automatically search
-          search(propsOrOptions.automaticSearch);
+          if (state.current.searching) {
+            if (propsOrOptions.automaticSearch.pileSearch) {
+              search(propsOrOptions.automaticSearch);
+            } else if (isSearchUnequalV) {
+              console.error(
+                "Automatic search parameters changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+                "changed from:",
+                prevPropsOrOptions.automaticSearch || null,
+                "to:",
+                propsOrOptions.automaticSearch || null,
+                "the real active search options is:",
+                activeSearchOptionsRef.current || null,
+              );
+            } else if (uniqueIDChanged) {
+              console.error(
+                "Automatic search unique id/version combination changed while it was searching, this caused the last search to be ignored, please consider your calls",
+                [prevPropsOrOptions.forId, prevPropsOrOptions.forVersion],
+                [propsOrOptions.forId, propsOrOptions.forVersion],
+              );
+            } else if (itemDefinitionWasUpdated) {
+              console.error(
+                "Automatic search item changed while it was searching, this caused the last search to be ignored, please consider your calls",
+                prevIdef.getQualifiedPathName(),
+                idef.getQualifiedPathName(),
+              );
+            } else if (didSomethingThatInvalidatedSetters) {
+              console.error(
+                "Automatic search setters changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+                prevPropsOrOptions.setters || null,
+                propsOrOptions.setters || null,
+              );
+            } else if (didSomethingThatInvalidatedPrefills) {
+              console.error(
+                "Automatic search prefills changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+                prevPropsOrOptions.prefills || null,
+                propsOrOptions.prefills || null,
+              );
+            } else if (prevUser.token !== user.token) {
+              console.error(
+                "Automatic search token changed while it was currently searching, this caused the last search to be ignored, please consider your calls",
+              );
+            } else {
+              console.error("Unknown reason why search changed, please consider your calls")
+            }
+          } else {
+            search(propsOrOptions.automaticSearch);
+          }
         }
       }
     } else if (!propsOrOptions.automaticSearchDoNotAutoDismissDuringChanges) {
@@ -3330,7 +3434,7 @@ export function runDismountOn(
 export async function storeStateDelayed(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
+  state: { readonly current: IActualItemProviderState | IHookItemProviderState },
 ) {
   if (propsOrOptions.storeStateOnChange && CacheWorkerInstance.isSupportedAsWorker) {
     const location = getStoredStateLocation(propsOrOptions.storeStateOnChange, propsOrOptions.forId, propsOrOptions.forVersion);
@@ -3426,6 +3530,7 @@ export function changeSearchListener(
     searchListenPolicy: "none",
     searchOriginalOptions: null,
     searchListenSlowPolling: false,
+    searchListenPolicyUpdateGraceTime: 0,
   };
 
   const searchStateComplex = idef.getSearchState(
@@ -3554,7 +3659,7 @@ export async function changeListener(
 export async function loadListener(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
+  state: { readonly current: IActualItemProviderState | IHookItemProviderState },
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   isUnmountedRef: { current: boolean },
   isCMountedRef: { current: boolean },
@@ -3683,7 +3788,7 @@ export async function downloadStateAt(
 export async function onPropertyChange(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: {readonly current: IActualItemProviderState | IHookItemProviderState},
+  state: { readonly current: IActualItemProviderState | IHookItemProviderState },
   lastLoadValuePromise: Promise<void>,
   lastUpdateIdRef: { current: number },
   updateTimeoutRef: { current: any },
@@ -3971,7 +4076,7 @@ export function onIncludeSetExclusionState(
 export async function del(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
+  state: { readonly current: IHookItemProviderState | IActualItemProviderState },
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   isUnmountedRef: { current: boolean },
   blockIdCleanRef: { current: string },
@@ -4114,7 +4219,7 @@ export async function del(
 export async function submit(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
-  state: {readonly current: IHookItemProviderState | IActualItemProviderState},
+  state: { readonly current: IHookItemProviderState | IActualItemProviderState },
   setState: (v: Partial<IHookItemProviderState | IActualItemProviderState>) => void,
   activeSubmitPromiseRef: { current: Promise<{ response: IActionSubmitResponse, options: IActionSubmitOptions }> },
   activeSubmitPromiseAwaiterRef: { current: string },
@@ -4636,6 +4741,7 @@ export async function onSearchReload(
   state: IHookItemProviderState | IActualItemProviderState,
   preventSearchFeedbackOnPossibleStaleDataRef: { current: boolean },
   reloadNextSearchRef: { current: boolean },
+  awaitingSearchReloadRemoteArgs: { current: IRemoteListenerRecordsCallbackArg[]},
   search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>,
 
   arg: IRemoteListenerRecordsCallbackArg
@@ -4646,6 +4752,33 @@ export async function onSearchReload(
       "Could not execute a search reload because the item is currently search reloading",
     );
     return;
+  }
+
+  // make an accumulator with a grace time
+  // for example say the user triggers a bunch of updates
+  // at the same time, the server currently gathers the updates in 250ms
+  // timeframes, but if the flow of updates is higher than that and they come from all
+  // over the place, it may cause
+  // a stream of search events in the case that a search is living with a cache policy
+  // or simply a listen policy (second case being the worst)
+  // by adding a grace timer we can prevent searches happening every time
+  // when updates come very quickly for a given search
+  let hasSetActiveSearchPromise = false;
+  if (state.searchListenPolicyUpdateGraceTime) {
+    // if there's a currently awaiting search reload active that is waiting
+    if (awaitingSearchReloadRemoteArgs.current) {
+      // we add ourselves to this list
+      awaitingSearchReloadRemoteArgs.current.push(arg);
+      // then we avoid search because we expect that one to run the search call
+      return;
+    } else {
+      // otherwise yes we have an active search promise that we handle
+      hasSetActiveSearchPromise = true;
+      // we add ourselves to this list
+      awaitingSearchReloadRemoteArgs.current = [arg];
+      // and wait for the grace time
+      await wait(state.searchListenPolicyUpdateGraceTime);
+    }
   }
 
   // this function is called when remotely the search
@@ -4659,18 +4792,35 @@ export async function onSearchReload(
   // feedback as we already got feedback
   preventSearchFeedbackOnPossibleStaleDataRef.current = true;
   reloadNextSearchRef.current = true;
+  let collectedArgsFromAllCalls: IRemoteListenerRecordsCallbackArg[] = [arg];
   await search(state.searchOriginalOptions);
+  if (hasSetActiveSearchPromise) {
+    // clear up the active search promise stuff
+    collectedArgsFromAllCalls = awaitingSearchReloadRemoteArgs.current;
+    awaitingSearchReloadRemoteArgs.current = null;
+  }
 
   // now that the search is done, any records in cache would have updated
   // in the case of cachePolicy usages, and now we can trigger updates
   // down the line
   const root = idef.getParentModule().getParentRoot();
-  arg.modifiedRecords.forEach((record) => {
-    const iDef = root.registry[record.type] as ItemDefinition;
-    const rqValue = iDef.getRQAppliedValue(record.id, record.version);
-    if (!rqValue || !rqValue.flattenedValue || rqValue.flattenedValue.last_modified !== record.last_modified) {
-      iDef.triggerListeners("reload", record.id, record.version);
-    }
+  const alreadyCalledRecordsSignatures: string[] = [];
+  collectedArgsFromAllCalls.forEach((recordInfoArg) => {
+    recordInfoArg.modifiedRecords.forEach((record) => {
+
+      // prevent duplicate calls
+      const signature = record.type + "." + record.id + "." + (record.version || "");
+      if (alreadyCalledRecordsSignatures.includes(signature)) {
+        return;
+      }
+      alreadyCalledRecordsSignatures.push(signature);
+
+      const iDef = root.registry[record.type] as ItemDefinition;
+      const rqValue = iDef.getRQAppliedValue(record.id, record.version);
+      if (!rqValue || !rqValue.flattenedValue || rqValue.flattenedValue.last_modified !== record.last_modified) {
+        iDef.triggerListeners("reload", record.id, record.version);
+      }
+    });
   });
 }
 
@@ -4726,6 +4876,7 @@ export function getDerived(
       searchMetadata: null,
       searchListenSlowPolling: false,
       searchOriginalOptions: null,
+      searchListenPolicyUpdateGraceTime: 0,
     };
 
     let searchWasRestored = "NO";

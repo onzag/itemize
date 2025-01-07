@@ -133,7 +133,7 @@ function AccessibleImage(props: IAccessibleImageProps) {
   }, [props.onClick, props.image, props.onImageClick]);
 
   const i18nLabel = useI18nRead({
-    id: props.i18nLabelId,
+    i18nId: props.i18nLabelId,
     context: props.i18nLabelContext,
   }) as string;
 

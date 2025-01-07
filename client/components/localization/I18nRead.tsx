@@ -58,7 +58,7 @@ export interface I18nReadOptions {
    * the root context is the last, and reads from the base root properties or the main i18n data properties
    * if nothing found in this last context, an error is thrown
    */
-  id: string;
+  i18nId: string;
   /**
    * A context to override the current pass a registry key
    */
@@ -171,7 +171,7 @@ function i18nReadInternal(
   include: Include,
   props: II18nReadProps,
 ) {
-  const idSplitted = props.id.split(".");
+  const idSplitted = props.i18nId.split(".");
 
   // so first we go in order of priority of what we want to read
   let i18nValue: React.ReactNode = null;
@@ -186,7 +186,7 @@ function i18nReadInternal(
         property.getI18nDataFor(localeContext.language),
         idSplitted,
       );
-    } else if (props.id === "name") {
+    } else if (props.i18nId === "name") {
       i18nValue = include.getI18nNameFor(localeContext.language) || null;
     } else {
       // othewise we just extract the i18n data for the include and call it with the id,
@@ -293,7 +293,7 @@ function i18nReadInternal(
   // if we still find nothing in all these contexts
   if (i18nValue === null || typeof i18nValue !== "string") {
     // we want to throw an error
-    let errMessage: string = "Unknown key in context: " + props.id;
+    let errMessage: string = "Unknown key in context: " + props.i18nId;
 
     // let's make the error more specific
     if (idef) {
@@ -422,7 +422,7 @@ interface I18nReadInternalOptimizedProps extends II18nReadProps {
  */
 export class I18nReadInternalOptimized extends React.PureComponent<I18nReadInternalOptimizedProps> {
   public render() {
-    if (!this.props.id) {
+    if (!this.props.i18nId) {
       return this.props.children ? this.props.children("MISSING ID") : "MISSING ID";
     };
 
@@ -520,8 +520,8 @@ export function useI18nRead(options: I18nReadOptions): React.ReactNode {
   const itemContextualValue = useContext(ItemContext);
   const root = useRootRetriever();
 
-  if (!options.id) {
-    return "MISSING ID";
+  if (!options.i18nId) {
+    return "MISSING I18n ID";
   };
 
   if (options.context) {

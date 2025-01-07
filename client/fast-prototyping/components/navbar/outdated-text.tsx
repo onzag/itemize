@@ -30,7 +30,7 @@ export function OutdatedText(props: OutdatedTextProps) {
       {(isOutdated) => {
         if (isOutdated) {
           return (
-            <I18nRead id="needs_update_navigation">
+            <I18nRead i18nId="needs_update_navigation">
               {(i18nNeedsUpdate) => (
                 <AltBadgeReactioner
                   reactionKey="o"

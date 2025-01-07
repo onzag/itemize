@@ -171,7 +171,7 @@ export interface IPropertyEntryProps<RendererPropsType, T extends string, SV ext
 /**
  * The setter props
  */
-export interface IPropertySetterProps<V extends PropertyDefinitionSupportedType, T extends string, SV extends string | never> extends IPropertyBasePropsWithItemContext<T, SV> {
+export interface IPropertySetterProps<V extends PropertyDefinitionSupportedType, T extends string = string, SV extends string | never = SearchVariants> extends IPropertyBasePropsWithItemContext<T, SV> {
   /**
    * The value to provide to such property
    */

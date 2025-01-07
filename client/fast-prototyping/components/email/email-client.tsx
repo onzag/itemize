@@ -311,7 +311,7 @@ export interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderP
   WrapperSpamWarning?: React.ComponentType<IWrapperComponentProps>;
   /**
    * Spam warning to use inside the warning object
-   * defaults to <I18nRead id="spam_warning" />
+   * defaults to <I18nRead i18nId="spam_warning" />
    */
   spamWarning?: React.ReactNode;
   /**
@@ -390,10 +390,10 @@ export function DefaultSwitcherComponent(props: ISwitcherComponentProps) {
       value={props.location}
       sx={style.tabs}
     >
-      <Tab value="unread" label={<I18nRead id="unread" context="mail/mail" capitalize={true} />} />
-      <Tab value="inbox" label={<I18nRead id="inbox" context="mail/mail" capitalize={true} />} />
-      <Tab value="outbox" label={<I18nRead id="outbox" context="mail/mail" capitalize={true} />} />
-      <Tab value="spam" label={<I18nRead id="spam" context="mail/mail" capitalize={true} />} />
+      <Tab value="unread" label={<I18nRead i18nId="unread" context="mail/mail" capitalize={true} />} />
+      <Tab value="inbox" label={<I18nRead i18nId="inbox" context="mail/mail" capitalize={true} />} />
+      <Tab value="outbox" label={<I18nRead i18nId="outbox" context="mail/mail" capitalize={true} />} />
+      <Tab value="spam" label={<I18nRead i18nId="spam" context="mail/mail" capitalize={true} />} />
     </Tabs>
   )
 }
@@ -718,7 +718,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
         return (
           <Chip
             label={
-              <strong><I18nRead id="me" capitalize={true} context="mail/mail" /></strong>
+              <strong><I18nRead i18nId="me" capitalize={true} context="mail/mail" /></strong>
             }
             sx={chipstyle}
             color="default"
@@ -1063,11 +1063,11 @@ export function EmailReader(props: IEmailReaderProps) {
   const appLanguage = useAppLanguageRetriever();
   const userData = useUserDataRetriever();
 
-  const i18nMarkAsSpam = useI18nRead({ id: "mark_as_spam", context: "mail/mail" }) as string;
-  const i18nMarkAsSafe = useI18nRead({ id: "mark_as_safe", context: "mail/mail" }) as string;
-  const i18nForward = useI18nRead({ id: "forward", context: "mail/mail" }) as string;
-  const i18nReply = useI18nRead({ id: "reply", context: "mail/mail" }) as string;
-  const i18nReplyAll = useI18nRead({ id: "reply_all", context: "mail/mail" }) as string;
+  const i18nMarkAsSpam = useI18nRead({ i18nId: "mark_as_spam", context: "mail/mail" }) as string;
+  const i18nMarkAsSafe = useI18nRead({ i18nId: "mark_as_safe", context: "mail/mail" }) as string;
+  const i18nForward = useI18nRead({ i18nId: "forward", context: "mail/mail" }) as string;
+  const i18nReply = useI18nRead({ i18nId: "reply", context: "mail/mail" }) as string;
+  const i18nReplyAll = useI18nRead({ i18nId: "reply_all", context: "mail/mail" }) as string;
 
   return (
     <ModuleProvider module="mail">
@@ -1157,7 +1157,7 @@ export function EmailReader(props: IEmailReaderProps) {
                       FallbackAvatarComponent={props.FallbackAvatarComponent}
                     >
                       {(avatars, usernames) => (
-                        <I18nRead id="wrote_to" args={[usernames]} context="mail/mail" />
+                        <I18nRead i18nId="wrote_to" args={[usernames]} context="mail/mail" />
                       )}
                     </EmailAccum>
                   </Box>
@@ -1272,7 +1272,7 @@ export function EmailReader(props: IEmailReaderProps) {
 
                         return (
                           <>
-                            <I18nRead id={spam ? "mark_as_safe" : "mark_as_spam"}>
+                            <I18nRead i18nId={spam ? "mark_as_safe" : "mark_as_spam"}>
                               {(i18nMark: string) => (
                                 <IconButton
                                   onClick={toggleSpam}
@@ -1295,7 +1295,7 @@ export function EmailReader(props: IEmailReaderProps) {
                       }}
                     </SubmitActioner>
                     {canReply ? <Link to={props.replyUrlResolver(props.id)}>
-                      <I18nRead id="reply">
+                      <I18nRead i18nId="reply">
                         {(i18nReply: string) => (
                           <IconButton
                             title={i18nReply}
@@ -1306,7 +1306,7 @@ export function EmailReader(props: IEmailReaderProps) {
                       </I18nRead>
                     </Link> : null}
                     {canReplyAll ? <Link to={props.replyAllUrlResolver(props.id)}>
-                      <I18nRead id="reply_all">
+                      <I18nRead i18nId="reply_all">
                         {(i18nReplyAll: string) => (
                           <IconButton
                             title={i18nReplyAll}
@@ -1317,7 +1317,7 @@ export function EmailReader(props: IEmailReaderProps) {
                       </I18nRead>
                     </Link> : null}
                     <Link to={props.forwardUrlResolver(props.id)}>
-                      <I18nRead id="forward">
+                      <I18nRead i18nId="forward">
                         {(i18nForward: string) => (
                           <IconButton
                             title={i18nForward}
@@ -1343,7 +1343,7 @@ export function EmailReader(props: IEmailReaderProps) {
                     return (
                       <Box sx={style.attachmentBox}>
                         <Typography variant="h6" sx={style.attachments}>
-                          <I18nRead id="label" propertyId="attachments" capitalize={true} />
+                          <I18nRead i18nId="label" propertyId="attachments" capitalize={true} />
                         </Typography>
                         <View id="attachments" />
                       </Box>
@@ -1362,11 +1362,11 @@ export function EmailReader(props: IEmailReaderProps) {
                 <ItemLoader>
                   {(state) => {
                     return (state.loaded ? (
-                      <I18nRead id="no_subject" context="mail/mail">
+                      <I18nRead i18nId="no_subject" context="mail/mail">
                         {(i18nNoSubject: string) => (
                           <Reader id="subject">
                             {(subject: string) => (
-                              <I18nRead id="re_f" context="mail/mail" args={[subject || i18nNoSubject]}>
+                              <I18nRead i18nId="re_f" context="mail/mail" args={[subject || i18nNoSubject]}>
                                 {(i18nReF: string) => (
                                   <EmailSender
                                     {...senderArgs}
@@ -1390,11 +1390,11 @@ export function EmailReader(props: IEmailReaderProps) {
                     <ItemLoader>
                       {(state) => {
                         return (state.loaded ? (
-                          <I18nRead id="no_subject" context="mail/mail">
+                          <I18nRead i18nId="no_subject" context="mail/mail">
                             {(i18nNoSubject: string) => (
                               <TextReader id="subject">
                                 {(subject) => (
-                                  <I18nRead id="re" context="mail/mail" args={[subject?.value || i18nNoSubject]}>
+                                  <I18nRead i18nId="re" context="mail/mail" args={[subject?.value || i18nNoSubject]}>
                                     {(i18nRe: string) => (
                                       <ReaderMany data={["source", "target"]}>
                                         {(source: string, target: string[]) => {
@@ -1500,7 +1500,7 @@ export function EmailReader(props: IEmailReaderProps) {
               spam ?
                 (
                   <Alert severity="warning" sx={style.spamWarning} role="note">
-                    {props.spamWarning || <I18nRead id="spam_warning" />}
+                    {props.spamWarning || <I18nRead i18nId="spam_warning" />}
                   </Alert>
                 ) : null
             );
@@ -1747,15 +1747,15 @@ function EmailAccum(props: IEmailAccumProps) {
       finalUsernameText = usernames;
     } else if (usernames.length === 2) {
       finalUsernameText = (
-        <I18nRead id="and_two" args={usernames} context="mail/mail" />
+        <I18nRead i18nId="and_two" args={usernames} context="mail/mail" />
       );
     } else if (usernames.length === 3) {
       finalUsernameText = (
-        <I18nRead id="and_three" args={usernames} context="mail/mail" />
+        <I18nRead i18nId="and_three" args={usernames} context="mail/mail" />
       );
     } else {
       finalUsernameText = (
-        <I18nRead id="and_more" args={usernames.concat([usernames.length])} context="mail/mail" />
+        <I18nRead i18nId="and_more" args={usernames.concat([usernames.length])} context="mail/mail" />
       );
     }
     return (
@@ -1973,7 +1973,7 @@ export function EmailClient(props: IEmailClientProps) {
             </WrapperComponent>
 
             <Link to={props.emailNewUrl}>
-              {props.fabComponent ? props.fabComponent : <I18nRead id="new">
+              {props.fabComponent ? props.fabComponent : <I18nRead i18nId="new">
                 {(i18nNew: string) => (
                   <Fab title={i18nNew} color="primary" sx={style.fab}>
                     <Create />

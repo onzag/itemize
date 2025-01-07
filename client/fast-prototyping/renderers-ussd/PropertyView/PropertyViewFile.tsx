@@ -9,6 +9,6 @@ import React from "react";
 
 export default function PropertyViewFileUSSDRenderer() {
   return (
-    <span>[<I18nRead id="rich_file"/>]</span>
+    <span>[<I18nRead i18nId="rich_file"/>]</span>
   );
 }

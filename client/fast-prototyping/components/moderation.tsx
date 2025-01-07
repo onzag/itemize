@@ -40,7 +40,7 @@ export function CreateReportDialog(props: IModerationCreateReportDialogProps) {
                 onClose={props.onClose}
                 open={props.isOpened}
                 title={props.title || (
-                  <I18nRead id="report" />
+                  <I18nRead i18nId="report" />
                 )}
                 buttons={
                   <>

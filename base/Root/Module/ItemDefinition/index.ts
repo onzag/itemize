@@ -60,6 +60,7 @@ export interface IItemSearchStateType {
   searchListenSlowPolling: boolean;
   searchParent: [string, string, string];
   searchListenPolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
+  searchListenPolicyUpdateGraceTime: number;
   searchCachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   searchShouldCache: boolean;
   searchCacheUsesProperty: [string, string];

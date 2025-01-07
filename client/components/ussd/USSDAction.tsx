@@ -49,9 +49,9 @@ class ActualUSSDAction extends React.Component<IActualUSSDActionProps, {}> {
     const actionId = "USSD_" + this.props.id;
     if (this.props.useI18n) {
       return (
-        <I18nRead id={this.props.label} capitalize={this.props.i18nCapitalize}>
+        <I18nRead i18nId={this.props.label} capitalize={this.props.i18nCapitalize}>
           {(i18nLabel: string) => (
-            typeof this.props.requestInput === "string" ? <I18nRead id={this.props.requestInput} capitalize={this.props.i18nCapitalize}>
+            typeof this.props.requestInput === "string" ? <I18nRead i18nId={this.props.requestInput} capitalize={this.props.i18nCapitalize}>
               {(i18nRequestInput: string) => (
                 <USSDActionElement
                   label={i18nLabel}

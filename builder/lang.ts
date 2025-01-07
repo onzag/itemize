@@ -466,14 +466,24 @@ function evaluateStringExpressionPotentials(exprSrc: ts.Expression, declContext:
   return {self: [], attributes: {}};
 }
 
-// Function to find all calls to a specific function or component
+/**
+ * Provides all potential string values for the i18n variable of that sort
+ * of values based on typescript description and the filepath
+ * 
+ * @param filePath 
+ */
 async function getAllLangPotentialsOf(filePath: string) {
-  //const sourceCode = "const i18nx = 'hello' + (isCat ? '_cat' : 'dog')"//await fsAsync.readFile(filePath, "utf-8");
+  // first we are going to read the source code
+  //const sourceCode = await fsAsync.readFile(filePath, "utf-8");
   const sourceCode = "const x = `hello${boi ? 'boi' : ''}cat${okay ? 'kitty' : ''}boy` as 'cat' | 'boi';(x: {text: 'kitten' | 'dog'}) => {const i18nx = x.text + 'cat';}"
+
+  // now we open it with typescript
   const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
+  // to store all potentials
   let allPotentialsOfThisFile: string[] = [];
 
+  // with this we visit each node
   const visit = (node: ts.Node, declContext: IDeclContextInfo) => {
     //console.log("N", node);
     if (
@@ -555,7 +565,6 @@ async function getAllLangPotentialsOf(filePath: string) {
         ts.isConstructorDeclaration(node) ||
         ts.isFunctionExpression(node)
       ) {
-        console.log("HERE");
         node.parameters.forEach((p) => {
           if (ts.isIdentifier(p.name)) {
             newDeclContext.declarations[p.name.text] = {
@@ -589,4 +598,4 @@ async function getAllLangPotentialsOf(filePath: string) {
   console.log(allPotentialsOfThisFile);
 }
 
-getAllLangPotentialsOf("kitten/boi");
+//getAllLangPotentialsOf("kitten/boi");

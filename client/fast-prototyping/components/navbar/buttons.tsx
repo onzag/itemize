@@ -144,7 +144,7 @@ export function Buttons(props: ButtonsProps) {
                     selector="button"
                   >
                     <Button color="inherit" variant="outlined" onClick={openLoginDialog} sx={buttonsStyles.loginButton}>
-                      <I18nRead id="login" context="users/user"/>
+                      <I18nRead i18nId="login" context="users/user"/>
                     </Button>
                   </AltBadgeReactioner>
                   {
