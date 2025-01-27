@@ -314,7 +314,7 @@ export async function searchModule(
     elasticQuery = appData.elastic.getSelectBuilder({
       itemOrModule: mod,
       language: elasticIndexLang,
-      types: resolverArgs.args.types,
+      types: resolverArgs.args.types || mod.getAllChildItemDefinitions().map((f) => f.getQualifiedPathName()),
     });
     elasticQuery.mustTerm({
       blocked_by: "?NULL",

@@ -36,6 +36,10 @@ interface ICustomLinkProps extends LinkProps {
    */
   as?: "div" | "span" | "a" | "p";
   /**
+   * Makes the link open in a new tab rather than the current
+   */
+  openInNewTab?: boolean;
+  /**
    * Whether to prevent propagation
    */
   propagateClicks?: boolean;
@@ -64,6 +68,28 @@ function linkOnClick(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElem
   }
   if (props.to === location.pathname + location.search) {
     e.preventDefault();
+  }
+
+  if (props.onClick) {
+    props.onClick(e);
+  }
+}
+
+function linkCustomOpenNewTab(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElement>) {
+  if (!props.propagateClicks) {
+    e.stopPropagation();
+  }
+
+  if (props.onClick) {
+    props.onClick(e);
+  }
+
+  window.open(props.to, props.target || "_blank").focus();
+}
+
+function linkATypeOpenNewTab(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElement>) {
+  if (!props.propagateClicks) {
+    e.stopPropagation();
   }
 
   if (props.onClick) {
@@ -176,6 +202,35 @@ const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAn
   delete newProps["retainQueryParamsFor"];
   delete newProps["retainAllQueryParams"];
   delete newProps["qsParams"];
+  delete newProps["openInNewTab"];
+
+  if (props.openInNewTab) {
+    let Component: any = "a";
+    if (props.as) {
+      delete newProps["as"];
+      Component = newProps["as"];
+    }
+
+    if (Component !== "a") {
+      delete newProps["to"];
+      return (
+        <Component {...newProps} onClick={linkCustomOpenNewTab.bind(null, props)} />
+      );
+    } else {
+      // string not assignable to string
+      newProps.href = newProps["to"] as any;
+      delete newProps["to"];
+      if (!newProps.target) {
+        newProps.target = "_blank";
+      }
+      if (!newProps.rel) {
+        newProps.rel = "noopener noreferrer";
+      }
+      return (
+        <Component {...newProps} onClick={linkATypeOpenNewTab.bind(null, props)} />
+      );
+    }
+  }
 
   // if we have an as
   if (props.as) {

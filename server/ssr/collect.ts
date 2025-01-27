@@ -23,6 +23,7 @@ import { getFieldsAndArgs, getPropertyListForSearchMode, getSearchQueryFor } fro
 import { searchItemDefinition, searchModule } from "../resolvers/actions/search";
 import { EndpointError } from "../../base/errors";
 import { deepMerge } from "../../rq-util";
+import { calculateSearchSignatureFor } from "../../client/providers/item/util";
 
 function noop() {};
 
@@ -435,6 +436,13 @@ export class Collector {
         forVersion: version || null,
       });
 
+      const searchSignature = calculateSearchSignatureFor(
+        idef,
+        id || null,
+        version || null,
+        args,
+      )
+
       // the fields nevertheless are another story as it uses the standard logic
       const searchFieldsAndArgs = getFieldsAndArgs({
         includeArgs: false,
@@ -557,6 +565,7 @@ export class Collector {
         searchError: null as any,
         searching: false,
         searchResults: rs.results,
+        searchSignature,
         searchHighlights: highlights,
         searchEngineUsedFullHighlights: args.useSearchEngine ? args.useSearchEngineFullHighlights : null,
         searchRecords: records,

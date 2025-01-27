@@ -55,6 +55,12 @@ export interface IItemSearchStateType {
   searchOffset: number;
   searchCount: number;
   searchId: string;
+  /**
+   * The difference between the id and the signature is that the id is unique for a search at a given time
+   * whereas the signature depends on the arguments, the signature is made out of the combination of the values
+   * that make up for a search, mushed togehter
+   */
+  searchSignature: string;
   searchOwner: string;
   searchLastModified: string;
   searchListenSlowPolling: boolean;

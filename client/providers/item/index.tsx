@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import ItemDefinition, { IItemSearchStateHighlightArgsType, IItemSearchStateType, IItemStateType } from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -30,7 +30,7 @@ import Hit from "../../components/analytics/Hit";
 import Timetrack from "../../components/analytics/Timetrack";
 import { genericAnalyticsDataProvider } from "../../components/analytics/util";
 import {
-  IStoredStateLocation, blockCleanup, changeListener, changeSearchListener, cleanWithProps,
+  IStoredStateLocation, blockCleanup, calculateSearchSignatureFor, changeListener, changeSearchListener, cleanWithProps,
   del, didUpdate, dismissDeleteError, dismissDeleted, dismissLoadError, dismissSearchError, dismissSearchResults,
   dismissSubmitError, dismissSubmitted, downloadStateAt, getDerived,
   installPrefills, installSetters, loadListener, loadStateFromFileAt, loadValue,
@@ -1243,6 +1243,13 @@ export interface IItemContextType<PlainProperties extends string = string, Searc
   /**
    * Whether to use and provide full highlight support for the searchengine highlights,
    * the number should be between 1 and 50 and specifies the fragment_size (elasticsearch)
+   * 
+   * If you are just going to display the value of the property do not use this, it will just make the request
+   * more expensive, this is very useful to keep requests shorter, and you should use the HighlightView component
+   * to display these highlights, the highlight value is given by the search loader if you want it raw, it was retrieved
+   * by elasticsearch
+   * 
+   * Full highlights and standard highlights otherwise work the same way related to the value highlight
    */
   searchEngineUsedFullHighlights: number;
   /**
@@ -1630,6 +1637,9 @@ export interface IItemProviderProps<
    * or the mount id changes; always remember to set a mountId property
    * for using this in order to be able to difference item definition
    * loaders between themselves
+   * 
+   * if no mount id is specified, the mount id will be considered
+   * to be the signature between the item definition, id and version
    */
   cleanOnDismount?: boolean | IActionCleanOptions;
   /**
@@ -1894,6 +1904,11 @@ export interface IItemAnalyticsProps {
  */
 export interface IActualItemProviderProps extends IItemProviderProps {
   /**
+   * an unique instance uuid used to refer to this instance
+   * that never changes
+   */
+  instanceUUID: string;
+  /**
    * The token data is retrieved from the token provider and is used for
    * running the requests
    */
@@ -2062,7 +2077,7 @@ export class ActualItemProvider extends
     props: IActualItemProviderProps,
     state: IActualItemProviderState,
   ): Partial<IActualItemProviderState> {
-    return getDerived(props.itemDefinitionInstance, props.location, props, state);
+    return getDerived(props.itemDefinitionInstance, props.location, props.instanceUUID, props, state);
   }
 
   public static async getDerivedServerSideStateFromProps(props: IActualItemProviderProps, state: IActualItemProviderState): Promise<Partial<IActualItemProviderState>> {
@@ -2192,6 +2207,7 @@ export class ActualItemProvider extends
     this.poke = this.poke.bind(this);
     this.unpoke = this.unpoke.bind(this);
     this.search = this.search.bind(this);
+    this.calculateSearchSignatureFor = this.calculateSearchSignatureFor.bind(this);
     this.redoSearch = this.redoSearch.bind(this);
     this.dismissSearchError = this.dismissSearchError.bind(this);
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
@@ -2208,7 +2224,7 @@ export class ActualItemProvider extends
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
     // we do this here to avoid useless callback changes as the listeners are not ready
-    installSetters(props.itemDefinitionInstance, props, this.isCMounted, this.search, this);
+    installSetters(props.itemDefinitionInstance, props, props.instanceUUID);
     installPrefills(props.itemDefinitionInstance, props, props.location);
 
     if (typeof document !== "undefined") {
@@ -2220,7 +2236,7 @@ export class ActualItemProvider extends
         this.loadListener,
         this.changeSearchListener,
         this.reloadListener,
-        this,
+        props.instanceUUID,
       );
       const $this = this;
       blockCleanup(
@@ -2333,6 +2349,7 @@ export class ActualItemProvider extends
       this.onConnectStatusChange,
       this.onSearchReload,
       this.search,
+      this.calculateSearchSignatureFor,
       this.loadValue,
       this.changeListener,
     );
@@ -2459,7 +2476,7 @@ export class ActualItemProvider extends
       this.changeSearchListener,
       this.onSearchReload,
       this.basicFnsRetriever,
-      this,
+      this.props.instanceUUID,
     );
   }
 
@@ -2935,7 +2952,7 @@ export class ActualItemProvider extends
       givenForId,
       givenForVersion,
       this.search,
-      this,
+      this.props.instanceUUID,
     );
   }
   public onPropertyClearEnforce(
@@ -2951,7 +2968,7 @@ export class ActualItemProvider extends
       givenForId,
       givenForVersion,
       this.search,
-      this,
+      this.props.instanceUUID,
     );
   }
 
@@ -2994,9 +3011,8 @@ export class ActualItemProvider extends
       this.reloadListener,
       this.onSearchReload,
       this.onConnectStatusChange,
-      this.search,
       this.internalUUID,
-      this,
+      this.props.instanceUUID,
     );
   }
 
@@ -3157,6 +3173,17 @@ export class ActualItemProvider extends
       this.props.tokenData.token,
       this.props.localeData.language,
       this.props.remoteListener,
+      options,
+    );
+  }
+
+  public calculateSearchSignatureFor(
+    options: IActionSearchOptions
+  ) {
+    return calculateSearchSignatureFor(
+      this.props.itemDefinitionInstance,
+      this.props.forId,
+      this.props.forVersion,
       options,
     );
   }
@@ -3559,6 +3586,8 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
   const searchContext = useContext(SearchItemValueContext);
   const location = useLocationRetriever();
 
+  const instanceUUID = useMemo(() => uuid.v4(), []);
+
   if (!data) {
     console.error("At element with props: ", props);
     throw new Error("The ItemProvider must be inside a ModuleProvider context");
@@ -3601,6 +3630,7 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
     searchContext: searchContext,
     config: config,
     location,
+    instanceUUID,
     ...props,
   }
 

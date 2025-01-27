@@ -834,6 +834,7 @@ export async function rqQuery(query: RQQueryBuilder, options?: {
     query.getAttachments().length === 0 &&
     // no progresser
     !options?.progresser &&
+    // TODO use a function that is aware of setup time
     !options?.remoteListener.isOffline() &&
     // and be the same token
     options?.remoteListener.token === tokenToUse

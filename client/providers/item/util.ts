@@ -23,8 +23,34 @@ import Include, { IncludeExclusionState } from "../../../base/Root/Module/ItemDe
 import { blobToTransferrable } from "../../../util";
 import { IRQRequestFields, IRQSearchRecord, IRQValue } from "../../../rq-querier";
 import { IConfigRawJSONDataType } from "../../../config";
+import uuidv5 from "uuid/v5";
 
 const isDevelopment = process.env.NODE_ENV === "development";
+
+function calculateMountId(idef: ItemDefinition, propsOrOptions: IActualItemProviderProps | IItemProviderOptions) {
+  if (propsOrOptions.mountId) {
+    return propsOrOptions.mountId;
+  }
+
+  return idef.getQualifiedPathName() + "." + (propsOrOptions.forId || "") + "." + (propsOrOptions.forVersion || "");
+}
+
+function anyObjectToUniqueStr(o: any): string {
+  if (typeof o === "object" && o !== null) {
+    let rs: string = "?";
+    Object.keys(o).sort().forEach((k) => {
+      rs += JSON.stringify(k) + ":";
+      rs += anyObjectToUniqueStr(o[k]);
+    });
+    return rs;
+  } else {
+    return JSON.stringify(o);
+  }
+}
+
+function hashObject(o: object) {
+  return uuidv5(anyObjectToUniqueStr(o), "cf34a763-60b8-435d-9211-7aac69159371");
+}
 
 function wait(n: number) {
   return new Promise((r) => {
@@ -147,6 +173,7 @@ export function setupInitialState(
     searchLastModified: null,
     searchParent: null,
     searchCacheUsesProperty: null,
+    searchSignature: null,
     searchShouldCache: false,
     searchFields: null,
     searchRequestedIncludes: {},
@@ -424,14 +451,12 @@ export function onPropertyClearEnforce(
 export function installSetters(
   idef: ItemDefinition,
   options: IItemProviderOptions | IActualItemProviderProps,
-  isCMounted: boolean,
-  performSearch: (options: IActionSearchOptions) => void,
   parentInstanceTrack: any,
 ) {
   if (options.setters) {
     options.setters.forEach((setter) => {
       const property = getPropertyFromCoreRule(setter, idef);
-      onPropertyEnforce(idef, options, isCMounted, property, setter.value, options.forId || null, options.forVersion || null, performSearch, parentInstanceTrack, true);
+      onPropertyEnforce(idef, options, null, property, setter.value, options.forId || null, options.forVersion || null, null, parentInstanceTrack, true);
     });
   }
 };
@@ -439,14 +464,12 @@ export function installSetters(
 export function removeSetters(
   idef: ItemDefinition,
   options: IItemProviderOptions | IActualItemProviderProps,
-  isCMounted: boolean,
-  performSearch: (options: IActionSearchOptions) => void,
   parentInstanceTrack: any,
 ) {
   if (options.setters) {
     options.setters.forEach((setter) => {
       const property = getPropertyFromCoreRule(setter, idef);
-      onPropertyClearEnforce(idef, options, isCMounted, property, options.forId || null, options.forVersion || null, performSearch, parentInstanceTrack, true);
+      onPropertyClearEnforce(idef, options, null, property, options.forId || null, options.forVersion || null, null, parentInstanceTrack, true);
     });
   }
 };
@@ -941,6 +964,34 @@ function removePossibleSearchListeners(
   }
 }
 
+export function calculateSearchSignatureFor(
+  idef: ItemDefinition,
+  forId: string,
+  forVersion: string,
+  options: IActionSearchOptions,
+) {
+  // we need the standard counterpart given we are in search mode right now, 
+  const standardCounterpart = idef.getStandardCounterpart();
+  const propertiesForArgs = getPropertyListForSearchMode(options.searchByProperties, standardCounterpart);
+
+  // the args of the item definition depend on the search mode, hence we use
+  // our current item definition instance to get the arguments we want to load
+  // in order to perform the search based on the search mode
+  const {
+    argumentsForQuery,
+  } = getFieldsAndArgs({
+    includeArgs: true,
+    includeFields: false,
+    propertiesForArgs,
+    includesForArgs: options.searchByIncludes || {},
+    itemDefinitionInstance: idef,
+    forId: forId || null,
+    forVersion: forVersion || null,
+  });
+
+  return hashObject({ idef: idef.getQualifiedPathName(), args: argumentsForQuery, options });
+}
+
 export async function search(
   idef: ItemDefinition,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
@@ -1186,6 +1237,8 @@ export async function search(
     forId: propsOrOptions.forId || null,
     forVersion: propsOrOptions.forVersion || null,
   });
+
+  const searchSignature = hashObject({ idef: idef.getQualifiedPathName(), args: argumentsForQuery, options });
 
   let searchCacheUsesProperty: [string, string] = null;
   if (trackedPropertyDef) {
@@ -1513,6 +1566,7 @@ export async function search(
       searching: false,
       searchResults: results,
       searchHighlights: highlights,
+      searchSignature,
       searchMetadata: metadata,
       searchRecords: records,
       searchCount: count,
@@ -1618,6 +1672,7 @@ export async function search(
       searchError: null as any,
       searching: false,
       searchResults: results,
+      searchSignature,
       searchHighlights: highlights,
       searchMetadata: metadata,
       searchRecords: records,
@@ -1892,6 +1947,7 @@ export function dismissSearchResults(
       searchId: null,
       searchFields: null,
       searchOwner: null,
+      searchParent: null,
       searchLastModified: null,
       searchShouldCache: false,
       searchRequestedIncludes: {},
@@ -2056,6 +2112,7 @@ export async function onMount(
   onConnectStatusChange: () => void,
   onSearchReload: (arg: IRemoteListenerRecordsCallbackArg) => void,
   search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>,
+  calculateSearchSignatureFor: (options: IActionSearchOptions) => string,
   loadValue: () => Promise<IActionResponseWithValue>,
   changeListener: () => void,
 ) {
@@ -2107,7 +2164,14 @@ export async function onMount(
       // was calculated from the server side
       // that's the issue with ssrEnabled searches that are also cache
       (searchIdToCheckAgainst === "SSR_SEARCH" && propsOrOptions.automaticSearch.cachePolicy !== "none") ||
-      (searchIdToCheckAgainst === "SSR_SEARCH" && propsOrOptions.automaticSearch.ssrRequestedProperties)
+      (searchIdToCheckAgainst === "SSR_SEARCH" && propsOrOptions.automaticSearch.ssrRequestedProperties) ||
+      // NO search listener from change listener, so probably an old value
+      // yet there is a search signature specified
+      (
+        !changedSearchListenerLastCollectedSearchIdRef.current &&
+        state.current.searchId &&
+        state.current.searchSignature !== calculateSearchSignatureFor(propsOrOptions.automaticSearch)
+      )
     ) {
       // this variable that is passed into the search is used to set the initial
       // state in case it needs to be saved in the history
@@ -2273,6 +2337,7 @@ export function getSearchStateOf(state: IActualItemProviderState | IHookItemProv
     searchCount: state.searchCount,
     searchError: state.searchError,
     searchFields: state.searchFields,
+    searchSignature: state.searchSignature,
     searchId: state.searchId,
     searchLastModified: state.searchLastModified,
     searchLimit: state.searchLimit,
@@ -2943,13 +3008,13 @@ export async function didUpdate(
   const uniqueIDChanged = (prevPropsOrOptions.forId || null) !== (propsOrOptions.forId || null) ||
     (prevPropsOrOptions.forVersion || null) !== (propsOrOptions.forVersion || null);
   const didSomethingThatInvalidatedSetters =
-    !equals(propsOrOptions.setters, prevPropsOrOptions.setters, { strict: true }) ||
     uniqueIDChanged ||
-    itemDefinitionWasUpdated;
+    itemDefinitionWasUpdated ||
+    !equals(propsOrOptions.setters, prevPropsOrOptions.setters, { strict: true });
   const didSomethingThatInvalidatedPrefills =
-    !equals(propsOrOptions.prefills, prevPropsOrOptions.prefills, { strict: true }) ||
     uniqueIDChanged ||
-    itemDefinitionWasUpdated;
+    itemDefinitionWasUpdated ||
+    !equals(propsOrOptions.prefills, prevPropsOrOptions.prefills, { strict: true });
 
   if (itemDefinitionWasUpdated || uniqueIDChanged) {
     releaseCleanupBlock(blockIdCleanRef, prevIdef, prevPropsOrOptions);
@@ -2994,13 +3059,36 @@ export async function didUpdate(
     );
   }
 
+  // when get derived made it so that it loaded a new search state because
+  // we have a new item definition slot id or anything
+  // and we need to invalidate those search results that we got
+  // NOTE that this could be true yet there may not be a searchid
+  const getDerivedTriggeredAMainIdChange = itemDefinitionWasUpdated || uniqueIDChanged;
+  const getDerivedTriggeredASearchChange = state.current.searchWasRestored !== "NO" && (
+    getDerivedTriggeredAMainIdChange ||
+    (
+      (
+        location &&
+        location.state &&
+        location.state[propsOrOptions.loadSearchFromNavigation] &&
+        location.state[propsOrOptions.loadSearchFromNavigation].searchId !== prevSearchState.searchId
+      )
+    )
+  );
+
   if (didSomethingThatInvalidatedSetters) {
-    removeSetters(prevIdef, prevPropsOrOptions, isCMountedRef.current, search, parentInstanceTrack);
-    installSetters(idef, propsOrOptions, isCMountedRef.current, search, parentInstanceTrack);
+    removeSetters(prevIdef, prevPropsOrOptions, parentInstanceTrack);
+    // get derived would've done this
+    if (!getDerivedTriggeredAMainIdChange) {
+      installSetters(idef, propsOrOptions, parentInstanceTrack);
+    }
   }
 
   if (didSomethingThatInvalidatedPrefills) {
-    installPrefills(idef, propsOrOptions, location);
+    // get derived would've done this
+    if (!getDerivedTriggeredAMainIdChange) {
+      installPrefills(idef, propsOrOptions, location);
+    }
   }
 
   // now if the id changed, the optimization flags changed, or the item definition
@@ -3150,7 +3238,15 @@ export async function didUpdate(
   // no search id for example if the slot changed during
   // an update of forId and forVersion and as a result
   // the search is empty in this slot
-  if (!currentSearch.searchId || currentSearch.searchId !== prevSearchState.searchId) {
+  if (
+    (!currentSearch.searchId || currentSearch.searchId !== prevSearchState.searchId) &&
+    // this used to cause a bug of synchronization because the did update will trigger
+    // for the searching: true afer the event lsiteners were set causing it in some circumstances
+    // to remove the just added event listener because it had no search id, anyway a second did update
+    // with the search id will come after this if it's searching so we don't need to dismiss anything if it is just searching
+    // we will dismiss afterwards we are done searching
+    !state.current.searching
+  ) {
     if (!currentSearch.searchId) {
       removePossibleSearchListeners(prevIdef, remoteListener, prevState, onSearchReload);
     } else {
@@ -3166,21 +3262,6 @@ export async function didUpdate(
       }
     }
   }
-
-  // when get derived made it so that it loaded a new search state because
-  // we have a new item definition slot id or anything
-  // and we need to invalidate those search results that we got
-  const getDerivedTriggeredASearchChange = state.current.searchWasRestored !== "NO" && (
-    itemDefinitionWasUpdated || uniqueIDChanged ||
-    (
-      (
-        location &&
-        location.state &&
-        location.state[propsOrOptions.loadSearchFromNavigation] &&
-        location.state[propsOrOptions.loadSearchFromNavigation].searchId !== prevSearchState.searchId
-      )
-    )
-  )
 
   const isSearchUnequalV = isSearchUnequal(propsOrOptions.automaticSearch, prevPropsOrOptions.automaticSearch);
   if (
@@ -3328,8 +3409,10 @@ export async function didUpdate(
   }
 
   // this is a different instance, we consider it dismounted
+  const previousMountId = calculateMountId(prevIdef, prevPropsOrOptions);
+  const currentMountId = calculateMountId(idef, propsOrOptions);
   if (
-    (prevPropsOrOptions as IActualItemProviderProps).mountId !== (propsOrOptions as IActualItemProviderProps).mountId
+    previousMountId !== currentMountId
   ) {
     runDismountOn(
       prevIdef,
@@ -3510,6 +3593,7 @@ export function changeSearchListener(
     searchRecords: null,
     searchLimit: null,
     searchOffset: null,
+    searchSignature: null,
     searchCount: null,
     searchId: null,
     searchOwner: null,
@@ -3995,7 +4079,6 @@ export function willUnmount(
   reloadListener: () => void,
   onSearchReload: (arg: IRemoteListenerRecordsCallbackArg) => void,
   onConnectStatusChange: () => void,
-  search: (options: IActionSearchOptions) => void,
   internalUUID: string,
   parentInstanceTrack: any,
 ) {
@@ -4022,8 +4105,6 @@ export function willUnmount(
   removeSetters(
     idef,
     propsOrOptions,
-    isCMounted,
-    search,
     parentInstanceTrack,
   );
   runDismountOn(
@@ -4741,7 +4822,7 @@ export async function onSearchReload(
   state: IHookItemProviderState | IActualItemProviderState,
   preventSearchFeedbackOnPossibleStaleDataRef: { current: boolean },
   reloadNextSearchRef: { current: boolean },
-  awaitingSearchReloadRemoteArgs: { current: IRemoteListenerRecordsCallbackArg[]},
+  awaitingSearchReloadRemoteArgs: { current: IRemoteListenerRecordsCallbackArg[] },
   search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>,
 
   arg: IRemoteListenerRecordsCallbackArg
@@ -4827,18 +4908,27 @@ export async function onSearchReload(
 export function getDerived(
   idef: ItemDefinition,
   location: Location<any>,
+  parentInstanceTrack: any,
   propsOrOptions: IItemProviderOptions | IActualItemProviderProps,
   state: IHookItemProviderState | IActualItemProviderState,
 ): Partial<IHookItemProviderState> {
+  const changedMainSlotId = idef.getQualifiedPathName() !== state.itemState.itemDefQualifiedName ||
+    (propsOrOptions.forId || null) !== (state.itemState.forId || null) ||
+    (propsOrOptions.forVersion || null) !== (state.itemState.forVersion || null);
+
+  // settters and prefills are basically ruined now
+  if (changedMainSlotId) {
+    installSetters(idef, propsOrOptions, parentInstanceTrack);
+    installPrefills(idef, propsOrOptions, location)
+  }
+
   // it is effective to do it here, so we use the state qualified name and the
   // idef qualified name to check, also the id in question matters to
   // normally we don't want to recalculate states in every render because
   // that is hugely inefficient, it would make the code simpler, but no
   // this needs to run fast, as it's already pretty resource intensive
   if (
-    idef.getQualifiedPathName() !== state.itemState.itemDefQualifiedName ||
-    (propsOrOptions.forId || null) !== (state.itemState.forId || null) ||
-    (propsOrOptions.forVersion || null) !== (state.itemState.forVersion || null) ||
+    changedMainSlotId ||
     (
       location &&
       location.state &&
@@ -4846,10 +4936,13 @@ export function getDerived(
       location.state[propsOrOptions.loadSearchFromNavigation].searchId !== state.searchId
     )
   ) {
+    // we will update the setters and prefills here
+    // because we need them to figure out this signature thing
+
     // for example when we didn't update right away the search state
     // when we changed slot this would cause old records to render
     // in the search loader
-    let searchState: IItemSearchStateType = {
+    let searchStateDefault: IItemSearchStateType = {
       searchError: null,
       searching: false,
       searchResults: null,
@@ -4857,6 +4950,7 @@ export function getDerived(
       searchLimit: null,
       searchOffset: null,
       searchCount: null,
+      searchSignature: null,
       searchId: null,
       searchOwner: null,
       searchLastModified: null,
@@ -4878,6 +4972,7 @@ export function getDerived(
       searchOriginalOptions: null,
       searchListenPolicyUpdateGraceTime: 0,
     };
+    let searchState: IItemSearchStateType;
 
     let searchWasRestored = "NO";
     if (
@@ -4913,9 +5008,27 @@ export function getDerived(
       }
     }
 
+    // okay so we loaded props or options with automatic search
+    // and we have a search state, we are hoping that the search state
+    // and the automatic search parameters match each other
+    // in order for this search state to be considered valid
+    if (propsOrOptions.automaticSearch && searchState) {
+      const newSignature = calculateSearchSignatureFor(idef, propsOrOptions.forId, propsOrOptions.forVersion, propsOrOptions.automaticSearch);
+      if (newSignature !== searchState.searchSignature) {
+        // the search signature does not match our current automatic search options
+        // this must therefore be an old search, we will now proceed to discard this state
+        // since it cannot possibly be valid
+        return {
+          itemState: getItemState(idef, propsOrOptions),
+          ...searchStateDefault,
+          searchWasRestored: "NO",
+        };
+      }
+    }
+
     return {
       itemState: getItemState(idef, propsOrOptions),
-      ...searchState,
+      ...(searchState || searchStateDefault),
       searchWasRestored: searchWasRestored as any,
     };
   }

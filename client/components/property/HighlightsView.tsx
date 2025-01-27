@@ -38,6 +38,7 @@ export interface IHighlightRetrieverProps {
 /**
  * Retrieves the highlights for a given property
  * special to be used with full type highlights
+ * 
  * @param props 
  * @returns 
  */

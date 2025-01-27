@@ -23,7 +23,7 @@ import { TokenContext } from "../../../client/internal/providers/token-provider"
 import { LocaleContext } from "../../../client/internal/providers/locale-provider";
 import { ConfigContext } from "../../../client/internal/providers/config-provider";
 import {
-  blockCleanup, changeListener, changeSearchListener, cleanWithProps, del, didUpdate,
+  blockCleanup, calculateSearchSignatureFor, changeListener, changeSearchListener, cleanWithProps, del, didUpdate,
   dismissDeleteError, dismissDeleted, dismissLoadError, dismissSearchError,
   dismissSearchResults, dismissSubmitError, dismissSubmitted, downloadStateAt, getDerived,
   installPrefills, installSetters, loadListener, loadStateFromFileAt, loadValue, onConnectStatusChange,
@@ -45,7 +45,7 @@ import { ISearchLoaderHookArg, ISearchLoaderOptions, useSearchLoader } from "../
 import type { IRQValue } from "../../../rq-querier";
 
 export interface IItemProviderOptions<PlainProperties extends string = string> extends
-  Omit<IItemProviderProps<PlainProperties>, 'mountId' | 'loadUnversionedFallback' | 'analytics'> {
+  Omit<IItemProviderProps<PlainProperties>, 'loadUnversionedFallback' | 'analytics'> {
   module: string | Module;
   suppressWarnings?: boolean;
 }
@@ -214,6 +214,8 @@ export function useItemProvider
   const tokenData = useContext(TokenContext);
   const location = useLocationRetriever();
 
+  const internalUUIDRef = useRef(uuid.v4());
+
   // first necessary functions
   // getting the item definition
   const idef: ItemDefinition = useMemo(() => {
@@ -243,7 +245,7 @@ export function useItemProvider
   const [stateBase, setStateBase] = useState<IHookItemProviderState>(
     () => setupInitialState(idef, options),
   );
-  const derived = getDerived(idef, location, options, stateBase);
+  const derived = getDerived(idef, location, internalUUIDRef.current, options, stateBase);
   const state = derived ? {
     ...stateBase,
     ...derived,
@@ -363,7 +365,6 @@ export function useItemProvider
 
   // refs
   // unlike the class this is used as reference, so it is always needed
-  const internalUUIDRef = useRef(uuid.v4());
   const blockIdCleanRef = useRef(null as string);
   const isUnmountedRef = useRef(false);
   const isCMountedRef = useRef(false);
@@ -891,7 +892,7 @@ export function useItemProvider
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
     // we do this here to avoid useless callback changes as the listeners are not ready
-    installSetters(idef, options, isCMountedRef.current, searchHook, internalUUIDRef.current);
+    installSetters(idef, options, internalUUIDRef.current);
     installPrefills(idef, options, location);
 
     if (typeof document !== "undefined") {
@@ -927,6 +928,9 @@ export function useItemProvider
       onConnectStatusChangeHook,
       onSearchReloadHook,
       searchHook,
+      (options) => {
+        return calculateSearchSignatureFor(idefRef.current, optionsRef.current.forId, optionsRef.current.forVersion, options);
+      },
       loadValueHook,
       changeListenerHook,
     );
@@ -949,7 +953,6 @@ export function useItemProvider
         reloadListenerHook,
         onSearchReloadHook,
         onConnectStatusChangeHook,
-        searchHook,
         internalUUIDRef.current,
         internalUUIDRef.current,
       );
