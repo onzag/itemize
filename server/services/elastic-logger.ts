@@ -3,6 +3,7 @@ import LoggingProvider, { ILogsResult, IPingsResult } from "./base/LoggingProvid
 import { Client } from "@elastic/elasticsearch";
 import { IItemizeFinalLoggingObject, IItemizePingObjectGenerator } from "../logger";
 import { FORCE_CONSOLE_LOGS, INSTANCE_UUID, NODE_ENV } from "../environment";
+import { SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 
 const logsIndex = LOGS_IDENTIFIER.toLowerCase();
 
@@ -109,6 +110,10 @@ export class ElasticLoggerService extends LoggingProvider<null> {
   public async log(instanceId: string, level: string, data: IItemizeFinalLoggingObject) {
     (data as any).instance_id = instanceId;
     (data as any).level = level;
+    if (level === "error") {
+      (data as any).resolved = false;
+      (data as any).fix_attempts = 0;
+    }
     await this.elastic.index({
       index: logsIndex,
       document: data,
@@ -396,10 +401,29 @@ export class ElasticLoggerService extends LoggingProvider<null> {
     });
   }
 
-  public async getLogsOf(instanceId: string, level: "info" | "error" | "any", fromDate: Date, toDate: Date): Promise<ILogsResult> {
-    const result = await this.elastic.search({
+  public async getLogsOf(
+    instanceId: string,
+    level: "info" | "error" | "any",
+    options: {
+      fromDate?: Date;
+      toDate?: Date;
+      id?: string;
+      className?: string;
+      methodName?: string;
+      functionName?: string;
+      endpoint?: string;
+      errorState?: "RESOLVED" | "UNRESOLVED" | "ANY";
+      errorMaximumResolveAttempts?: number;
+      data?: {
+        [id: string]: string | boolean | number;
+      };
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<ILogsResult> {
+    const searchR: SearchRequest = {
       index: logsIndex,
-      size: 10000,
+      size: options.limit || 10000,
       query: {
         bool: {
           must: ([
@@ -410,6 +434,48 @@ export class ElasticLoggerService extends LoggingProvider<null> {
                 },
               },
             },
+            options.id ? {
+              term: {
+                id: {
+                  value: options.id,
+                },
+              }
+            } : null,
+            options.className ? {
+              term: {
+                className: {
+                  value: options.className,
+                },
+              }
+            } : null,
+            options.methodName ? {
+              term: {
+                methodName: {
+                  value: options.methodName,
+                },
+              }
+            } : null,
+            options.endpoint ? {
+              term: {
+                endpoint: {
+                  value: options.endpoint,
+                },
+              }
+            } : null,
+            options.errorState && options.errorState !== "ANY" ? {
+              term: {
+                resolved: {
+                  value: options.errorState === "RESOLVED",
+                },
+              }
+            } : null,
+            typeof options.errorMaximumResolveAttempts === "number" ? {
+              range: {
+                fix_attempts: {
+                  lt: options.errorMaximumResolveAttempts,
+                },
+              }
+            } : null,
             level !== "any" ? {
               term: {
                 level: {
@@ -419,17 +485,25 @@ export class ElasticLoggerService extends LoggingProvider<null> {
             } : null,
             {
               range: {
-                timestamp: toDate && fromDate ? {
-                  gte: fromDate.toISOString(),
-                  lte: toDate.toISOString(),
-                } : (fromDate ? {
-                  gte: fromDate.toISOString(),
+                timestamp: options.toDate && options.fromDate ? {
+                  gte: options.fromDate.toISOString(),
+                  lte: options.toDate.toISOString(),
+                } : (options.fromDate ? {
+                  gte: options.fromDate.toISOString(),
                 } : {
-                  lte: toDate.toISOString(),
+                  lte: options.toDate.toISOString(),
                 }),
               },
             },
-          ]).filter((v) => !!v),
+          ]).concat(Object.keys(options.data || {}).map((vKey) => {
+            return ({
+              term: {
+                ["data." + vKey]: {
+                  value: options.data[vKey],
+                },
+              },
+            }) as any;
+          })).filter((v) => !!v),
         },
       },
       sort: [
@@ -439,7 +513,13 @@ export class ElasticLoggerService extends LoggingProvider<null> {
           }
         } as any,
       ],
-    });
+    };
+
+    if (options.offset) {
+      searchR.from = options.offset;
+    }
+
+    const result = await this.elastic.search(searchR);
 
     return ({
       instanceId,
@@ -497,7 +577,7 @@ export class ElasticLoggerService extends LoggingProvider<null> {
     // Scroll through the remaining batches
     while (response.hits.hits.length > 0) {
       response.hits.hits.forEach(hit => write(JSON.stringify(hit._source) + '\n'));
-      
+
       response = await this.elastic.scroll({
         scroll_id: scrollId,
         scroll: "1m",
@@ -553,7 +633,7 @@ export class ElasticLoggerService extends LoggingProvider<null> {
     // Scroll through the remaining batches
     while (response.hits.hits.length > 0) {
       response.hits.hits.forEach(hit => write(JSON.stringify(hit._source) + '\n'));
-      
+
       response = await this.elastic.scroll({
         scroll_id: scrollId,
         scroll: "1m",

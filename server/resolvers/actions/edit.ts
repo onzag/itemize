@@ -115,7 +115,8 @@ export async function editItemDefinition(
           // note how we don't pass the requested fields because we want it all
           currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
             appData.cache.getServerData(),
-            appData,
+            appData.config,
+            appData.databaseConfig,
             itemDefinition,
             sqlValue,
           );
@@ -487,7 +488,8 @@ export async function editItemDefinition(
     // convert it using the requested fields for that, and ignoring everything else
     const rqValue = convertSQLValueToRQValueForItemDefinition(
       appData.cache.getServerData(),
-      appData,
+      appData.config,
+      appData.databaseConfig,
       itemDefinition,
       sqlValue,
     );

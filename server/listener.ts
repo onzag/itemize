@@ -770,6 +770,7 @@ export class Listener {
         root: this.root,
         value: value ? convertSQLValueToRQValueForItemDefinition(
           this.cache.getServerData(),
+          this.config,
           null,
           itemDefinition,
           value,
@@ -2892,6 +2893,7 @@ export class Listener {
         root: this.root,
         value: value ? convertSQLValueToRQValueForItemDefinition(
           this.cache.getServerData(),
+          this.config,
           null,
           itemDefinition,
           value,

@@ -212,7 +212,7 @@ export default class PropertyEntryFile
       !!this.props.poked !== !!nextProps.poked ||
       nextProps.forId !== this.props.forId ||
       nextProps.forVersion !== this.props.forVersion ||
-      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+      this.props.forceInvalid !== nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
       this.props.altLabel !== nextProps.altLabel ||
@@ -441,12 +441,12 @@ export default class PropertyEntryFile
       FILE_SUPPORTED_IMAGE_TYPES.includes(rejectedValue.type);
 
     // get the invalid reason if any
-    const invalidReason = this.props.state.invalidReason;
+    const invalidReason = typeof this.props.forceInvalid === "string" ? this.props.forceInvalid : this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
       (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
-      isCurrentlyShownAsInvalid && i18nData &&
+      (isCurrentlyShownAsInvalid || this.props.forceInvalid) && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
       i18nInvalidReason = i18nData.error[invalidReason];

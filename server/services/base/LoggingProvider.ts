@@ -235,7 +235,26 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
     return null;
   }
 
-  public async getLogsOf(instanceId: string, level: "info" | "error" | "any", fromDate: Date, toDate: Date): Promise<ILogsResult> {
+  public async getLogsOf(
+    instanceId: string,
+    level: "info" | "error" | "any",
+    options: {
+      fromDate?: Date,
+      toDate?: Date,
+      id?: string;
+      className?: string;
+      methodName?: string;
+      functionName?: string;
+      endpoint?: string;
+      errorState?: "RESOLVED" | "UNRESOLVED" | "ANY";
+      errorMaximumResolveAttempts?: number;
+      data?: {
+        [id: string]: string | boolean | number;
+      };
+      limit?: number;
+      offset?: number;
+    } = {}
+  ): Promise<ILogsResult> {
     return null;
   }
 

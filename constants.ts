@@ -740,7 +740,7 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
  * The format that dates are expected to have in order to be exchanged
  * these represent the SQL form, does not support nano date
  */
-export const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
+export const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSSSSZ";
 /**
  * The format with the nano information included, used mainly for elastic
  * parsing

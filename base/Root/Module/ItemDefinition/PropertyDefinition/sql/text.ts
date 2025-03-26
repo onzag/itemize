@@ -111,7 +111,7 @@ function fakeInnerText(ele: Node): string {
 export function textSQLOut(arg: ISQLOutInfo): IPropertyDefinitionSupportedTextType {
   const value = arg.row[arg.prefix + arg.id];
   const language = arg.row[arg.prefix + arg.id + "_LANGUAGE"] ||
-    (arg.appData && arg.appData.config.fallbackLanguage.split("-")[0]) ||
+    (arg.config && arg.config.fallbackLanguage.split("-")[0]) ||
     "en";
 
   if (
@@ -176,8 +176,8 @@ export function textSQLIn(arg: ISQLInInfo) {
   let language: string;
   if ((arg.value as IPropertyDefinitionSupportedTextType) && (arg.value as IPropertyDefinitionSupportedTextType).language) {
     language = (arg.value as IPropertyDefinitionSupportedTextType).language || null;
-    dictionary = arg.appData ? (arg.appData.databaseConfig.dictionaries[language] ||
-      arg.appData.databaseConfig.dictionaries["*"] ||
+    dictionary = arg.databaseConfig ? (arg.databaseConfig.dictionaries[language] ||
+      arg.databaseConfig.dictionaries["*"] ||
       null) : null;
   } else if (typeof arg.language === "string" || !arg.language) {
     language = (arg.language || null) as string;

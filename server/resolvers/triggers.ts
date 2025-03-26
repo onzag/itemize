@@ -222,17 +222,17 @@ export type SearchTriggerType<TSQL = ISQLTableRowValue> = (arg: ISearchTriggerAr
  * return true to overwrite
  * false to throw the error
  */
-export type IOConflictTriggerType = (arg: IOConflictTriggerArgType) => void | boolean | Promise<void | boolean>;
+export type IOConflictTriggerType<TSQL = ISQLTableRowValue> = (arg: IOConflictTriggerArgType<TSQL>) => void | boolean | Promise<void | boolean>;
 
 export interface IBaseTriggerRegistry {
   io?: {
-    [path: string]: IOTriggerType;
+    [path: string]: IOTriggerType<any, any, any>;
   },
   search?: {
-    [path: string]: SearchTriggerType;
+    [path: string]: SearchTriggerType<any>;
   },
   ioConflict?: {
-    [path: string]: IOConflictTriggerType;
+    [path: string]: IOConflictTriggerType<any>;
   }
 }
 

@@ -320,6 +320,9 @@ export default {
     versionIsLanguageAndCountry: {
       type: "boolean",
     },
+    versionIsLanguageAndRegion: {
+      type: "boolean",
+    },
     versionIsLanguage: {
       type: "boolean",
     },
@@ -408,6 +411,7 @@ export default {
     canCreateInBehalfTargetRoles: ["canCreateInBehalf"],
     versioningRoleAccess: ["enableVersioning"],
     versionIsLanguageAndCountry: ["enableVersioning"],
+    versionIsLanguageAndRegion: ["enableVersioning"],
     versionIsLanguage: ["enableVersioning"],
     versionIsCountry: ["enableVersioning"],
   },

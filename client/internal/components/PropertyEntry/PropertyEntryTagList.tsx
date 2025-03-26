@@ -45,7 +45,7 @@ export default class PropertyEntryTagList extends React.Component<
       nextProps.property !== this.props.property ||
       !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
-      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+      this.props.forceInvalid !== nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
       this.props.altLabel !== nextProps.altLabel ||
@@ -70,12 +70,12 @@ export default class PropertyEntryTagList extends React.Component<
     const i18nDescription = this.props.hideDescription ? null : (typeof this.props.altDescription !== "undefined" ? this.props.altDescription : (i18nData && i18nData.description));
     const i18nPlaceholder = this.props.hidePlaceholder ? null : (this.props.altPlaceholder || (i18nData && i18nData.placeholder));
 
-    const invalidReason = this.props.state.invalidReason;
+    const invalidReason = typeof this.props.forceInvalid === "string" ? this.props.forceInvalid : this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
       (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
-      isCurrentlyShownAsInvalid && i18nData &&
+      (isCurrentlyShownAsInvalid || this.props.forceInvalid) && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
       i18nInvalidReason = i18nData.error[invalidReason];

@@ -83,8 +83,9 @@ export interface IPropertyEntryProps<RendererPropsType, T extends string, SV ext
   onEntryDrivenChange?: (value: PropertyDefinitionSupportedType) => void;
   /**
    * make it seem as invalid, allows displaying an entry property as invalid
+   * make it a string to use a custom error message from the property
    */
-  showAsInvalid?: boolean;
+  showAsInvalid?: boolean | string;
   /**
    * Whether to hide the description that is hidden in language data
    */

@@ -204,7 +204,7 @@ function httpRequestOriginal<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T
             if (data.returnNonOk || (resp.statusCode >= 200 && resp.statusCode < 300) || !resp.statusCode) {
               resolve({ response: resp, data: valueToRespondWith });
             } else {
-              const err = new Error("Request failed, server responsed with status: " + resp.statusCode);
+              const err = new Error("Request failed, server responsed with status " + resp.statusCode + " with the message: " + JSON.stringify(dataProcessed));
               !hasFiredError && reject(err);
               hasFiredError = true;
             }

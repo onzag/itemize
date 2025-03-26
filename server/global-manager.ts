@@ -17,6 +17,7 @@ import {
 import {
   ISensitiveConfigRawJSONDataType,
   IConfigRawJSONDataType,
+  IDBConfigRawJSONDataType,
 } from "../config";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import uuid from "uuid";
@@ -73,6 +74,7 @@ export class GlobalManager {
   public sensitiveConfig: ISensitiveConfigRawJSONDataType;
   public mailProvider: MailProvider<any>;
   public config: IConfigRawJSONDataType;
+  public databaseConfig: IDBConfigRawJSONDataType;
   private customServices: {
     [name: string]: ServiceProvider<any>;
   };
@@ -90,6 +92,7 @@ export class GlobalManager {
     redisPub: ItemizeRedisClient,
     redisSub: ItemizeRedisClient,
     config: IConfigRawJSONDataType,
+    databaseConfig: IDBConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     currencyFactorsProvider: CurrencyFactorsProvider<any>,
     mailProvider: MailProvider<any>,
@@ -108,6 +111,7 @@ export class GlobalManager {
     this.modNeedsMantenience = [];
     this.serverData = null;
     this.config = config;
+    this.databaseConfig = databaseConfig;
     this.sensitiveConfig = sensitiveConfig;
     this.registry = registry;
     this.mailProvider = mailProvider;
@@ -122,6 +126,8 @@ export class GlobalManager {
     mailProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES") &&
       mailProvider.setupGlobalResources(
         this.databaseConnection,
+        this.rawDB,
+        this.elastic,
         this.globalCache,
         this.redisPub,
         this.redisSub,
@@ -133,6 +139,8 @@ export class GlobalManager {
     phoneProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES") &&
       phoneProvider.setupGlobalResources(
         this.databaseConnection,
+        this.rawDB,
+        this.elastic,
         this.globalCache,
         this.redisPub,
         this.redisSub,
@@ -144,6 +152,8 @@ export class GlobalManager {
     currencyFactorsProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA") &&
       currencyFactorsProvider.setupGlobalResources(
         this.databaseConnection,
+        this.rawDB,
+        this.elastic,
         this.globalCache,
         this.redisPub,
         this.redisSub,
@@ -183,6 +193,8 @@ export class GlobalManager {
       this.customServices[service.getInstanceName()] = service;
       service.setupGlobalResources(
         this.databaseConnection,
+        this.rawDB,
+        this.elastic,
         this.globalCache,
         this.redisPub,
         this.redisSub,
@@ -319,7 +331,8 @@ export class GlobalManager {
               prefix: "",
               property: p,
               serverData: this.serverData,
-              appData: null,
+              config: this.config,
+              databaseConfig: this.databaseConfig,
               value,
             });
 
@@ -358,7 +371,8 @@ export class GlobalManager {
                 prefix: i.getPrefixedQualifiedIdentifier(),
                 property: propDef,
                 serverData: this.serverData,
-                appData: null,
+                config: this.config,
+                databaseConfig: this.databaseConfig,
                 value: valueInState.value,
               });
 
@@ -1098,7 +1112,8 @@ export class GlobalManager {
         .getPropertyDefinitionDescription()
         .sqlMantenience({
           serverData: this.serverData,
-          appData: null,
+          config: this.config,
+          databaseConfig: this.databaseConfig,
           id: p.pdef.getId(),
           prefix: p.include ? p.include.getPrefixedQualifiedIdentifier() : "",
           property: p.pdef,

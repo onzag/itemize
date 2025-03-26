@@ -767,7 +767,7 @@ export default class PropertyEntryText
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.forId !== nextProps.forId ||
       this.props.forVersion !== nextProps.forVersion ||
-      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+      this.props.forceInvalid !== nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
       this.props.altLabel !== nextProps.altLabel ||
@@ -891,12 +891,12 @@ export default class PropertyEntryText
       (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
-      !invalidReasonIsMediaProperty && isCurrentlyShownAsInvalid && i18nData &&
+      !invalidReasonIsMediaProperty && (isCurrentlyShownAsInvalid || this.props.forceInvalid) && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
       i18nInvalidReason = i18nData.error[invalidReason];
     } else if (
-      invalidReasonIsMediaProperty && isCurrentlyShownAsInvalid && i18nData &&
+      invalidReasonIsMediaProperty && (isCurrentlyShownAsInvalid || this.props.forceInvalid) && i18nData &&
       i18nData.error && i18nData.error["MEDIA_PROPERTY_" + invalidReason]
     ) {
       i18nInvalidReason = i18nData.error["MEDIA_PROPERTY_" + invalidReason];

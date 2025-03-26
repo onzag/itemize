@@ -415,7 +415,7 @@ export default class PropertyEntryField
       !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
-      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+      this.props.forceInvalid !== nextProps.forceInvalid ||
       nextProps.currency.code !== this.props.currency.code ||
       nextProps.country.code !== this.props.country.code ||
       this.props.altDescription !== nextProps.altDescription ||
@@ -766,12 +766,12 @@ export default class PropertyEntryField
     const valueToUse = this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value;
 
     // get the invalid reason if any
-    const invalidReason = this.props.state.invalidReason;
+    const invalidReason = typeof this.props.forceInvalid === "string" ? this.props.forceInvalid : this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
       (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
-      isCurrentlyShownAsInvalid && i18nData &&
+      (isCurrentlyShownAsInvalid || this.props.forceInvalid) && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
       i18nInvalidReason = i18nData.error[invalidReason];

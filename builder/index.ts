@@ -135,6 +135,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   versioningRoleAccess?: string[];
   enableVersioning?: boolean;
   versionIsLanguageAndCountry?: boolean;
+  versionIsLanguageAndRegion?: boolean;
   versionIsLanguage?: boolean;
   versionIsCountry?: boolean;
   searchLimiters?: ISearchLimitersType;
@@ -779,6 +780,10 @@ async function buildItemDefinition(
 
     if (actualEvaledFileData.versionIsLanguageAndCountry) {
       finalValue.versionIsLanguageAndCountry = actualEvaledFileData.versionIsLanguageAndCountry;
+    }
+
+    if (actualEvaledFileData.versionIsLanguageAndRegion) {
+      finalValue.versionIsLanguageAndRegion = actualEvaledFileData.versionIsLanguageAndRegion;
     }
 
     if (actualEvaledFileData.versioningRoleAccess) {

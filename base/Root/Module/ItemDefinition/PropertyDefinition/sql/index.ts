@@ -25,7 +25,8 @@ import StorageProvider from "../../../../../../server/services/base/StorageProvi
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../../../database/OrderByBuilder";
 import type { ElasticQueryBuilder } from "../../../../../../server/elastic";
-import type { IAppDataType } from "../../../../../../server";
+import type { IAppDataType, IServerDataType } from "../../../../../../server";
+import type { IConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../../../../../../config";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -509,7 +510,8 @@ export function getSQLTableDefinitionForProperty(
     include,
     // server data unavailable
     serverData: null,
-    appData: null,
+    config: null,
+    databaseConfig: null,
   });
 }
 
@@ -517,8 +519,9 @@ export function getElasticSchemaForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
 ): IElasticIndexDefinitionType {
   const elasticFn = propertyDefinition.getPropertyDefinitionDescription().elastic;
   if (elasticFn) {
@@ -529,7 +532,8 @@ export function getElasticSchemaForProperty(
       itemDefinition,
       include,
       serverData,
-      appData,
+      config,
+      databaseConfig,
     });
   }
 
@@ -549,8 +553,9 @@ export function getElasticSchemaForProperty(
  * @returns the rq value for the property
  */
 export function convertSQLValueToRQValueForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -582,7 +587,8 @@ export function convertSQLValueToRQValueForProperty(
     include,
     property: propertyDefinition,
     id: propertyDefinition.getId(),
-    appData,
+    config,
+    databaseConfig,
   });
 
   // we check for null coersion, while this shouldn't really
@@ -610,8 +616,9 @@ export function convertSQLValueToRQValueForProperty(
 }
 
 export function convertSQLValueToElasticSQLValueForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -626,7 +633,8 @@ export function convertSQLValueToElasticSQLValueForProperty(
     include,
     property: propertyDefinition,
     id: propertyDefinition.getId(),
-    appData,
+    config,
+    databaseConfig,
   });
   return value;
 }
@@ -648,8 +656,9 @@ export function convertSQLValueToElasticSQLValueForProperty(
  * included in it
  */
 export function convertRQValueToSQLValueForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   mod: Module,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -722,7 +731,8 @@ export function convertRQValueToSQLValueForProperty(
       value: rqPropertyValue,
       prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
       serverData,
-      appData,
+      config,
+      databaseConfig,
       itemDefinition,
       include,
       property: propertyDefinition,
@@ -747,8 +757,9 @@ export function convertRQValueToSQLValueForProperty(
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
 export function buildSQLQueryForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -770,7 +781,8 @@ export function buildSQLQueryForProperty(
     dictionary,
     isOrderedByIt,
     property: propertyDefinition,
-    appData,
+    config,
+    databaseConfig,
   });
 }
 
@@ -787,8 +799,9 @@ export function buildSQLQueryForProperty(
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
 export function buildElasticQueryForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -813,7 +826,8 @@ export function buildElasticQueryForProperty(
       isOrderedByIt,
       property: propertyDefinition,
       boost: propertyDefinition.getSearchBoost(),
-      appData,
+      config,
+      databaseConfig,
       fullHighlights,
     });
   }
@@ -835,8 +849,9 @@ export function buildElasticQueryForProperty(
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
 export function buildSQLStrSearchQueryForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -860,7 +875,8 @@ export function buildSQLStrSearchQueryForProperty(
       dictionary,
       isOrderedByIt,
       property: propertyDefinition,
-      appData,
+      config,
+      databaseConfig,
     });
   }
 
@@ -881,8 +897,9 @@ export function buildSQLStrSearchQueryForProperty(
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
 export function buildElasticStrSearchQueryForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -908,7 +925,8 @@ export function buildElasticStrSearchQueryForProperty(
       isOrderedByIt,
       property: propertyDefinition,
       boost: propertyDefinition.getSearchBoost(),
-      appData,
+      config,
+      databaseConfig,
     });
   }
 
@@ -942,8 +960,9 @@ const actualNulls = {
  * @param wasIncludedInStrSearch whether this property was included in the str FTS search
  */
 export function buildSQLOrderByForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -971,7 +990,8 @@ export function buildSQLOrderByForProperty(
       wasIncludedInSearch,
       wasIncludedInStrSearch,
       args,
-      appData,
+      config,
+      databaseConfig,
     });
 
     // if we have a result at all
@@ -997,8 +1017,9 @@ export function buildSQLOrderByForProperty(
  * @param wasIncludedInStrSearch whether this property was included in the str FTS search
  */
 export function buildElasticOrderByForProperty(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -1025,7 +1046,8 @@ export function buildElasticOrderByForProperty(
       wasIncludedInSearch,
       wasIncludedInStrSearch,
       args,
-      appData,
+      config,
+      databaseConfig,
     });
 
     return result || null;
@@ -1063,7 +1085,8 @@ export function buildSQLOrderByForInternalRequiredProperty(
     wasIncludedInSearch: null,
     wasIncludedInStrSearch: null,
     serverData: null,
-    appData: null,
+    config: null,
+    databaseConfig: null,
     args,
   });
 
@@ -1104,7 +1127,8 @@ export function buildElasticOrderByForInternalRequiredProperty(
     wasIncludedInSearch: null,
     wasIncludedInStrSearch: null,
     serverData: null,
-    appData: null,
+    config: null,
+    databaseConfig: null,
     args,
   });
 

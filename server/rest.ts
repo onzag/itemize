@@ -908,7 +908,10 @@ export default function restServices(appData: IAppDataType) {
     const fromD = new Date(fromMs);
     const toD = toMs && !isNaN(toMs) ? new Date(toMs) : null;
 
-    const allLogs = await appData.loggingService.getLogsOf(id, level, fromD, toD);
+    const allLogs = await appData.loggingService.getLogsOf(id, level, {
+      fromDate: fromD,
+      toDate: toD,
+    });
     res.end(JSON.stringify({
       status: "OK",
       logs: allLogs,

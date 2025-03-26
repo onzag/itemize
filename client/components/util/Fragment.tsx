@@ -19,6 +19,19 @@ import { IPropertyEntryRendererProps } from "../../internal/components/PropertyE
 import type { EndpointErrorType } from "../../../base/errors";
 import { SearchVariants } from "../../../constants";
 
+function getPotentialLanguageFromVersion(version: string) {
+  if (!version) {
+    return null;
+  }
+
+  const languagePart = version.split("-")[0];
+  if (languagePart.toLowerCase() === languagePart && languagePart.length === 2) {
+    return languagePart;
+  }
+
+  return null;
+}
+
 /**
  * Argument that the fragment provides
  */
@@ -85,11 +98,19 @@ export interface IFragmentProps {
    * and it's attempting to submit for that
    */
   onBeforeSubmitUnversioned?: (options: IActionSubmitOptions) => IActionSubmitOptions;
+  /**
+   * Language for the unversioned
+   */
+  unversionedLanguageOverride: string;
 
   /**
    * For the submit of the specific fragment to be added or edited
    */
   onBeforeSubmit?: (action: "add" | "edit", options: IActionSubmitOptions) => IActionSubmitOptions;
+  /**
+   * language override for the versioned
+   */
+  languageOverride?: string;
 
   /**
    * Whenever edit is triggered
@@ -214,16 +235,17 @@ export default function Fragment(props: IFragmentProps) {
   const idVersion = useIdVersionRetriever();
 
   const save = useCallback(async () => {
-    // this means that it loaded an unversioned fallback so we need to add
+    // this means that it loaded a fallback so we need to add
     // also we would add if the original itself is not found
     const action = idVersion.version !== props.version || itemLoader.notFound ? "add" : "edit";
 
-    if (itemLoader.notFound) {
+    if (itemLoader.notFound && idVersion.version === null) {
       let unversionedOptions: IActionSubmitOptions = {
         action: "add",
         properties: props.properties,
         submitForId: idVersion.id,
         submitForVersion: null,
+        languageOverride: props.unversionedLanguageOverride,
       };
 
       if (props.onBeforeSubmitUnversioned) {
@@ -246,7 +268,7 @@ export default function Fragment(props: IFragmentProps) {
       properties: props.properties,
       submitForId: idVersion.id,
       submitForVersion: props.version,
-      languageOverride: idVersion.version,
+      languageOverride: props.languageOverride ? props.languageOverride : getPotentialLanguageFromVersion(props.version),
     };
 
     if (props.onBeforeSubmit) {
@@ -262,6 +284,8 @@ export default function Fragment(props: IFragmentProps) {
   }, [
     idVersion,
     props.version,
+    props.unversionedLanguageOverride,
+    props.languageOverride,
     props.properties,
     props.onBeforeSubmit,
     props.onBeforeSubmitUnversioned,

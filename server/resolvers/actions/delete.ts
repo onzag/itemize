@@ -83,7 +83,8 @@ export async function deleteItemDefinition(
         const ownerUserId = sqlValue ? (itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by) : null;
         currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
           appData.cache.getServerData(),
-          appData,
+          appData.config,
+          appData.databaseConfig,
           itemDefinition,
           sqlValue,
         );

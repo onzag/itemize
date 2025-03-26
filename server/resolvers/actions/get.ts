@@ -75,7 +75,8 @@ export async function getItemDefinition(
       rolesManager: (sqlValue: ISQLTableRowValue) => {
         currentWholeValueAsRQ = sqlValue ? convertSQLValueToRQValueForItemDefinition(
           appData.cache.getServerData(),
-          appData,
+          appData.config,
+          appData.databaseConfig,
           itemDefinition,
           sqlValue,
         ) : null;
@@ -404,7 +405,8 @@ export async function getItemDefinitionList(
     resultQuery.should((q) => {
       rHighReply = buildElasticQueryForItemDefinition(
         appData.cache.getServerData(),
-        appData,
+        appData.config,
+        appData.databaseConfig,
         itemDefinition,
         resolverArgs.args,
         q,
@@ -474,7 +476,8 @@ export async function getItemDefinitionList(
       );
       const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
-        appData,
+        appData.config,
+        appData.databaseConfig,
         itemDefinition,
         value,
       );
@@ -723,7 +726,8 @@ export async function getModuleList(
     resultQuery.should((q) => {
       rHighReply = buildElasticQueryForModule(
         appData.cache.getServerData(),
-        appData,
+        appData.config,
+        appData.databaseConfig,
         mod,
         resolverArgs.args,
         q,
@@ -792,7 +796,8 @@ export async function getModuleList(
 
       const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
-        appData,
+        appData.config,
+        appData.databaseConfig,
         itemDefinition,
         value,
       );

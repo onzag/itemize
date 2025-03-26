@@ -8,7 +8,7 @@
 
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CHANGED_FEEDBACK_EVENT, generateOwnedParentedSearchMergedIndexIdentifier, generateOwnedSearchMergedIndexIdentifier, generateParentedSearchMergedIndexIdentifier, generatePropertySearchMergedIndexIdentifier, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT, PROPERTY_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
-import { CACHED_SELECTS_LOCATION_GLOBAL, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
+import { CACHED_SELECTS_LOCATION_GLOBAL, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES, TRACKERS_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
 import { logger } from "./logger";
 import type { ItemizeRedisClient } from "./redis";
@@ -30,14 +30,14 @@ import uuidv5 from "uuid/v5";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
-import type { IAppDataType } from "../server";
+import type { IAppDataType, IServerDataType } from "../server";
 import { DeclareCursorBuilder } from "../database/DeclareCursorBuilder";
 import { CloseCursorBuilder } from "../database/CloseCursorBuilder";
 import { FetchOrMoveFromCursorBuilder } from "../database/FetchOrMoveFromCursorBuilder";
 import { deleteEveryPossibleFileFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { analyzeModuleForPossibleParent } from "./cache";
 import { Listener } from "./listener";
-import { IConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../config";
 import { INSTANCE_MODE, NODE_ENV } from "./environment";
 import StorageProvider from "./services/base/StorageProvider";
 import type { IRQValue } from "../rq-querier";
@@ -118,6 +118,7 @@ export class ItemizeRawDB {
   public databaseConnection: DatabaseConnection;
 
   private config: IConfigRawJSONDataType;
+  private databaseConfig: IDBConfigRawJSONDataType;
   private uploadsClient: StorageProvider<any>;
 
   /**
@@ -133,6 +134,7 @@ export class ItemizeRawDB {
     databaseConnection: DatabaseConnection,
     root: Root,
     config: IConfigRawJSONDataType,
+    databaseConfig: IDBConfigRawJSONDataType,
     uploadsClient: StorageProvider<any>,
   ) {
     this.redisPub = redisPub;
@@ -168,6 +170,7 @@ export class ItemizeRawDB {
     );
 
     this.config = config;
+    this.databaseConfig = databaseConfig;
     this.uploadsClient = uploadsClient;
   }
 
@@ -218,7 +221,7 @@ export class ItemizeRawDB {
    * @returns a new instance of raw db
    */
   public hookInto(connection: DatabaseConnection, options: { transacting?: boolean, singleClient?: boolean } = {}): ItemizeRawDB {
-    const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, connection, this.root, this.config, this.uploadsClient);
+    const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, connection, this.root, this.config, this.databaseConfig, this.uploadsClient);
     newRawDB.setupElastic(this.elastic);
     if (options.transacting) {
       newRawDB.transacting = true;
@@ -241,7 +244,7 @@ export class ItemizeRawDB {
   } = {}): Promise<T> {
     let newRawDB: ItemizeRawDB;
     const rs = await this.databaseConnection.startTransaction(async (transactingClient) => {
-      newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root, this.config, this.uploadsClient);
+      newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root, this.config, this.databaseConfig, this.uploadsClient);
       newRawDB.setupElastic(this.elastic);
       newRawDB.transacting = true;
       return await fn(newRawDB);
@@ -272,6 +275,7 @@ export class ItemizeRawDB {
         transactingClient,
         this.root,
         this.config,
+        this.databaseConfig,
         this.uploadsClient,
       );
       newRawDB.setupElastic(this.elastic);
@@ -307,6 +311,10 @@ export class ItemizeRawDB {
   }
 
   /**
+   * TODO make this handle somehow uploads
+   * TODO this can't work in global context because it requires appData because appData is used
+   * in say, payments
+   * 
    * Will convert a rq style value into a full row SQL value in order to execute many value
    * types functionality and directly insert values in a safer way
    * 
@@ -331,7 +339,7 @@ export class ItemizeRawDB {
   public processrqValue(
     item: ItemDefinition | string,
     value: any,
-    appData: IAppDataType,
+    serverData: IServerDataType,
     language: string,
     dictionary: string,
     currentValue?: IRQValue,
@@ -345,8 +353,9 @@ export class ItemizeRawDB {
     const mod = itemDefinition.getParentModule();
 
     const modSQL = convertRQValueToSQLValueForModule(
-      appData.cache.getServerData(),
-      appData,
+      serverData,
+      this.config,
+      this.databaseConfig,
       mod,
       value,
       currentValue || null,
@@ -357,8 +366,9 @@ export class ItemizeRawDB {
     );
 
     const itemSQL = convertRQValueToSQLValueForItemDefinition(
-      appData.cache.getServerData(),
-      appData,
+      serverData,
+      this.config,
+      this.databaseConfig,
       itemDefinition,
       value,
       currentValue || null,
@@ -368,7 +378,26 @@ export class ItemizeRawDB {
       partialFields,
     );
 
+    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      if (((p === "parent_id" || p === "parent_version") && !value[p]) || p === "created_at") {
+        return;
+      } else if (typeof value[p] !== "undefined") {
+        modSQL.value[p] = value[p];
+      }
+    });
+
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      if (((p === "id" || p === "version") && !value[p]) || p === "type" || p === "last_modified") {
+        return;
+      } else if (typeof value[p] !== "undefined") {
+        modSQL.value[p] = value[p];
+      }
+    });
+
     const consumeStreams = async (id: string, version: string) => {
+      // TODO it should, but it should do it so that a cluster needs to be specified to consume such streams
+      // the global manager is not guaranteed to be at the context of any cluster
+      // or maybe it should
       if (INSTANCE_MODE === "GLOBAL_MANAGER") {
         throw new Error("Global Manager cannot handle file uploads as it has no exposed uploads manager to speak to a client");
       }
@@ -628,8 +657,8 @@ export class ItemizeRawDB {
 
       if (action === "created") {
         const combinedLimiters = idef.getSearchLimiters(true);
-        const isSearchLimited = idef.shouldRowBeIncludedInSearchEngine(row, combinedLimiters, true);
-        if (!isSearchLimited) {
+        const shouldBeIncluded = idef.shouldRowBeIncludedInSearchEngine(row, combinedLimiters, true);
+        if (shouldBeIncluded) {
           await this.elastic.createDocument(
             idef,
             language,
@@ -647,8 +676,8 @@ export class ItemizeRawDB {
         );
       } else if (action === "modified") {
         const combinedLimiters = idef.getSearchLimiters(true);
-        const isSearchLimited = idef.shouldRowBeIncludedInSearchEngine(row, combinedLimiters, true);
-        if (isSearchLimited) {
+        const shouldBeIncluded = idef.shouldRowBeIncludedInSearchEngine(row, combinedLimiters, true);
+        if (!shouldBeIncluded) {
           await this.elastic.deleteDocumentUnknownLanguage(
             idef,
             row.id,
@@ -2096,10 +2125,10 @@ export class ItemizeRawDB {
    * @param fetcher 
    * @returns 
    */
-  public async fetchFromRawDBCursor(
+  public async fetchFromRawDBCursor<T = ISQLTableRowValue>(
     cursorName: string,
     fetcher: (builder: FetchOrMoveFromCursorBuilder) => void,
-  ): Promise<ISQLTableRowValue[]> {
+  ): Promise<T[]> {
     const builder = new FetchOrMoveFromCursorBuilder("FETCH", cursorName);
     fetcher(builder);
     return await this.databaseConnection.queryRows(builder);
@@ -2145,7 +2174,7 @@ export class ItemizeRawDB {
    * @param selecter 
    * @param options 
    */
-  public async *performRawDBCursorSelect(
+  public async *performRawDBCursorSelect<T = ISQLTableRowValue>(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     selecter: (builder: SelectBuilder) => void,
     options: {
@@ -2153,7 +2182,7 @@ export class ItemizeRawDB {
       batchSize?: number,
       withHold?: boolean,
     } = {}
-  ): AsyncGenerator<ISQLTableRowValue[], void, boolean | undefined> {
+  ): AsyncGenerator<T[], void, boolean | undefined> {
     const cursorname = "cursor_" + uuid.v4().replace(/-/g, "");
     const batchSize = options.batchSize || 100;
     await this.declareRawDBCursorSelect(
@@ -2167,7 +2196,7 @@ export class ItemizeRawDB {
     );
 
     try {
-      let currentBatch = await this.fetchFromRawDBCursor(cursorname, (b) => {
+      let currentBatch = await this.fetchFromRawDBCursor<T>(cursorname, (b) => {
         b.forward(batchSize);
       });
 
@@ -2177,7 +2206,7 @@ export class ItemizeRawDB {
         if (continueProcessing === false) {
           break;
         }
-        currentBatch = await this.fetchFromRawDBCursor(cursorname, (b) => {
+        currentBatch = await this.fetchFromRawDBCursor<T>(cursorname, (b) => {
           b.forward(batchSize);
         });
       }

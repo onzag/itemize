@@ -488,7 +488,8 @@ export async function searchModule(
     // for that specific user
     const rHighReply = buildElasticQueryForModule(
       appData.cache.getServerData(),
-      appData,
+      appData.config,
+      appData.databaseConfig,
       mod,
       resolverArgs.args,
       elasticQuery,
@@ -632,7 +633,8 @@ export async function searchModule(
     // now we build the sql query for the module
     const addedSearchRaw = buildSQLQueryForModule(
       appData.cache.getServerData(),
-      appData,
+      appData.config,
+      appData.databaseConfig,
       mod,
       resolverArgs.args,
       queryModel.whereBuilder,
@@ -824,7 +826,8 @@ export async function searchModule(
           if (moduleTrigger || itemDefinitionTrigger) {
             const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
               appData.cache.getServerData(),
-              appData,
+              appData.config,
+              appData.databaseConfig,
               itemDefinition,
               r,
             );
@@ -1538,7 +1541,8 @@ export async function searchItemDefinition(
 
       const rHighReply = buildElasticQueryForItemDefinition(
         appData.cache.getServerData(),
-        appData,
+        appData.config,
+        appData.databaseConfig,
         itemDefinition,
         resolverArgs.args,
         elasticQuery,
@@ -1677,7 +1681,8 @@ export async function searchItemDefinition(
 
       const addedSearchRaw = buildSQLQueryForItemDefinition(
         appData.cache.getServerData(),
-        appData,
+        appData.config,
+        appData.databaseConfig,
         itemDefinition,
         resolverArgs.args,
         queryModel.whereBuilder,
@@ -1861,7 +1866,8 @@ export async function searchItemDefinition(
             if (moduleTrigger || itemDefinitionTrigger) {
               const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
                 appData.cache.getServerData(),
-                appData,
+                appData.config,
+                appData.databaseConfig,
                 itemDefinition,
                 r,
               );

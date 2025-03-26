@@ -1099,7 +1099,8 @@ export class Cache {
     const rqValue = isSQLType ? (
       convertSQLValueToRQValueForItemDefinition(
         this.serverData,
-        this.appData,
+        this.appData.config,
+        this.appData.databaseConfig,
         itemDefinition,
         value,
       )
@@ -1188,7 +1189,8 @@ export class Cache {
     // and the module table, this value is database ready
     const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertRQValueToSQLValueForItemDefinition(
       this.serverData,
-      this.appData,
+      this.appData.config,
+      this.appData.databaseConfig,
       itemDefinition,
       rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
@@ -1200,7 +1202,8 @@ export class Cache {
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertRQValueToSQLValueForModule(
       this.serverData,
-      this.appData,
+      this.appData.config,
+      this.appData.databaseConfig,
       itemDefinition.getParentModule(),
       rqValue as IRQArgs, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
@@ -1572,7 +1575,8 @@ export class Cache {
         // now we can get this new value
         const newValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
-          this.appData,
+          this.appData.config,
+          this.appData.databaseConfig,
           itemDefinition,
           sideEffectedProperty.include,
           sideEffectedProperty.property,
@@ -1894,7 +1898,8 @@ export class Cache {
     const editedBy = options.editedBy || UNSPECIFIED_OWNER;
     const currentValueAsRQ = options.currentrqValue || convertSQLValueToRQValueForItemDefinition(
       this.serverData,
-      this.appData,
+      this.appData.config,
+      this.appData.databaseConfig,
       itemDefinition,
       currentSQLValue,
     );
@@ -1979,7 +1984,8 @@ export class Cache {
 
         const originalValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
-          this.appData,
+          this.appData.config,
+          this.appData.databaseConfig,
           itemDefinition,
           preSideEffectedProperty.include,
           preSideEffectedProperty.property,
@@ -2034,7 +2040,8 @@ export class Cache {
     // we don't want things to be defaulted in the query
     const sqlIdefDataComposed = convertRQValueToSQLValueForItemDefinition(
       this.serverData,
-      this.appData,
+      this.appData.config,
+      this.appData.databaseConfig,
       itemDefinition,
       update,
       currentValueAsRQ,
@@ -2045,7 +2052,8 @@ export class Cache {
     );
     const sqlModDataComposed = convertRQValueToSQLValueForModule(
       this.serverData,
-      this.appData,
+      this.appData.config,
+      this.appData.databaseConfig,
       itemDefinition.getParentModule(),
       update,
       currentValueAsRQ,
@@ -2554,7 +2562,8 @@ export class Cache {
         // now we can get this new value
         const newValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
-          this.appData,
+          this.appData.config,
+          this.appData.databaseConfig,
           itemDefinition,
           sideEffectedProperty.include,
           sideEffectedProperty.property,
@@ -2564,7 +2573,8 @@ export class Cache {
         // get the original value
         const originalValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
-          this.appData,
+          this.appData.config,
+          this.appData.databaseConfig,
           itemDefinition,
           sideEffectedProperty.include,
           sideEffectedProperty.property,
@@ -3262,7 +3272,8 @@ export class Cache {
               // now we can get this new value
               const originalValue = convertSQLValueToRQValueForProperty(
                 this.getServerData(),
-                this.appData,
+                this.appData.config,
+                this.appData.databaseConfig,
                 itemDefinition,
                 sideEffectedProperty.include,
                 sideEffectedProperty.property,

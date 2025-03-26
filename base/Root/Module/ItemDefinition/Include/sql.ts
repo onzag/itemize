@@ -23,9 +23,10 @@ import { IRQValue, IRQArgs } from "../../../../../rq-querier";
 import StorageProvider from "../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../database/WhereBuilder";
 import type { ElasticQueryBuilder } from "../../../../../server/elastic";
-import type { IAppDataType } from "../../../../../server";
+import type { IAppDataType, IServerDataType } from "../../../../../server";
+import type { IConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../../../../../config";
 
-export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, include: Include, serverData: any, appData: IAppDataType): IElasticIndexDefinitionType {
+export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, include: Include, serverData: IServerDataType, config: IConfigRawJSONDataType, databaseConfig: IDBConfigRawJSONDataType): IElasticIndexDefinitionType {
   // the exclusion state needs to be stored in the table bit
   // so we basically need to get a prefix for this item definition
   // this is usually INCLUDE_ the include prefix, and the id of the include
@@ -52,7 +53,8 @@ export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, inclu
       include,
       sinkingProperty,
       serverData,
-      appData,
+      config,
+      databaseConfig,
     );
 
     Object.assign(
@@ -125,9 +127,10 @@ export function getSQLTableDefinitionForInclude(itemDefinition: ItemDefinition, 
  * @returns a partial rq value
  */
 export function convertSQLValueToRQValueForInclude(
-  serverData: any,
-  appData: IAppDataType,
-  itemDefinition: ItemDefinition, 
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
+  itemDefinition: ItemDefinition,
   include: Include,
   row: ISQLTableRowValue,
   rqFields?: any,
@@ -152,7 +155,8 @@ export function convertSQLValueToRQValueForInclude(
       rqParentResult,
       convertSQLValueToRQValueForProperty(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition,
         include,
         sinkingProperty,
@@ -170,9 +174,10 @@ export function convertSQLValueToRQValueForInclude(
 }
 
 export function convertSQLValueToElasticSQLValueForInclude(
-  serverData: any,
-  appData: IAppDataType,
-  itemDefinition: ItemDefinition, 
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
+  itemDefinition: ItemDefinition,
   include: Include,
   row: ISQLTableRowValue,
 ): IRQValue {
@@ -186,7 +191,8 @@ export function convertSQLValueToElasticSQLValueForInclude(
       result,
       convertSQLValueToElasticSQLValueForProperty(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition,
         include,
         sinkingProperty,
@@ -220,8 +226,9 @@ export function convertSQLValueToElasticSQLValueForInclude(
  * @returns the partial sql result to be added into the table
  */
 export function convertRQValueToSQLValueForInclude(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   data: IRQArgs,
@@ -260,7 +267,8 @@ export function convertRQValueToSQLValueForInclude(
         // to be prefixed with what we are giving, in this case ITEM_wheel_
         const addedFieldsByProperty = convertRQValueToSQLValueForProperty(
           serverData,
-          appData,
+          config,
+          databaseConfig,
           itemDefinition.getParentModule(),
           itemDefinition,
           include,
@@ -298,8 +306,9 @@ export function convertRQValueToSQLValueForInclude(
  * @param dictionary the dictionary to use to build the search
  */
 export function buildSQLQueryForInclude(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   args: IRQArgs,
@@ -334,7 +343,8 @@ export function buildSQLQueryForInclude(
           }
           buildSQLQueryForProperty(
             serverData,
-            appData,
+            config,
+            databaseConfig,
             itemDefinition,
             include,
             pd,
@@ -364,9 +374,10 @@ export function buildSQLQueryForInclude(
  * @param args the args as they come from the search module, specific for this item (not nested)
  * @param dictionary the dictionary to use to build the search
  */
- export function buildElasticQueryForInclude(
-  serverData: any,
-  appData: IAppDataType,
+export function buildElasticQueryForInclude(
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   args: IRQArgs,
@@ -408,7 +419,8 @@ export function buildSQLQueryForInclude(
           }
           buildElasticQueryForProperty(
             serverData,
-            appData,
+            config,
+            databaseConfig,
             itemDefinition,
             include,
             pd,

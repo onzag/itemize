@@ -45,7 +45,7 @@ import { ISearchLoaderHookArg, ISearchLoaderOptions, useSearchLoader } from "../
 import type { IRQValue } from "../../../rq-querier";
 
 export interface IItemProviderOptions<PlainProperties extends string = string> extends
-  Omit<IItemProviderProps<PlainProperties>, 'loadUnversionedFallback' | 'analytics'> {
+  Omit<IItemProviderProps<PlainProperties>, 'loadUnversionedFallback' | 'analytics' | 'loadOtherVersionsFallback'> {
   module: string | Module;
   suppressWarnings?: boolean;
 }

@@ -117,6 +117,7 @@ export default async function build(version: string, action: "build" | "dump" | 
   // write the resulting actual
   let showAllDone = true;
   try {
+    await databaseConnection.queryFirst(`ALTER DATABASE ${dbConnectionConfig.database} SET TIMEZONE = 'UTC'`);
     await buildDatabase(databaseConnection, getSQLTablesSchemaForRoot(root));
   } catch (err) {
     console.log(colors.red(err.stack));

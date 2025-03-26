@@ -327,7 +327,8 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     let data: any;
     try {
       data = await (await fetch("/rest/user/validate?type=" + encodeURIComponent(type) +
-        "&userId=" + encodeURIComponent(this.props.userContext.forId) + "&noRedirect=t", {
+        "&userId=" + encodeURIComponent(this.props.userContext.forId) + "&randomId=" +
+        encodeURIComponent(randomId) + "&noRedirect=t", {
         method: "GET",
         cache: "no-cache",
       })).json();

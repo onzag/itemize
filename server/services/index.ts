@@ -6,13 +6,15 @@ import type Root from "../../base/Root";
 import type { DatabaseConnection } from "../../database";
 
 import { ItemizeRawDB } from "../raw-db";
-import { IAppDataType } from "..";
+import { IAppDataType, IServerDataType } from "..";
 import { IItemizeLoggingErrorStructure, IItemizeLoggingStructure, logger } from "../logger";
 import express from "express";
 import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../../config";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import PhoneProvider from "./base/PhoneProvider";
 import { CAN_LOG_DEBUG } from "../environment";
+import { SERVER_DATA_IDENTIFIER } from "../../constants";
+import { ItemizeElasticClient } from "../../server/elastic";
 
 const wait = (time: number) => {
   return new Promise((resolve) => {
@@ -41,6 +43,7 @@ export class ServiceProvider<T> {
   public globalRedisPub: ItemizeRedisClient;
   public globalRedisSub: ItemizeRedisClient;
   public globalRedis: ItemizeRedisClient;
+  public globalElastic: ItemizeElasticClient;
   public globalRawDB: ItemizeRawDB;
   public globalRoot: Root;
   public globalMailProvider: MailProvider<any>;
@@ -89,6 +92,25 @@ export class ServiceProvider<T> {
     return this.localInstance;
   }
 
+  public async getServerData(): Promise<IServerDataType> {
+    if (this.localAppData) {
+      return this.localAppData.cache.getServerData();
+    }
+
+    // if we are not in local app data we will try this and wait until we get it
+    // usually it will return immediately but in rare cases
+    // this may be necessary
+    let serverDataStr: string = null;
+    while (true) {
+      serverDataStr = await this.globalRedis.get(SERVER_DATA_IDENTIFIER);
+      if (serverDataStr) {
+        break;
+      }
+      await wait(300);
+    }
+    return JSON.parse(serverDataStr);
+  }
+
   public logInfo<T>(data: IItemizeLoggingStructure<T>) {
     logger && logger.info(data);
   }
@@ -123,6 +145,8 @@ export class ServiceProvider<T> {
 
   public setupGlobalResources(
     globalDatabaseConnection: DatabaseConnection,
+    globalRawDB: ItemizeRawDB,
+    globalElastic: ItemizeElasticClient,
     globalClient: ItemizeRedisClient,
     globalPub: ItemizeRedisClient,
     globalSub: ItemizeRedisClient,
@@ -139,18 +163,8 @@ export class ServiceProvider<T> {
     this.globalRedisPub = globalPub;
     this.globalRedisSub = globalSub;
     this.globalRoot = root;
-    this.globalRawDB = new ItemizeRawDB(
-      globalClient,
-      globalPub,
-      globalSub,
-      this.globalDatabaseConnection,
-      this.globalRoot,
-      this.appConfig,
-      // No uploads client global manager cannot handle file uploads
-      // via raw db because it has no place to store these files
-      // so they are exposed
-      null,
-    );
+    this.globalRawDB = globalRawDB;
+    this.globalElastic = globalElastic;
     this.globalCustomServices = globalCustomServices;
     this.globalMailProvider = globalMailProvider;
     this.globalPhoneProvider = globalPhoneProvider;

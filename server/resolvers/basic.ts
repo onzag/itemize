@@ -16,7 +16,7 @@ import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefin
 import Module from "../../base/Root/Module";
 import { convertSQLValueToRQValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import { convertSQLValueToRQValueForModule } from "../../base/Root/Module/sql";
-import { IAppDataType } from "..";
+import { IAppDataType, IServerDataType } from "..";
 import { logger } from "../logger";
 import equals from "deep-equal";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
@@ -416,7 +416,8 @@ export async function validateParentingRules(
       } : null,
       value: convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
-        appData,
+        appData.config,
+        appData.databaseConfig,
         parentingItemDefinition,
         result,
       ),
@@ -1009,7 +1010,7 @@ export function filterAndPrepareRQValueSimple(
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
 export async function filterAndPrepareRQValue(
-  serverData: any,
+  serverData: IServerDataType,
   appData: IAppDataType,
   value: ISQLTableRowValue,
   requestedFields: IRQRequestFields,
@@ -1026,7 +1027,8 @@ export async function filterAndPrepareRQValue(
     // to process what was requested
     valueOfTheItem = convertSQLValueToRQValueForItemDefinition(
       serverData,
-      appData,
+      appData.config,
+      appData.databaseConfig,
       parentModuleOrIdef,
       value,
       requestedFields,
@@ -1035,7 +1037,8 @@ export async function filterAndPrepareRQValue(
     // same for modules
     valueOfTheItem = convertSQLValueToRQValueForModule(
       serverData,
-      appData,
+      appData.config,
+      appData.databaseConfig,
       parentModuleOrIdef,
       value,
       requestedFields,
@@ -1550,7 +1553,8 @@ export async function runPolicyCheck(
           property,
           serverData: arg.appData.cache.getServerData(),
           itemDefinition: property.getParentItemDefinition(),
-          appData: arg.appData,
+          config: arg.appData.config,
+          databaseConfig: arg.appData.databaseConfig,
         });
 
         // if it doesn't match then we have failed the policy

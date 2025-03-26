@@ -1149,7 +1149,7 @@ export async function search(
   const propertiesForArgs = getPropertyListForSearchMode(options.searchByProperties, standardCounterpart);
 
   // now we use this function to check that everything is valid
-  const isValid = checkItemStateValidity(idef, propsOrOptions, state.current, {
+  const isValid = options.doNotCheckForValidity ? true : checkItemStateValidity(idef, propsOrOptions, state.current, {
     properties: propertiesForArgs,
     includes: options.searchByIncludes || {},
   });
@@ -4175,7 +4175,7 @@ export async function del(
     return null;
   }
 
-  const isValid = checkItemStateValidity(
+  const isValid = options.doNotCheckForValidity ? true : checkItemStateValidity(
     idef,
     propsOrOptions,
     state.current,
@@ -4396,7 +4396,7 @@ export async function submit(
     activeSubmitPromiseReject = reject;
   });
 
-  const isValid = checkItemStateValidity(
+  const isValid = options.doNotCheckForValidity ? true : checkItemStateValidity(
     idef,
     propsOrOptions,
     state.current,

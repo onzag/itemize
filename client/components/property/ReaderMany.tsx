@@ -51,9 +51,9 @@ class ReaderManyInternal extends React.Component<IReaderManyInternalProps> {
     }
 
     let current: IPropertyReadOneProp<any> = this.props.data[0] as IPropertyReadOneProp<any>;
-    if (typeof current === "string") {
+    if (typeof current === "string" || current === null) {
       current = {
-        id: current,
+        id: current as unknown as string,
       }
     }
     if (this.props.useAppliedValue) {

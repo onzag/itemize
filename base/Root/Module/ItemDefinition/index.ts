@@ -205,6 +205,13 @@ export interface IItemDefinitionRawJSONDataType {
   versionIsLanguageAndCountry?: boolean;
 
   /**
+   * Similar to versionIsLanguageAndCountry except that this allows for regions
+   * regions are not checked, eg. es-LA and en-XA
+   * regions do not have iso codes
+   */
+  versionIsLanguageAndRegion?: boolean;
+
+  /**
    * Whether the version can be a country
    */
   versionIsCountry?: boolean;
@@ -1135,7 +1142,8 @@ export default class ItemDefinition {
       // if there is no complex condition for these localized versions
       !this.rawData.versionIsCountry &&
       !this.rawData.versionIsLanguage &&
-      !this.rawData.versionIsLanguageAndCountry
+      !this.rawData.versionIsLanguageAndCountry &&
+      !this.rawData.versionIsLanguageAndRegion
     ) {
       // then the version must simply not be null
       return version !== null;
@@ -1154,6 +1162,7 @@ export default class ItemDefinition {
     const isEntireLocale = versionSplitted.length === 2 && isLanguageOrEntireLocale;
     const isLanguageAndCountry = !!possibleCountry &&
       !!countries[possibleCountry] && supportedLanguages.find((l) => l === possibleLanguage);
+    const isLanguageAndRegion = !!possibleCountry && possibleCountry.length === 2;
 
     // and check each
     if (
@@ -1169,6 +1178,11 @@ export default class ItemDefinition {
     } else if (
       this.rawData.versionIsLanguageAndCountry &&
       (isLanguageAndCountry || isEntireLocale)
+    ) {
+      return true;
+    } else if (
+      this.rawData.versionIsLanguageAndRegion &&
+      (isLanguageAndRegion || isEntireLocale)
     ) {
       return true;
     }

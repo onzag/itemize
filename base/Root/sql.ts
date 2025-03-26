@@ -11,7 +11,8 @@ import {
   CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER,
   DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER, TRACKERS_INDEX, TRACKERS_REGISTRY_IDENTIFIER,
 } from "../../constants";
-import type { IAppDataType } from "../../server";
+import type { IAppDataType, IServerDataType } from "../../server";
+import type { IConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../../config";
 
 export interface ISQLTableIndexType {
   /**
@@ -135,12 +136,12 @@ export interface ISQLStreamComposedTableRowValue {
   consumeStreams: ConsumeStreamsFnType,
 }
 
-export function getElasticSchemaForRoot(root: Root, serverData: any, appData: IAppDataType): IElasticSchemaDefinitionType {
+export function getElasticSchemaForRoot(root: Root, serverData: IServerDataType, config: IConfigRawJSONDataType, databaseConfig: IDBConfigRawJSONDataType): IElasticSchemaDefinitionType {
   let resultSchema: IElasticSchemaDefinitionType = {};
 
   root.getAllModules().forEach((cModule) => {
     // add together the schemas of all the modules
-    resultSchema = { ...resultSchema, ...getElasticSchemaForModule(cModule, serverData, appData) };
+    resultSchema = { ...resultSchema, ...getElasticSchemaForModule(cModule, serverData, config, databaseConfig) };
   });
 
   return resultSchema;

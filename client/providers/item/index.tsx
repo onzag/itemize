@@ -485,6 +485,17 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * You may resolve conflicts manually
    */
   ifLastModified?: string;
+  /**
+   * By default we check for validity when attempting
+   * to submit, this is to prevent a potentially invalid state
+   * for being send to the server which will yield an error and due to
+   * conditionals and partial information it is not possible to predict partial
+   * states
+   * 
+   * However if you know what you are doing or if you want to force it, you may
+   * as well do not check for validity
+   */
+  doNotCheckForValidity?: boolean;
 }
 
 /**
@@ -515,6 +526,17 @@ export interface IActionDeleteOptions extends IActionCleanOptions {
    * in deletes this is mostly useless since it's basically instant
    */
   progresser?: ProgresserFn;
+  /**
+   * By default we check for validity when attempting
+   * to submit, this is to prevent a potentially invalid state
+   * for being send to the server which will yield an error and due to
+   * conditionals and partial information it is not possible to predict partial
+   * states
+   * 
+   * However if you know what you are doing or if you want to force it, you may
+   * as well do not check for validity
+   */
+  doNotCheckForValidity?: boolean;
 }
 
 /**
@@ -1009,6 +1031,17 @@ export interface IActionSearchOptions<PlainProperties extends string = string> e
    * by searching while searching, passing a boolean puts things in a queue where the last search is executed
    */
   pileSearch?: boolean | ActionSearchOptionCb;
+  /**
+   * By default we check for validity when attempting
+   * to submit, this is to prevent a potentially invalid state
+   * for being send to the server which will yield an error and due to
+   * conditionals and partial information it is not possible to predict partial
+   * states
+   * 
+   * However if you know what you are doing or if you want to force it, you may
+   * as well do not check for validity
+   */
+  doNotCheckForValidity?: boolean;
 }
 
 /**
@@ -1507,8 +1540,15 @@ export interface IItemProviderProps<
    * Loads the unversioned version if the version
    * given is not found since every value must have
    * an unversioned primary form
+   * 
+   * loadOtherVersionsFallback takes priority
    */
   loadUnversionedFallback?: boolean;
+  /**
+   * Loads other versions as fallback if not found
+   * in the order given
+   */
+  loadOtherVersionsFallback?: string[];
   /**
    * Normally items will be automatically reloaded when
    * their value couldn't be retrieved because it couldn't connect
@@ -2378,6 +2418,8 @@ export class ActualItemProvider extends
       nextProps.tokenData.id !== this.props.tokenData.id ||
       nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.remoteListener !== this.props.remoteListener ||
+      nextProps.loadOtherVersionsFallback !== this.props.loadOtherVersionsFallback ||
+      nextProps.loadUnversionedFallback !== this.props.loadUnversionedFallback ||
       nextProps.markForDestructionOnLogout !== this.props.markForDestructionOnLogout ||
       nextProps.markForDestructionOnUnmount !== this.props.markForDestructionOnUnmount ||
       !equals(nextProps.properties || [], this.props.properties || [], { strict: true }) ||
@@ -3411,20 +3453,38 @@ export class ActualItemProvider extends
 
   public render() {
     if (
-      this.props.loadUnversionedFallback &&
+      (
+        this.props.loadUnversionedFallback ||
+        this.props.loadOtherVersionsFallback?.length
+      ) &&
       this.props.forId &&
       this.props.forVersion &&
       this.state.notFound
     ) {
-      const newProps: IItemProviderProps = {
-        ...this.props,
-        loadUnversionedFallback: false,
-        forVersion: null,
-      }
+      if (this.props.loadOtherVersionsFallback?.length) {
+        const otherVersionsCopy = [...this.props.loadOtherVersionsFallback];
+        const versionToGet = otherVersionsCopy.shift();
 
-      return (
-        <ItemProvider {...newProps} />
-      );
+        const newProps: IItemProviderProps = {
+          ...this.props,
+          forVersion: versionToGet,
+          loadOtherVersionsFallback: otherVersionsCopy,
+        };
+  
+        return (
+          <ItemProvider {...newProps} />
+        );
+      } else {
+        const newProps: IItemProviderProps = {
+          ...this.props,
+          loadUnversionedFallback: false,
+          forVersion: null,
+        }
+  
+        return (
+          <ItemProvider {...newProps} />
+        );
+      }
     }
 
     let analyticsNode: React.ReactNode = null;

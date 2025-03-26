@@ -225,7 +225,7 @@ export default class PropertyEntryPayment extends React.Component<
       nextProps.property !== this.props.property ||
       !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
-      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+      this.props.forceInvalid !== nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
       this.props.useAppliedValue !== nextProps.useAppliedValue ||
@@ -252,12 +252,12 @@ export default class PropertyEntryPayment extends React.Component<
 
     const i18nInLanguage = this.props.i18n[this.props.language];
 
-    const invalidReason = this.props.state.invalidReason;
+    const invalidReason = typeof this.props.forceInvalid === "string" ? this.props.forceInvalid : this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
       (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
-      isCurrentlyShownAsInvalid && i18nData &&
+      (isCurrentlyShownAsInvalid || this.props.forceInvalid) && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
       i18nInvalidReason = i18nData.error[invalidReason];

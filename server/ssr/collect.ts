@@ -758,7 +758,8 @@ export class Collector {
         user: this.appliedRule.forUser,
         value: rowValue ? convertSQLValueToRQValueForItemDefinition(
           this.appData.cache.getServerData(),
-          this.appData,
+          this.appData.config,
+          this.appData.databaseConfig,
           idef,
           rowValue,
         ) : null,

@@ -71,7 +71,7 @@ export interface IPropertyDefinitionRawJSONRuleDataType {
  */
 export interface IPropertyDefinitionRawJSONInvalidRuleDataType {
   error: string;
-  if: IConditionalRuleSetRawJSONDataType;
+  if?: IConditionalRuleSetRawJSONDataType;
 }
 
 /**
@@ -905,7 +905,7 @@ export default class PropertyDefinition {
     }));
 
     // create the invalid rules
-    this.invalidIf = rawJSON.invalidIf && rawJSON.invalidIf.map((ii) => ({
+    this.invalidIf = rawJSON.invalidIf && rawJSON.invalidIf.filter((ii) => !!ii.if).map((ii) => ({
       error: ii.error,
       if: new ConditionalRuleSet(ii.if, parentModule, parentItemDefinition, this, null),
     }));
@@ -1968,7 +1968,7 @@ export default class PropertyDefinition {
     // if we have invalid if conditions
     if (this.invalidIf) {
       // we run all of them
-      const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate(id, version));
+      const invalidMatch = this.invalidIf.find((ii) => ii.if?.evaluate(id, version));
       // if one matches we give an error
       if (invalidMatch) {
         return invalidMatch.error;

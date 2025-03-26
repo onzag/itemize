@@ -15,6 +15,14 @@ const standardErrorTransport = new winston.transports.File({
 
 export interface IItemizeLoggingStructure<T> {
   message: string;
+  /**
+   * A resolve identifier helps to address errors of this kind later on
+   * with an error resolver, the identifier is by error type and not by
+   * unique error, unless that is what is wanted
+   * 
+   * These identifiers can be used later to createUrgentResolver, createStandardResolver or createPassiveResolver
+   */
+  resolveIdentifier?: string;
 
   className?: string;
   methodName?: string;

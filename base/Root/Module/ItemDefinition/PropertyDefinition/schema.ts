@@ -146,7 +146,7 @@ export default {
           },
         },
         additionalProperties: false,
-        required: ["error", "if"],
+        required: ["error"],
       },
     },
     searchInvalidIf: {

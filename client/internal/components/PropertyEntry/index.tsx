@@ -237,7 +237,7 @@ export interface IPropertyEntryMainHandlerProps<ValueType extends PropertyDefini
    * 
    * Developer Provided check base.tsx
    */
-  forceInvalid?: boolean;
+  forceInvalid?: boolean | string;
   /**
    * Avoid passing a description to the renderer
    * 

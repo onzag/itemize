@@ -471,13 +471,20 @@ export function checkItemDefinition(
         "Search engine uses version but versioning is disabled",
         actualTraceback.newTraceToBit("searchEngineLangUseVersion"),
       );
-    } else if (!rawData.versionIsLanguage && !rawData.versionIsLanguageAndCountry) {
+    } else if (!rawData.versionIsLanguage && !rawData.versionIsLanguageAndCountry && !rawData.versionIsLanguageAndRegion) {
       throw new CheckUpError(
         "Search engine uses version but versioning does not contain any language or localization data that can be used to obtain a language, " +
-        "you should use either versionIsLanguage or versionIsLanguageAndCountry",
+        "you should use either versionIsLanguage, versionIsLanguageAndCountry or versionIsLanguageAndRegion",
         actualTraceback.newTraceToBit("searchEngineLangUseVersion"),
       );
     }
+  }
+
+  if (rawData.versionIsLanguageAndCountry && rawData.versionIsLanguageAndRegion) {
+    throw new CheckUpError(
+      "Cannot have versionIsLanguageAndRegion and versionIsLanguageAndCountry at the same time",
+      actualTraceback.newTraceToBit("versionIsLanguageAndRegion"),
+    );
   }
 
   if (rawData.searchEngineMainLangProperty) {

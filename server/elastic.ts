@@ -15,6 +15,7 @@ import { setInterval } from "timers";
 import type { IElasticHighlightReply } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISearchLimitersType } from "../base/Root";
 import type { SelectBuilder } from "../database/SelectBuilder";
+import type { IServerDataType } from "../server";
 
 interface ElasticRequestOptions {
   ignoreAllInGroup?: boolean | string | string[];
@@ -213,7 +214,7 @@ export class ItemizeElasticClient {
   private root: Root;
   private rootSchema: IElasticSchemaDefinitionType;
   private langAnalyzers: ILangAnalyzers;
-  private serverData: any;
+  private serverData: IServerDataType;
   private lastFailedWaitMultiplied: number = 0;
   private runningConsistencyCheckOn: { [key: string]: Promise<void> } = {};
 
@@ -260,14 +261,14 @@ export class ItemizeElasticClient {
    * data has been obtained, you should not use it by yourself
    * @param serverData the server data that has changed
    */
-  public async informNewServerData(serverData: any) {
+  public async informNewServerData(serverData: IServerDataType) {
     // first we check wether we should resolve the server data promise
     // that comes when our first server data has arrived
     const shouldResolvePrmomise = !this.serverData;
 
     if (!this.serverData || !equals(this.serverData, serverData)) {
       this.serverData = serverData;
-      this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData, null);
+      this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData, null, null);
     }
 
     // this is our first server data so we resolve it
@@ -1602,6 +1603,7 @@ export class ItemizeElasticClient {
             const convertedSQL = convertSQLValueToElasticSQLValueForItemDefinition(
               this.serverData,
               null,
+              null,
               idef,
               knownValue,
             );
@@ -2493,6 +2495,7 @@ export class ItemizeElasticClient {
     const mergedId = id + "." + (version || "");
     const elasticFormIdef = convertSQLValueToElasticSQLValueForItemDefinition(
       this.serverData,
+      null,
       null,
       idef,
       newValue,

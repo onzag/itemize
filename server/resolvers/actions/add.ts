@@ -545,7 +545,8 @@ export async function addItemDefinition(
     // pass the requestedFields anyway
     const rqValue = convertSQLValueToRQValueForItemDefinition(
       appData.cache.getServerData(),
-      appData,
+      appData.config,
+      appData.databaseConfig,
       itemDefinition,
       value,
     );

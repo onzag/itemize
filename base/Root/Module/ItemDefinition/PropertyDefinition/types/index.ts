@@ -30,9 +30,11 @@ import file, { PropertyDefinitionSupportedFileType } from "./file";
 import ItemDefinition from "../..";
 import Include from "../../Include";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
-import type { IAppDataType } from "../../../../../../server";
+import type { IAppDataType, IServerDataType } from "../../../../../../server";
 import type { ElasticQueryBuilder } from "../../../../../../server/elastic";
 import { RQField } from "../../../../rq";
+// import type PaymentProvider from "../../../../../../server/services/base/PaymentProvider";
+import type { IConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../../../../../../config";
 
 /**
  * All the supported property types
@@ -76,8 +78,11 @@ export interface ISQLRedoDictionaryBasedIndex extends IArgInfo {
 }
 
 export interface ISQLArgInfo extends IArgInfo {
-  serverData: any;
-  appData: IAppDataType;
+  serverData: IServerDataType;
+  config: IConfigRawJSONDataType;
+  databaseConfig: IDBConfigRawJSONDataType;
+  // paymentServiceProvider: PaymentProvider<any>,
+  // appData: IAppDataType;
 }
 
 export interface ISQLInInfo extends ISQLArgInfo {

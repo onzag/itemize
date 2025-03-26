@@ -45,13 +45,15 @@ import { WhereBuilder } from "../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../database/OrderByBuilder";
 import type { ElasticQueryBuilder } from "../../../../server/elastic";
 import { IElasticHighlightReply } from "./PropertyDefinition/types";
-import type { IAppDataType } from "../../../../server";
+import type { IAppDataType, IServerDataType } from "../../../../server";
+import type { IDBConfigRawJSONDataType, IConfigRawJSONDataType } from "../../../../config";
 
 export function getElasticSchemaForItemDefinition(
   itemDefinition: ItemDefinition,
   moduleIndexSchema: IElasticIndexDefinitionType,
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
 ) {
   const qualifiedName = itemDefinition.getQualifiedPathName();
   const resultSchema: IElasticSchemaDefinitionType = {
@@ -62,7 +64,7 @@ export function getElasticSchemaForItemDefinition(
   }
 
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-    const result = getElasticSchemaForProperty(itemDefinition, null, pd, serverData, appData);
+    const result = getElasticSchemaForProperty(itemDefinition, null, pd, serverData, config, databaseConfig);
     Object.assign(
       resultSchema[qualifiedName].properties,
       result.properties,
@@ -78,7 +80,7 @@ export function getElasticSchemaForItemDefinition(
 
   // now we loop over the child items
   itemDefinition.getAllIncludes().forEach((i) => {
-    const result = getElasticSchemaForInclude(itemDefinition, i, serverData, appData);
+    const result = getElasticSchemaForInclude(itemDefinition, i, serverData, config, databaseConfig);
     Object.assign(
       resultSchema[qualifiedName].properties,
       result.properties,
@@ -173,7 +175,8 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
           prefix: "",
           property,
           itemDefinition: null,
-          appData: null,
+          config: null,
+          databaseConfig: null,
         });
         if (columnsToAddLimiter) {
           columnsToAddLimiter.forEach((columnName: string, index: number) => {
@@ -201,7 +204,8 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
           prefix: "",
           property,
           itemDefinition: null,
-          appData: null,
+          config: null,
+          databaseConfig: null,
         });
         if (columnsToAddLimiter) {
           columnsToAddLimiter.forEach((columnName: string, index: number) => {
@@ -258,8 +262,9 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
  * @returns a rq value
  */
 export function convertSQLValueToRQValueForItemDefinition(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
   rqFields?: IRQRequestFields,
@@ -288,7 +293,7 @@ export function convertSQLValueToRQValueForItemDefinition(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToRQValueForProperty(serverData, appData, itemDefinition, null, pd, row),
+      convertSQLValueToRQValueForProperty(serverData, config, databaseConfig, itemDefinition, null, pd, row),
     );
   });
 
@@ -300,7 +305,8 @@ export function convertSQLValueToRQValueForItemDefinition(
       result,
       convertSQLValueToRQValueForInclude(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition,
         include,
         row,
@@ -313,8 +319,9 @@ export function convertSQLValueToRQValueForItemDefinition(
 }
 
 export function convertSQLValueToElasticSQLValueForItemDefinition(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
 ): IRQValue {
@@ -335,7 +342,7 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToElasticSQLValueForProperty(serverData, appData, itemDefinition, null, pd, row),
+      convertSQLValueToElasticSQLValueForProperty(serverData, config, databaseConfig, itemDefinition, null, pd, row),
     );
   });
 
@@ -345,7 +352,8 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
       result,
       convertSQLValueToElasticSQLValueForInclude(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition,
         include,
         row,
@@ -376,8 +384,9 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
  * @returns a sql value
  */
 export function convertRQValueToSQLValueForItemDefinition(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   data: IRQArgs,
   oldData: IRQValue,
@@ -399,7 +408,8 @@ export function convertRQValueToSQLValueForItemDefinition(
     ) {
       const addedFieldsByProperty = convertRQValueToSQLValueForProperty(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition.getParentModule(),
         itemDefinition,
         null,
@@ -430,7 +440,8 @@ export function convertRQValueToSQLValueForItemDefinition(
       const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
       const addedFieldsByInclude = convertRQValueToSQLValueForInclude(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition,
         include,
         data,
@@ -470,8 +481,9 @@ export function convertRQValueToSQLValueForItemDefinition(
  * @returns a list of raw added selected fields
  */
 export function buildSQLQueryForItemDefinition(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   args: IRQArgs,
   whereBuilder: WhereBuilder,
@@ -494,7 +506,8 @@ export function buildSQLQueryForItemDefinition(
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
     const wasSearchedBy = buildSQLQueryForProperty(
       serverData,
-      appData,
+      config,
+      databaseConfig,
       itemDefinition,
       null,
       pd,
@@ -516,7 +529,8 @@ export function buildSQLQueryForItemDefinition(
   itemDefinition.getAllIncludes().forEach((include) => {
     buildSQLQueryForInclude(
       serverData,
-      appData,
+      config,
+      databaseConfig,
       itemDefinition,
       include,
       args,
@@ -538,7 +552,8 @@ export function buildSQLQueryForItemDefinition(
         builder.orWhere((orBuilder) => {
           const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
             serverData,
-            appData,
+            config,
+            databaseConfig,
             itemDefinition,
             null,
             pd,
@@ -592,7 +607,8 @@ export function buildSQLQueryForItemDefinition(
 
       buildSQLOrderByForProperty(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition,
         null,
         pd,
@@ -623,8 +639,9 @@ export function buildSQLQueryForItemDefinition(
  * @returns a list of raw added selected fields
  */
 export function buildElasticQueryForItemDefinition(
-  serverData: any,
-  appData: IAppDataType,
+  serverData: IServerDataType,
+  config: IConfigRawJSONDataType,
+  databaseConfig: IDBConfigRawJSONDataType,
   itemDefinition: ItemDefinition,
   args: IRQArgs,
   elasticQueryBuilder: ElasticQueryBuilder,
@@ -647,7 +664,8 @@ export function buildElasticQueryForItemDefinition(
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
     const wasSearchedBy = buildElasticQueryForProperty(
       serverData,
-      appData,
+      config,
+      databaseConfig,
       itemDefinition,
       null,
       pd,
@@ -669,7 +687,8 @@ export function buildElasticQueryForItemDefinition(
     // TODO add includes in highlights
     buildElasticQueryForInclude(
       serverData,
-      appData,
+      config,
+      databaseConfig,
       itemDefinition,
       include,
       args,
@@ -692,7 +711,8 @@ export function buildElasticQueryForItemDefinition(
         builder.should((orBuilder) => {
           const wasStrSearchedBy = buildElasticStrSearchQueryForProperty(
             serverData,
-            appData,
+            config,
+            databaseConfig,
             itemDefinition,
             null,
             pd,
@@ -750,7 +770,8 @@ export function buildElasticQueryForItemDefinition(
 
       const orderRule = buildElasticOrderByForProperty(
         serverData,
-        appData,
+        config,
+        databaseConfig,
         itemDefinition,
         null,
         pd,

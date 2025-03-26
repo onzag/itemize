@@ -757,6 +757,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
       databaseConnection,
       root,
       config,
+      dbConfig,
       storageClient,
     );
 
@@ -862,6 +863,7 @@ export async function initializeServer(initConfig: IInitializeServerConfig) {
         redisPub,
         redisSub,
         config,
+        dbConfig,
         sensitiveConfig,
         currencyFactorsService,
         mailService,

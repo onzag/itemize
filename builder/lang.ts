@@ -475,7 +475,7 @@ function evaluateStringExpressionPotentials(exprSrc: ts.Expression, declContext:
 async function getAllLangPotentialsOf(filePath: string) {
   // first we are going to read the source code
   //const sourceCode = await fsAsync.readFile(filePath, "utf-8");
-  const sourceCode = "const x = `hello${boi ? 'boi' : ''}cat${okay ? 'kitty' : ''}boy` as 'cat' | 'boi';(x: {text: 'kitten' | 'dog'}) => {const i18nx = x.text + 'cat';}"
+  const sourceCode = "const x = `hello${cat ? 'cat' : ''}cat${okay ? 'kitty' : ''}cat` as 'cat' | 'boi';(x: {text: 'kitten' | 'dog'}) => {const i18nx = x.text + 'cat';}"
 
   // now we open it with typescript
   const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
@@ -598,4 +598,4 @@ async function getAllLangPotentialsOf(filePath: string) {
   console.log(allPotentialsOfThisFile);
 }
 
-//getAllLangPotentialsOf("kitten/boi");
+//getAllLangPotentialsOf("kitten/cat");

@@ -252,7 +252,8 @@ export function userRestServices(appData: IAppDataType) {
                 value: arg.username as string,
                 property: usernameProperty,
                 whereBuilder: internalOrQueryBuilder,
-                appData,
+                config: appData.config,
+                databaseConfig: appData.databaseConfig,
               })
             }
           );
@@ -277,7 +278,8 @@ export function userRestServices(appData: IAppDataType) {
                     value: arg.username as string,
                     property: usernameProperty,
                     whereBuilder: internalUsernameWhereBuilder,
-                    appData,
+                    config: appData.config,
+                    databaseConfig: appData.databaseConfig,
                   });
                 }).andWhere((internalEvalidatedWhereBuilder) => {
                   eValidatedPropertyDescription.sqlEqual({
@@ -290,7 +292,8 @@ export function userRestServices(appData: IAppDataType) {
                     value: true,
                     property: eValidatedProperty,
                     whereBuilder: internalEvalidatedWhereBuilder,
-                    appData,
+                    config: appData.config,
+                    databaseConfig: appData.databaseConfig,
                   });
                 })
               }
@@ -317,7 +320,8 @@ export function userRestServices(appData: IAppDataType) {
                     value: phoneNumberIntValue,
                     property: phoneProperty,
                     whereBuilder: internalUsernameWhereBuilder,
-                    appData,
+                    config: appData.config,
+                    databaseConfig: appData.databaseConfig,
                   });
                 }).andWhere((internalPvalidatedWhereBuilder) => {
                   pValidatedPropertyDescription.sqlEqual({
@@ -330,7 +334,8 @@ export function userRestServices(appData: IAppDataType) {
                     value: true,
                     property: pValidatedProperty,
                     whereBuilder: internalPvalidatedWhereBuilder,
-                    appData,
+                    config: appData.config,
+                    databaseConfig: appData.databaseConfig,
                   });
                 })
               }
@@ -349,7 +354,8 @@ export function userRestServices(appData: IAppDataType) {
             value: arg.password as string,
             property: passwordProperty,
             whereBuilder: internalPasswordWhereBuilder,
-            appData,
+            config: appData.config,
+            databaseConfig: appData.databaseConfig,
           })
         });
 
@@ -1581,7 +1587,8 @@ export function userRestServices(appData: IAppDataType) {
             include: null,
             value: email,
             property: emailProperty,
-            appData,
+            config: appData.config,
+            databaseConfig: appData.databaseConfig,
           })
         }).andWhere((evalidatedWhereBuilder) => {
           eValidatedPropertyDescription.sqlEqual({
@@ -1594,7 +1601,8 @@ export function userRestServices(appData: IAppDataType) {
             include: null,
             value: true,
             property: eValidatedProperty,
-            appData,
+            config: appData.config,
+            databaseConfig: appData.databaseConfig,
           })
         });
       } else {
@@ -1609,7 +1617,8 @@ export function userRestServices(appData: IAppDataType) {
             include: null,
             value: phone,
             property: phoneProperty,
-            appData,
+            config: appData.config,
+            databaseConfig: appData.databaseConfig,
           })
         }).andWhere((pvalidatedWhereBuilder) => {
           pValidatedPropertyDescription.sqlEqual({
@@ -1622,7 +1631,8 @@ export function userRestServices(appData: IAppDataType) {
             include: null,
             value: true,
             property: pValidatedProperty,
-            appData,
+            config: appData.config,
+            databaseConfig: appData.databaseConfig,
           })
         });
       }
@@ -1906,7 +1916,8 @@ export function userRestServices(appData: IAppDataType) {
               include: null,
               value: email,
               property: emailProperty,
-              appData,
+              config: appData.config,
+              databaseConfig: appData.databaseConfig,
             })
           }).andWhere((evalidatedWhereBuilder) => {
             eValidatedPropertyDescription.sqlEqual({
@@ -1919,7 +1930,8 @@ export function userRestServices(appData: IAppDataType) {
               include: null,
               value: true,
               property: eValidatedProperty,
-              appData,
+              config: appData.config,
+              databaseConfig: appData.databaseConfig,
             })
           });
         } else {
@@ -1934,7 +1946,8 @@ export function userRestServices(appData: IAppDataType) {
               include: null,
               value: phone,
               property: phoneProperty,
-              appData,
+              config: appData.config,
+              databaseConfig: appData.databaseConfig,
             })
           }).andWhere((pvalidatedWhereBuilder) => {
             pValidatedPropertyDescription.sqlEqual({
@@ -1947,7 +1960,8 @@ export function userRestServices(appData: IAppDataType) {
               include: null,
               value: true,
               property: pValidatedProperty,
-              appData,
+              config: appData.config,
+              databaseConfig: appData.databaseConfig,
             })
           });
         }
