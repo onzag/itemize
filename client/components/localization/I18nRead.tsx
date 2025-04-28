@@ -287,7 +287,25 @@ function i18nReadInternal(
   if (i18nValue && props.countable) {
     const countValue = (typeof props.countValue === "number" ? props.countValue :
       (props.args && props.args.find((a) => typeof a === "number"))) || 0;
-    i18nValue = i18nValue[countValue.toString()] || i18nValue["n"];
+    const sourceI18n = i18nValue;
+    const defaultCountValue = i18nValue["n"];
+    i18nValue = i18nValue[countValue.toString()];
+
+    if (!i18nValue) {
+      const matchingRange = Object.keys(sourceI18n).find((r) => {
+        if (r.includes("-")) {
+          const range = r.split("-").map(parseInt);
+          return (range[0] >= countValue && countValue >= range[1]);
+        }
+
+        return false;
+      });
+      if (!matchingRange) {
+        i18nValue = defaultCountValue;
+      } else {
+        i18nValue = sourceI18n[matchingRange];
+      }
+    }
   }
 
   // if we still find nothing in all these contexts

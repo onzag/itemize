@@ -124,13 +124,39 @@ export async function propertiesReader(pathToFile: string) {
           );
         }
         if (variation !== "n") {
-          const variationAsInt = parseInt(variation);
-          if (isNaN(variationAsInt) || variationAsInt.toString() !== variation) {
-            throw new Error(
-              "Invalid value in " + key + " due to " +
-              JSON.stringify(keyBit) + " not having a variation of 'n' or an integer but instead " + JSON.stringify(variation) +
-              " at file " + pathToFile
-            );
+          if (variation.includes("-")) {
+            const [variationA, variationB] = variation.split("-");
+            const variationAAsInt = parseInt(variationA);
+            const variationBAsInt = parseInt(variationB);
+            if (
+              isNaN(variationAAsInt) ||
+              variationAAsInt.toString() !== variationA ||
+              isNaN(variationBAsInt) ||
+              variationBAsInt.toString() !== variationB
+            ) {
+              throw new Error(
+                "Invalid value in " + key + " due to " +
+                JSON.stringify(keyBit) + " not having a variation of 'n' or an integer or an integer range but instead " + JSON.stringify(variation) +
+                " at file " + pathToFile
+              );
+            }
+
+            if (variationBAsInt <= variationAAsInt) {
+              throw new Error(
+                "Invalid value in " + key + " due to " +
+                JSON.stringify(keyBit) + " variation integer being smaller or equal than end variation " + JSON.stringify(variation) +
+                " at file " + pathToFile
+              );
+            }
+          } else {
+            const variationAsInt = parseInt(variation);
+            if (isNaN(variationAsInt) || variationAsInt.toString() !== variation) {
+              throw new Error(
+                "Invalid value in " + key + " due to " +
+                JSON.stringify(keyBit) + " not having a variation of 'n' or an integer or am integer range but instead " + JSON.stringify(variation) +
+                " at file " + pathToFile
+              );
+            }
           }
         }
       }
@@ -183,13 +209,13 @@ export async function propertiesReader(pathToFile: string) {
       rs[inheritMainKey] = {};
     };
 
-    applyMergeProperties(rs[inheritMainKey], rs[inheritsFromKey], inheritMainKey, inheritsFromKey);
+    applyMergeProperties(pathToFile, rs[inheritMainKey], rs[inheritsFromKey], inheritMainKey, inheritsFromKey);
   });
 
   return rs;
 }
 
-function applyMergeProperties(applyTo: any, applyFrom: any, keyTo: string, keyFrom: string) {
+function applyMergeProperties(fileName: string, applyTo: any, applyFrom: any, keyTo: string, keyFrom: string) {
   if (!applyFrom) {
     return;
   }
@@ -206,9 +232,9 @@ function applyMergeProperties(applyTo: any, applyFrom: any, keyTo: string, keyFr
         applyTo[applyFromKey] = {};
       }
 
-      applyMergeProperties(applyTo[applyFromKey], applyFrom[applyFromKey], newKeyTo, newKeyFrom);
+      applyMergeProperties(fileName, applyTo[applyFromKey], applyFrom[applyFromKey], newKeyTo, newKeyFrom);
     } else if (typeof applyTo[applyFromKey] === "undefined") {
-      console.warn(colors.yellow("Key at " + newKeyTo + " was filled with information from " + newKeyFrom));
+      console.warn(colors.yellow(fileName + ": Key at " + newKeyTo + " was filled with information from " + newKeyFrom));
       applyTo[applyFromKey] = applyFrom[applyFromKey];
     }
   });
