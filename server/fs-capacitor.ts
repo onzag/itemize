@@ -52,7 +52,8 @@ export class ReadStream extends Readable {
     // `bytesRead`, and discard the rest. This prevents node from having to zero
     // out the entire allocation first.
     const buf = Buffer.allocUnsafe(n);
-    read(this._writeStream["_fd"], buf, 0, n, this._pos, (error, bytesRead) => {
+    // typescript bugs as usual bugging the thing down
+    read(this._writeStream["_fd"] as any, buf as any, 0, n, this._pos as any, (error, bytesRead) => {
       if (error) this.destroy(error);
 
       // Push any read bytes into the local stream buffer.
@@ -205,7 +206,8 @@ export class WriteStream extends Writable {
       return;
     }
 
-    write(this._fd, chunk, 0, chunk.length, this._pos, (error) => {
+    // typescript bugs
+    write(this._fd as any, chunk as any, 0, chunk.length, this._pos as any, (error) => {
       if (error) {
         callback(error);
         return;

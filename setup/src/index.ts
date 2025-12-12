@@ -166,7 +166,8 @@ async function copyAndProcessDirectoryLevelFor(
     } else if (readAsUtf8) {
       isContentEquals = currentTargetContent === content;
     } else {
-      isContentEquals = Buffer.compare(currentTargetContent as Buffer, content as Buffer) === 0;
+      // typescript bugs
+      isContentEquals = Buffer.compare(currentTargetContent as any, content as any) === 0;
     }
 
     let isOverwrite = currentTargetContent !== null;
