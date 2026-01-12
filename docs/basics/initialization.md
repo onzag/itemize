@@ -79,6 +79,10 @@ Reload
 
 `npm run start-dev-environment development`
 
+Or with sudo due to docker rootless changes that make it stop working
+
+`sudo env "PATH=$PATH" npm run start-dev-environment development`
+
 9. Build the development database
 
 `npm run build-database development`
@@ -308,11 +312,19 @@ This will run esbuild, typescript compiler and the build data process that is ne
 
 `npm run start-dev-environment development`
 
+Or with sudo due to issues with rootless docker not working anymore
+
+`sudo env "PATH=$PATH" npm run start-dev-environment development`
+
 This will spawn both redis and postgreSQL using your development configuration
 
 Remember to stop the dev environment once you are done
 
 `npm run stop-dev-environment development`
+
+Or with sudo due to issues with docker rootless not working anymore
+
+`sudo env "PATH=$PATH" npm run stop-dev-environment`
 
 ### Update your database
 
