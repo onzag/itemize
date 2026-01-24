@@ -1495,6 +1495,7 @@ export function useSearchLoader<RawType = IRQValue, FlatType = IRQValue>(options
     options.static,
     options.enableExternalChecks,
     state.currentlySearching.length,
+    state.showAsSearching,
     context,
   ]);
 }
