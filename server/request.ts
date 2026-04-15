@@ -181,7 +181,7 @@ function httpRequestOriginal<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T
             let valueToRespondWith: any = dataProcessed;
             if (
               data.processAsJSON ||
-              resp.headers["content-type"].startsWith("application/json")
+              resp.headers["content-type"]?.startsWith("application/json")
             ) {
               try {
                 valueToRespondWith = JSON.parse(dataProcessed);
